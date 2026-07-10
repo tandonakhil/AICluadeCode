@@ -43,10 +43,15 @@ agent roster or gate order changes, not left stale.
    (informed by the Intake answers and template) and let the human trim the
    optional portion, along with `usage-monitor`'s rough token-cost estimate
    for the full pipeline broken out by which optional agents are included
-   (see step 3.5). Record the approved roster in `PROJECT_CONTEXT.md` under
-   "Active Team." Every downstream stage only invokes agents on the approved
-   roster (functional-agent/industry-expert still keep their Intake-time KB
-   even if dropped here — see step 3).
+   (see step 3.5). Also ask whether any active suite should be **advisory**
+   rather than blocking at the Test gate (default: everything blocking —
+   only mark a suite advisory if there's a real reason for this specific
+   project, per `test-agent.md`'s policy; don't offer this as a way to make
+   gates pass faster in general). Record the approved roster **and any Test
+   Policy exceptions** in `PROJECT_CONTEXT.md` under "Active Team." Every
+   downstream stage only invokes agents on the approved roster (functional-
+   agent/industry-expert still keep their Intake-time KB even if dropped
+   here — see step 3).
 
 3.5. **Usage estimate**: invoke `usage-monitor` to read `memory/USAGE_INDEX.md`
    and any comparable prior projects' `USAGE.md` for historical per-stage
@@ -87,7 +92,12 @@ agent roster or gate order changes, not left stale.
    SME's owned suite (functional, industry/compliance, UX/accessibility,
    architecture, security, red-team/bias — only for agents actually on the
    roster). Present the report broken out per suite, not merged into one
-   pass/fail number. Stop and wait for approval.
+   pass/fail number, and clearly marked per `PROJECT_CONTEXT.md`'s Test
+   Policy which suites are blocking vs. advisory (default: all blocking).
+   A blocking suite's failure stops the gate — the human either sends it
+   back or explicitly overrides with a recorded `[override]` reason in the
+   Decisions Log. An advisory suite's failure is still fully reported but
+   doesn't force a stop. Stop and wait for approval.
 
 10. **Review gate**: invoke `review-agent` (narrow scope — see its own
     definition; does not re-check what the Test gate's suites already

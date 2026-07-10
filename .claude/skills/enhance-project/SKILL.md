@@ -35,3 +35,7 @@ full procedure — this skill is the thin entry point).
 - Before the mini pipeline's Code stage, invoke `usage-monitor` for a
   pre-work estimate the same way `/new-project`'s Team Composition gate
   does, scaled to a single-feature scope rather than a whole project.
+- **Test Policy**: the mini pipeline's Test stage respects the project's
+  existing blocking/advisory suite policy from `PROJECT_CONTEXT.md` (see
+  `test-agent.md`) unless the human explicitly amends it as part of the
+  re-engagement decision for this feature.

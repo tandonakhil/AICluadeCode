@@ -33,6 +33,7 @@ and `knowledge/SECURITY_KB.md` for full detail.
 Approved 2026-07-05 — **full team** (Phase 4 verification run, deliberately includes every optional agent):
 - Core (non-droppable): plan-agent, code-agent, test-agent, review-agent, deploy-agent, ui-ux-designer (template is UI-bearing).
 - Optional (all included): functional-agent, industry-expert, solution-architect, security-architect.
+- Test Policy (set 2026-07-09): Advisory: UX/usability+accessibility. All other suites remain blocking. Rationale: this is an internal-tool-first deployment (per `knowledge/INDUSTRY_KB.md`'s OPG "ChatOPG" precedent — internal staff tool, not consumer-facing); functional correctness is already extensively tested and matters more than polish here, and the UI was already manually verified via real Playwright/screenshot testing during its Code gate (2026-07-06), so re-blocking the gate on UX going forward is lower-value than for a consumer product. Human decision, recorded per test-agent's Blocking vs. advisory suites convention; can be escalated back to blocking at any point.
 
 - 2026-07-05: Code gate — implemented grounded-refusal + authority-labeled
   citations per PLAN.md/ARCHITECTURE_KB.md/SECURITY_KB.md. Judgment calls:
@@ -118,6 +119,13 @@ All 4 optional SMEs (functional-agent, industry-expert, solution-architect, secu
 
 ## Current Status (frontend addendum)
 Both backend and frontend are real, working, and integration-tested end-to-end via an actual browser, not just API-level curl checks. Frontend port: 3421 (proxying to backend :8421 via `NEXT_PUBLIC_API_URL`), backend port: 8421. **Both currently running** — deployed for live human testing, 2026-07-06.
+
+- 2026-07-09: **Test Policy applied + real per-suite re-run demonstrating the new reporting format** (retroactive application of test-agent's Blocking vs. advisory suites convention to this project). Policy: UX/usability+accessibility marked **Advisory**; unit/integration and security remain **Blocking** (see Active Team section for the recorded rationale). Genuinely re-ran the real, repeatable suites:
+  - **Blocking — unit/integration**: `pytest tests/test_smoke.py` inside `dev/backend/.venv` (`.env` exported): **1/1 passed** (`test_health`). Not a zero-test suite.
+  - **Blocking — security**: `pytest tests/test_security.py`, same environment: **4/4 passed** (overlong-question 422, exact-2000-char boundary accepted, empty-string no-crash, whitespace-only no-crash). Confirms both previously-fixed bugs (unhandled 500 on blank/whitespace input; list-content-shape crash) remain fixed.
+  - Combined real run: `pytest` → **5 passed, 0 failed** in 4.78s.
+  - **Advisory — UX/usability+accessibility**: not re-run in this session (no repeatable automated UX suite exists in this codebase; the only real UX verification was the one-time manual Playwright/screenshot session at the 2026-07-06 Code gate). Reporting its last known real result (4/4 scenarios passed, one CORS bug found and fixed mid-session) under an explicit Advisory heading to demonstrate the new reporting format — **not** claimed as a fresh run.
+  - Structured per-scenario evidence written to `test-evidence/unit-integration-2026-07-09.md`, `test-evidence/security-2026-07-09.md` (both Blocking), and `test-evidence/ux-accessibility-2026-07-09.md` (Advisory, reproducing the 2026-07-06 result under the new format). [test-agent]
 
 ## Environment note
 Node.js was not available in this environment; installed via `nvm` (v0.40.1) with Node v24.18.0 LTS during this session, added to `~/.zshrc` so it persists across terminal sessions. This was an environment setup action, not a project-specific one — future frontend work in any project no longer needs this step.

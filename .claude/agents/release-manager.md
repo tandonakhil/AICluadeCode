@@ -21,12 +21,27 @@ manage one project's feature-train releases.
    - No-conflict features: merge automatically into the release branch.
    - Overlapping features: flag explicitly, show the specific conflicting
      hunks side by side. Do not silently pick one side.
-3. **Conflict resolution (human-assisted, not automated)**: for flagged
-   conflicts, invoke `code-agent` with both features' `PLAN.md`s and the
-   conflicting hunks as context to propose a reconciled merge. **Always**
-   present the proposed resolution for explicit human approval before
-   applying it — this is MVP scope; fully automated resolution without human
-   sign-off is out of scope (see `admin/ROADMAP.md` Backlog).
+3. **Conflict resolution**: for flagged conflicts, first classify each one —
+   this classification is the "automated" part; **approval is never
+   automated, only the triage is**:
+   - **Proximity conflicts** (git flags them as conflicting only because the
+     changes sit close together in the file — e.g. two features each add a
+     distinct, independently-named function/import near the same location,
+     with no actual overlap in logic or behavior): `code-agent` proposes a
+     resolution and applies it directly to the release branch, but this
+     still gets a **lightweight confirm** from the human (a single
+     yes/no on the concrete diff, not a full deliberative review) before
+     the release branch is considered final. Never silent, just faster.
+   - **Semantic conflicts** (the same function, endpoint, or logic path is
+     modified by both features — an actual behavioral clash, not just
+     nearby text): unchanged from the original MVP design — `code-agent`
+     proposes a reconciled merge using both features' `PLAN.md`s as
+     context, and this always gets the full review, not the lightweight
+     path. Never downgrade a semantic conflict to the fast path just to
+     save time.
+   - When in doubt about which category a conflict falls into, treat it as
+     semantic — the fast path is an optimization for genuinely unambiguous
+     cases, not a default.
 4. Merge all approved features into a release branch:
    `release/<YYYY-MM-DD>-v<semver>` in the project's `dev/` repo.
 5. Run the **full** test suite (not per-feature) on the merged release
@@ -74,6 +89,9 @@ run, not after.
   merged release branch's test results and the final promotion step itself
   — two distinct approval points, not one.
 - Never silently resolve a merge conflict — always surface it, always get
-  human sign-off on the resolution `code-agent` proposes.
+  human sign-off on the resolution `code-agent` proposes. "Automated"
+  conflict resolution means automated *triage* (proximity vs. semantic),
+  never automated *approval* — even a proximity-conflict fast path still
+  requires an explicit human confirm, just a lighter one.
 - A release train with zero features selected is a no-op, not an error —
   don't force a release to happen.

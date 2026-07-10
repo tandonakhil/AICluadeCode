@@ -6,6 +6,116 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **KB site v3 — "The Signal Path" (2026-07-10)**: full visual redesign after
+  the human rejected v2 as "vanilla," benchmarked against a premium
+  reference site (heavn-one.webflow.io) the human supplied. Process:
+  researched the reference (WebFetch), engaged `ui-ux-designer` for a
+  concrete design spec (saved at `admin/kb-server/DESIGN_SPEC.md`), then
+  `code-agent` implemented it — the platform's own agents doing the
+  platform's own work, now invoked as first-class registered agent types.
+  Design thesis: *the site IS a signal traveling through a machine* — a
+  scroll-driven signal line threads the page, gates render as aperture
+  slits, agents as conic-gradient irises. Dark-only (light theme
+  deliberately deleted per spec), ember/arc dual accents, viewport-scale
+  display type, hero particle-beam canvas (9 slits dev / 5 admin),
+  scroll-ignited pipeline stations with a sticky mini-map, instrument-rack
+  roster with a shared inspector panel, terminal-ledger console. Verified
+  with real Playwright screenshots of both tabs; found and fixed one layout
+  collision (ghost numeral vs. station tag) plus a Flask template-caching
+  gotcha (debug=False caches compiled templates in memory — server restart
+  required after template edits). Server: `admin/kb-server`, port 5050.
+- **Post-Phase-9, visual pass (2026-07-09)**: added a signature hero
+  visual — a canvas-drawn "orbit" diagram directly representing the
+  pipeline (a pulsing core node with 9 satellite gate nodes on a ring,
+  directional light-pulses traveling the ring), asymmetric hero layout
+  (text left, orbit right, not centered). Added: count-up stat animation
+  on scroll-into-view, scroll-reveal fade/rise for every section, a subtle
+  SVG grain/noise texture overlay for tactile depth, distinct geometric
+  glyph icons per agent-roster tier (square/diamond/hexagon/circle —
+  reinforces hierarchy, not decoration), stronger accent-colored glow
+  shadows on panel/gate hover, and flow-connector notches between pipeline
+  gate boxes. All verified via real Playwright screenshots in both themes
+  with console/page-error capture (none found) — not just visually
+  eyeballed once.
+- **Post-Phase-9 (2026-07-09)**: redesigned the knowledge-base page as a
+  two-tab experience (Developers / Admins) and moved it from a static
+  Artifact to a real local Flask server at `admin/kb-server/` (`app.py`,
+  `templates/index.html`, `requirements.txt`; run with `python app.py`,
+  serves on `127.0.0.1:5050`). New "web 4.0" visual identity: deep
+  indigo-black ground, ambient canvas particle field (agents-as-nodes,
+  respects `prefers-reduced-motion`), dual signal accents — amber for
+  Developers, cyan for Admins — that switch with the active tab as a
+  functional (not decorative) "which mode am I in" signal. Developers tab:
+  what the harness is, pipeline overview, full lifecycle walkthrough,
+  commands, how to use `/help`. Admins tab: Admin Panel governance flow,
+  agent roster, a capabilities matrix (can-do/cannot-do per layer), and a
+  new "how to report or fix an issue" section routing bugs/gaps/backlog
+  items to their correct real path. **Verified for real**: ran the actual
+  Flask server, confirmed clean logs and a 200 response, then used
+  Playwright to screenshot both tabs in both themes and confirm the gate
+  click-to-expand interaction actually works — not just described. Known
+  follow-up, not yet done: wiring this page's regeneration into
+  `deliverables-agent`'s trigger (content is still hand-embedded, same
+  limitation the original standalone Artifact version had).
+- **Phase 9, item 6/6 (2026-07-09)**: shipped `deliverables-agent` — the
+  heaviest lift of the batch, first agent needing third-party libraries.
+  Verified for real: confirmed python-pptx/python-docx/openpyxl actually
+  install and work here, then generated genuine PPTX/DOCX/XLSX files for
+  `policy-lookup-assistant` from its real markdown, each re-opened and
+  validated with its own library after writing. Remaining: Excel rollups of
+  the roadmap/FEATURES.md, and wiring the standalone HTML page's
+  regeneration into this agent (currently manual refresh). **All 6 selected
+  backlog items now shipped** (feature flags scoped-but-deferred per human
+  agreement, the other 5 fully built and verified).
+- **Phase 9, item 5/5 (2026-07-09)**: shipped `release-manager`'s automated
+  conflict resolution — proximity vs. semantic classification, lightweight
+  confirm for the former, full review unchanged for the latter, approval
+  never automated. Verified for real: created two genuinely conflicting
+  features on `load-alert-agent`, confirmed the conflict via an actual git
+  merge probe, correctly classified and resolved it, real test pass, real
+  promotion to a corrected `v1.0.0` baseline in `prod/` (this was actually
+  the project's first release — an initial version-numbering assumption
+  error was caught and fixed rather than left inconsistent). **All 5
+  selected backlog items now shipped.**
+- **Phase 9, item 4/5 (2026-07-09)**: shipped `usage-monitor`'s
+  auto-pause/durable-resume capability — `CronCreate` added to its tool
+  grant, honest design around the real constraint that no tool reports
+  remaining usage budget proactively (the trigger is always a human signal
+  or a rate-limit-shaped tool error, never proactive detection). On trigger:
+  checkpoint written to whichever file is already the natural status
+  record (`admin/CHANGELOG.md` for platform work, `PROJECT_CONTEXT.md` for
+  project work), a one-shot `CronCreate` job scheduled for the known/
+  estimated reset time, resume reads the checkpoint and continues exactly
+  where it left off with normal approval gates still applying. **Verified
+  for real, not simulated**: scheduled a genuine one-shot cron at 20:09 CDT
+  for 20:12 CDT (3-minute real-time test), it fired exactly on schedule,
+  and the resumed session read this checkpoint and continued autonomously.
+  This formalizes what had already been done manually twice earlier in this
+  platform's own build (informal checkpoints resumed on a human "continue"
+  message) into an actual scheduled mechanism.
+- **Phase 9, item 3/5 (2026-07-09)**: shipped the multi-suite Test-gate
+  override policy — suites default blocking, a project can mark specific
+  ones advisory (human decision, recorded, reversible), blocking failures
+  still require a fix or an explicit `[override]`-tagged reason. Wired into
+  `test-agent.md`, `/new-project`, `/enhance-project`. Verified for real:
+  applied to `policy-lookup-assistant` (UX/accessibility marked advisory),
+  re-ran its real blocking suites (5/5 pass), confirmed correct report
+  separation.
+- **Phase 9, item 2/5 (2026-07-09)**: scoped feature flags via `mas-architect`
+  — real problem identified (surgical per-feature rollback inside a bundled
+  release, not rollout %/targeting, which doesn't apply to local deploys),
+  mechanism designed (extend `release-manager`, `prod/flags.json`, opt-in
+  per feature), deliberately **not built**: no release has ever needed
+  partial rollback yet, and building ahead of a real trigger risks getting
+  the design's edges wrong. Human agreed to defer after hearing the
+  reasoning. See `admin/ROADMAP.md` Backlog section for the full design,
+  ready to build the first time it's actually needed.
+- **Phase 9, item 1/5 (2026-07-09)**: shipped the interactive HTML
+  knowledge-base page, decoupled from `deliverables-agent` (needed none of
+  its Office-export tooling). Source at `admin/deliverables/knowledge-base.html`,
+  published as an Artifact. Click-to-expand pipeline gates and agent cards,
+  generated from real registry/skill data. Human selected 5 of 6 backlog
+  items to build next; this is item 1 of 5.
 - **Phase 8 (2026-07-09)**: shipped `/consult` — thin router to any SME on
   demand, never touches the Active Team roster. **Original MVP scope
   (roadmap items 1-10) is now 100% shipped.** Verified with a real consult:

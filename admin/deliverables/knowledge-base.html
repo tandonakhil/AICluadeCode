@@ -1,0 +1,597 @@
+<title>MAS Knowledge Base — Multi-Agent SDLC System</title>
+<style>
+  :root {
+    --ink-950: #f6f4ee;
+    --ink-900: #ffffff;
+    --ink-850: #efece3;
+    --text-1: #1b2029;
+    --text-2: #5b6270;
+    --text-3: #868d99;
+    --line: rgba(27,32,41,0.10);
+    --line-strong: rgba(27,32,41,0.22);
+    --amber: #a8631f;
+    --amber-soft: rgba(168,99,31,0.12);
+    --teal: #2a7566;
+    --teal-soft: rgba(42,117,102,0.12);
+    --good: #2f8f4e;
+    --good-soft: rgba(47,143,78,0.12);
+    --warn: #b3811a;
+    --warn-soft: rgba(179,129,26,0.12);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink-950: #10141c;
+      --ink-900: #171d29;
+      --ink-850: #1e2532;
+      --text-1: #eef1f5;
+      --text-2: #a7afbf;
+      --text-3: #7b8394;
+      --line: rgba(255,255,255,0.09);
+      --line-strong: rgba(255,255,255,0.18);
+      --amber: #e0a35e;
+      --amber-soft: rgba(224,163,94,0.14);
+      --teal: #6fc3b2;
+      --teal-soft: rgba(111,195,178,0.14);
+      --good: #62c583;
+      --good-soft: rgba(98,197,131,0.14);
+      --warn: #d9ab4a;
+      --warn-soft: rgba(217,171,74,0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink-950: #10141c; --ink-900: #171d29; --ink-850: #1e2532;
+    --text-1: #eef1f5; --text-2: #a7afbf; --text-3: #7b8394;
+    --line: rgba(255,255,255,0.09); --line-strong: rgba(255,255,255,0.18);
+    --amber: #e0a35e; --amber-soft: rgba(224,163,94,0.14);
+    --teal: #6fc3b2; --teal-soft: rgba(111,195,178,0.14);
+    --good: #62c583; --good-soft: rgba(98,197,131,0.14);
+    --warn: #d9ab4a; --warn-soft: rgba(217,171,74,0.14);
+  }
+  :root[data-theme="light"] {
+    --ink-950: #f6f4ee; --ink-900: #ffffff; --ink-850: #efece3;
+    --text-1: #1b2029; --text-2: #5b6270; --text-3: #868d99;
+    --line: rgba(27,32,41,0.10); --line-strong: rgba(27,32,41,0.22);
+    --amber: #a8631f; --amber-soft: rgba(168,99,31,0.12);
+    --teal: #2a7566; --teal-soft: rgba(42,117,102,0.12);
+    --good: #2f8f4e; --good-soft: rgba(47,143,78,0.12);
+    --warn: #b3811a; --warn-soft: rgba(179,129,26,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .kb {
+    font-family: var(--sans);
+    background: var(--ink-950);
+    color: var(--text-1);
+    line-height: 1.55;
+  }
+  .kb h1, .kb h2, .kb h3, .kb .mono {
+    font-family: var(--mono);
+    letter-spacing: -0.01em;
+  }
+  .kb code, .kb .tag { font-family: var(--mono); }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; gap: 4px; overflow-x: auto;
+    padding: 14px 24px; background: color-mix(in srgb, var(--ink-950) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav a {
+    font-family: var(--mono); font-size: 0.78rem; white-space: nowrap;
+    color: var(--text-2); text-decoration: none; padding: 6px 10px;
+    border-radius: 6px; transition: color .15s, background .15s;
+  }
+  .nav a:hover, .nav a:focus-visible { color: var(--text-1); background: var(--ink-850); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.09em; color: var(--teal); margin: 0 0 10px;
+  }
+  h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin: 0 0 14px; text-wrap: balance; }
+  h2 { font-size: 1.5rem; margin: 0 0 8px; text-wrap: balance; }
+  h3 { font-size: 1.05rem; margin: 0 0 6px; }
+  .lede { font-size: 1.08rem; color: var(--text-2); max-width: 64ch; margin: 0 0 6px; }
+  p { max-width: 68ch; }
+  .muted { color: var(--text-2); }
+
+  /* ---------- hero ---------- */
+  .hero { padding-top: 56px; padding-bottom: 40px; }
+  .hero-grid { display: grid; gap: 28px; }
+
+  /* ---------- pipeline ---------- */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    margin: 36px 0 0;
+  }
+  @media (max-width: 900px) {
+    .pipeline { grid-template-columns: 1fr; }
+  }
+  .gate {
+    background: var(--ink-900);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 10px;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--sans);
+    color: var(--text-1);
+    transition: border-color .15s, transform .1s;
+    position: relative;
+  }
+  .gate:hover, .gate:focus-visible { border-color: var(--amber); outline: none; }
+  .gate[aria-expanded="true"] { border-color: var(--amber); background: var(--amber-soft); }
+  .gate .num { font-family: var(--mono); font-size: 0.68rem; color: var(--amber); display: block; margin-bottom: 6px; }
+  .gate .name { font-family: var(--mono); font-size: 0.78rem; font-weight: 600; line-height: 1.25; display: block; }
+  .gate .cond { font-size: 0.68rem; color: var(--text-3); display: block; margin-top: 4px; }
+
+  .gate-detail {
+    grid-column: 1 / -1;
+    background: var(--ink-900);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-top: 4px;
+    display: none;
+  }
+  .gate-detail.open { display: block; }
+  .gate-detail .agents { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+  .chip {
+    font-family: var(--mono); font-size: 0.72rem;
+    background: var(--teal-soft); color: var(--teal);
+    border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
+    padding: 4px 9px; border-radius: 999px;
+  }
+  .chip.opt { background: var(--ink-850); color: var(--text-2); border-color: var(--line-strong); }
+
+  /* ---------- two axes ---------- */
+  .axes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; }
+  @media (max-width: 720px) { .axes { grid-template-columns: 1fr; } }
+  .axis-card {
+    background: var(--ink-900); border: 1px solid var(--line); border-radius: 12px;
+    padding: 24px;
+  }
+  .axis-card.gov { border-color: color-mix(in srgb, var(--amber) 40%, var(--line)); }
+  .axis-card.dev { border-color: color-mix(in srgb, var(--teal) 40%, var(--line)); }
+  .axis-card .kicker { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .axis-card.gov .kicker { color: var(--amber); }
+  .axis-card.dev .kicker { color: var(--teal); }
+  .cmdline {
+    font-family: var(--mono); font-size: 0.82rem; background: var(--ink-850);
+    border-radius: 6px; padding: 8px 10px; margin: 4px 0; display: inline-block;
+  }
+
+  /* ---------- roster ---------- */
+  .roster-group { margin-top: 36px; }
+  .roster-group:first-child { margin-top: 28px; }
+  .roster-group-label {
+    font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .agent-card {
+    background: var(--ink-900); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; cursor: pointer;
+  }
+  .agent-card:hover, .agent-card:focus-visible { border-color: var(--line-strong); outline: none; }
+  .agent-card .name { font-family: var(--mono); font-size: 0.86rem; font-weight: 600; }
+  .agent-card .desc {
+    font-size: 0.83rem; color: var(--text-2); margin-top: 6px; max-height: 0;
+    overflow: hidden; transition: max-height .2s ease;
+  }
+  .agent-card.open .desc { max-height: 240px; margin-top: 8px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--good); }
+  .status-dot.planned { background: var(--warn); }
+
+  /* ---------- templates ---------- */
+  .templates-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  @media (max-width: 820px) { .templates-grid { grid-template-columns: 1fr; } }
+  .tpl-card { background: var(--ink-900); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .tpl-card .stack { font-family: var(--mono); font-size: 0.72rem; color: var(--teal); margin-bottom: 10px; }
+  .tpl-card p { font-size: 0.88rem; color: var(--text-2); }
+
+  /* ---------- commands table ---------- */
+  .cmd-table-wrap { overflow-x: auto; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; min-width: 600px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 0.88rem; vertical-align: top; }
+  th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+  td.cmd { font-family: var(--mono); color: var(--amber); white-space: nowrap; }
+
+  /* ---------- governance flow ---------- */
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 26px 0; }
+  .flow-step {
+    font-family: var(--mono); font-size: 0.8rem; background: var(--ink-900);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px;
+  }
+  .flow-arrow { color: var(--text-3); font-size: 1.1rem; }
+
+  /* ---------- getting started ---------- */
+  .steps { counter-reset: step; margin-top: 26px; display: grid; gap: 14px; }
+  .step { display: grid; grid-template-columns: 32px 1fr; gap: 14px; }
+  .step .n {
+    counter-increment: step; font-family: var(--mono); font-size: 0.8rem;
+    color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line));
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .step .n::before { content: counter(step); }
+  .step .body p { margin: 4px 0 0; font-size: 0.92rem; }
+  .step .body .cmdline { margin-top: 6px; }
+
+  footer { padding: 32px 0 56px; text-align: center; color: var(--text-3); font-size: 0.8rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="kb">
+  <nav class="nav">
+    <a href="#pipeline">Pipeline</a>
+    <a href="#axes">Two Axes</a>
+    <a href="#roster">Agent Roster</a>
+    <a href="#templates">Templates</a>
+    <a href="#commands">Commands</a>
+    <a href="#governance">Governance</a>
+    <a href="#start">Getting Started</a>
+  </nav>
+
+  <div class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Multi-Agent SDLC System — Knowledge Base</p>
+      <h1>18 agents. 9 gates. One repo that builds and governs itself.</h1>
+      <p class="lede">
+        This platform builds AI-centric applications for the energy industry through a
+        gated, human-approved pipeline — and evolves its own agent roster through the
+        same kind of governed process it applies to every project. Click a gate below
+        to see who acts there.
+      </p>
+
+      <div class="pipeline" id="pipeline">
+        <button class="gate" data-gate="0">
+          <span class="num">01</span><span class="name">Intake</span>
+          <span class="cond">unconditional</span>
+        </button>
+        <button class="gate" data-gate="1">
+          <span class="num">02</span><span class="name">Team Composition</span>
+          <span class="cond">roster decision</span>
+        </button>
+        <button class="gate" data-gate="2">
+          <span class="num">03</span><span class="name">Plan &amp; Backlog</span>
+          <span class="cond">MVP scope</span>
+        </button>
+        <button class="gate" data-gate="3">
+          <span class="num">04</span><span class="name">Experience Design</span>
+          <span class="cond">UI-bearing only</span>
+        </button>
+        <button class="gate" data-gate="4">
+          <span class="num">05</span><span class="name">Architecture</span>
+          <span class="cond">joint + advisory</span>
+        </button>
+        <button class="gate" data-gate="5">
+          <span class="num">06</span><span class="name">Code</span>
+          <span class="cond">implementation</span>
+        </button>
+        <button class="gate" data-gate="6">
+          <span class="num">07</span><span class="name">Test</span>
+          <span class="cond">up to 6 suites</span>
+        </button>
+        <button class="gate" data-gate="7">
+          <span class="num">08</span><span class="name">Review</span>
+          <span class="cond">narrow scope</span>
+        </button>
+        <button class="gate" data-gate="8">
+          <span class="num">09</span><span class="name">Deploy</span>
+          <span class="cond">local, smoke-tested</span>
+        </button>
+
+        <div class="gate-detail" id="detail-0">
+          <h3>Intake</h3>
+          <p class="muted">Runs unconditionally, before Team Composition even decides who stays on the roster — this is deliberate: it avoids a circular dependency where the roster decision needs answers that would otherwise come from agents the roster hasn't approved yet.</p>
+          <div class="agents">
+            <span class="chip">functional-agent — asks the domain question</span>
+            <span class="chip">industry-expert — asks the industry question</span>
+          </div>
+        </div>
+        <div class="gate-detail" id="detail-1">
+          <h3>Team Composition</h3>
+          <p class="muted">The human trims the optional roster. Core agents are never droppable; ui-ux-designer is non-droppable only for UI-bearing templates. usage-monitor gives a token-cost estimate broken out by which optional agents are included, right here.</p>
+          <div class="agents">
+            <span class="chip">plan-agent</span><span class="chip">code-agent</span>
+            <span class="chip">test-agent</span><span class="chip">review-agent</span>
+            <span class="chip">deploy-agent</span>
+            <span class="chip opt">+ ui-ux-designer (UI-bearing templates)</span>
+          </div>
+          <p class="muted" style="margin-top:8px">Droppable: functional-agent, industry-expert, solution-architect, security-architect, responsible-ai-architect.</p>
+        </div>
+        <div class="gate-detail" id="detail-2">
+          <h3>Plan &amp; Backlog</h3>
+          <p class="muted">Drafts <code>PLAN.md</code> and a feature backlog; the approved subset becomes the project's MVP scope, recorded in <code>FEATURES.md</code>.</p>
+          <div class="agents">
+            <span class="chip">plan-agent</span>
+            <span class="chip opt">industry-expert — trend-informed backlog</span>
+            <span class="chip opt">functional-agent — devil's advocate</span>
+          </div>
+        </div>
+        <div class="gate-detail" id="detail-3">
+          <h3>Experience Design</h3>
+          <p class="muted">Skipped entirely for API-only templates. Proposes flows, layout, and visual language; pushes components via DesignSync.</p>
+          <div class="agents"><span class="chip">ui-ux-designer</span></div>
+        </div>
+        <div class="gate-detail" id="detail-4">
+          <h3>Architecture</h3>
+          <p class="muted">solution-architect and security-architect jointly own this gate and have final say; responsible-ai-architect joins as a third advisory voice. Each owns a distinct lane — technical design, authn/authz/secrets, content/behavior guardrails — and none should duplicate another's pass.</p>
+          <div class="agents">
+            <span class="chip opt">solution-architect — joint owner</span>
+            <span class="chip opt">security-architect — joint owner</span>
+            <span class="chip opt">responsible-ai-architect — advisory</span>
+          </div>
+        </div>
+        <div class="gate-detail" id="detail-5">
+          <h3>Code</h3>
+          <p class="muted">Implements exactly what the approved plan/architecture describe — no unstated scope additions or cuts.</p>
+          <div class="agents"><span class="chip">code-agent</span></div>
+        </div>
+        <div class="gate-detail" id="detail-6">
+          <h3>Test</h3>
+          <p class="muted">Up to six suites run and report separately — never merged into one pass/fail number, so a failure is always attributable to the right owner.</p>
+          <div class="agents">
+            <span class="chip">test-agent — unit/integration + smoke</span>
+            <span class="chip opt">functional-agent — functional</span>
+            <span class="chip opt">industry-expert — industry/compliance</span>
+            <span class="chip opt">ui-ux-designer — UX/accessibility</span>
+            <span class="chip opt">solution-architect — architecture</span>
+            <span class="chip opt">security-architect — security</span>
+            <span class="chip opt">responsible-ai-architect — red-team/bias</span>
+          </div>
+        </div>
+        <div class="gate-detail" id="detail-7">
+          <h3>Review</h3>
+          <p class="muted">Deliberately narrow: code style, diff hygiene, decision-intent match, cross-cutting consistency. Does not re-check what the Test gate's suites already covered.</p>
+          <div class="agents"><span class="chip">review-agent</span></div>
+        </div>
+        <div class="gate-detail" id="detail-8">
+          <h3>Deploy</h3>
+          <p class="muted">Runs the app locally, confirms it's serving, hands off for a post-deploy smoke test. <code>target_env</code> is stubbed for a future cloud option — only <code>local</code> is implemented today.</p>
+          <div class="agents"><span class="chip">deploy-agent</span><span class="chip opt">test-agent — smoke test</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="axes">
+      <p class="eyebrow">Two Axes</p>
+      <h2>Building a project is not the same as evolving the platform</h2>
+      <p class="muted">These never mix — a project developer can't accidentally alter the platform, and platform changes never leak into a project's own files.</p>
+      <div class="axes">
+        <div class="axis-card dev">
+          <p class="kicker">Project Development</p>
+          <h3>Build and evolve one application</h3>
+          <p class="muted">The 9-gate pipeline above, plus ongoing feature work.</p>
+          <div><span class="cmdline">/new-project</span></div><br>
+          <div><span class="cmdline">/enhance-project</span></div><br>
+          <div><span class="cmdline">/modify-feature</span></div><br>
+          <div><span class="cmdline">/cut-release</span></div><br>
+          <div><span class="cmdline">/consult</span></div>
+        </div>
+        <div class="axis-card gov">
+          <p class="kicker">Platform Governance</p>
+          <h3>Evolve the MAS itself</h3>
+          <p class="muted">Every new agent or scope change is proposed, evaluated for overlap, and approved before anything is built.</p>
+          <div><span class="cmdline">/admin-panel propose-agent</span></div><br>
+          <div><span class="cmdline">/admin-panel add-agent</span></div><br>
+          <div><span class="cmdline">/admin-panel roadmap</span></div><br>
+          <div><span class="cmdline">/admin-panel release</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="roster">
+      <p class="eyebrow">Agent Roster</p>
+      <h2>18 agents, 17 built</h2>
+      <p class="muted">Click any card for what it reads, produces, and owns at the Test gate.</p>
+
+      <div class="roster-group">
+        <div class="roster-group-label"><span class="status-dot"></span>Core pipeline — non-droppable</div>
+        <div class="roster-grid" data-group="core"></div>
+      </div>
+      <div class="roster-group">
+        <div class="roster-group-label"><span class="status-dot"></span>Subject-matter experts — optional, droppable</div>
+        <div class="roster-grid" data-group="sme"></div>
+      </div>
+      <div class="roster-group">
+        <div class="roster-group-label"><span class="status-dot"></span>Infrastructure — always active, not a droppable role</div>
+        <div class="roster-grid" data-group="infra"></div>
+      </div>
+      <div class="roster-group">
+        <div class="roster-group-label"><span class="status-dot"></span>Platform governance (<code>mas-*</code>)</div>
+        <div class="roster-grid" data-group="platform"></div>
+      </div>
+    </section>
+
+    <section id="templates">
+      <p class="eyebrow">Templates</p>
+      <h2>Three shapes to start from</h2>
+      <p class="muted"><code>plan-agent</code> picks between these based on your request — a document-grounded Q&amp;A app, a conversational app, and a tool-using automation, are three genuinely different shapes, not variations of one.</p>
+      <div class="templates-grid">
+        <div class="tpl-card">
+          <div class="stack">FastAPI · LangGraph · API-only</div>
+          <h3>agentic-workflow</h3>
+          <p>A multi-step, tool-using agent invoked programmatically. No chat UI, no document corpus. Good fit for backend automation — "given a region, look up its status and decide whether to raise an alert."</p>
+        </div>
+        <div class="tpl-card">
+          <div class="stack">Next.js · FastAPI · LangChain</div>
+          <h3>genai-chatbot</h3>
+          <p>A conversational, chat-first application, optionally with tool use. No document corpus to ground answers in — that's rag-knowledge-base's job.</p>
+        </div>
+        <div class="tpl-card">
+          <div class="stack">Next.js · FastAPI · LangChain · Chroma</div>
+          <h3>rag-knowledge-base</h3>
+          <p>A question-answering app grounded in a real document corpus — answers must be retrieved from and cited against source documents, not just conversed about generically.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="commands">
+      <p class="eyebrow">Commands</p>
+      <h2>Every entry point, one place</h2>
+      <div class="cmd-table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody id="cmd-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="governance">
+      <p class="eyebrow">Governance</p>
+      <h2>How the platform adds a new agent to itself</h2>
+      <p class="muted"><code>mas-architect</code> is purely advisory — it never writes a file. <code>mas-registrar</code> only acts on an already-approved recommendation.</p>
+      <div class="flow">
+        <div class="flow-step">idea proposed</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">mas-architect checks overlap, scopes the contract</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">human approves</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">mas-registrar scaffolds it</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">available at the next project's Team Composition</div>
+      </div>
+      <p class="muted">A newly registered agent never appears retroactively on a project already in flight — that requires an explicit re-open via <code>/enhance-project</code>.</p>
+    </section>
+
+    <section id="start">
+      <p class="eyebrow">Getting Started</p>
+      <h2>Build your first project</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="n"></div>
+          <div class="body">
+            <h3>Start a project</h3>
+            <p>Describe what you want in one line. If it's genuinely ambiguous between two templates, the platform asks — it doesn't guess.</p>
+            <div class="cmdline">/new-project "a Q&amp;A tool grounded in our maintenance manuals"</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n"></div>
+          <div class="body">
+            <h3>Answer Intake, then trim the team</h3>
+            <p>Domain and industry questions come first, unconditionally. Then decide which optional SMEs are worth the token cost — usage-monitor gives you a real number to weigh that against.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n"></div>
+          <div class="body">
+            <h3>Approve each gate as it comes</h3>
+            <p>Plan, Architecture, Code, Test, Review, Deploy — every one pauses for your sign-off. Nothing merges or ships silently.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n"></div>
+          <div class="body">
+            <h3>Ship it, then keep going</h3>
+            <p>Add features without waiting for a whole new project. Bundle finished features into a release when you're ready.</p>
+            <div class="cmdline">/enhance-project · /cut-release</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n"></div>
+          <div class="body">
+            <h3>Ask a specialist anytime</h3>
+            <p>Don't wait for the next gate for a targeted question.</p>
+            <div class="cmdline">/consult security-architect "does this need rate limiting?"</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>Generated from admin/MAS_REGISTRY.md, admin/ROADMAP.md, .claude/agents/*.md, and .claude/skills/*/SKILL.md — regenerate after any registry or roadmap change.</footer>
+</div>
+
+<script>
+(function () {
+  var agents = [
+    { g: "core", name: "plan-agent", status: "built", gate: "Plan & Backlog", desc: "Drafts PLAN.md and the project's feature backlog/MVP scope. Reads the template manifest and PROJECT_CONTEXT.md to stay consistent with prior decisions." },
+    { g: "core", name: "code-agent", status: "built", gate: "Code", desc: "Implements exactly what the approved plan and architecture describe. Never touches prod/ — only release-manager writes there, via an approved promotion." },
+    { g: "core", name: "test-agent", status: "built", gate: "Test", desc: "Owns unit/integration and the post-deploy smoke test. Aggregates every active SME suite into one report, broken out per suite." },
+    { g: "core", name: "review-agent", status: "built", gate: "Review", desc: "Deliberately narrow: code style, diff hygiene, decision-intent match, cross-cutting consistency — not a re-check of what Test already covered." },
+    { g: "core", name: "deploy-agent", status: "built", gate: "Deploy", desc: "Runs the app locally, confirms it's serving, hands off for a smoke test. target_env is stubbed for a future cloud option." },
+    { g: "sme", name: "functional-agent", status: "built", gate: "Intake · Plan · Architecture", desc: "Asks the domain question at Intake, unconditionally. Plays devil's advocate on domain-correctness risk. Owns the functional test suite." },
+    { g: "sme", name: "industry-expert", status: "built", gate: "Intake · Plan · Architecture · Review · Deploy", desc: "Asks the industry question at Intake, unconditionally. Proposes a trend-informed backlog. Owns the industry/compliance suite." },
+    { g: "sme", name: "ui-ux-designer", status: "built", gate: "Experience Design", desc: "Non-droppable for UI-bearing templates. Proposes flows, layout, and color scheme; pushes components via DesignSync. Owns UX/accessibility testing." },
+    { g: "sme", name: "solution-architect", status: "built", gate: "Architecture (joint owner)", desc: "Technical design: component boundaries, data flow, technology choices, trade-offs. Owns the architecture test suite." },
+    { g: "sme", name: "security-architect", status: "built", gate: "Architecture (joint owner)", desc: "Authn/authz, secrets, compliance. Authentication & Authorization Design is a mandatory, reasoned KB subsection — never a one-line waiver. Owns the security suite." },
+    { g: "sme", name: "responsible-ai-architect", status: "built", gate: "Architecture (advisory) · Review", desc: "Content/behavior guardrails — a distinct lane from security-architect's authn/authz and functional-agent's domain-correctness. Owns a red-team/bias suite." },
+    { g: "infra", name: "enhance-agent", status: "built", gate: "cross-cutting", desc: "Drives /enhance-project and /modify-feature. Is the SME re-engagement mechanism — decides who comes back for a feature on an already-deployed project." },
+    { g: "infra", name: "release-manager", status: "built", gate: "cross-cutting", desc: "Owns /cut-release: conflict detection, semver, full-regression gate, promotion to prod/ via a local git remote + merge. Two distinct approvals required before promotion." },
+    { g: "infra", name: "usage-monitor", status: "built", gate: "cross-cutting", desc: "Tracks real per-agent token usage, gives pre-work estimates at Team Composition, enforces soft (overridable) budgets. Auto-pause/resume is backlogged." },
+    { g: "infra", name: "deliverables-agent", status: "planned", gate: "cross-cutting, on-demand", desc: "Backlog. Exports PPTX/DOCX/XLSX one-way from markdown, plus this very page. Needs new third-party tooling the platform doesn't have yet." },
+    { g: "platform", name: "mas-architect", status: "built", gate: "/admin-panel propose-agent", desc: "Advisory only — never writes a file. Evaluates every proposed agent for overlap, decides gate placement and core/optional status." },
+    { g: "platform", name: "mas-registrar", status: "built", gate: "/admin-panel add-agent", desc: "The only agent that writes to this registry. Scaffolds an agent only after a human has approved mas-architect's recommendation." },
+    { g: "platform", name: "mas-release-manager", status: "built", gate: "/admin-panel roadmap · release", desc: "Owns the platform's own roadmap and changelog — distinct from the project-level release-manager above." }
+  ];
+
+  var groups = { core: [], sme: [], infra: [], platform: [] };
+  agents.forEach(function (a) { groups[a.g].push(a); });
+
+  Object.keys(groups).forEach(function (key) {
+    var el = document.querySelector('.roster-grid[data-group="' + key + '"]');
+    if (!el) return;
+    groups[key].forEach(function (a) {
+      var card = document.createElement('div');
+      card.className = 'agent-card';
+      card.tabIndex = 0;
+      card.innerHTML =
+        '<span class="status-dot' + (a.status === 'planned' ? ' planned' : '') + '"></span> ' +
+        '<span class="name">' + a.name + '</span>' +
+        '<div class="desc"><strong>' + a.gate + '.</strong> ' + a.desc + '</div>';
+      function toggle() { card.classList.toggle('open'); }
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      el.appendChild(card);
+    });
+  });
+
+  var commands = [
+    ["/new-project", "Create a new project, run the full 9-gate pipeline."],
+    ["/enhance-project", "Propose and build a new feature on an already-deployed project."],
+    ["/modify-feature", "Correct or adjust an existing feature — lighter-weight mode of enhance-agent."],
+    ["/cut-release", "Bundle Ready-for-Release features into a versioned release, promote to prod/."],
+    ["/consult", "Ask any SME a targeted question anytime, without waiting for a gate."],
+    ["/help", "List every command available right now, read dynamically — never a stale list."],
+    ["/admin-panel", "Entry point for evolving the platform itself — propose-agent, add-agent, roadmap, release."]
+  ];
+  var tbody = document.getElementById('cmd-table-body');
+  commands.forEach(function (c) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td class="cmd">' + c[0] + '</td><td>' + c[1] + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('.gate').forEach(function (btn) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', function () {
+      var id = 'detail-' + btn.getAttribute('data-gate');
+      var detail = document.getElementById(id);
+      var wasOpen = detail.classList.contains('open');
+      document.querySelectorAll('.gate-detail.open').forEach(function (d) { d.classList.remove('open'); });
+      document.querySelectorAll('.gate[aria-expanded="true"]').forEach(function (g) { g.setAttribute('aria-expanded', 'false'); });
+      if (!wasOpen) {
+        detail.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        detail.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  });
+})();
+</script>
