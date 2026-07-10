@@ -1,0 +1,16 @@
+Grid Maintenance Policy (Sample Document)
+
+Scheduled maintenance on regional grid infrastructure occurs during off-peak
+hours, defined as 1:00 AM to 5:00 AM local time, to minimize disruption to
+consumers and businesses.
+
+Any substation reporting a load above 90% capacity for more than two
+consecutive hours must be flagged for priority inspection within 48 hours.
+
+Emergency maintenance (unplanned outages, equipment failure) takes precedence
+over scheduled maintenance and may occur at any hour. Affected customers must
+be notified within 15 minutes of a known outage exceeding 30 minutes in
+expected duration.
+
+All maintenance crews must file a completion report within 24 hours of work
+finishing, including load readings before and after the intervention.

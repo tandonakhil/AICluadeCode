@@ -1,0 +1,43 @@
+# MAS Agent Registry
+
+Single source of truth for every agent in the system. Populated by
+`mas-architect`'s Founding Review (Phase 0.5, approved 2026-07-05), then
+updated by `mas-registrar` every time `/admin-panel add-agent` ships a new
+agent. Status values: `planned` (approved, not yet built) → `built` (scaffolded
+and in use).
+
+## Governance rules (apply across every row below)
+
+- **Gate approval authority**: where a droppable SME sits alongside a
+  core-pipeline gate owner, the core-pipeline owner always has final say
+  (solution-architect + security-architect jointly own Architecture;
+  deploy-agent owns Deploy). SME input is always surfaced to the human, always
+  advisory, never independently blocking.
+- **Intake questions are unconditional**: functional-agent's domain question
+  and industry-expert's industry question are always asked at Intake,
+  regardless of what Team Composition (which runs after Intake) later decides
+  about their ongoing engagement — this avoids a circular dependency between
+  the two gates.
+
+## Registry
+
+| Agent | Gate(s) | Core / Optional | Knowledge Base | Owns Test Suite | Tools | Re-engagement (on enhancement) | Notes | Status |
+|---|---|---|---|---|---|---|---|---|
+| mas-architect | Platform-level (advisory; `/admin-panel propose-agent`) | Core (platform) | None | None | Read, Grep, Glob, WebSearch | N/A — platform agent | Never writes files; recommendation only | built |
+| mas-registrar | Platform-level (`/admin-panel add-agent`) | Core (platform) | None | None | Read, Write, Edit, Glob | N/A — platform agent | Only agent that writes to this registry | built |
+| mas-release-manager | Platform-level (`/admin-panel roadmap`/`release`) | Core (platform) | None | None | Read, Write, Edit | N/A — platform agent | Distinct from project-level release-manager below | built |
+| plan-agent | Plan & Backlog | Core | None | None | Read, Write, Grep, Glob | Always | Drafts PLAN.md + project feature backlog/MVP | built |
+| code-agent | Code | Core | None | None | Read, Write, Edit, Bash(git) | Always | | built |
+| test-agent | Test | Core | None | Unit/integration + post-deploy smoke | Read, Bash | Always | | built |
+| review-agent | Review | Core | None | None | Read, Bash(git diff) | Always | Scope is narrow by design: code style/diff hygiene, decision-intent match, cross-cutting consistency — does NOT re-check what the 6 test suites already cover | built |
+| deploy-agent | Deploy | Core | None | None (hands smoke test to test-agent) | Read, Bash | Always | `target_env` stubbed; only `local` implemented in MVP | built |
+| functional-agent | Intake (domain question, unconditional) + Plan & Backlog (devil's advocate) + Architecture (advisory review) | Optional / droppable | `knowledge/DOMAIN_KB.md` | Functional | Read, WebSearch, Write (KB only) | Only if flagged relevant | | built |
+| industry-expert | Intake (industry question, unconditional) + Plan & Backlog (trend backlog) + Architecture + Review + Deploy (advisory stakeholder) | Optional / droppable | `knowledge/INDUSTRY_KB.md` | Industry/compliance | Read, WebSearch, Write (KB only) | Only if flagged relevant | | built |
+| ui-ux-designer | Experience Design (own gate, UI-bearing templates only, between Plan & Backlog and Architecture) | Core for `genai-chatbot`/`rag-knowledge-base`; not applicable for `agentic-workflow` | `knowledge/UX_KB.md` | UX/usability + accessibility | Read, Write (KB), DesignSync | Always, for UI-bearing projects | Design intent + observed post-deploy behavior logged in same KB | built |
+| solution-architect | Architecture (joint owner with security-architect) | Optional / droppable | `knowledge/ARCHITECTURE_KB.md` | Architecture | Read, Write (KB) | Always, on enhancement/key design decision | | built |
+| security-architect | Architecture (joint owner with solution-architect) | Optional / droppable | `knowledge/SECURITY_KB.md` | Security | Read, Write (KB) | Always, on enhancement/key design decision | Tightened 2026-07-06: Authentication & Authorization Design is a mandatory `SECURITY_KB.md` subsection (decision + criteria + revisit triggers) — never a one-line waiver, even when the answer is "none needed" | built |
+| responsible-ai-architect | Architecture (advisory, alongside solution-architect + security-architect) + Review | Optional / droppable | `knowledge/RESPONSIBLE_AI_KB.md` | Red-team/bias | Read, Write (KB), WebSearch | Always, on enhancement | Content/behavior guardrails — distinct from security-architect (authn/authz/secrets) and functional-agent (domain-correctness); must not duplicate either's devil's-advocate pass | built |
+| enhance-agent | Cross-cutting — drives `/enhance-project` (mini Plan→Experience Design→Architecture→Code→Test→Review→Deploy) and `/modify-feature` (correction mode) | Core (infra) | None (writes `FEATURES.md`) | None | Read, Write, Bash(git) | N/A — this agent is the re-engagement mechanism | Owns both `/enhance-project` and `/modify-feature`; solution-architect/security-architect/responsible-ai-architect/ui-ux-designer (UI-bearing) always re-engage, functional-agent/industry-expert only if flagged | built |
+| release-manager | Cross-cutting — `/cut-release` command, after Deploy | Core (infra) | None (writes `RELEASES.md`/`CHANGELOG.md`) | None | Read, Write, Bash(git) | Always, when a release train is cut | Project-level; distinct from mas-release-manager above. Conflict detection + human-assisted resolution in MVP; automated resolution deferred to backlog. Two distinct approvals required before prod promotion (test results, then promotion itself). | built |
+| usage-monitor | Cross-cutting — observes all gates | Core (infra) | None (writes `USAGE.md`/`USAGE_INDEX.md`) | None | Read, Write | Always | Auto-pause/resume deferred to post-MVP backlog (needs `CronCreate`, not granted to MVP version); tracking/estimation/soft-budget only. Logging is orchestrator bookkeeping per agent call, not a separate agent invocation. | built |
+| deliverables-agent | Cross-cutting — on-demand export, never a blocking gate | Optional | None (reads others' KBs; writes one-way to `projects/<name>/deliverables/` and, for the platform-level HTML page, `admin/deliverables/`) | None | Read, Write, Bash (python-pptx/python-docx/openpyxl) | On-demand, triggered at the end of the same gate/action that updated the source markdown — not a standing file-watcher | **Post-MVP backlog.** Exports FROM markdown (architecture→PPTX, plan/design docs→DOCX, test scripts + per-scenario evidence→XLSX), one-way only — hard rule: no agent ever reads from `deliverables/`. Also produces an Excel rollup of `admin/ROADMAP.md` (platform-wide tracking) and each project's `FEATURES.md` (per-project tracking), plus (added 2026-07-09, ship after the per-project exports are proven) an interactive HTML knowledge-base page documenting the MAS end-to-end — first platform-level export target, triggered by `mas-registrar`/`mas-release-manager` actions. First agent requiring new third-party libraries. | planned |
