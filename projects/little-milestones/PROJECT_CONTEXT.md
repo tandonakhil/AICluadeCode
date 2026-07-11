@@ -341,6 +341,205 @@ brief, not silently decided):
 scope): F8 delivery (opt-in, scheduler, email/notification channel), F9
 (product catalog/CPSC filter), F10 (real signup/login/invites/roles).
 
+## Increment 3 implementation summary (code-agent, 2026-07-11)
+
+F9 (buying recommendations + CPSC filtering), F10 (real auth activation +
+multi-caregiver), and F8 delivery (Resend email + scheduler + unsubscribe)
+built against PLAN §4.5-§4.6 and `knowledge/ARCHITECTURE_KB.md` §5
+(real-delivery revision) / `knowledge/SECURITY_KB.md` §1 (auth design,
+dedicated non-collapsible section) in full. **165 backend tests pass**
+(`pytest`, up from 101 at the end of Increment 2 -- 64 new tests: 30 auth,
+16 products, 8 email delivery, 9 scheduler, 8 unsubscribe-route -- exact
+counts overlap slightly across files); both `python -m pytest -v` and
+plain `pytest -v` from `dev/backend/` report identical 165/165 (finding-7
+parity re-confirmed a third time). Frontend `tsc --noEmit`/`next build`
+both clean. F1-F8(content) code was left untouched except where F9/F10
+genuinely needed to extend it: `get_current_family`'s body (the
+Increment-1 seam, exactly as designed), `routes/profiles.py`'s and
+`routes/photos.py`'s delete handlers (added the owner-only role check),
+`routes/digest.py` (added the unsubscribe route alongside the unchanged
+Increment-2 digest-content route), `db.py`'s schema (one additive column,
+one migration helper), `main.py` (new routers + conditional scheduler
+startup), and `tests/conftest.py` (see judgment call 1 below -- this is
+the one broad, deliberate change).
+
+**Backend** (`dev/backend/app/`):
+
+- **F9**: `products.py` (`get_products_for_bucket` -- catalog load +
+  **serve-time** CPSC-denylist filter, evaluated on every call, not cached
+  pre-filtered) + `data/products_catalog.json` (10 checklist buckets x 2
+  curated categories, `_meta` block, no brands/SKUs/tracking) +
+  `data/cpsc_denylist.json` (12 recalled/banned/AAP-warned categories) +
+  `routes/products.py` (`GET /profiles/{id}/products`, same
+  newborn/out-of-range/corrected-bucket pattern as `/activities`).
+- **F10**: `users.py` (`User`/`Invite` models, `UserStore`/`InviteStore`/
+  `FamilyStore`); `auth.py` rewritten from the Increment-1 stub into the
+  real thing -- session creation/resolution (opaque
+  `secrets.token_urlsafe(32)`, SHA-256-hashed at rest, 30-day sliding /
+  90-day absolute expiry), `get_current_family`'s body now resolves from
+  the real session (its signature and every route's
+  `Depends(get_current_family)` declaration are byte-for-byte unchanged,
+  confirming ARCHITECTURE_KB §2's contract), `require_owner` (a new,
+  additive dependency used only on the three owner-gated routes), an
+  in-process fixed-window rate limiter (`check_rate_limit`), cookie
+  helpers (`HttpOnly`/`SameSite=Lax`/conditionally-`Secure`).
+  `routes/auth.py` (`POST /auth/signup|login|logout|join`, `POST
+  /invites` owner-only, `GET`/`PATCH /auth/me` for the per-caregiver
+  digest-opt-in toggle -- not explicitly named in PLAN's route list but
+  required by its own frontend requirement).
+- **F8 delivery**: `email_delivery.py` (thin Resend wrapper,
+  `send_digest_notification(to_email, unsubscribe_url)`, fixed
+  content-free HTML body, RFC 8058 `List-Unsubscribe`/
+  `List-Unsubscribe-Post` headers, `MAILING_ADDRESS` placeholder flagged
+  inline); `scheduler.py` (`run_digest_job` -- the exact due-check query
+  + per-user try/except from ARCHITECTURE_KB §5.3 -- and
+  `start_scheduler`/`shutdown_scheduler`, an in-process APScheduler
+  `BackgroundScheduler`); two new `users` columns
+  (`last_digest_sent_at`, already present from Increment 1's forward-
+  looking schema; `unsubscribe_token`, new this increment, see judgment
+  call 2); `routes/digest.py` extended with `GET
+  /digest/unsubscribe?token=...` (unauthenticated, idempotent, rate-
+  limited, a structurally single-purpose `UPDATE ... SET digest_opt_in =
+  0` per SECURITY_KB §1.7 point 3, a confirmation page with zero
+  external resource loads/links per §1.7 point 5). `main.py`'s startup
+  hook only calls `start_scheduler()` when `ENABLE_DIGEST_SCHEDULER=true`
+  is set in `.env` -- **left unset in this environment**, since no
+  verified Resend sending domain exists yet (ARCHITECTURE_KB §5.1's
+  stated operational precondition; flagged again in the report to the
+  human/Test gate, not silently worked around).
+
+**Frontend** (`dev/frontend/`): `AuthScreen.tsx` (signup/login/join,
+storybook-warm styling reusing `.lm-onboarding`/`.lm-field`/`.lm-btn`
+rather than inventing new visual language); `SettingsScreen.tsx` (family
+panel with plain-words role labels, owner-only invite generation, the
+per-caregiver digest toggle default-off, the documented no-password-reset
+gap as UI copy, logout); `ProductsPanel.tsx` ("Ideas for this stage" on
+Today, deliberately identical card anatomy to the activity-card family
+per UXR-11 -- no distinct "product card" style). `app/page.tsx` now
+gates the whole app shell behind a session check (`getMe()`), adds a
+Settings nav entry to both the sidebar and bottom tab bar, and wires
+logout to reset local state. `lib/api.ts`'s `request()` now sends
+`credentials: "include"` on every call (required for the session cookie
+to cross the :3000 -> :8000 origin boundary, paired with the backend's
+new `allow_credentials=True` CORS setting) -- the two non-`request()`
+fetch calls (`sendChatMessage`, `uploadPhoto`) were updated the same way.
+**Design-gap flag**: no `design-review/` mockup exists for the
+auth/signup/login/join, Settings/invite, or product-recommendation
+screens -- confirmed absent by search, not overlooked. UX_KB.md §1.7
+specifies the *flow and exact copy* for all three (Flow 3a/3b/3c) but no
+visual mockup was produced for them at any Experience Design gate pass.
+The screens above are functional implementations matching that copy and
+reusing the established component language (cards, pill buttons,
+one-column forms); they have **not** been through visual design review
+and should be treated as a real gap for ui-ux-designer to close, not a
+silent substitute for one.
+
+**Judgment calls made during Increment 3** (documented per the Code-gate
+brief, not silently decided):
+
+1. **`tests/conftest.py`'s `client` fixture now authenticates a default
+   user before yielding, rather than every existing test file being
+   individually rewritten to sign up/log in.** This is the mechanism that
+   satisfies PLAN §7-J item 37 ("the full Increment-1 red-team/
+   adversarial suite must re-pass under an authenticated session") for
+   every test in this pytest-based suite: since `TestClient` persists
+   cookies across requests within one instance (the same way a browser
+   does), authenticating once at fixture setup means all 101 pre-existing
+   Increment-1/2 tests (profiles, ages, activities, guardrails,
+   memories/timeline, photos, digest content) now genuinely exercise
+   their original behavior through a real session, not a bypassed one --
+   confirmed by full-suite re-run (165/165 passing, no test file's
+   assertions needed to change). A new `unauthenticated_client` fixture
+   (no signup) was added alongside it for tests that need to control
+   authentication themselves (auth flows, 401 checks, cross-family
+   isolation). This is also why `client`'s authenticated user becomes
+   this test process's "first user ever" and lands as owner of
+   `family_id=1` -- every existing test's implicit `family_id=1`
+   assumption keeps holding, which is the same migration behavior
+   ARCHITECTURE_KB §2 specifies for real production signups.
+2. **Added a plaintext `users.unsubscribe_token` column beyond what
+   ARCHITECTURE_KB §5.4 literally specifies** (which names only
+   `unsubscribe_token_hash`, mirroring session-token hash-only storage).
+   A hash is one-way; it cannot be turned back into the raw token
+   `scheduler.py` needs to embed in each week's outbound email URL, and
+   §5.4 explicitly wants a *stable* link reused across every send (not a
+   fresh token minted per send, which single-use/rotating tokens would
+   force). `unsubscribe_token_hash` remains the sole verification
+   mechanism the incoming `GET /digest/unsubscribe` request is checked
+   against, exactly as specified -- this column is additive, not a
+   substitution. Flagged here for solution-architect/security-architect
+   to confirm or revise; worst case on either value's compromise is
+   unchanged from SECURITY_KB §1.7 point 1's existing assessment (an
+   unwanted opt-out of a weekly email, not an account/data breach).
+3. **`require_owner` is checked before the cross-family/existence check**
+   on `DELETE /profiles/{id}` and `DELETE /profiles/{id}/photos/{id}`
+   (FastAPI dependency order): a caregiver session gets 403 for *any*
+   profile/photo id, including one that doesn't exist or belongs to
+   another family, before the route body ever looks up the resource. This
+   doesn't leak anything about the specific resource (role is a property
+   of the session, not the target), and keeps the two checks cleanly
+   separated (coarse-grained role gate, then fine-grained
+   ownership/existence gate) -- flagged as a design choice, not
+   independently re-derived per PLAN/ARCHITECTURE_KB, since neither
+   document specifies the ordering for the caregiver-cross-family-delete
+   combination specifically.
+4. **`/auth/me` (`GET`/`PATCH`) is a new route pair not explicitly named
+   in PLAN §4.6's route list** (`POST /auth/signup|login|logout`, `POST
+   /invites`, `POST /auth/join` are the only ones named). It exists
+   because PLAN's own frontend requirement -- "per-user digest opt-in
+   toggle (default off)" -- has no other way to read or write the current
+   session's `digest_opt_in` without it. Scoped minimally: `PATCH
+   /auth/me` accepts only `{digest_opt_in: bool}`, nothing else.
+5. **CORS `allow_credentials=True` and every frontend fetch call's
+   `credentials: "include"`** were added as a necessary consequence of
+   session cookies now existing at all -- not called out in PLAN/
+   ARCHITECTURE_KB explicitly, but a cross-origin cookie-based session
+   (frontend `:3000`, backend `:8000`) does not work without both sides
+   of this. Also required: `crossOrigin="use-credentials"` on
+   `JourneyScreen.tsx`'s `<img>` tags for photo bytes, since a plain
+   cross-origin `<img>` does not send cookies by default -- without this,
+   every existing photo in the Journey view would have silently 401'd
+   once auth went live, a real regression risk this fix closes.
+6. **Rate-limit state (`app.auth._RATE_BUCKETS`) is process-global, not
+   per-request or per-connection** -- an in-process fixed-window counter,
+   per SECURITY_KB §1.5's own specified mechanism ("no external
+   dependency needed at this scale"). `reset_rate_limits()` is a
+   test-only helper to prevent state leaking between test cases sharing
+   the same Python process; it is never called from application code.
+7. **Invite codes are `secrets.token_urlsafe(32)[:12]`** (truncating the
+   same high-entropy generator already used for session/unsubscribe
+   tokens) rather than a separately-tuned `secrets.token_urlsafe(9)` call
+   -- SECURITY_KB §1.1 specifies "~12 chars, base64url" for invite codes,
+   which this achieves via one shared generator instead of a second
+   entropy-source configuration to reason about separately. Truncating a
+   URL-safe base64 token is safe (no encoding-boundary issue) and the
+   resulting ~12-char prefix still carries far more entropy than needed
+   given the rate-limited, single-use, 7-day-expiring design.
+8. **F8 delivery is genuinely not enabled in this environment.** This is
+   not a code gap -- `email_delivery.py`, `scheduler.py`, and the
+   unsubscribe route are fully built and tested (mocked Resend calls
+   throughout; zero real network calls in the test suite) -- it is the
+   stated operational precondition from ARCHITECTURE_KB §5.1 (no
+   verified Resend sending domain) staying unmet. `ENABLE_DIGEST_
+   SCHEDULER` defaults to unset/false; `RESEND_API_KEY` is unset in this
+   `.env`. Flagged explicitly for the human/Test gate/deploy-agent, per
+   the Code-gate brief's specific instruction not to silently skip this.
+9. **`MAILING_ADDRESS` in `email_delivery.py` is a placeholder string**,
+   not a real address -- ARCHITECTURE_KB §5.6 states this is a
+   business/operational detail outside code-agent's authority to invent.
+   `test_email_delivery.py::test_email_body_contains_mailing_address_
+   placeholder_flag` locks in that the placeholder is present (and would
+   need updating alongside any future change that fills in a real
+   address) rather than letting it silently drift.
+
+**Not built this increment / explicitly deferred, matching
+ARCHITECTURE_KB's own "what is explicitly NOT built" list (§5.9) and
+SECURITY_KB's revisit triggers (§1.6)**: no per-user digest send-time
+preference, no email open/click tracking, no digest-frequency options, no
+self-service password reset (documented gap, unchanged from Increment 1),
+no MFA/OAuth/magic-link (F12, later backlog per human request, already
+recorded in FEATURES.md).
+
 ## Decisions Log
 - 2026-07-10: plan-agent recommended `genai-chatbot` over `rag-knowledge-base`
   (no document corpus — recommendations are LLM-generated from the kid's
@@ -800,6 +999,57 @@ security (security-architect), red-team/bias (responsible-ai-architect).
 F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
 §8). Usage-monitor should re-estimate before the Architecture gate.
 
+- **2026-07-11: Increment 3 Code gate — F9 (buying recommendations +
+  CPSC filtering), F10 (real auth activation + multi-caregiver), and F8
+  delivery (Resend email + scheduler + unsubscribe) built and committed
+  to `dev/`.** Backend: 101 → 165 tests, all passing under both `pytest`
+  invocations (parity re-confirmed). Frontend `tsc --noEmit`/`next build`
+  both clean. See "Increment 3 implementation summary" above for the
+  full file list and 9 documented judgment calls. Two items explicitly
+  flagged for the Test gate/human, not silently resolved:
+  1. **F8 real email sending is not enabled in this environment** — the
+     mechanism (`email_delivery.py`, `scheduler.py`, the unsubscribe
+     route) is fully built and tested against mocked Resend calls, but
+     `ENABLE_DIGEST_SCHEDULER` stays unset and `RESEND_API_KEY` stays
+     blank, per ARCHITECTURE_KB §5.1's stated operational precondition
+     (no verified Resend sending domain exists for this project). This
+     is a real, unmet operational gap, not a code gap — a human/deploy-
+     agent action item before any real send is enabled.
+  2. **`MAILING_ADDRESS` in `email_delivery.py` is a placeholder**, per
+     ARCHITECTURE_KB §5.6's own flag — must be filled with a real
+     mailing address or registered PO box before production sending
+     (CAN-SPAM). A test (`test_email_body_contains_mailing_address_
+     placeholder_flag`) locks in that this is still a placeholder so it
+     doesn't silently drift into looking like a real address was
+     supplied.
+  - One judgment call flagged for solution-architect/security-architect
+    re-review at Test gate: a plaintext `users.unsubscribe_token` column
+    was added beyond ARCHITECTURE_KB §5.4's literal "hash only" spec,
+    because a hash cannot be reversed to rebuild the stable, reused-
+    across-sends URL the scheduler needs each week — `unsubscribe_token_
+    hash` remains the sole verification mechanism for the incoming
+    request, exactly as specified; this is additive, not a substitution.
+    Worst case on compromise of either value is unchanged from
+    SECURITY_KB §1.7 point 1's existing assessment.
+  - **Full §7-A adversarial-scenario regression (PLAN §7-J item 37)**:
+    satisfied for this project's automated pytest-based suite by making
+    `tests/conftest.py`'s default `client` fixture authenticate before
+    yielding (judgment call 1 above) — all 101 pre-existing Increment
+    1/2 tests, including the photo/LLM-isolation integration test and
+    the guardrail-net unit tests, now run under a real session with zero
+    test-file assertion changes required, and the full suite (165/165)
+    passes. **Not re-covered in this pass**: a live-LLM red-team re-run
+    (real Anthropic API calls exercising the 8 PLAN §7-A adversarial
+    chat scenarios under a real authenticated session) equivalent to the
+    one the orchestrator ran live for Increment 1
+    (`test-evidence/red-team-bias-2026-07-11-LIVE-RERUN.md`) — that was
+    a manual, non-pytest exercise even then, and re-running it live is
+    recommended but not performed as part of this Code-gate pass; flagged
+    for the Test gate to decide whether to re-run it explicitly now that
+    auth sits in the request path, or to treat the pytest-level
+    regression coverage above as sufficient given `/chat`'s guardrail
+    logic itself was not touched this increment. [code-agent]
+
 ## Test Results
 
 **2026-07-11: Test gate, Increment 1 (F1-F5) — unit/integration suite run
@@ -1120,3 +1370,16 @@ this gate -- deploy-agent does not set "deployed" status unilaterally.
 Review, and Deploy gates are all closed for this increment. Proceeding
 to Increment 3 (F9 buying recommendations, F10 auth activation +
 multi-caregiver, F8 email delivery) per PLAN §4.7.
+
+**2026-07-11: Increment 3 Code gate — F9, F10, and F8 delivery built.**
+See "Increment 3 implementation summary" above and the matching Decisions
+Log entry for the full file list, 9 documented judgment calls, and two
+items explicitly flagged rather than silently resolved (F8 real sending
+stays disabled pending an unmet Resend-domain-verification precondition;
+`MAILING_ADDRESS` is a placeholder pending a real address). Backend:
+101 → 165 tests, both `python -m pytest -v` and plain `pytest -v` from
+`dev/backend/` reporting identical results. Frontend `tsc --noEmit`/`next
+build` both clean. This is the final increment per PLAN §4.7 — not yet
+run: the Test gate's five suites (unit/integration, UX/accessibility,
+architecture, security, red-team/bias) against PLAN §7-I, §7-J, §7-H(4-5),
+and the §7-A regression-under-auth requirement. [code-agent]
