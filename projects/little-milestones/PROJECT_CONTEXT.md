@@ -975,7 +975,15 @@ re-verification passes by architecture and UX suites both confirm
 this session: F12 (hardened auth suite — MFA/OAuth/password-reset)
 added to `FEATURES.md`'s later backlog per human request, referencing
 SECURITY_KB §1.6's existing revisit triggers rather than inventing new
-criteria. **Proceeding to Review gate, Increment 2.**
+criteria.
+
+**2026-07-11: Review gate, Increment 2 — Approve.** Diff hygiene clean
+across all 14 Increment-2 commits; decision-intent match confirmed
+against PLAN §4.2-§4.4 and all 8 documented judgment calls. One trivial
+finding: `TimelineEntry.photo_ids` (a TypedDict, not runtime-validated)
+was left `list[int]` when the real `Memory.photo_ids` type fix landed —
+inert at runtime, fixed same-day for documentation accuracy. 101/101
+tests still passing. **Proceeding to Deploy gate, Increment 2.**
 
 ## Current Status
 Architecture gate held 2026-07-10 (solution-architect + security-architect
