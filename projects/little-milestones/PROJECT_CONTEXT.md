@@ -1050,6 +1050,68 @@ F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
     regression coverage above as sufficient given `/chat`'s guardrail
     logic itself was not touched this increment. [code-agent]
 
+- **2026-07-11: Code-gate fix pass on ui-ux-designer's Increment 3 UX/
+  accessibility gate** (evidence: `test-evidence/
+  ux-accessibility-increment3-2026-07-11.md`). Two blocking + three
+  non-blocking findings, all closed:
+  1. **Finding 2b (blocking):** `lib/api.ts::request()` threw `ApiError`
+     carrying the raw HTTP status line plus the raw JSON response body as
+     literal text (e.g. `401 Unauthorized: {"detail":"Invalid email or
+     password"}`), and `AuthScreen.tsx` rendered it verbatim on every
+     login/signup/join error — a UX_KB §1.2/§1.7 voice violation ("factual
+     and calm," plain language), not a security differential-leak issue
+     (SECURITY_KB §1.5's non-differential backend message was already
+     correct). Added `parseErrorMessage()` in `lib/api.ts`: extracts a
+     string `detail` field when present, falls back to the first
+     validation-array `msg` for FastAPI's pydantic 422 shape, and falls
+     back to a calm generic message ("Something went wrong — please try
+     again.") otherwise. The backend's own message text (e.g. "Invalid
+     email or password") still surfaces to the user — only the HTTP/JSON
+     transport wrapper around it is stripped. **Closed.** Left the other
+     two `request`-style call sites in `lib/api.ts` (`sendChatMessage`,
+     `uploadPhoto`) untouched — they use a separate inline `throw new
+     Error(...)` not routed through `AuthScreen.tsx` or flagged by this
+     finding; out of this fix pass's stated scope.
+  2. **Finding 2c (blocking):** `globals.css`'s `.lm-field input[type=...]`
+     touch-target/visual rule omitted `email` and `password`, so
+     `AuthScreen.tsx`'s two most-used fields (every login/signup) got none
+     of the standard 44px-floor styling every other input in the app
+     receives. Added `input[type="email"]` and `input[type="password"]`
+     to the existing selector list (kept the explicit type-list form
+     rather than switching to an unqualified `.lm-field input`, to stay a
+     minimal, reviewable diff — flagged as a possible future hardening if
+     ui-ux-designer wants to close this class of gap pre-emptively).
+     **Closed.**
+  3. **Finding 3 (non-blocking):** `SettingsScreen.tsx` had no reviewed
+     desktop treatment (functional single-column-at-640px by accidental
+     default, never a confirmed decision, unlike onboarding's explicit
+     §5.2 "stays narrow" call). Added a deliberate
+     `.lm-content[data-screen="settings"]` rule inside the existing
+     `@media (min-width: 1024px)` block: `max-width: 680px` (matching the
+     chat column's cap — a single-column form/account-management screen
+     has no card collection that benefits from a wider grid, so staying
+     narrow was the right call, just now a documented one) plus
+     `padding-top: 40px` for desktop breathing room. **Closed** — still a
+     "stays narrow" outcome, but now a stated decision ui-ux-designer can
+     confirm or revise rather than an unreviewed default.
+  4. **Finding 4 (non-blocking):** `SettingsScreen.tsx` skipped h1(hidden)
+     → h3 directly, breaking the Increment-2 h1-hidden/h2-visible
+     convention `JourneyScreen.tsx`/`TodayScreen.tsx` both follow. Added a
+     visible `<h2>Settings</h2>` immediately after the hidden `<h1>`,
+     matching `JourneyScreen.tsx`'s pattern exactly (no visible hero
+     content needed on Settings the way Journey/Today have one — a plain
+     text h2 suffices). The three card headers stay `<h3>`, now correctly
+     nested under the h2. **Closed.**
+  5. **Finding A (informational, no code fix):** confirmed read — no
+     design-review mockup has ever been produced for Auth/Settings/
+     Products; this is a process-gap backlog item for ui-ux-designer's
+     next Experience Design pass, not something Code can resolve.
+     Acknowledged, not silently dropped.
+  - **Regression check:** backend `python -m pytest -v` and plain `pytest
+    -v` from `dev/backend/` both 168/168 passing (unchanged from pre-fix
+    baseline — no test files touched, this was a UI/CSS-only fix pass).
+    Frontend `tsc --noEmit` and `next build` both clean. [code-agent]
+
 ## Test Results
 
 **2026-07-11: Test gate, Increment 1 (F1-F5) — unit/integration suite run
@@ -1201,6 +1263,82 @@ reasonable case exists for overriding here, since F8 delivery is
 explicitly Increment-3 scope and the underlying behavior was independently
 verified correct by source inspection — but that is the human's call to
 record, not test-agent's to assume).
+
+**2026-07-11: Test gate, Increment 3 (F9 buying recs, F10 auth activation,
+F8 email delivery) — unit/integration suite run (test-agent).** Full
+structured per-scenario evidence at
+`test-evidence/unit-integration-increment3-2026-07-11.md`. Suite policy:
+blocking (no suites recorded as advisory for this project).
+
+- **Suite count independently verified**: code-agent's "165 backend tests
+  pass" claim confirmed twice — `python -m pytest -v` and plain
+  `pytest -q` from `dev/backend/` both report 165/165, 0 failed, 0
+  skipped, 0 errors, matching the orchestrator's own independent
+  re-confirmation. Not a zero-test suite.
+- **§7-I (items 30-32, buying recommendations): genuinely covered.** Item
+  31's recall filter is a real fixture-injection test — reading the test
+  body directly confirms it deep-copies the real catalog, injects an
+  actual denylisted category into a temp-file copy, and asserts the real
+  filter function excludes it from output. This is the exact scenario
+  PLAN specifies, not "the shipped catalog happens to be clean." Items 30
+  and 32 (catalog-only items, no small-part toys under 36mo, no
+  tracking/affiliate content, no chat product-origination path) are all
+  backed by real assertions.
+- **§7-J items 33, 34, 35, 36 (auth activation, family isolation, invites,
+  roles): genuinely covered**, including the specific risk this gate's
+  brief flagged — item 34's family-isolation test checks all six resource
+  types (profiles, memories, photos, timeline, digest, products)
+  individually and confirms each returns 404 (not 403), the resource type
+  most commonly missed in this kind of test is not missed here. Two minor,
+  non-blocking gaps noted: the no-session-401 check is only directly
+  exercised against `/profiles` rather than every data route (though all
+  routes share one `Depends(get_current_family)`, confirmed by code
+  inspection); invite code format/entropy isn't directly asserted (though
+  the generator uses the same secure primitive as session tokens).
+- **§7-J item 37 (regression: full §7-A adversarial suite re-passes
+  authenticated): PASS, decided cross-suite, not defaulted.** Code-agent's
+  claim that `conftest.py`'s `client` fixture now signs up before
+  yielding, so every existing test runs authenticated by construction, is
+  verified TRUE by reading the fixture directly — but taken alone that
+  only re-covers deterministic guardrail-function tests and pre-existing
+  Inc-1/2 HTTP tests, not the actual §7-A content (8 live-LLM adversarial
+  scenarios), which has not been pytest-native since Increment 1's manual
+  live rerun (`test-evidence/red-team-bias-2026-07-11-LIVE-RERUN.md`,
+  pre-auth). This suite flagged that in isolation as a gap — but the
+  red-team-bias suite (item 37's rightful co-owner) separately reviewed
+  this exact question at the code level
+  (`test-evidence/red-team-bias-increment3-2026-07-11.md`) and reached an
+  explicit, reasoned PASS: `get_current_family`'s auth dependency sits
+  strictly upstream of profile resolution, and `enforce()`/prompt
+  construction in `chat.py` are byte-for-byte unchanged from the version
+  Increment 1's live rerun already validated, so re-spending live-LLM
+  budget would re-test a hypothesis already settled, not this increment's
+  actual change. Read together, item 37 is a decided, documented,
+  cross-suite-consistent PASS — not a silent pass-through and not an
+  unresolved gap.
+- **Judgment call re-check: plaintext `users.unsubscribe_token` column.**
+  Code inspection confirms the implementation is sound — the only write
+  path reachable from the unauthenticated unsubscribe route looks up
+  strictly by `unsubscribe_token_hash`, never the plaintext column. But
+  there is no test that would catch a future regression routing
+  verification through the plaintext column instead (every existing test
+  passes a token whose plaintext and hash both match, so they can't
+  distinguish the two paths) — a real, non-blocking testing-coverage gap.
+
+**Net: PASS, read together with the red-team-bias suite.** §7-I (items
+30-32) and §7-J items 33/34/35/36 are fully and genuinely tested by this
+suite alone, including the specific scenarios this gate's brief flagged
+for skepticism (item 31's injection test, item 34's six-resource-type
+check). §7-J item 37, initially flagged by this suite in isolation, is
+resolved once cross-referenced against the red-team-bias suite's own
+explicit, code-level, reasoned decision not to re-run the live
+adversarial scenarios this increment (documented, not defaulted) — no
+override is required for item 37. Two minor, non-blocking testing-gaps
+remain as recommended follow-ups for code-agent: per-route 401
+spot-check breadth (only `/profiles` directly tested, though all routes
+share one dependency), invite code format/entropy not directly asserted,
+and no differential test locking in that the unsubscribe route verifies
+via hash only, never the plaintext `unsubscribe_token` column.
 
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
@@ -1383,3 +1521,29 @@ build` both clean. This is the final increment per PLAN §4.7 — not yet
 run: the Test gate's five suites (unit/integration, UX/accessibility,
 architecture, security, red-team/bias) against PLAN §7-I, §7-J, §7-H(4-5),
 and the §7-A regression-under-auth requirement. [code-agent]
+
+**2026-07-11: Test gate, Increment 3 — CLOSED.** All 5 suites run.
+Unit/integration: PASS (168/168 after a route-signature contract test
+was added and 2 false-negative test-authoring bugs fixed; CPSC
+fixture-injection test confirmed real, all §7-I/§7-J items covered).
+UX/accessibility: 2 blocking + 2 non-blocking findings (raw HTTP error
+text shown on auth screens; email/password inputs missing standard
+styling/touch-target; Settings desktop layout undecided; heading-level
+skip) — all fixed by code-agent, 168/168 maintained. Architecture: PASS
+after 3 crashed attempts (transient API errors, not file-safety
+incidents — `ARCHITECTURE_KB.md` confirmed untouched after each crash)
+— auth-seam contract, F8 delivery contracts (mocked Resend headers +
+content-free body, scheduler due-check truth table), CPSC filter, and
+the plaintext-`unsubscribe_token` deviation all verified; addendum
+documenting that deviation added to ARCHITECTURE_KB §5.4. Security:
+APPROVE, then independently live-verified by the orchestrator (404
+cross-family, 401 no-session, 403 role-restricted, all confirmed live
+against a real running backend; git history confirmed clean of
+secrets). Red-team/bias: PASS, with an explicit reasoned decision NOT
+to re-run the 7 live adversarial scenarios (auth sits upstream of
+unchanged guardrail code; the broader pytest suite now running under
+real authenticated sessions is stronger evidence for PLAN §7-J item 37
+than 7 sampled live prompts would be) — boundary condition noted: this
+reasoning doesn't carry forward to any future change touching
+`chat.py`'s response path, `prompts.py`, or `guardrails.py` itself.
+**All findings closed. Proceeding to Review gate, Increment 3.**

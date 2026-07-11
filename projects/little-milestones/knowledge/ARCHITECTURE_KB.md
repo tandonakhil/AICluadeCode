@@ -474,6 +474,25 @@ Two new columns on `users` (SQLite, per §3's schema):
   or need special-cased idempotent handling; a stable per-user token
   achieves the same idempotency more simply.
 
+**Addendum, 2026-07-11 (Increment 3 Test gate) — plaintext `unsubscribe_token`
+column.** code-agent's Increment-3 build added a third column,
+`unsubscribe_token` (plaintext, alongside `unsubscribe_token_hash` above),
+because the scheduler's weekly send needs to rebuild the same stable
+unsubscribe URL every time and a hash can't be reversed for that.
+`unsubscribe_token_hash` remains the sole verification/lookup mechanism —
+the plaintext column is never read for auth purposes. Both
+solution-architect and security-architect independently reviewed this
+deviation from this section's original "hash only" spec (Test gate,
+2026-07-11) and concluded it's an acceptable, narrowly-bounded trade-off:
+blast radius on DB compromise is capped at one already-low-severity
+capability (opt-out replay), and the SQLite file is already an accepted
+plaintext-PII surface for this MVP (§3), so this doesn't change the file's
+risk classification. See `test-evidence/security-increment3-2026-07-11.md`
+and `test-evidence/architecture-increment3-2026-07-11.md` for the full
+reasoning. Optional future hardening (non-blocking): encrypt this column
+with the existing Fernet key, decrypt only inside `scheduler.py`, before
+the scheduler is ever enabled against real sends.
+
 ### 5.5 Unsubscribe: real, one-click, independent of the in-app toggle
 
 **The in-app `digest_opt_in` Settings toggle remains** (governs whether the

@@ -43,3 +43,9 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Review gate Increment 2 | review-agent | 75,323 | 2,909,469 |
 | 2026-07-11 | Deploy gate Increment 2 | deploy-agent | 51,875 | 2,961,344 |
 | 2026-07-11 | Code Increment 3 (F9 products, F10 auth activation, F8 delivery) | code-agent | 314,724 | 3,276,068 |
+| 2026-07-11 | Test gate Increment 3: unit/integration | test-agent | 94,096 | 3,370,164 |
+| 2026-07-11 | Test gate Increment 3: UX/accessibility | ui-ux-designer | 103,571 | 3,473,735 |
+| 2026-07-11 | Test gate Increment 3: security | security-architect | 125,807 | 3,599,542 |
+| 2026-07-11 | Test gate Increment 3: red-team/bias | responsible-ai-architect | 54,244 | 3,653,786 |
+| 2026-07-11 | Test gate Increment 3: architecture (4 attempts, 3 crashed) | solution-architect | 25,703 | 3,679,489 |
+| 2026-07-11 | Fix 2 blocking + 2 non-blocking UX findings (Increment 3) | code-agent | 65,963 | 3,745,452 |
