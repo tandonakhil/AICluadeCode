@@ -40,9 +40,27 @@ dev/frontend/        — Next.js, per UX_KB.md; no architecture changes beyond
                         what ui-ux-designer's component/screen inventory implies
 ```
 
-All stores implement a common `Store[T]` protocol (`create`, `get`,
-`list_for_family`, `delete`) so the SQLite decision (§3) is testable in
-isolation and swappable in principle, though no swap is planned.
+All stores implement a common `create`/`get`/`delete` shape so the SQLite
+decision (§3) is testable in isolation and swappable in principle, though
+no swap is planned. **The list method's name and every method's scoping
+parameter follow one rule, not one literal method name:** a store whose
+entity is directly family-scoped exposes `list_for_family(family_id)`
+and scopes every method by `family_id` (`ProfileStore` — the only store
+in this shape as of Increment 2); a store whose entity is scoped
+*transitively*, through a parent entity's `family_id` plus `ON DELETE
+CASCADE` (no `family_id` column of its own), exposes
+`list_for_<parent>(<parent>_id)` instead and scopes every method by that
+parent id (`MemoryStore.list_for_profile(profile_id)`; `PhotoStore
+.list_for_profile(profile_id)`). `PhotoStore` additionally splits the
+single `get` this pattern would otherwise imply into `get_meta`
+(metadata only) and `get_bytes` (decrypt + read) — a plain `get`
+returning sometimes-metadata, sometimes-plaintext-bytes would be a worse
+interface, and decrypting on every metadata read would be wasteful.
+**Corrected at the Increment-2 fix pass** (previous wording claimed a
+single literal `Store[T]` protocol every store followed exactly, which
+`MemoryStore`/`PhotoStore` never actually did; `tests/test_stores.py`
+now asserts each store's real shape explicitly rather than leaving the
+divergence unflagged and untested).
 
 ---
 
@@ -179,7 +197,14 @@ can't drift out of sync across store implementations. Concretely:
 - `memories(id, profile_id FK→profiles ON DELETE CASCADE, moment_date, title, note, milestone_tag)`
 - `photo_meta(id, memory_id FK→memories ON DELETE CASCADE, profile_id, content_type, size, created_at, enc_iv)` —
   note: `enc_iv` (or equivalent) lives here, never the key (SECURITY_KB owns
-  key handling)
+  key handling). **`id` is TEXT/uuid4, not an autoincrementing int like
+  every other table's `id` above** — it also names the on-disk photo file
+  (`backend/data/photos/{profile_id}/{id}`), so it needs to be
+  non-enumerable, the same reasoning already applied to
+  `sessions.token_hash`/`invites.code`'s opaque, non-sequential ids. Not
+  an inconsistency with this schema's conventions; a second, already-
+  established tier of them (documented here at the Increment-2 fix pass;
+  see PROJECT_CONTEXT.md Decisions Log, Increment 2 judgment call 1).
 - `invites(code, family_id FK→families, expires_at, single_use, used_at)`
 
 **Note (added by §5's revision, does not alter anything above):** §5.4 below
@@ -615,15 +640,29 @@ not sufficient on their own — especially once F8's digest generation runs
 unattended (no parent in the loop to notice a bad response the way a chat
 turn is at least read before the parent acts on it). `app/guardrails.py` is
 a **post-generation, code-level check layered on every LLM-touching
-response path** (`/chat` streaming completion, `/digest` generation), plus
-**serve-time filters that are not LLM-adjacent at all** for F9.
+response path** (`/chat` streaming completion), plus **serve-time filters
+that are not LLM-adjacent at all** for F9.
+
+**Correction, Increment-2 fix pass:** `/digest` does **not** run
+`guardrails.enforce()` (or `check_framing`/`check_medical`) at request
+time, and correctly so — `digest.py`'s `build_digest` is pure,
+curated-data assembly (the same CDC-2022 table + fixed activity/
+supervision text §1 already grounds everything else in) with zero LLM
+involvement anywhere in its call path, so there is no free-text model
+output for a post-generation guardrail to check. (The framing lint *is*
+still exercised — `tests/test_digest.py::test_digest_framing_lint` runs
+the digest's milestone/activity text through `check_framing`/
+`check_medical` directly, as a static content-safety check on the
+curated data itself, not as a request-time enforcement call `build_digest`
+makes.) The line below describing a `/digest` runtime guardrail call was
+inaccurate and is corrected here to match the shipped (correct) behavior.
 
 ### 6.1 R1 anxiety-framing check (`guardrails.check_framing(text) -> Violation | None`)
 
 Runs after the full response is assembled (streaming responses are checked
 on the complete buffered text before being released to the client for
-non-streaming paths like `/digest`; for `/chat`'s streaming response,
-see the trade-off note below) against:
+non-streaming, LLM-touching paths; `/digest` has no LLM-touching path to
+check at all, see the correction above) against:
 - A denylist regex/phrase set: "behind," "delayed" (in a child-comparison
   context — a simple substring check is intentionally over-inclusive here;
   false positives are cheap, a missed violation is not), "ahead of,"

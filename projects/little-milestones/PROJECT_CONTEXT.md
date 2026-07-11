@@ -672,6 +672,112 @@ scope): F8 delivery (opt-in, scheduler, email/notification channel), F9
      confusing enough in practice to warrant fixing ahead of a UX_KB
      revision) — ARCHITECTURE_KB §4.2 cross-references §9.2.
   [solution-architect]
+
+- **2026-07-11 — Code-gate fix pass on Increment 2's Test-gate findings**
+  (evidence: `test-evidence/{architecture,ux-accessibility,
+  unit-integration}-increment2-2026-07-11.md`). All 13 findings (4
+  architecture, 6 UX/accessibility, 2 unit/integration, 1 documentation
+  pair counted as one) closed, same discipline as the Increment-1 fix
+  pass — each logical change in its own commit. Backend suite: 91 -> 101
+  passing (10 new regression/property tests); `python -m pytest -v` and
+  plain `pytest -v` from `dev/backend/` both report identical 101/101
+  (finding-7 parity re-confirmed). Frontend: `tsc --noEmit` clean, `next
+  build` clean.
+
+  **Architecture (blocking), all closed:**
+  1. **Real bug found and fixed:** `routes/memories.py`'s delete handler
+     already unlinked attached-photo files before the DB cascade (code
+     was correct), but `app/memories.py`'s `Memory.photo_ids` was typed
+     `list[int]` while `photo_meta.id` is TEXT/uuid4 (ARCHITECTURE_KB
+     §3) — any memory with an attached photo failed Pydantic validation
+     on every read (`MemoryStore.get`/`list_for_profile`), which is what
+     actually made the "does delete unlink the file" path untestable and
+     misread as "unlinking never happens." Fixed the type to `list[str]`.
+     Added `test_delete_memory_with_attached_photo_purges_both_row_and_file`
+     asserting both the `photo_meta` row and the on-disk file are gone
+     after a memory-only delete. **Closed.**
+  2. **`Store[T]` contract test:** added `tests/test_stores.py` (3
+     explicit per-store interface assertions — `ProfileStore`'s literal
+     `Store[T]` match, `MemoryStore`/`PhotoStore`'s transitively-scoped
+     `list_for_profile` + `PhotoStore`'s `get_meta`/`get_bytes` split).
+     Also tightened `ARCHITECTURE_KB.md` §0's wording to describe the
+     real, reasoned pattern instead of a single literal protocol every
+     store was implied to follow identically. **Closed.**
+  3. **`extract_accent` property-based test:** added
+     `test_extract_accent_property_n_random_hues_stay_in_clamped_bands`
+     (N=50 random hues, seeded) and
+     `test_extract_accent_skin_tone_band_is_excluded` (direct coverage of
+     the hue 5-35°/sat 20-60%/light 40-85% exclusion band, previously
+     untested) to `tests/test_photo_theme.py`. **Closed.**
+  4. **Cascade coverage asymmetry:** added a direct `SELECT COUNT(*) FROM
+     photo_meta WHERE profile_id = ?` assertion to
+     `test_profile_delete_leaves_zero_photo_files` (previously only
+     checked the on-disk directory). **Closed.**
+  - Also closed, flagged non-blocking in the evidence: extended
+    `test_photo_isolation_import_check` with a dedicated
+    `test_guardrails_photos_isolation_import_check` (the literal
+    `guardrails.py` <-> `photos.py` pair ARCHITECTURE_KB §7 names, not
+    just the `app.llm`/`app.prompts` pair); documented `photo_meta.id`'s
+    TEXT/uuid4 shape in ARCHITECTURE_KB §3 (consistent with
+    `sessions.token_hash`/`invites.code`'s existing precedent, not an
+    inconsistency); corrected ARCHITECTURE_KB §6.1's inaccurate claim
+    that `/digest` runs the R1 framing check at request time (`build_digest`
+    is pure curated-data assembly with zero LLM involvement and correctly
+    never calls `guardrails.enforce()` — the framing lint test exercises
+    the curated content directly, not a runtime enforcement call).
+
+  **UX/accessibility (blocking), all closed:**
+  5. **Photo-personalization was invisible end-to-end:** `Profile`
+     (`app/profiles.py`) now exposes `photo_accent_mid/deep/tint` (all
+     three, null until a photo is uploaded); added
+     `test_profile_response_exposes_photo_accent_fields`. Frontend:
+     `lib/types.ts`'s `Profile` carries the same three fields; new
+     `lib/theme.ts::photoAccentStyle()` sets `--lm-photo-mid/-deep/-tint`
+     as inline CSS custom properties; wired into `JourneyScreen.tsx`'s
+     header, `TodayScreen.tsx`'s hero card, and `ProfileSwitcher.tsx`'s
+     identity dot (+ ring + informational "photo theme"/"default theme"
+     chip per UX_KB §6.5). `globals.css`'s `.lm-journey-header`/
+     `.lm-hero-card` gradients now read `var(--lm-photo-mid/-deep,
+     var(--lm-peach|--lm-coral|--lm-gold))` — falls through to the fixed
+     default theme when a profile has no photo, per §6.4. `.lm-hero-card`
+     also gained the §6.3-rule-3 fixed black scrim layer behind its white
+     headline text. **Closed.**
+  6. **JourneyScreen desktop layout:** added a `@media (min-width:
+     1024px)` block to `globals.css` (`.lm-content[data-screen="journey"]`
+     max-width 760px, `.lm-river` centered spine, alternating
+     `.lm-river-side-l`/`.lm-river-side-r` per moment) matching
+     `design-review/screens/desktop/journey-desktop.html`'s alternating-
+     river pattern; `JourneyScreen.tsx` now assigns alternating side
+     classes to memory entries (not chapter markers, which stay
+     centered) via a separate counter. **Closed.**
+  7. **`AddMemoryForm`'s title/note/date inputs had no `className`:**
+     added a new `.lm-input` class (14px radius, 12-14px padding, 15-16px
+     font, 1.5px border, 44px min-height per `photo-upload.html`'s
+     spec) and applied it to all three inputs. **Closed.**
+  8. **`JourneyScreen.tsx` rendered memory photos with `alt=""`:** now
+     `alt={entry.title || "Photo from this moment"}`. **Closed.**
+  - Non-blocking, also closed: `.lm-ptile-remove` (staged-photo remove)
+    grew a 44x44px transparent hit-area wrapper around its unchanged
+    22px visible icon, same pattern as Increment 1's `.lm-btn-quiet`/
+    `.lm-info-btn` fix generalized to this new control.
+    `AddMemoryForm` converted from an ad-hoc centered dialog to
+    `.lm-sheet-backdrop`/`.lm-sheet` — a real bottom sheet (grabber,
+    rounded-top-only corners) below 768px matching
+    `design-review/screens/photo-upload.html`, a centered 640px modal
+    with a 5-column photo grid at >=768px, matching the desktop mockup's
+    intent.
+
+  **Unit/integration (non-blocking), closed:**
+  9. Added `test_digest_opt_in_defaults_false_at_schema_level` (inserts a
+     `users` row without specifying `digest_opt_in`, asserts the stored
+     value is `0`) and `test_no_scheduler_queue_or_email_code_exists_yet`
+     (AST-based import scan of every `.py` file under `app/` for
+     `apscheduler`/`celery`/`smtplib`/`email.mime`/`email.message` or any
+     import name containing "scheduler"/"smtp" — fails loudly if a future
+     change reintroduces dormant delivery code before Increment 3) to
+     `tests/test_digest.py`. **Closed.**
+  [code-agent]
+
 Approved 2026-07-10 — **core + 3 architects** (usage-monitor's recommended
 option (b), est. ~420k–540k remaining vs ~590k–720k full-team):
 - Core (non-droppable): plan-agent, code-agent, test-agent, review-agent,
@@ -768,6 +874,84 @@ decision: either code-agent/responsible-ai-architect build the missing
 supplied for this environment) before sign-off, or the human explicitly
 overrides with a recorded reason.
 
+**2026-07-11: Test gate, Increment 2 (F6 memory/timeline, F7 photos, F8
+digest content) — unit/integration suite run (test-agent).** Full
+structured per-scenario evidence at
+`test-evidence/unit-integration-increment2-2026-07-11.md`. Suite policy:
+blocking (no suites recorded as advisory for this project).
+
+- **Suite count independently verified**: code-agent's "88 -> 91 backend
+  tests, all passing" claim confirmed — `python -m pytest -v` from
+  `dev/backend/` collects and passes 91/91, 0 skipped, 0 errors. Not a
+  zero-test suite.
+- **Finding-7 regression check (Increment 1's `python -m pytest` vs plain
+  `pytest` divergence): no regression.** Both invocations produce identical
+  91/91 results even with the newly-added `pillow-heif` dependency — the
+  Increment-1 editable-install fix (`pyproject.toml`'s `packages =
+  ["app"]`) still holds.
+- **PLAN §7-F (memory log + timeline, items 17-19): genuinely covered.**
+  Memory CRUD validation, chronological ordering, hard delete, and cascade
+  delete on profile removal all pass with real assertions against the
+  store (not just route status codes). Item 19 — the R1 hard schema lint
+  on the timeline payload — was specifically re-verified by reading the
+  test implementation, not just its name: it is a real recursive walk over
+  the full response tree (dicts and lists, all nesting levels) checking
+  for `expected_by`/`status`/`on_track`/`typical_range`/`typical_range_band`,
+  plus a raw-text substring check for "typical range" and "behind". This is
+  genuinely the structural lint PLAN §4.2 calls for, not a shallow
+  top-level-only check.
+- **PLAN §7-G (photos, items 20-24): genuinely covered.** Upload
+  size/type validation (content-sniffed, not extension-trusted), private-
+  by-default routing, and the three items this gate's brief flagged for
+  extra scrutiny were all independently corroborated against the actual
+  source, not just re-run and trusted:
+  - Item 21 (delete purge): the test asserts BOTH the metadata row is gone
+    (direct `test_db` query) AND `os.path.exists()` on the file path is
+    `False`, in the same test — both halves genuinely covered.
+  - Item 23 (at-rest protection + EXIF-GPS absence): confirmed
+    `app/photos.py` genuinely calls `Fernet.encrypt()`/`decrypt()` (real
+    encryption, not a claim-only comment); the on-disk file's raw bytes do
+    not match the real JPEG magic-byte signature; EXIF is stripped to zero
+    tags on both JPEG and HEIC uploads (the HEIC case has its own
+    regression test, because `pillow-heif`'s HEIF encoder was found to
+    auto-propagate already-decoded EXIF unless explicitly cleared — a real
+    gap the JPEG-only test would have missed).
+  - Item 24 (structural isolation): the isolation check is a genuine
+    AST-based import-graph scan (`ast.parse`/`ast.walk`), not a
+    comment/docstring substring grep — independently corroborated by
+    manually reading every `import`/`from` line in `photos.py`,
+    `photo_theme.py`, `routes/photos.py`, `llm.py`, and `prompts.py`; no
+    cross-import exists in either direction.
+- **PLAN §7-H (digest, items 25-27; items 28-29 correctly excluded as
+  Increment-3 scope): items 25-26 genuinely covered, item 27 is a real
+  gap.** Digest content, newborn-mode, out-of-range-mode, and the framing
+  lint all pass with real assertions. Item 27 ("opt-in defaults false;
+  nothing ever sent/queued for a non-opted-in user") is **not covered by
+  any test** — independent source inspection (grep + read) confirms the
+  underlying behavior is currently correct (the `users.digest_opt_in`
+  schema column defaults to `0`; no scheduler/queue/SMTP/email code exists
+  anywhere in `app/`, confirmed by `app/digest.py`'s own docstring and a
+  full-repo grep), so there's no dormant Increment-3 delivery machinery
+  accidentally shipped early. But nothing in the automated suite would
+  catch a future regression of either half (a flipped default, or a
+  quietly-added scheduler). Recommend two small additions before this item
+  is marked genuinely closed: a unit test asserting the schema/store
+  default, and a regression guard against scheduler/queue code appearing
+  in `app/` before Increment 3.
+
+**Net: this is a conditional pass, not a clean pass.** F6 (memory/timeline)
+and F7 (photos) acceptance criteria are fully and genuinely tested,
+including every item this gate's brief specifically flagged for skepticism.
+F8's in-app digest content (items 25-26) is likewise genuinely tested.
+The one real gap is §7-H item 27: correct behavior, zero test coverage.
+Per the platform's blocking-suite policy, this should stop the gate for
+human decision — either code-agent adds the two small tests recommended
+above, or the human explicitly overrides with a recorded reason (a
+reasonable case exists for overriding here, since F8 delivery is
+explicitly Increment-3 scope and the underlying behavior was independently
+verified correct by source inspection — but that is the human's call to
+record, not test-agent's to assume).
+
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
 - Frontend (Next.js): `3000`
@@ -842,3 +1026,23 @@ Proceeding to Test gate for Increment 2 next.
   shape as the JPEG test), HEIC upload reaches `photo_theme.
   extract_accent` and sets the profile's accent columns. Full suite:
   88 -> 91 backend tests, all passing. [code-agent]
+
+**2026-07-11: Increment 2 Test gate run — architecture (blocking FAIL),
+UX/accessibility (blocking FAIL), unit/integration (conditional pass,
+non-blocking gap) — 13 findings total, see evidence:
+`test-evidence/{architecture,ux-accessibility,unit-integration}-increment2-
+2026-07-11.md`. Sent to code-agent for a fix pass rather than proceeding
+to Review gate.**
+
+**2026-07-11: Increment 2 Code-gate fix pass — all 13 findings closed.**
+See the Decisions Log entry above for the full per-finding breakdown. One
+real defect found and fixed in the process (a `Memory.photo_ids` type
+mismatch that made memories with attached photos fail validation, masking
+what the architecture evidence had read as "unlinking never happens" —
+the unlink code was already correct). Backend suite 91 -> 101 passing,
+verified identical under both `python -m pytest -v` and plain `pytest -v`
+from `dev/backend/`. Frontend `tsc --noEmit` and `next build` both clean.
+`knowledge/ARCHITECTURE_KB.md` §0/§3/§6.1 updated to match the fix pass
+(store-interface wording, `photo_meta.id` shape note, `/digest` framing-
+check correction). Ready for solution-architect/ui-ux-designer/test-agent
+to re-verify and, pending that, Review gate. [code-agent]

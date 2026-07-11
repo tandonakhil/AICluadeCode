@@ -32,3 +32,8 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Code Increment 2 (F6 memory/timeline, F7 photos, F8 digest content) | code-agent | 212,346 | 1,878,095 |
 | 2026-07-11 | Increment 2 follow-up: resolve HEIC + theme-source design questions | solution-architect | 88,460 | 1,966,555 |
 | 2026-07-11 | Increment 2 follow-up: implement pillow-heif fix | code-agent | 62,867 | 2,029,422 |
+| 2026-07-11 | Test gate Increment 2: unit/integration | test-agent | 85,380 | 2,114,802 |
+| 2026-07-11 | Test gate Increment 2: UX/accessibility | ui-ux-designer | 119,339 | 2,234,141 |
+| 2026-07-11 | Test gate Increment 2: architecture | solution-architect | 120,152 | 2,354,293 |
+| 2026-07-11 | Test gate Increment 2: security | security-architect | 61,772 | 2,416,065 |
+| 2026-07-11 | Test gate Increment 2: red-team/bias | responsible-ai-architect | 86,904 | 2,502,969 |
