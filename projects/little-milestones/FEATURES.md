@@ -125,6 +125,35 @@ backend from JSON files to SQLite. See PLAN.md §6.
   pediatric corpus (CDC/AAP) is introduced; never scraped parenting blogs.
   _Source: PROJECT_CONTEXT later-scope; DOMAIN_KB R8._
 
+- **F12 — Hardened auth suite (conditional on SECURITY_KB §1.6's revisit
+  triggers, added 2026-07-11 per human request).** F10 ships a deliberately
+  right-sized baseline (local email+password, argon2id, server-side
+  sessions, no MFA/OAuth/password-reset — see SECURITY_KB §1.1–§1.3 for the
+  full reasoning). F12 is the future pass that goes beyond that baseline if
+  and when the triggers SECURITY_KB §1.6 already names actually fire:
+  - **Self-service password reset** — the accepted MVP gap (no reset flow
+    ships with F10); this is the first thing that should build once email
+    infrastructure is used for it (email infra itself already shipped for
+    F8, but was deliberately not repurposed for reset tokens — see
+    SECURITY_KB §1.3's note). Single-use, short-expiry, rate-limited reset
+    tokens, same rigor as invite codes.
+  - **MFA** (TOTP-based) — revisit if the threat model changes (e.g.
+    monetization, third-party integration, or data export/sharing beyond
+    the family unit — SECURITY_KB §1.6 trigger 3).
+  - **OAuth/social login** — currently rejected on privacy grounds (routes
+    a child-adjacent account signal through a third-party identity
+    provider); revisit only if a concrete user-facing need emerges that
+    argon2id+session hygiene doesn't already serve.
+  - **Managed session store / higher-concurrency session infra** — revisit
+    before any non-local (cloud-dev/cloud-prod) deployment, alongside
+    confirming `Secure`/HTTPS enforcement end-to-end (SECURITY_KB §1.6
+    trigger 1).
+  **Not scheduled** — this is a tracked, named backlog item so the decision
+  not to gold-plate auth now is visible and revisitable, not a commitment
+  to build all four sub-items together. Each sub-item's own trigger
+  (above) decides when it actually gets picked up.
+  _Source: human request 2026-07-11; SECURITY_KB §1.3, §1.6._
+
 ## Ready for Release
 
 ## Released
