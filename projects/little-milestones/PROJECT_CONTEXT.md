@@ -1073,3 +1073,50 @@ from `dev/backend/`. Frontend `tsc --noEmit` and `next build` both clean.
 (store-interface wording, `photo_meta.id` shape note, `/digest` framing-
 check correction). Ready for solution-architect/ui-ux-designer/test-agent
 to re-verify and, pending that, Review gate. [code-agent]
+
+**2026-07-11: Deploy gate, Increment 2 (local) — verified up, ready.**
+[deploy-agent] Found both `:8000` (backend) and `:3000` (frontend) already
+listening from a prior session — stale Increment-1-era processes, not
+verified as running current Increment-2 code. Killed both cleanly and
+restarted fresh from `dev/backend` (`.venv/bin/uvicorn app.main:app --port
+8000`) and `dev/frontend` (`npm run dev -- --port 3000`), reusing the same
+recorded ports (no reassignment). Confirmed genuinely serving (not just
+process-exit-0) via health check + full new-surface round-trip, not process
+existence alone:
+- `GET /health` -> `200 {"status":"ok"}`.
+- F6: `POST /profiles` (id=1) -> 201; `POST /profiles/1/memories` -> 201
+  real memory row; `GET /profiles/1/timeline` -> 200, real chronological
+  merge of the new memory with server-computed `age_at_moment` interleaved
+  among CDC-bucket chapter markers -- not a stub/empty array.
+- F7: uploaded a real 100x100 JPEG (Pillow-generated, 824 bytes) to
+  `POST /profiles/1/photos` -> 201, real `uuid4`-hex photo id (not an
+  autoincrement int, per the Increment-2 schema change). `GET
+  /profiles/1/photos/{id}` -> 200, `content-type: image/jpeg`, body
+  byte-identical to the original upload (`cmp` confirmed) -- decrypt-on-
+  serve genuinely works. Independently confirmed the on-disk file at
+  `dev/backend/data/photos/1/{id}` is `file`-typed as opaque ASCII text
+  (Fernet ciphertext), not JPEG, and differs byte-for-byte from the
+  plaintext upload -- encryption at rest is real, not a pass-through.
+- F8: `GET /profiles/1/digest` -> 200, real content (age line, 3 curated
+  milestones, 2 activities with supervision notes, memory-prompt nudge,
+  full disclaimer text) -- not an empty/stub payload.
+- Frontend: fresh `next dev` process on `:3000` (new PID, distinct from
+  the stale one killed) -> `GET /` returns 200 with `<title>little-
+  milestones</title>`, confirming it's serving this project, not a
+  leftover process from something else.
+- Backend log reviewed end-to-end for this session: every request 200/201
+  as expected, zero 4xx/5xx besides one intentional 422 during smoke-test
+  schema discovery (missing `display_name` on first `POST /profiles`
+  attempt -- corrected, not a product defect).
+- `target_env=local` only, per MVP scope -- no cloud deploy attempted, per
+  `admin/ROADMAP.md`'s explicit deferral.
+
+**Deploy gate: ready.** Ports unchanged (`8000`/`3000`, recorded above).
+Handing off to test-agent for the template's documented smoke test next.
+Current Status remains as previously recorded pending human approval of
+this gate -- deploy-agent does not set "deployed" status unilaterally.
+
+**Increment 2 (F6-F7-F8 content) is deployed (dev, local).** Test,
+Review, and Deploy gates are all closed for this increment. Proceeding
+to Increment 3 (F9 buying recommendations, F10 auth activation +
+multi-caregiver, F8 email delivery) per PLAN §4.7.

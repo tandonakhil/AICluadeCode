@@ -41,3 +41,4 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Re-verify architecture suite (Increment 2 fixes) | solution-architect | 66,033 | 2,767,113 |
 | 2026-07-11 | Re-verify UX suite (Increment 2 fixes) | ui-ux-designer | 67,033 | 2,834,146 |
 | 2026-07-11 | Review gate Increment 2 | review-agent | 75,323 | 2,909,469 |
+| 2026-07-11 | Deploy gate Increment 2 | deploy-agent | 51,875 | 2,961,344 |
