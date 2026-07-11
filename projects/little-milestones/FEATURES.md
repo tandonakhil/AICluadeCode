@@ -90,10 +90,13 @@ gates run per-increment.
 
 - **F8 — Weekly prompt digest.** Strictly opt-in (default off, one-click
   opt-out) "Maya is 14 months this week" digest with typical milestones
-  ("most children" framing only), activities, and a memory prompt. Digest
-  content generation and an in-app "this week" view build now; the delivery
-  channel (email/notification infrastructure) is an Architecture-gate
-  decision, and per-caregiver email opt-in activates with F10 accounts.
+  ("most children" framing only), activities, and a memory prompt. **Shipped
+  in full**: content + in-app "this week" view (Increment 2), real delivery
+  via Resend + in-process APScheduler with RFC 8058 one-click unsubscribe
+  (Increment 3, per ARCHITECTURE_KB §5's human-overridden real-delivery
+  design) — real sending stays gated off pending an unmet Resend
+  sending-domain verification precondition, not a code gap. Per-caregiver
+  email opt-in active with F10 accounts.
   _Source: INDUSTRY_KB I5._
 
 - **F9 — Buying recommendations.** Age-staged, contextual-only (never
