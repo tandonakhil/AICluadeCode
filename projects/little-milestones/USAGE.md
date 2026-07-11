@@ -37,3 +37,6 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Test gate Increment 2: architecture | solution-architect | 120,152 | 2,354,293 |
 | 2026-07-11 | Test gate Increment 2: security | security-architect | 61,772 | 2,416,065 |
 | 2026-07-11 | Test gate Increment 2: red-team/bias | responsible-ai-architect | 86,904 | 2,502,969 |
+| 2026-07-11 | Fix 13 Test-gate Increment 2 findings | code-agent | 198,111 | 2,701,080 |
+| 2026-07-11 | Re-verify architecture suite (Increment 2 fixes) | solution-architect | 66,033 | 2,767,113 |
+| 2026-07-11 | Re-verify UX suite (Increment 2 fixes) | ui-ux-designer | 67,033 | 2,834,146 |

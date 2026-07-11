@@ -958,6 +958,25 @@ record, not test-agent's to assume).
 - Stable across redeploys — reuse these, do not reassign, unless a conflict
   forces a change (record any change here if it happens).
 
+**2026-07-11: Test gate, Increment 2 — CLOSED.** 5 suites run (unit/
+integration, UX/accessibility, architecture, security, red-team/bias).
+Initial pass: unit/integration conditional-pass (1 coverage gap), UX
+BLOCK (4 blocking), architecture BLOCK (4 blocking, incl. a real bug —
+memory-only delete orphaned encrypted photo files due to a
+`Memory.photo_ids` type mismatch), security pass-conditional (2 checks
+needed Bash the agent lacked, closed directly by the orchestrator: 91/91
+→ later 101/101 tests, `python -m pytest`/plain `pytest` parity, `.env`/
+`data/photos` git-ignore confirmed), red-team/bias pass clean. All 13
+findings (7 blocking, 6 non-blocking) fixed by code-agent in one pass;
+re-verification passes by architecture and UX suites both confirm
+**CLOSED** on every finding, plus one new trivial non-blocking item
+(duplicate `<h1>` on Journey) found and fixed immediately. Backend:
+91 → 101 tests, all passing, both pytest invocations identical. Also
+this session: F12 (hardened auth suite — MFA/OAuth/password-reset)
+added to `FEATURES.md`'s later backlog per human request, referencing
+SECURITY_KB §1.6's existing revisit triggers rather than inventing new
+criteria. **Proceeding to Review gate, Increment 2.**
+
 ## Current Status
 Architecture gate held 2026-07-10 (solution-architect + security-architect
 joint design, responsible-ai-architect advisory) — **pending human
