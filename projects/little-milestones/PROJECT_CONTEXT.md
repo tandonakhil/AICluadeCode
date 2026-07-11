@@ -288,7 +288,10 @@ brief, not silently decided):
    default theme rather than recomputing from a remaining photo. This is
    a real simplification of the multi-photo case, not a bug — flagged for
    Architecture/UX review if a future increment wants "delete just falls
-   back to the next-most-recent photo's theme" instead.
+   back to the next-most-recent photo's theme" instead. **Resolved
+   2026-07-11 — see the Decisions Log entry below and ARCHITECTURE_KB §9.2:
+   accepted as a documented Increment-2 limitation, no schema change this
+   run.**
 3. **EXIF handling strips all EXIF metadata, not GPS tags only.** PLAN
    §4.3 specifically calls for GPS stripping; the implementation strips
    the entire EXIF block on re-save (simpler, and strictly more private —
@@ -303,7 +306,9 @@ brief, not silently decided):
    (logged as `photo_exif_strip_failed`) and never contributes a photo
    accent. Flagged as a real gap for security-architect/solution-architect
    to confirm is acceptable, or to add `pillow-heif` as a dependency in a
-   follow-up.
+   follow-up. **Resolved 2026-07-11 — see the Decisions Log entry below and
+   ARCHITECTURE_KB §9.1: gap closed, `pillow-heif` approved as a new
+   dependency, implementation steps specified for code-agent's next pass.**
 5. **Timeline chapter-marker anchor dates use chronological DOB +
    bucket_months**, not a corrected-age-adjusted date, purely for
    interleaving position on the calendar timeline — this is a placement
@@ -624,6 +629,49 @@ scope): F8 delivery (opt-in, scheduler, email/notification channel), F9
   pre-existing uncommitted Increment-1 diffs found in the working tree
   and deliberately left untouched. [code-agent] Next: Test gate (PLAN
   §7-F, §7-G, §7-H(1-3)).
+
+- **2026-07-11 — solution-architect: Increment-2 open design questions
+  resolved, pre-Test-gate.** code-agent flagged two questions
+  (Increment-2 judgment calls 2 and 4 above); both resolved directly by
+  solution-architect (architecture-owned "how," not a plan-scope change;
+  no security-architect co-review required — neither touches auth/
+  encryption/data-flow surface). Full reasoning: `knowledge/
+  ARCHITECTURE_KB.md` §9.
+  1. **HEIC EXIF-strip/color-extraction gap (judgment call 4): closed, not
+     documented-as-accepted.** Decision: add `pillow-heif` as a new
+     approved backend dependency (a small, actively-maintained Pillow codec
+     plugin, not a new architecture surface). Reasoning: SECURITY_KB §2's
+     EXIF-GPS-stripped-on-upload commitment is a stated privacy guarantee,
+     not a soft preference, and HEIC is Apple's default iOS capture format
+     — the current silent fallback (raw bytes stored unmodified,
+     `photo_exif_strip_failed` logged) means the format most likely to
+     carry phone-camera GPS EXIF is exactly the one the stated protection
+     doesn't cover. A well-scoped fix exists (`pillow_heif.
+     register_heif_opener()`, zero pipeline-logic changes once registered),
+     so documenting an exception rather than closing the gap was judged the
+     wrong call here. **Implementation is code-agent's next pass, not done
+     by solution-architect** — five concrete steps specified in
+     ARCHITECTURE_KB §9.1 (dependency addition, startup registration,
+     removal of the HEIC special-case, regression tests, dependency-conflict
+     verification).
+  2. **Multi-photo theme-source tracking (judgment call 2): accepted as a
+     documented Increment-2 limitation.** Decision: no schema change
+     (`theme_source_photo_id` or equivalent) this run; code-agent's
+     last-upload-wins / reset-to-default-on-any-delete behavior stands as
+     implemented. Reasoning: this sits entirely in decorative-UI territory
+     (UX_KB §6's theme is explicitly a non-safety-bearing accent layer,
+     structurally isolated from the LLM and from any PII concern either
+     way) — the worst case is a mildly surprising visual reset, not a
+     privacy/correctness failure, and it is self-healing (any new upload
+     recomputes the theme). Building a schema/migration/recompute-logic
+     fix now would also risk guessing at a UX_KB decision (what should
+     "delete with photos remaining" actually show?) that isn't
+     solution-architect's alone to make. Documented with an explicit
+     revisit trigger (a future UX_KB revision specifying multi-photo
+     fallback behavior, or a future Test-gate finding that the reset is
+     confusing enough in practice to warrant fixing ahead of a UX_KB
+     revision) — ARCHITECTURE_KB §4.2 cross-references §9.2.
+  [solution-architect]
 Approved 2026-07-10 — **core + 3 architects** (usage-monitor's recommended
 option (b), est. ~420k–540k remaining vs ~590k–720k full-team):
 - Core (non-droppable): plan-agent, code-agent, test-agent, review-agent,
@@ -759,3 +807,38 @@ backend (`:8000`) and frontend (`:3000`) confirmed genuinely serving,
 health-checked, real end-to-end `/chat` call verified. **Increment 1
 (F1-F5) is deployed (dev, local).** Proceeding to Increment 2 (F6-F7 +
 digest content) per PLAN §4.7's three-increment structure.
+
+**2026-07-11: Increment 2 (F6/F7/F8-content) built; two open design
+questions code-agent flagged were resolved by solution-architect
+pre-Test-gate** — HEIC EXIF/theme gap closed (new `pillow-heif` dependency
+approved, implementation steps specified for code-agent), multi-photo
+theme-source tracking accepted as a documented limitation with a revisit
+trigger. See Decisions Log above and `knowledge/ARCHITECTURE_KB.md` §9.
+Proceeding to Test gate for Increment 2 next.
+
+- **2026-07-11: code-agent — ARCHITECTURE_KB §9.1 HEIC fix implemented,
+  small scoped follow-up ahead of Test gate.** `pillow-heif` added to
+  `dev/backend/pyproject.toml`; `pillow_heif.register_heif_opener()`
+  called once at import time in `app/main.py` (module-level, so it's
+  active for test collection too, not only a running server). Removed
+  `_strip_exif`'s HEIC special-case in `app/photos.py`: HEIC now maps to
+  Pillow's `"HEIF"` save format (not `"JPEG"`) so the re-saved bytes stay
+  HEIC — this preserves the existing invariant every other accepted
+  format already had, that `PhotoMeta.content_type` (the sniffed type)
+  always matches the on-disk/served format. One judgment call the KB's
+  five steps didn't anticipate: `pillow-heif`'s HEIF encoder auto-carries
+  forward any EXIF already present in `image.info["exif"]` on re-save
+  unless it's explicitly cleared first (unlike the JPEG/PNG/WEBP save
+  path, where simply omitting the `exif=` kwarg is enough) — caught by
+  the new regression test, fixed with an explicit `image.info.pop("exif",
+  None)` before every re-save (JPEG/PNG/WEBP unaffected, since they never
+  populated that key in the first place). No changes needed to
+  `photo_theme.py`, confirming the KB's "zero pipeline-logic changes"
+  expectation for extraction. `pip install pillow-heif` pulled no new
+  transitive dependencies beyond Pillow itself (already a floor
+  dependency) — no conflict with the plan's approved dependency list.
+  Three new regression tests (`tests/test_photos.py`): HEIC upload
+  accepted (201), HEIC EXIF-GPS stripped on upload (same assertion
+  shape as the JPEG test), HEIC upload reaches `photo_theme.
+  extract_accent` and sets the profile's accent columns. Full suite:
+  88 -> 91 backend tests, all passing. [code-agent]

@@ -292,6 +292,13 @@ extraction. This also means re-computation on photo replace/delete is
 trivial: delete clears the three columns (falls back to default theme
 immediately, satisfying UX_KB §6.4), replace re-runs the pipeline.
 
+**Note on multi-photo theme-source tracking (added 2026-07-11 — see §9.2):**
+this section, as originally written, describes a single-photo mental model
+("delete clears the three columns... replace re-runs the pipeline") and does
+not specify how a profile with *multiple* photos should track which one is
+currently powering the theme. §9.2 records the Increment-2 resolution of
+that gap.
+
 ### 4.3 Library choice
 
 **Pillow** (already a near-certain dependency for content-sniffing/EXIF-strip
@@ -301,6 +308,11 @@ ML model) is justified for a decorative accent-color feature. This keeps the
 median-cut extraction is not claimed to be perceptually perfect) matched by
 an equally simple, auditable implementation — no black-box color-science
 library where a bug would be hard to reason about.
+
+**Update, 2026-07-11 — HEIC support (see §9.1):** this section's "Pillow
+alone is sufficient" claim is qualified by §9.1 — it is sufficient for the
+JPEG/PNG/WebP formats Pillow decodes natively, but not for HEIC without the
+`pillow-heif` plugin. §9.1 records the decision to add that plugin.
 
 ---
 
@@ -785,3 +797,106 @@ be (re-)consulted on §5's API-key handling (§5.8) and any new data-flow
 implications before this revision is treated as jointly approved,
 consistent with the joint-presentation requirement for the Architecture
 gate.**
+
+---
+
+## 9. Increment 2 architecture follow-ups (solution-architect, 2026-07-11)
+
+code-agent flagged two open design questions in the Increment-2 implementation
+summary (`PROJECT_CONTEXT.md`) before the Test gate runs. Both resolved here.
+Neither required security-architect co-review (no auth/encryption/data-flow
+surface touched) or a human gate re-approval (both are within solution-
+architect's "how, not what" authority over an already-approved F6/F7/F8
+design) — recorded per the re-engagement requirement regardless, since both
+are exactly the kind of "key design decision" that must not be silently
+resolved by code-agent alone.
+
+### 9.1 HEIC uploads — decision: close the gap, add `pillow-heif`
+
+**Decision: (a), add `pillow-heif` as an approved dependency.** Not (b)
+document-only.
+
+**Reasoning:** SECURITY_KB §2's EXIF-GPS-stripped-on-upload commitment
+(PLAN §4.3) is not a soft preference — it is the stated privacy guarantee
+for a product whose entire premise is storing photos of children. HEIC is
+not an edge-case format for this product's actual user base: it is Apple's
+default capture format on every iOS device since iOS 11, and this product's
+"parent uploads a phone photo of their kid" core flow means a large fraction
+of real uploads will be HEIC. A silent, format-dependent gap in a stated
+privacy commitment — where the code path exists and looks like it works
+(upload succeeds, photo displays) but quietly skips the privacy-bearing step
+for exactly the files most likely to carry embedded GPS data (phone camera
+EXIF) — is a materially different risk than "a feature is incomplete." It is
+the kind of gap that should not be closed by documentation alone when a
+well-scoped fix exists.
+
+`pillow-heif` is a mature, actively-maintained plugin (not a heavy or novel
+dependency — it registers a Pillow-compatible codec, `pillow_heif.
+register_heif_opener()`, after which `photos.py`'s existing Pillow-based
+EXIF-strip and `photo_theme.py`'s existing extraction pipeline both handle
+HEIC with zero pipeline-logic changes). This is a one-line dependency
+addition plus one registration call, not a new architecture surface —
+right-sized to close a real gap, not scope creep.
+
+**What code-agent's next pass must do** (not implemented by
+solution-architect — this is implementation work):
+1. Add `pillow-heif` to the backend's dependency list (`pyproject.toml`/
+   `requirements.txt`), alongside Pillow.
+2. Call `pillow_heif.register_heif_opener()` once at app startup (e.g. in
+   `main.py` or `db.py`'s init path, wherever other one-time startup
+   registration lives).
+3. Remove the current HEIC special-case (the `photo_exif_strip_failed`
+   fallback-to-raw-bytes path in `photos.py`) for the format itself — HEIC
+   should flow through the same EXIF-strip and `photo_theme.extract_accent`
+   pipeline as JPEG/PNG once the plugin is registered, no separate code path.
+4. Add regression tests: a real (or synthetically-constructed) HEIC fixture
+   upload asserts EXIF-GPS is stripped and a theme accent is extracted, same
+   assertions as the existing JPEG/PNG upload tests.
+5. Verify `pillow_heif` doesn't reintroduce any dependency the plan's
+   approved list was deliberately keeping out (it has no ML/network
+   dependencies of its own — a pure C-library-backed codec binding — so no
+   conflict expected, but this is code-agent's install-and-verify step, not
+   an assumption to carry forward unchecked).
+
+**Not a revisit-trigger deferral** — this is closed now, at the next
+code-agent pass, before Test gate re-runs, since it is a real privacy-
+commitment gap rather than a scoped-out feature.
+
+### 9.2 Multi-photo theme-source tracking — decision: accept as a documented Increment-2 limitation
+
+**Decision: (a), acceptable simplification for Increment 2.** No schema
+addition (`theme_source_photo_id` FK or equivalent) this run.
+
+**Reasoning:** unlike §9.1, this gap sits entirely in decorative UI
+territory — UX_KB §6's photo-personalization theme is explicitly a
+"decorative accent layer only" (per the Architecture-gate summary,
+PROJECT_CONTEXT.md), structurally excluded from anything safety- or
+privacy-bearing (no LLM reachability, no PII implication either way). The
+worst-case user-facing outcome of the current behavior — deleting any one
+photo resets the accent to the default theme even if other photos remain,
+rather than recomputing from a remaining photo — is a mildly surprising
+visual reset, not a data-loss, privacy, or correctness problem in any of the
+senses this project's Architecture/Security/Responsible-AI gates actually
+care about. It is also self-healing: uploading any new photo (or the parent
+noticing and re-uploading) immediately recomputes a theme, and the "last-
+upload-wins" model code-agent implemented is a coherent, simple mental model
+in its own right, not an obviously-broken one.
+
+Adding `theme_source_photo_id` now would be real, non-trivial scope: a
+schema migration, delete-time "find the next-most-recent remaining photo
+and recompute" logic, and a UX_KB decision (not solution-architect's alone)
+about whether "falls back to next-most-recent" is even the experience
+design wants, versus e.g. "always resets, re-upload to re-theme" being fine
+by design. Building the schema/logic side of that before UX_KB has actually
+specified the desired multi-photo behavior would risk building the wrong
+thing.
+
+**Documented as a known Increment-2 limitation, with an explicit revisit
+trigger:** revisit if either (a) a future increment's UX_KB revision
+specifies multi-photo theme-fallback behavior explicitly (at which point
+this becomes a scoped, spec'd feature rather than a speculative one), or
+(b) red-team/UX testing at a future Test gate finds the reset-to-default
+behavior is confusing or objectionable enough in practice to warrant fixing
+ahead of a UX_KB revision. Until then, code-agent's existing implementation
+(§Increment 2 judgment call 2 in PROJECT_CONTEXT.md) stands as designed.
+`ARCHITECTURE_KB.md` §4.2 has been annotated to point here.

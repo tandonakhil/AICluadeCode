@@ -30,3 +30,5 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Review gate follow-up: implement stale-age backstop + file recovery | responsible-ai-architect | 50,393 | 1,627,985 |
 | 2026-07-11 | Deploy gate Increment 1 | deploy-agent | 37,764 | 1,665,749 |
 | 2026-07-11 | Code Increment 2 (F6 memory/timeline, F7 photos, F8 digest content) | code-agent | 212,346 | 1,878,095 |
+| 2026-07-11 | Increment 2 follow-up: resolve HEIC + theme-source design questions | solution-architect | 88,460 | 1,966,555 |
+| 2026-07-11 | Increment 2 follow-up: implement pillow-heif fix | code-agent | 62,867 | 2,029,422 |
