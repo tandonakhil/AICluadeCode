@@ -223,6 +223,119 @@ of scope): F6 (memories/timeline), F7 (photo upload/encryption), F8
 (real signup/login/invites — only the `get_current_family` seam and
 argon2id helper exist).
 
+## Increment 2 implementation summary (code-agent, 2026-07-11)
+
+F6 (memory log + life-journey timeline), F7 (photo upload + storage), and
+F8-content (in-app "This week" digest) built against PLAN §4.2-§4.4 and
+the Architecture/Security gate designs in `knowledge/SECURITY_KB.md` §2
+and `knowledge/ARCHITECTURE_KB.md` §4. All 88 backend tests pass
+(`pytest`, up from 30 at the end of Increment 1); frontend type-checks and
+builds cleanly (`tsc --noEmit`, `next build`). F1-F5 code was left
+untouched except where F6/F7 genuinely needed to extend it (the
+`photo_meta.id` schema type and `routes/profiles.py`'s delete handler,
+both noted below).
+
+**Backend** (`dev/backend/app/`): `memories.py` (`Memory` + family-
+transitively-scoped `MemoryStore`; `moment_date` validated >= DOB and <=
+today, the DOB half enforced at the route layer since the Pydantic model
+has no profile context); `timeline.py` (pure function: chronological merge
+of memory entries carrying server-computed age-at-moment with passed-
+checklist-bucket chapter markers — the R1 hard rule is structural, not a
+filter: the payload shape has no field for "expected," so nothing renders
+one); `routes/memories.py`. `photos.py` (`PhotoMeta` + `PhotoStore`:
+Fernet-encrypted bytes on the filesystem, content-sniffed upload
+validation via magic bytes — not extension/claimed-type — EXIF stripped
+on upload, files-first-then-metadata delete ordering with verified purge,
+per-photo-delete and per-profile-cascade both covered); `photo_theme.py`
+(the ARCHITECTURE_KB §4 color-extraction pipeline: Pillow downsample ->
+median-cut quantize (k=5) -> skin-tone/near-gray cluster filter -> clamp
+to 3 HSL bands -> hue-rotate within 20° of `--lm-danger` -> WCAG AA
+contrast pre-check -> `None` on any failure, caller falls back to the
+default theme); `routes/photos.py` (upload/serve/delete, zero static
+mount); `digest.py` (`build_digest` — pure content assembly, reuses
+`ages.py`/`milestones.py`/the R1 framing rules + F6's last-memory date;
+content only, no opt-in/scheduler/email per PLAN's explicit Increment-3
+split); `routes/digest.py`.
+
+**Frontend** (`dev/frontend/`): `JourneyScreen.tsx` (the "life journey"
+tab — matches `design-review/journey/timeline.html`'s river layout);
+`AddMemoryForm.tsx` (matches `design-review/screens/photo-upload.html` —
+title/note/date/optional-tag entry with staged local photo previews,
+uploaded once the memory exists); `DigestPanel.tsx` (the in-app "This
+week" panel, wired into `TodayScreen`, fails quietly rather than blocking
+Today if the digest call errors). `lib/types.ts`/`lib/api.ts` extended
+with the F6/F7/F8 types and fetch wrappers, including `photoUrl()` which
+always resolves through the family-scoped API route.
+
+**Judgment calls made during Increment 2** (documented per the Code-gate
+brief, not silently decided):
+1. **`photo_meta.id` changed from an autoincrementing integer to a TEXT
+   `uuid4` hex** in `db.py`'s schema (an F1-era schema line, touched
+   because F7 genuinely needs it): the id also names the on-disk file
+   (`backend/data/photos/{profile_id}/{photo_id}`), and a random,
+   non-enumerable id is the right shape for something that doubles as a
+   filename an attacker might try to guess. No migration was needed or
+   written — no production photo data exists yet at this stage of the
+   pipeline; the dev-only `little_milestones.db` file was deleted and
+   regenerates from the new schema on next startup.
+2. **Photo-theme "which photo currently powers the theme" simplification**:
+   ARCHITECTURE_KB §4.2 describes "delete clears the three columns...
+   replace re-runs the pipeline" without specifying how a profile with
+   *multiple* photos tracks which one is the theme's source (no
+   `is_theme_source` flag exists in the schema). Implemented as: every
+   successful upload's extraction overwrites the profile's current accent
+   (last-uploaded-wins); deleting *any* photo resets the accent to the
+   default theme rather than recomputing from a remaining photo. This is
+   a real simplification of the multi-photo case, not a bug — flagged for
+   Architecture/UX review if a future increment wants "delete just falls
+   back to the next-most-recent photo's theme" instead.
+3. **EXIF handling strips all EXIF metadata, not GPS tags only.** PLAN
+   §4.3 specifically calls for GPS stripping; the implementation strips
+   the entire EXIF block on re-save (simpler, and strictly more private —
+   a floor, not a ceiling, on the stated requirement).
+4. **HEIC uploads are accepted by content-sniff (magic bytes) but are not
+   run through the EXIF-strip/color-extraction pipeline** in this
+   environment, since Pillow can't decode HEIC without the optional
+   `pillow-heif` plugin (not part of the plan's approved dependency list,
+   and Architecture's photo-pipeline design named Pillow alone as
+   sufficient). A HEIC upload is still validated, capped, and encrypted at
+   rest; it just falls back to storing the original bytes unmodified
+   (logged as `photo_exif_strip_failed`) and never contributes a photo
+   accent. Flagged as a real gap for security-architect/solution-architect
+   to confirm is acceptable, or to add `pillow-heif` as a dependency in a
+   follow-up.
+5. **Timeline chapter-marker anchor dates use chronological DOB +
+   bucket_months**, not a corrected-age-adjusted date, purely for
+   interleaving position on the calendar timeline — this is a placement
+   detail, not a milestone claim (the marker's only content is a neutral
+   month-count label), so it doesn't need the same corrected-age handling
+   that milestone *content* elsewhere in the app does.
+6. **`routes/profiles.py`'s delete handler was extended** (the one F1-era
+   route file genuinely touched by F7) to unlink all of a profile's photo
+   files before the DB's `ON DELETE CASCADE` removes the `memories`/
+   `photo_meta` rows — SQLite cascades handle metadata, never filesystem
+   bytes, so this had to be explicit (SECURITY_KB §2.4's stated ordering).
+7. **`digest.py`'s route return type is `dict`, not the `DigestPayload`
+   TypedDict**, because `DigestPayload.activities` nests
+   `milestones.Activity`, a `typing.TypedDict` from Increment-1 code
+   (left as-is per this increment's "don't touch F1-F5" instruction) —
+   pydantic v2 on this project's Python 3.9 runtime can't build a
+   response-model schema from a plain `typing.TypedDict` used as a route
+   return annotation. `DigestPayload` remains a real internal type for
+   `digest.py`'s own callers/tests; only the route's declared return
+   annotation is loosened.
+8. **Pre-existing uncommitted Increment-1 diffs found in the working tree
+   at the start of this run** (`app/guardrails.py`, `routes/chat.py`,
+   `tests/test_guardrails.py`, `frontend/next-env.d.ts` — apparent
+   stale-age-backstop and `next-env.d.ts` regeneration work, not attributed
+   to this session) were left untouched and unstaged: not part of F6/F7/F8
+   scope, and not mine to commit or discard. Flagged for the human/whoever
+   owns that in-flight change to commit or revert explicitly.
+
+**Not built this increment** (Increment 3 per PLAN §4.7, confirmed out of
+scope): F8 delivery (opt-in, scheduler, email/notification channel), F9
+(product catalog/CPSC filter), F10 (real signup/login/invites/roles).
+
 ## Decisions Log
 - 2026-07-10: plan-agent recommended `genai-chatbot` over `rag-knowledge-base`
   (no document corpus — recommendations are LLM-generated from the kid's
@@ -483,7 +596,34 @@ argon2id helper exist).
     instead of `Write`).
   - **Review gate: CLOSED.** Proceeding to Deploy gate next.
 
-## Active Team
+- **2026-07-11 — Deploy gate (local): verified up.** Backend
+  (`uvicorn app.main:app --port 8000`) and frontend (`npm run dev -- --port
+  3000`) confirmed genuinely serving, not just process-exit-0: `GET /health`
+  -> `200 {"status":"ok"}`; end-to-end `POST /chat` with a real profile ->
+  `200`, non-empty text + `disclaimer` field present (matches the Review-gate
+  fix). CORS confirmed scoped to `http://localhost:3000` only. Found and
+  fixed a real gap: the backend the orchestrator believed was already running
+  on :8000 for the human demo was **not actually listening** (port dark) at
+  the start of this check — restarted it; it is left running for the demo.
+  Frontend on :3000 was already up and confirmed serving the correct project
+  (cwd verified). Ports recorded above (8000/3000), stable for future
+  redeploys. `target_env=local` only, per MVP scope — no cloud deploy
+  attempted. **Deploy gate: ready**, pending hand-off to test-agent for the
+  template's documented smoke test (backend `/health` + `/chat`; frontend
+  Playwright once run). [deploy-agent]
+
+- **2026-07-11 — Increment 2 Code gate: F6 (memory log + timeline), F7
+  (photo upload + encrypted storage + photo-theme extraction), and F8
+  content (in-app "This week" digest) built and committed to `dev/` in
+  three logical commits (F6+F7 backend, F8 backend, frontend). 88 backend
+  tests pass (30 -> 88); frontend `tsc --noEmit`/`next build` both clean.
+  See "Increment 2 implementation summary" above for the full file list
+  and 8 documented judgment calls, including a real gap flagged for
+  Architecture/Security review (HEIC uploads skip the EXIF-strip/
+  color-extraction pipeline in this environment) and a note about
+  pre-existing uncommitted Increment-1 diffs found in the working tree
+  and deliberately left untouched. [code-agent] Next: Test gate (PLAN
+  §7-F, §7-G, §7-H(1-3)).
 Approved 2026-07-10 — **core + 3 architects** (usage-monitor's recommended
 option (b), est. ~420k–540k remaining vs ~590k–720k full-team):
 - Core (non-droppable): plan-agent, code-agent, test-agent, review-agent,
@@ -580,6 +720,12 @@ decision: either code-agent/responsible-ai-architect build the missing
 supplied for this environment) before sign-off, or the human explicitly
 overrides with a recorded reason.
 
+## Ports (local dev, assigned by deploy-agent 2026-07-11)
+- Backend (FastAPI/uvicorn): `8000`
+- Frontend (Next.js): `3000`
+- Stable across redeploys — reuse these, do not reassign, unless a conflict
+  forces a change (record any change here if it happens).
+
 ## Current Status
 Architecture gate held 2026-07-10 (solution-architect + security-architect
 joint design, responsible-ai-architect advisory) — **pending human
@@ -604,5 +750,12 @@ responsible-ai-architect) that PLAN §7-A through §7-E specify as
 Increment-1's blocking Test-gate criteria — those are the Test gate's
 job, not code-agent's, and are the next step before Increment 2 starts.
 [code-agent]
-</content>
-</invoke>
+
+**2026-07-11: Test, Review, and Deploy gates for Increment 1 all closed.**
+Test gate: 7 findings fixed + 3 additional live-red-team-discovered defects
+fixed, 48/48 tests passing. Review gate: approved, one architecture/code
+divergence found and closed (stale-age backstop implemented). Deploy gate:
+backend (`:8000`) and frontend (`:3000`) confirmed genuinely serving,
+health-checked, real end-to-end `/chat` call verified. **Increment 1
+(F1-F5) is deployed (dev, local).** Proceeding to Increment 2 (F6-F7 +
+digest content) per PLAN §4.7's three-increment structure.

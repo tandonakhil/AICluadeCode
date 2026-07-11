@@ -26,3 +26,7 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Test gate: red-team/bias (blocked, static-only) | responsible-ai-architect | 34,553 | 1,345,424 |
 | 2026-07-11 | Fix 7 Test-gate findings | code-agent | 132,593 | 1,478,017 |
 | 2026-07-11 | Red-team/bias re-run live (orchestrator, direct exec: server + 6 scenarios + 3 live-found fixes) | orchestrator | 41,200 | 1,519,217 |
+| 2026-07-11 | Review gate (review-agent) | review-agent | 58,375 | 1,577,592 |
+| 2026-07-11 | Review gate follow-up: implement stale-age backstop + file recovery | responsible-ai-architect | 50,393 | 1,627,985 |
+| 2026-07-11 | Deploy gate Increment 1 | deploy-agent | 37,764 | 1,665,749 |
+| 2026-07-11 | Code Increment 2 (F6 memory/timeline, F7 photos, F8 digest content) | code-agent | 212,346 | 1,878,095 |
