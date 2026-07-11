@@ -50,3 +50,4 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Test gate Increment 3: architecture (4 attempts, 3 crashed) | solution-architect | 25,703 | 3,679,489 |
 | 2026-07-11 | Fix 2 blocking + 2 non-blocking UX findings (Increment 3) | code-agent | 65,963 | 3,745,452 |
 | 2026-07-11 | Review gate Increment 3 | review-agent | 104,345 | 3,849,797 |
+| 2026-07-11 | Deploy gate Increment 3 (final) | deploy-agent | 41,731 | 3,891,528 |

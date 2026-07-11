@@ -1556,3 +1556,174 @@ drift beyond two stale-doc lines (`FEATURES.md`'s F8 description still
 described delivery as undecided; `memory/INDEX.md`'s stage was stale) —
 both corrected same-day. **Proceeding to Deploy gate, Increment 3 —
 the final gate of this project's original F1-F10 scope.**
+
+- **2026-07-11 — Deploy gate, Increment 3 (local) — verified up, ready.
+  This is the FINAL gate of this project's original F1-F10 scope.**
+  [deploy-agent] Found both `:8000` (backend) and `:3000` (frontend)
+  already listening from a prior session — stale processes, not verified
+  as running current Increment-3 code. Killed both cleanly (PIDs 30904,
+  28701) and restarted fresh from `dev/backend` (`.venv/bin/uvicorn
+  app.main:app --port 8000`) and `dev/frontend` (`npm run dev -- --port
+  3000`), reusing the same recorded ports (no reassignment; see Ports
+  section above). Confirmed genuinely serving, not just process-exit-0.
+
+  **New Increment-3 surface (auth now required on every data route —
+  the biggest behavioral change of the project):**
+  1. `GET /health` -> `200 {"status":"ok"}` — still unauthenticated, as
+     required.
+  2. `GET /profiles` with no session cookie -> `401 {"detail":"Not
+     authenticated"}` — confirms auth is actually enforced, not just
+     built-and-unused.
+  3. `POST /auth/signup` (real test email/password) -> `201`, real
+     `lm_session` cookie set (`HttpOnly`, confirmed via cookie jar).
+  4. Using that session: `POST /profiles` -> `201`; `GET /profiles` ->
+     `200` with real data (the new profile plus a pre-existing one from
+     earlier live-verification sessions this increment — expected,
+     harmless local dev data). Full auth-gated flow confirmed end to
+     end.
+  5. `GET /profiles/1/products` (with session) -> `200`, two real
+     curated recommendations (`simple_building_blocks`,
+     `picture_naming_books`) — cross-checked against
+     `app/data/cpsc_denylist.json`'s 12 denied categories: neither
+     returned item is denylisted.
+  6. `POST /invites` (with session, as owner) -> `201`, real invite code
+     (`lI5tRq7cxP84`, 12-char base64url, 7-day expiry).
+  7. Frontend confirmed serving: `GET /` -> `200`, correct
+     `<title>little-milestones</title>`. `AuthScreen.tsx`,
+     `SettingsScreen.tsx`, `ProductsPanel.tsx` all present under
+     `dev/frontend/components/` and wired into `app/page.tsx` (grep-
+     confirmed) — **visual/browser verification not possible without a
+     browser tool; noted as a gap, not silently skipped.**
+  8. Digest scheduler confirmed genuinely NOT auto-starting: backend
+     startup log shows no scheduler-start line; `grep -i scheduler` on
+     the startup log returns nothing. `RESEND_API_KEY` and
+     `ENABLE_DIGEST_SCHEDULER` both confirmed absent from
+     `dev/backend/.env` (grep returned no matches for either key).
+
+  **Full-system sanity check — F1-F5 (Increment 1) and F6-F8-content
+  (Increment 2) surfaces re-verified live under a real session, now that
+  auth wraps everything:**
+  - `POST /chat` (profile 1, real message) -> `200`, real non-empty LLM
+    text (age-bucket-appropriate activity suggestions), `disclaimer`
+    field present in the JSON payload, R1-safe framing observed
+    (no "behind"/"ahead" language).
+  - `GET /profiles/1/timeline` -> `200`, real chronological merge of a
+    pre-existing memory ("First laugh," from an earlier live-
+    verification session) interleaved with CDC-bucket chapter markers
+    and server-computed `age_at_moment` — not a stub.
+  - `GET /profiles/1/photos` (no such collection route by design) ->
+    `405`, expected. Found one **orphaned** `photo_meta` DB row from an
+    earlier session (id `48d3eac8...`, no matching on-disk file) ->
+    `GET /profiles/1/photos/{id}` correctly returned `404` and the
+    backend logged `photo_orphaned_metadata profile_id=1` — graceful,
+    logged handling of stale prior-session data, not a current-code
+    defect. Verified this by performing a **fresh** upload/serve
+    round-trip through the current session instead: `POST
+    /profiles/1/photos` (real 100x100 JPEG) -> `201`; `GET
+    /profiles/1/photos/{new_id}` -> `200`, byte-identical to the
+    original upload (`cmp` confirmed) — decrypt-on-serve genuinely
+    works. On-disk file independently confirmed as opaque ASCII
+    (Fernet ciphertext), byte-different from the plaintext upload —
+    encryption at rest is real, not a pass-through.
+
+  Backend log reviewed end-to-end for this session: every request
+  200/201 as expected except the three intentional negative-path checks
+  (401 no-session, 405 no-collection-route, 404 orphaned-photo) — zero
+  unexpected 4xx/5xx. CORS confirmed scoped to `http://localhost:3000`
+  only with `allow_credentials=True` (required for the session cookie
+  across the :3000 -> :8000 origin boundary, per Increment-3 judgment
+  call 5). `target_env=local` only, per MVP scope — no cloud deploy
+  attempted, per `admin/ROADMAP.md`'s explicit deferral.
+
+  **Deploy gate: ready.** Ports unchanged (`8000`/`3000`, recorded
+  above). Handing off to test-agent for the template's documented smoke
+  test next. Current Status remains as previously recorded pending human
+  approval of this gate — deploy-agent does not set "deployed" status
+  unilaterally.
+
+  **This completes the entire original F1-F10 approved scope** (Plan &
+  Backlog gate, 2026-07-10) across all three increments — pending human
+  approval of this final Deploy gate and the resulting Current Status
+  update.
+
+- **2026-07-11 — Deploy gate, Increment 3 (local) — re-verified against
+  the live LAN-serving instances, ready. Supersedes the CORS/process
+  details of the entry immediately above (which predates the LAN setup);
+  the "ready" verdict and F1-F10-complete conclusion stand.** [deploy-agent]
+  This run did **not** restart or kill anything — the orchestrator already
+  had backend (`:8000`) and frontend (`:3000`) running, both bound to
+  `0.0.0.0` so the human's phone can reach them at `10.0.0.47`, with
+  `EXTRA_CORS_ORIGINS` extending the CORS allow-list (confirmed wired in
+  `app/main.py`, `allow_credentials=True` preserved) and the frontend's
+  `NEXT_PUBLIC_API_BASE_URL` pointed at the LAN IP. Human is actively using
+  these for LAN/mobile testing and was explicitly told to keep them up, so
+  this gate verified against the already-running processes (PIDs unchanged
+  before/after: backend 32410, frontend 32433/32434) instead of the usual
+  restart-and-confirm pattern.
+
+  All checks run via `curl` against `http://localhost:8000` (same process
+  as the LAN-reachable one):
+  1. `GET /health` -> `200`.
+  2. `GET /profiles` no session cookie -> `401` (auth genuinely enforced).
+  3. `POST /auth/signup` (real test email `deploy-agent-verify+lm3@
+     example.com`) -> `201`, real `HttpOnly` `lm_session` cookie set.
+  4. With that session: `POST /profiles` -> `201`; `GET /profiles` ->
+     `200` with the real created profile.
+  5. `GET /profiles/{id}/products` -> `200`, two real curated items
+     (`simple_building_blocks`, `picture_naming_books`) — cross-checked
+     against all 12 entries in `app/data/cpsc_denylist.json`, neither
+     returned category is denylisted.
+  6. `POST /invites` (as owner) -> `201`, real invite code + 7-day expiry.
+  7. F1-F5/F6-F8-content surfaces re-confirmed live under the same real
+     session: `POST /chat` -> `200` non-empty, age-appropriate, R1-safe
+     text; `GET /profiles/{id}/timeline` -> `200` real CDC-bucket chapter
+     markers; photo upload/serve/delete round-trip (`POST` then `GET` then
+     `DELETE` on `/profiles/{id}/photos/{photo_id}`, the collection-level
+     `GET /profiles/{id}/photos` correctly `405`s by design, no such
+     route) -> `201`/`200`/`200`, byte count matched on serve.
+  8. Digest scheduler confirmed genuinely not auto-starting: `grep -i
+     scheduler` on the live backend's stdout log (`/private/tmp/
+     lm-backend.log`) returns nothing beyond the four expected startup
+     lines (`Started server process` / `Waiting for application startup`
+     / `Application startup complete` / `Uvicorn running`); `RESEND_API_KEY`
+     and `ENABLE_DIGEST_SCHEDULER` both confirmed absent from `dev/backend/
+     .env`; the live process's own environment (`ps eww`) also shows
+     neither var set, consistent with `.env`.
+
+  Test data cleanup: the test profile (`id=5`) and its one uploaded test
+  photo were deleted via the API's own `DELETE /profiles/{id}` and
+  `DELETE /profiles/{id}/photos/{id}` endpoints (both `200`) — confirmed
+  gone from `GET /profiles` afterward. The one test user/family row
+  (`deploy-agent-verify+lm3@example.com`, family_id 3) could not be
+  cleaned up the same way — no user-delete endpoint exists in this scope
+  (expected; not a gap) — left in place as a harmless, invisible-to-the-
+  human-session DB row rather than reaching outside the API to hand-edit
+  SQLite.
+
+  **Deploy gate: ready.** Ports unchanged (`8000`/`3000`). ***Servers are
+  being left running, per explicit human instruction*** — this is not the
+  usual "confirm up" close-out; it's "confirm up AND stays up," since the
+  human is actively browsing/mobile-testing against these exact processes.
+  Handing off to test-agent for the template's documented smoke test.
+  Current Status remains as previously recorded pending human approval of
+  this gate — deploy-agent does not set "deployed" status unilaterally.
+
+  **This re-confirms completion of the entire original F1-F10 approved
+  scope** (Plan & Backlog gate, 2026-07-10) across all three increments —
+  pending human approval of this final Deploy gate and the resulting
+  Current Status update.
+
+**2026-07-11: Increment 3 (F9-F10-F8 delivery) is deployed (dev, local).**
+Test, Review, and Deploy gates all closed. Also added LAN/mobile
+reachability this session (an operational convenience, not a gated
+increment): backend/frontend both bound to `0.0.0.0`, backend CORS
+extended via a new `EXTRA_CORS_ORIGINS` env var (additive — does not
+change the `http://localhost:3000` default), frontend's
+`NEXT_PUBLIC_API_BASE_URL` pointed at the LAN IP for phone testing.
+Servers deliberately left running per explicit human instruction.
+
+**All three increments (F1-F10) are now deployed (dev, local). This is
+the entire originally-approved MVP scope for little-milestones,
+complete.** Only F11 (conditional RAG mode) and F12 (hardened auth
+suite, added 2026-07-11) remain in the later backlog, both explicitly
+deferred and neither blocking this project's MVP completion.
