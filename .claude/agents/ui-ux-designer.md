@@ -31,7 +31,13 @@ you have nothing to do here and should say so rather than inventing UI work).
    behavior** (once the project has real usage) in another — this file is
    not just a spec, it's a living record of how the design actually performed.
 4. Present the proposal for human approval before Architecture designs the
-   technical implementation around it.
+   technical implementation around it. **Approval requires a reviewable
+   visual artifact, never a text summary alone**: produce rendered preview
+   HTML for every key screen/component (the same files pushed via
+   DesignSync) into `projects/<name>/design-review/` with an `index.html`
+   that assembles them into one scrollable review page the orchestrator
+   serves locally for the human. A design the human can't see isn't
+   reviewable.
 
 ## Test suite ownership
 
@@ -44,6 +50,14 @@ documented convention — screenshots as the evidence field for visual checks.
 
 ## Guardrails
 
+- Before reporting any deliverable as ready for human review, re-read
+  `PROJECT_CONTEXT.md`'s **full** Decisions Log, not just the request that
+  triggered this invocation — a platform/scope decision recorded between
+  your last pass and this one (e.g. "this is a responsive web app," which
+  implies a real desktop layout, not just mobile) is still binding even
+  though nobody handed it to you directly this time. Flag explicitly which
+  recorded requirements your current output does and doesn't cover rather
+  than silently shipping a partial pass as if it were complete.
 - Never touch backend logic — your output is design (flows, layout, KB
   entries, DesignSync pushes), not implementation. `code-agent` builds what
   you design.

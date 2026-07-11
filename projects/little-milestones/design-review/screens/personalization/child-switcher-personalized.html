@@ -1,0 +1,72 @@
+<!-- @dsCard group="Personalization" name="Child switcher — per-child accents" subtitle="Each profile previews its own extracted accent (or default identity hue if no photo) — never one shared accent" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>little-milestones — Child switcher (photo-personalized)</title>
+<style>
+  :root{
+    --lm-cream:#FDF8F2; --lm-ink:#3D3833; --lm-ink-soft:#6E6259;
+    --lm-terracotta:#C1502A; --lm-sky:#6FA8D8; --lm-moss:#7CB56C;
+    /* Maya — from her photo (dusty rose) */
+    --maya-mid:#B85C7B; --maya-deep:#6B2E42;
+    /* Theo — from his photo (warm teal) */
+    --theo-mid:#3E8C86; --theo-deep:#1F4B47;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",sans-serif;background:#EFE7DA;color:var(--lm-ink);margin:0;padding:36px 16px;line-height:1.55}
+  .caption{text-align:center;font-size:13px;color:var(--lm-ink-soft);margin:0 0 10px;font-weight:600}
+  .flag{max-width:375px;margin:0 auto 14px;background:#fff;border:1px solid #E8D9C8;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--lm-ink-soft)}
+  .flag b{color:var(--lm-terracotta)}
+  .device{width:375px;margin:0 auto;position:relative}
+  .screen{background:#00000055;border-radius:32px;overflow:hidden;min-height:820px;display:flex;flex-direction:column;justify-content:flex-end}
+  .sheet{background:#fff;border-radius:24px 24px 0 0;padding:18px 18px 24px;box-shadow:0 -10px 30px rgba(0,0,0,.2)}
+  .grabber{width:40px;height:4px;background:#E8D9C8;border-radius:4px;margin:0 auto 14px}
+  h2.st{font-size:16px;margin:0 0 14px 4px}
+  .row{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:16px;margin-bottom:6px}
+  .row.sel{background:var(--lm-cream)}
+  .avatar{width:52px;height:52px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;position:relative}
+  .avatar.maya{background:linear-gradient(135deg,#E8B4C4,#8A4A5E);border:3px solid var(--maya-mid)}
+  .avatar.theo{background:linear-gradient(135deg,#7FC3BE,#1F4B47);border:3px solid var(--theo-mid)}
+  .avatar.sam{background:var(--lm-moss);border:3px solid #E8D9C8}
+  .info b{display:block;font-size:15.5px}
+  .info span{font-size:12.5px;color:var(--lm-ink-soft)}
+  .chip{margin-left:auto;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;white-space:nowrap}
+  .chip.photo{color:#fff}
+  .chip.maya{background:var(--maya-deep)}
+  .chip.theo{background:var(--theo-deep)}
+  .chip.default{background:var(--lm-cream);color:var(--lm-ink-soft);border:1px solid #E8D9C8}
+  .add{display:flex;align-items:center;gap:10px;padding:14px 8px;color:var(--lm-terracotta);font-weight:700;font-size:14.5px}
+  .plus{width:36px;height:36px;border-radius:50%;border:2px dashed var(--lm-terracotta);display:flex;align-items:center;justify-content:center;font-size:18px}
+</style>
+</head>
+<body>
+<p class="caption">Child switcher sheet &middot; two profiles with photos (different accents), one without</p>
+<div class="flag"><b>Each child's accent is independent.</b> Maya's dusty-rose and Theo's teal are each derived from that child's own uploaded photo — never one shared theme across profiles. Sam has no photo yet, so his row previews the fixed default identity hue (moss) instead, exactly as it always has.</div>
+<div class="device">
+  <div class="screen">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <h2 class="st">Switch child</h2>
+      <div class="row sel">
+        <div class="avatar maya">M</div>
+        <div class="info"><b>Maya</b><span>14 months</span></div>
+        <div class="chip photo maya">photo theme</div>
+      </div>
+      <div class="row">
+        <div class="avatar theo">T</div>
+        <div class="info"><b>Theo</b><span>3 months</span></div>
+        <div class="chip photo theo">photo theme</div>
+      </div>
+      <div class="row">
+        <div class="avatar sam">S</div>
+        <div class="info"><b>Sam</b><span>9 months</span></div>
+        <div class="chip default">default theme</div>
+      </div>
+      <div class="add"><div class="plus">＋</div>Add a child</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

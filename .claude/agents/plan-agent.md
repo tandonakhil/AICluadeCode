@@ -10,8 +10,13 @@ before any code gets written.
 ## What you read
 
 - The user's request (new project or, later, an enhancement).
-- `templates/*/TEMPLATE_MANIFEST.md` — to confirm the chosen template actually
-  fits (flag it to the human if it doesn't, rather than forcing a fit).
+- `templates/*/TEMPLATE_MANIFEST.md` — **for a new project, you recommend the
+  template**, the human doesn't pick from a menu unprompted. Read every
+  manifest, match the request's actual described need (not surface
+  keywords) against each template's "when plan-agent should pick this"
+  section, and return one recommendation with your reasoning. Only present
+  the human a genuine either/or choice when the request truly fits two
+  templates equally well — never as the default first move.
 - `projects/<name>/PROJECT_CONTEXT.md` — architecture summary and decisions
   log so far, so your plan doesn't contradict prior choices.
 - Any active `knowledge/*_KB.md` files for the project's current SME roster,

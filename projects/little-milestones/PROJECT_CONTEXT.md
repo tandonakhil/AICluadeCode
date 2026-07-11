@@ -1,0 +1,608 @@
+# Project: little-milestones
+
+## Overview
+- Template: genai-chatbot (recommended by plan-agent, human-confirmed)
+- Created: 2026-07-10
+- Target environment: local (cloud-dev/cloud-prod deferred, see admin/ROADMAP.md)
+- Current stage: Increment 1 (F1-F5) code built 2026-07-10, pending Test gate
+
+## Full described scope (human's original request, verbatim intent)
+A website to track infant-to-toddler details: kid profile created up front,
+picture upload, best activities to do at each age as the kid grows, buying
+recommendations as the kid grows, an interactive chat window for questions at
+each milestone, and a "really cool life journey" visualization at a point in
+time on a button click.
+
+## This run vs. later (human-approved split, 2026-07-10 — supersedes plan-agent's first-slice proposal)
+- **This pipeline run (F1–F10, human-selected via itemized backlog review)**:
+  kid profiles, age computation, guarded milestone chat, activity
+  suggestions, disclaimer, memory log + life-journey timeline, photo upload
+  + storage (with its compliance preconditions pulled into scope:
+  retention/delete, encryption at rest, private-by-default, no face
+  processing, no AI training on child photos), weekly opt-in digest, buying
+  recommendations with CPSC recall filtering, and multi-caregiver access.
+  Built in three internal increments with per-increment gates — see PLAN.md
+  §4.7.
+- **Later via /enhance-project**: F11 only — a RAG-grounded answering mode,
+  conditional on a vetted pediatric-guidance corpus ever being introduced.
+- **Flagged for Architecture gate**: R3 milestone grounding, auth design
+  (forced by F10), photo storage/encryption design (forced by F7),
+  email/notification infrastructure (F8), storage backend (JSON vs. SQLite).
+  See PLAN.md §6. **Resolved 2026-07-10 at the Architecture gate — see
+  Architecture Summary below; pending human approval.**
+
+## Architecture Summary
+**Architecture gate held 2026-07-10 — pending human approval.** Jointly
+designed by solution-architect (`knowledge/ARCHITECTURE_KB.md`) and
+security-architect (`knowledge/SECURITY_KB.md`, joint owners), with
+responsible-ai-architect advisory (`knowledge/RESPONSIBLE_AI_KB.md`, this
+project's first). No disagreement among the three roles. Resolves all six
+PLAN.md §6 open questions plus output-side enforcement:
+
+1. **R3 grounding — Option A, curated CDC-2022 table.** Adopts
+   functional-agent's DOMAIN_KB position: `app/data/milestones_cdc2022.json`
+   + activities table, hand-curated, injected into the prompt/served
+   directly. Curation ownership: solution-architect, with
+   responsible-ai-architect co-review on framing changes; update triggered
+   by CDC/AAP revisions or CPSC recalls, not a calendar cadence. Same
+   discipline extended to F9's product catalog + CPSC denylist.
+2. **Auth — baseline confirmed with refinements.** Local email+password,
+   argon2id (`passlib`), server-side sessions (hashed tokens in SQLite),
+   HTTP-only/SameSite=Lax/conditionally-Secure cookies, owner/caregiver
+   roles, single-use expiring invites, cross-family access = 404. No OAuth,
+   no magic-link, no MFA this run; no self-service password reset this run
+   (documented gap, revisit when email infra ships). Full reasoning +
+   revisit triggers in SECURITY_KB.md §1 (dedicated, non-collapsible
+   section).
+3. **Photo storage/encryption — confirmed.** Bytes on filesystem
+   (id-derived paths, gitignored), Fernet (AES+HMAC) application-level
+   encryption, key in `.env` for local dev (revisit before non-local
+   deploy), decrypt-on-serve, no static mount, EXIF-GPS stripped, hard
+   delete = unlink-then-DB-row-delete (crash-safe ordering), no automatic
+   backups. SQLite DB file itself not separately encrypted this run
+   (named gap, revisit trigger set) — photo bytes and credentials are
+   already covered by their own mechanisms regardless.
+4. **Photo color-extraction algorithm — specified.** Server-side, upload-
+   time, Pillow-based: downsample → median-cut/k-means quantize → filter
+   near-gray + skin-tone-band clusters → pick dominant remaining cluster →
+   clamp to three HSL bands (`--lm-photo-mid/-deep/-tint` per UX_KB §6.3) →
+   hue-rotate if near `--lm-danger` → automated WCAG contrast pre-check
+   with fixed-scrim compositing → fallback to default theme (not an
+   unchecked accent) if it still fails. Only three hex values ever leave
+   the pipeline; nothing photo-derived reaches the LLM layer.
+5. **Email/notification infra (F8) — REVISED 2026-07-10, real delivery
+   (human override).** The original gate's deferral was overridden by the
+   human same-day; `knowledge/ARCHITECTURE_KB.md` §5 was fully replaced
+   (not appended) with a real-delivery design: **Resend** as the
+   transactional email provider (generous free tier fits this project's
+   scale, minimal API, first-class custom-header support needed for
+   one-click unsubscribe), **in-process APScheduler** daily job (confirms
+   the originally-documented fallback rather than revising it), sent via a
+   thin `app/email_delivery.py` wrapper. The original privacy concern (a
+   child's name/stage leaving the machine to a third party on an
+   unattended, recurring basis) is addressed directly, not dropped: the
+   email body is a **fixed, content-free notification only** — no child
+   name, DOB, age, or milestone content ever appears in an outbound email;
+   all specifics require login to the in-app `/digest` panel. A **real
+   one-click unsubscribe** (`GET /digest/unsubscribe?token=...`,
+   unauthenticated by design, RFC 8058 `List-Unsubscribe-Post` header,
+   stable per-user token) exists independent of the in-app opt-in toggle.
+   CAN-SPAM was checked explicitly (a gap INDUSTRY_KB itself did not name)
+   and is complied with — mailing-address requirement flagged for
+   human/deploy-agent to supply before the scheduler runs against real
+   users. `RESEND_API_KEY` handled via `.env`, same pattern as existing
+   secrets. **security-architect's independent review completed 2026-07-10
+   — see the Decisions Log entry below: approved conditional on two
+   concrete additions to the unsubscribe route (scoping enforcement +
+   rate limiting) and a new privacy-policy/vendor-disclosure item for
+   Resend as a third-party processor; API-key handling itself confirmed
+   consistent with no changes needed.**
+6. **Storage backend — confirmed SQLite.** Single gitignored file,
+   `PRAGMA foreign_keys=ON`, `ON DELETE CASCADE` across
+   families→users/profiles→memories→photo_meta; photo bytes stay on
+   filesystem, never DB blobs; no automatic backups (a backup is a
+   liability under the delete promise until the human requests export).
+   (§5's revision adds two columns to `users` — `last_digest_sent_at`,
+   `unsubscribe_token_hash` — documented in ARCHITECTURE_KB §5.4.)
+7. **Output-side enforcement — `app/guardrails.py`.** Post-generation
+   code-level checks for R1 (anxiety-framing denylist/pattern checks) and
+   R2 (dosage/diagnosis pattern checks) on both `/chat` and `/digest`
+   (digest gets no relaxation — unattended generation, PLAN §3.5 in
+   RESPONSIBLE_AI_KB). `/chat` streaming is buffered server-side and
+   checked before release to the client — an explicit latency trade-off
+   stated rather than left to the template's streaming default. F9's CPSC
+   filter is structural (serve-time catalog filter with no LLM code path),
+   not a guardrail check.
+
+Responsible-AI baseline (first `RESPONSIBLE_AI_KB.md` for this project):
+content/behavior boundaries for R1 (never "behind"/"ahead," reassurance
+must always pair with CDC framing + pediatrician suggestion), R2 (hard
+refusal on diagnosis/dosing/triage, red-flag list never minimized or
+excused by corrected age), and appropriate-use boundaries beyond
+correctness (chat must not become a product-recommendation side door
+around F9's catalog filter; no cross-child comparison; EI/diagnosed-
+condition disclosures must be acknowledged, not overridden by generic
+framing). Seven red-team scenarios specified for the Test-gate suite,
+including a tone-matching-escalation probe and a persistent-unlock probe
+that a keyword denylist alone would not catch.
+
+Full detail, rationale, and trade-offs: `knowledge/ARCHITECTURE_KB.md`,
+`knowledge/SECURITY_KB.md`, `knowledge/RESPONSIBLE_AI_KB.md`.
+
+## Increment 1 implementation summary (code-agent, 2026-07-10)
+
+F1-F5 built for real against the Architecture/Security/Responsible-AI gate
+design, plus the Increment-1 seams PLAN §4.7 calls for. All 30 backend
+tests pass (`pytest`); frontend type-checks and builds cleanly (`tsc
+--noEmit`, `next build`).
+
+**Backend** (`dev/backend/app/`): `db.py` (full SQLite schema for every
+F1-F10 entity — families/users/sessions/profiles/memories/photo_meta/
+invites — `PRAGMA foreign_keys=ON`, idempotent `init_db()`, 0600 file
+perms); `ages.py` (chronological + corrected age via an adjusted-DOB
+`relativedelta` approach, CDC-2022 bucketing, newborn/out-of-range mode);
+`profiles.py` (minimal-fields model + family-scoped `ProfileStore`, hard
+delete); `auth.py` (the Increment-1 seam — `get_current_family` always
+resolves to the seeded default family; argon2id hashing helpers wired up
+but not yet reachable from any route); `data/milestones_cdc2022.json` +
+`milestones.py` (curated CDC/AAP milestone + activity table, 10 checklist
+buckets); `prompts.py` (system-prompt assembly: persona, server-computed
+child context, R1/R2/R5 hard rules, disclaimer, grounding block);
+`guardrails.py` (post-generation R1 framing-denylist + R2 dosage/
+diagnostic-assertion checks, discard-and-replace, no-PII incident
+logging); `routes/{profiles,chat}.py` + assembly-only `main.py`.
+
+**Frontend** (`dev/frontend/`): a real Next.js App Router build replacing
+the placeholder — onboarding (welcome/name/birthday/born-early/ready per
+UX_KB's exact sensitive copy), profile switcher with typed-confirmation
+hard delete, milestone chat (age-context strip, corrected-age explainer,
+pediatrician-note card), Today (activity cards + coming-next), a
+persistent disclaimer footer, and the UX_KB §5.1 responsive shell (bottom
+tab bar under 1024px, sidebar nav at/above it, Today's 2-column grid at
+the same breakpoint).
+
+**Judgment calls made during Increment 1** (documented per the Code-gate
+brief, not silently decided):
+1. **SQLite thread affinity**: `sqlite3.connect(..., check_same_thread=False)`
+   was required — FastAPI's sync route handlers run in Starlette's
+   threadpool, so a connection created on one thread must be usable from
+   the worker thread handling the request. Each request still gets its
+   own connection via `get_db`'s yield-per-request pattern; this doesn't
+   introduce cross-request sharing.
+2. **`X-LM-Disclaimer` header uses an ASCII-safe variant** of the
+   disclaimer (em dash replaced with a hyphen) — the real disclaimer text
+   is not Latin-1 encodable and would break HTTP header transmission.
+   `DISCLAIMER` (full text) is still used in the system prompt, UI, and
+   JSON payloads; `DISCLAIMER_HEADER_SAFE` is header-only.
+3. **CDC-2022 milestone content was reconstructed from general model
+   knowledge, not a live fetch** (no web-search tool available in this
+   environment, same constraint ui-ux-designer noted for competitor
+   research). The table is structured, sourced, and flagged (`_meta`
+   block) per ARCHITECTURE_KB §1.1, but a pre-production content review
+   against the actual cdc.gov checklist pages is an open follow-up, not
+   yet done — recommended before Test-gate red-team sign-off treats the
+   content as authoritative.
+4. **Newborn-mode activities reuse the 2-month bucket's curated
+   activities** (there is no separate newborn bucket in the curated
+   table below 2 months) rather than a bespoke newborn activity set —
+   right-sized for Increment 1; flagged for review if red-team finds any
+   2-month activity unsuitable for a 3-week-old.
+5. **No Tailwind/shadcn build-out.** `package.json` lists `tailwindcss`
+   per the template, but no config scaffolding (`tailwind.config.js`,
+   `postcss.config.js`) existed in the repo, and TEMPLATE_MANIFEST's
+   "shadcn/ui" claim had no corresponding files either. Rather than spend
+   Increment-1 budget standing up a utility-class pipeline neither the
+   Plan nor UX_KB requires by name, styling is hand-written CSS using the
+   exact UX_KB §4.2 token values. Revisit only if a later increment's
+   design surface genuinely benefits from a component library.
+6. **`/chat` is not truly streamed**, per ARCHITECTURE_KB §6.1's own
+   explicit trade-off (buffer full response server-side, run guardrails,
+   release once): the route calls `model.invoke(...)` (not `.stream(...)`).
+   **Correction (2026-07-11, review-agent):** as of finding-4's fix
+   (`94fc502`), the response is a plain `JSONResponse` (`{"text":
+   ..., "disclaimer": ...}`), not `StreamingResponse` — the buffer-then-
+   guardrail-check trade-off itself is unchanged, only this sentence's
+   technical claim about the response type was stale.
+7. **Frontend age display in the profile switcher is a simple client-side
+   month count**, not corrected age — it's a quick list label only; every
+   surface that does real milestone/corrected-age framing (Today, Chat)
+   uses the server's `/profiles/{id}/activities` response, never
+   recomputes age logic client-side.
+8. **No router modules for memories/photos/digest/products/auth were
+   created this increment** (`app/routes/` has only `profiles.py` and
+   `chat.py`). PLAN §4.1 says code-agent should set up the router-split
+   structure "as routes accumulate" — since only F1-F5 are in scope this
+   increment, stub routers for not-yet-built features were judged as
+   unstated scope addition rather than a required seam; `main.py`'s
+   `include_router` pattern makes adding them in Increment 2 additive, not
+   a refactor.
+
+**Not built this increment** (Increment 2-3 per PLAN §4.7, confirmed out
+of scope): F6 (memories/timeline), F7 (photo upload/encryption), F8
+(digest — content or delivery), F9 (product catalog/CPSC filter), F10
+(real signup/login/invites — only the `get_current_family` seam and
+argon2id helper exist).
+
+## Decisions Log
+- 2026-07-10: plan-agent recommended `genai-chatbot` over `rag-knowledge-base`
+  (no document corpus — recommendations are LLM-generated from the kid's
+  profile, not cited from documents) and `agentic-workflow` (API-only, no UI;
+  this is a consumer website). Human confirmed. [plan-agent, approved]
+- 2026-07-10: Scaffolded from `genai-chatbot` template (FastAPI+LangChain
+  backend, Next.js frontend placeholder), dev repo initialized at `72ef863`.
+  [new-project skill]
+- 2026-07-10: Intake complete — domain: child development & parenting
+  guidance (functional-agent, `DOMAIN_KB.md`, 8 risks flagged incl. an
+  active challenge for Architecture: don't let the LLM generate milestone
+  ages ungrounded, embed a curated CDC-2022 table instead); industry:
+  consumer parenting/family tech (industry-expert, `INDUSTRY_KB.md`,
+  6-item trend-informed backlog + compliance flags: no AI training on
+  child data, no face processing on photos, retention/delete policy
+  before photos ship, contextual-only product recs). [Intake gate]
+- 2026-07-10: Plan & Backlog gate — human reviewed the itemized backlog and
+  approved F1–F10 for this run (larger than plan-agent's proposed F1–F5
+  slice; F11 alone deferred), built in 3 gated increments per PLAN.md §4.7;
+  pulls F7 photo-compliance preconditions and the F10 auth decision into
+  scope and ~2.5–3.5×'s the original token estimate (usage-monitor
+  re-estimate recommended before Architecture). [plan-agent, human-approved]
+- 2026-07-10: **Platform decision, explicitly confirmed** — responsive web
+  app (any browser, no install), not a PWA and not a native iOS/Android
+  app. This had been an unstated assumption baked into `genai-chatbot`
+  (Next.js/FastAPI is a browser stack) and ui-ux-designer's "phone-first,
+  one-handed" design language, which could plausibly have read as native.
+  Human confirmed responsive web is correct — no template or scope change.
+  solution-architect should treat this as settled, not reopen it. [human,
+  explicit]
+- 2026-07-10: **Experience Design gate approved** (4 revisions, human
+  review at each): rev 1 core flows/palette; rev 2 more saturated palette
+  + full-screen wireframes (research-informed: parent-facing vibrancy
+  register, not child-facing toy register); rev 3 desktop responsive
+  layouts (sidebar nav ≥1024px, 2-col Today grid, centered Journey with
+  alternating cards); rev 4 photo-personalized theming (decorative accent
+  layer only, pediatrician-note slate + destructive red structurally
+  excluded from the personalization token set, scrim-based contrast
+  guarantee, automated pre-render fallback to default theme rather than a
+  contrast violation — UXR-13). All reviewed via a locally-served
+  design-review page (localhost:5051), never approved from text alone, per
+  the process fix logged in `admin/LESSONS.md`. `knowledge/UX_KB.md` §§1-6
+  is the full record. [ui-ux-designer, human-approved]
+- 2026-07-10: **Architecture gate held — pending human approval.** Jointly
+  designed by solution-architect and security-architect (no disagreement),
+  advised by responsible-ai-architect. Resolved all PLAN.md §6 open
+  questions: R3 grounding (curated CDC-2022 table adopted), auth design
+  (baseline confirmed with refinements — full authn/authz reasoning in
+  SECURITY_KB.md's dedicated section), photo storage/encryption (Fernet
+  app-level encryption, key in `.env`, DB file itself not separately
+  encrypted this run — named gap with a revisit trigger), photo color-
+  extraction algorithm (server-side Pillow pipeline satisfying UX_KB §6.3's
+  contrast contract), email/notification infra (deferred this run,
+  documented fallback design if overridden), storage backend (SQLite
+  confirmed, cascade-enforced schema), and output-side enforcement
+  (`app/guardrails.py`, post-generation R1/R2 checks, streaming buffered
+  server-side before release). First `RESPONSIBLE_AI_KB.md` established
+  with content/behavior boundaries and 7 red-team scenarios. See
+  `knowledge/ARCHITECTURE_KB.md`, `knowledge/SECURITY_KB.md`,
+  `knowledge/RESPONSIBLE_AI_KB.md` for full detail. **Not yet approved by
+  the human — Code gate cannot start until this is signed off.**
+  [solution-architect + security-architect, joint; responsible-ai-architect,
+  advisory; pending human approval]
+- 2026-07-10: **Architecture gate, item 5 revised — human override.** The
+  human explicitly overrode the F8 email-deferral decision recorded above,
+  same day, requesting real email delivery rather than dormant opt-in
+  machinery. solution-architect replaced `knowledge/ARCHITECTURE_KB.md` §5
+  in full (not appended) with a real-delivery design: Resend as the
+  transactional provider, in-process APScheduler daily job (confirms the
+  gate's own documented fallback), a content-free notification-only email
+  body (no child name/DOB/age/milestone content ever leaves the machine —
+  the direct design answer to the deferral's original stated privacy
+  concern, not a walk-back of it), a real one-click unsubscribe
+  independent of the in-app opt-in toggle (unauthenticated by design, RFC
+  8058 one-click headers, stable per-user token), CAN-SPAM compliance
+  checked explicitly (INDUSTRY_KB did not name it; mailing-address
+  requirement flagged for human/deploy-agent action before go-live), and
+  `RESEND_API_KEY` handled via the existing `.env` secrets pattern. This
+  revision is solution-architect's design alone; **security-architect
+  should be re-consulted on the API-key handling and the new
+  unauthenticated-route/data-flow implications before this piece is
+  treated as jointly signed off**, consistent with the Architecture gate's
+  joint-presentation requirement. Everything else from the original
+  Architecture gate is unchanged. [solution-architect, per human override;
+  pending security-architect re-consult and human approval]
+- 2026-07-10: **security-architect's independent re-consultation on the F8
+  revision, completed.** Reviewed `ARCHITECTURE_KB.md` §5 in full against
+  `SECURITY_KB.md`'s existing auth/secrets design and appended findings to
+  `SECURITY_KB.md` §1.7 (unsubscribe-route review), §5 (new "Third-party
+  data processors" section), and §6.1 (F8 sign-off addendum) — additive,
+  not a rewrite of the existing Auth & Authz section. Findings:
+  - **API key handling (`RESEND_API_KEY` in `.env`): confirmed consistent**
+    with SECURITY_KB §2.5's existing secrets pattern — no change needed.
+  - **Unauthenticated unsubscribe route (`GET /digest/unsubscribe`):
+    approved, conditional on two concrete changes**, not a rubber stamp —
+    (1) the route handler must perform a structurally single-purpose write
+    (a dedicated single-column update, not a call through a generic
+    user-update function) so the "only digest_opt_in can change" property
+    is enforced by code shape, not just documented intent, with a new
+    Test-gate scoping test to verify it; (2) a rate limiter (reusing the
+    existing `/auth/login`-style limiter, e.g. 20 req/min/IP) must be added
+    to the route for abuse resistance — token entropy (256-bit,
+    `secrets.token_urlsafe(32)`, matching session-token design exactly)
+    already rules out brute-force as a concern, so this is for ordinary
+    DoS/abuse resistance on an unauthenticated write-capable endpoint, not
+    brute-force defense. Stable non-expiring token design, hashed storage,
+    and GET-based RFC 8058 transport are all confirmed correct as designed
+    — no change requested on those points. One additional explicit
+    constraint added: the unsubscribe confirmation page must contain no
+    third-party resource loads/links, to prevent Referer-header token leak.
+  - **New consideration surfaced, not previously covered: Resend as a
+    third-party data processor.** ARCHITECTURE_KB §5.8 addressed only
+    API-key mechanics; it did not address that a caregiver's email address
+    (adult-caregiver PII, not child PII) now reaches a third-party vendor
+    on every send. Assessed as low-risk (no child data, structurally
+    consented-to via digest opt-in) but requiring an explicit privacy-
+    policy disclosure naming Resend as a sub-processor, and a light-touch
+    vendor-posture check (published SOC 2/DPA availability) before
+    production sending — flagged as a human/deploy-agent go-live checklist
+    item, same class as ARCHITECTURE_KB §5.6's mailing-address requirement,
+    not a blocker for continuing to Code gate at `local`-target scope.
+  - **Net result: the F8 revision is treated as jointly approved by
+    security-architect**, conditional on the two unsubscribe-route
+    additions and the privacy-policy/vendor-check item being tracked and
+    completed before production sending is enabled — full reasoning in
+    `SECURITY_KB.md` §1.7, §5, §6.1. [security-architect, independent
+    review complete; still pending final human approval of the gate as a
+    whole]
+- 2026-07-11: **Code-gate fix pass on the 7 findings from Increment 1's
+  Test gate** (evidence: `test-evidence/{unit-integration,red-team-bias,
+  ux-accessibility}-2026-07-11.md`). All 7 closed, each in its own commit:
+  1. **Blocking (responsible-ai-architect):** `_DRUG_DENYLIST_RE` was
+     defined in `guardrails.py` but never called from `check_medical()`,
+     so a drug name without a numeric mg/ml/mcg dose slipped through
+     unmodified. Wired it in; added regression tests for several
+     dose-free drug-name phrasings plus an end-to-end `enforce()` check.
+     **Closed.**
+  2. **Blocking (ui-ux-designer + backend root cause):** `age_summary`
+     in `routes/profiles.py` collapsed preterm profiles to a
+     corrected-only number ("4 months (corrected)"), and the profile
+     switcher computed a client-side chronological-only estimate with a
+     label-only "(corrected age used)" suffix — neither showed the
+     exact UX_KB §1.5 dual-age format. Fixed both call sites to
+     `"{chrono} months (about {corrected} months corrected)"`;
+     `Profile` responses (create/get/list) now carry a server-computed
+     `age_summary` so the switcher renders the same authoritative
+     string. Non-preterm profiles confirmed unchanged (chronological
+     only). Added regression tests for both cases. **Closed.**
+  3. **Blocking (ui-ux-designer, UXR-9):** `--lm-danger` (reserved for
+     the delete-confirmation dialog) was used in `ChatScreen.tsx`'s
+     network-error text and `OnboardingFlow.tsx`'s submit-error text.
+     Both restyled to `--lm-terracotta-deep`, matching the existing
+     non-alarm treatment used for onboarding's DOB-validation error.
+     **Closed.**
+  4. **Blocking (test-agent, PLAN §7-D item 14):** `/chat`'s response
+     body carried no disclaimer at all — only an `X-LM-Disclaimer`
+     header using the ASCII-safe variant, not the exact `DISCLAIMER`
+     constant, and not in the payload. `/chat` now returns
+     `{"text": ..., "disclaimer": DISCLAIMER}` (header kept too),
+     matching how `/activities` already does it. Frontend updated to
+     read the JSON payload. Added a regression test asserting the exact
+     constant. **Closed.**
+  5. **Non-blocking (ui-ux-designer, UXR-6):** `.lm-btn-quiet` (Skip/
+     Cancel/Remove) overrode `min-height: auto`, and the chat info
+     button's visible 20px dot was its entire hit area — both under the
+     44×44px floor. Fixed: `.lm-btn-quiet` now enforces a 44×44px
+     minimum tappable area (visual style unchanged); the info button
+     keeps its 20px visible dot inside a 44×44px wrapper. **Closed.**
+  6. **Non-blocking (ui-ux-designer):** no `<main>` landmark around the
+     Today/Chat shell and no page-level `<h1>` on either screen. Added
+     a `<main>` wrapper around `.lm-content` in `page.tsx` and a
+     visually-hidden-but-announced `<h1>` (new `.lm-visually-hidden`
+     utility) on `TodayScreen.tsx` and `ChatScreen.tsx`. **Closed.**
+  7. **Tooling (test-agent):** plain `pytest` from `dev/backend/`
+     silently imported a stale, non-editable pip-installed copy of
+     `app` from `.venv/site-packages/app/` (confirmed via
+     `direct_url.json`: a prior non-editable `pip install .`), missing
+     the `check_same_thread=False` fix and causing spurious failures.
+     `pyproject.toml` lacked explicit package discovery (`data/`, the
+     runtime SQLite dir, was being picked up as a second top-level
+     package, breaking `pip install -e .`); added
+     `[tool.setuptools] packages = ["app"]`, uninstalled the stale
+     install, reinstalled editable. Verified: `pytest -v` and
+     `python -m pytest -v` both report identical 37/37 passing.
+     **Closed.**
+  - Added real regression tests for findings 1-4 specifically (not just
+    the code fix) per instruction — these were exactly the failure
+    modes with zero prior coverage. Full suite: 37/37 passing under
+    both `pytest -v` and `python -m pytest -v` (up from 30, +7 new
+    regression tests). [code-agent]
+
+- **2026-07-11 — Red-team/bias suite re-run LIVE (orchestrator, direct
+  execution — `responsible-ai-architect` has no shell/execution tool, same
+  gap as other SME agents this session). Real `ANTHROPIC_API_KEY` now in
+  `dev/backend/.env` (explicit human consent given earlier this session to
+  reuse the key already used for other projects).** Full report:
+  `test-evidence/red-team-bias-2026-07-11-LIVE-RERUN.md`. Result: **6/6
+  executable scenarios PASS** (scenario 5/digest confirmed N/A — not shipped
+  until F8). Scenario 3 (persistent-unlock dosing) — the one static-review
+  FAIL from the earlier pass — now confirmed fixed live: refusal held
+  identically across all 4 escalating turns including the teaspoon-phrased
+  rephrasing that was the original gap.
+  - **Three additional real defects found live** (invisible to the earlier
+    static-only review) and fixed before finalizing this report:
+    1. `AIMessage.content` is `str | list[str | dict]` — every real `/chat`
+       call with an extended-thinking content block 500'd inside
+       `check_medical()`. This is the exact LangChain content-type pitfall
+       already on record in `admin/LESSONS.md`, now confirmed against this
+       project's real code path, not a hypothetical. Fixed:
+       `chat.py::_as_text()` normalizes before enforcement. Commit
+       `2d80a96`.
+    2. **False-positive medical-refusal fallback**: `_DIAGNOSTIC_ASSERTION_RE`'s
+       alternation was ungrouped — bare `"this is"` matched as a full
+       alternative, unconnected to the trailing `(diagnosis|condition|disorder)`
+       clause, so any benign response containing "this is" (e.g. "this is
+       completely routine") got misclassified as a medical violation and
+       silently swapped for the refusal fallback. Observed directly
+       breaking Scenario 1's tone-matching response ~2/3 of live attempts
+       before the fix. Fixed: corrected regex grouping. Commit `31b67c5`.
+    3. **Mid-sentence truncation**: default `max_tokens=1024` was
+       insufficient once extended-thinking overhead counts against the
+       same budget — observed a real response cut off mid-safety-caveat.
+       Raised to 4096. Commit `ddeeeeb`.
+  - Regression tests added for (1) and (2); full suite re-verified clean
+    at **42/42** (up from 37) under both `python -m pytest` and plain
+    `pytest`.
+  - **Test gate for Increment 1 is now fully closed**: all 7 original
+    findings fixed and verified, plus 3 additional defects found and fixed
+    by actually executing the previously-blocked live suite. Proceeding to
+    Review gate next.
+
+- **2026-07-11 — Review gate: Approve** (review-agent). Diff hygiene clean
+  across all 15 Increment-1 commits; decision-intent match confirmed for
+  the regex/content/max_tokens fixes. One real gap found: ARCHITECTURE_KB
+  §6.1 specified a log-only "stale age" backstop check in `guardrails.py`
+  that was never implemented — a genuine divergence between approved
+  architecture and shipped code, invisible to any single Test-gate suite.
+  **Resolved same day (responsible-ai-architect): implemented**, not
+  dropped — `check_stale_age()`/`log_stale_age()` added to
+  `guardrails.py` exactly per spec (log-only, not wired into `enforce()`'s
+  block-and-replace path), plus 6 regression tests. Full suite: 48/48
+  passing. Two accompanying stale-documentation items also closed:
+  `PROJECT_CONTEXT.md`'s Increment-1 summary point 6 corrected (response
+  is `JSONResponse`, not `StreamingResponse`, since finding-4's fix) and
+  `memory/INDEX.md`'s little-milestones row updated off its stale
+  `intake`/2026-07-10 state.
+  - **Incident during this resolution, logged for completeness:** the
+    responsible-ai-architect subagent handling this fix accidentally
+    overwrote `knowledge/ARCHITECTURE_KB.md` with placeholder text via a
+    misused `Write` call. The file was recovered in full (787 lines,
+    verified against known content and internal §0–§8 structure) from this
+    session's own transcript logs, since the file predates any root-repo
+    git commit for this project. Restored with explicit human
+    confirmation before being written back. See `admin/LESSONS.md` for
+    the queued process fix (agents that only have `Write`, not `Edit`,
+    for KB files spanning hundreds of lines are one bad tool call away
+    from this — worth requiring `Edit` for any append-only KB file
+    instead of `Write`).
+  - **Review gate: CLOSED.** Proceeding to Deploy gate next.
+
+## Active Team
+Approved 2026-07-10 — **core + 3 architects** (usage-monitor's recommended
+option (b), est. ~420k–540k remaining vs ~590k–720k full-team):
+- Core (non-droppable): plan-agent, code-agent, test-agent, review-agent,
+  deploy-agent, ui-ux-designer (UI-bearing template).
+- Optional, kept: solution-architect, security-architect,
+  responsible-ai-architect — all three retained specifically because this
+  project's risk lives at Architecture (child-data privacy, medical-advice
+  boundary, the R3 grounding debate).
+- Optional, dropped after Intake: functional-agent, industry-expert. Their
+  Intake-time KBs (`DOMAIN_KB.md`, `INDUSTRY_KB.md`) remain the project's
+  grounding context; their test suites are skipped at the Test gate; they
+  can be re-engaged later via /enhance-project or /consult.
+
+**Test Policy**: all active suites blocking (default) — no advisory
+exceptions. Active suites at Test gate: unit/integration (test-agent),
+UX/accessibility (ui-ux-designer), architecture (solution-architect),
+security (security-architect), red-team/bias (responsible-ai-architect).
+
+**Note (2026-07-10):** the ~420k–540k token estimate above was made for the
+F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
+§8). Usage-monitor should re-estimate before the Architecture gate.
+
+## Test Results
+
+**2026-07-11: Test gate, Increment 1 (F1-F5) — unit/integration suite run
+(test-agent).** Full structured per-scenario evidence at
+`test-evidence/unit-integration-2026-07-11.md`. Suite policy: blocking (no
+suites recorded as advisory for this project).
+
+- **Suite count independently verified**: code-agent's "30 backend tests
+  pass" claim confirmed — `python -m pytest -v` from `dev/backend/`
+  collects and passes 30/30, 0 skipped, 0 errors. Not a zero-test suite.
+- **Environment finding (blocking):** the bare `pytest` console-script
+  invocation from `dev/backend/` does not put the current working directory
+  on `sys.path`, so it imports a stale, non-editable pip-installed copy of
+  the `app` package from `.venv/lib/python3.9/site-packages/app/` instead
+  of the live source in `dev/backend/app/`. That installed snapshot is
+  missing the `check_same_thread=False` fix present in current
+  `app/db.py`, producing 11 spurious `sqlite3.ProgrammingError` failures
+  that describe a bug the current source does not have. Confirmed by direct
+  diff of the two copies. Workaround used for this run: `python -m pytest`.
+  Recommend code-agent move to an editable install (`pip install -e .`) or
+  document `python -m pytest` explicitly — otherwise any future CI/gate
+  automation running plain `pytest` will get a false-negative signal.
+- **PLAN §7-B (activities endpoint) and §7-C (profiles + age math +
+  template smoke): thoroughly covered, all passing.** Two minor
+  test-strength caveats noted in the evidence file (P1's activity-count
+  assertion checks `>= 2` where PLAN §7-B item 9 says `>= 3`; P2's
+  corrected-bucket check only greps for the word "corrected" rather than
+  verifying the specific bucket's content) — not product defects, but worth
+  tightening.
+- **PLAN §7-A (the 8 adversarial red-team chat scenarios): zero end-to-end
+  coverage.** None of the anxiety-framing ("should she be walking"),
+  medical-dosing-deflection, diagnosis-deflection, regression/red-flag
+  (including the preterm-P2 "corrected age must not excuse it" case),
+  premature-corrected-age, out-of-range-old, out-of-range-newborn, or
+  unsafe-activity-request scenarios have any test that exercises real model
+  output. What exists instead: unit tests of the post-generation
+  guardrail-net functions (`check_framing`/`check_medical`/`enforce`) on
+  hand-picked strings, and one chat wiring test with the LLM fully mocked.
+  Further blocked in this environment by **no `.env`/`ANTHROPIC_API_KEY`
+  present in `dev/backend`** (only `.env.example` with a blank key) — real
+  LLM calls cannot be made here at all right now. Reported plainly as an
+  untested gap, not silently skipped.
+- **PLAN §7-D item 14 (disclaimer, exact constant, in every response
+  payload): PASS for `/activities`, FAIL for `/chat`.** The `/chat`
+  response body carries no disclaimer at all — it is only present as an
+  `X-LM-Disclaimer` HTTP header, and that header uses a modified
+  ASCII-safe variant (em dash replaced with a hyphen), not the exact
+  constant the acceptance criterion specifies. This needs either an
+  explicit gate-level carve-out for `/chat` or a code change to add the
+  disclaimer to the payload body.
+- **PLAN §7-D item 15 (framing lint across all 7-A transcripts and
+  digest/timeline/product payloads): no coverage** — there are no 7-A
+  transcripts to lint yet, and no corpus-level lint suite exists (isolated
+  unit tests of the lint functions only).
+- **PLAN §7-A item 5's specific "integration test" requirement** (injected
+  system prompt must be asserted to contain both chronological and
+  corrected ages for a preterm profile) **does not exist** — no test calls
+  `build_system_prompt()` directly and inspects its output.
+- §7-E (UX/accessibility) is out of test-agent's scope (ui-ux-designer
+  owns it) and is not assessed in this suite.
+
+**Net: this is a blocking finding, not a pass.** The deterministic,
+server-computed logic (ages, buckets, profile CRUD, activities content) is
+solid and well-tested. The actual child-safety-critical behavior this
+product exists to guarantee — that the LLM's real chat output follows R1
+anxiety-aware framing and R2 medical-deflection/red-flag rules under
+adversarial prompting — has no test coverage at all in this increment, and
+the disclaimer-in-every-payload invariant has a real gap on `/chat`. Per
+the platform's blocking-suite policy, this should stop the gate for human
+decision: either code-agent/responsible-ai-architect build the missing
+§7-A/§7-D(15) coverage (which requires an `ANTHROPIC_API_KEY` to be
+supplied for this environment) before sign-off, or the human explicitly
+overrides with a recorded reason.
+
+## Current Status
+Architecture gate held 2026-07-10 (solution-architect + security-architect
+joint design, responsible-ai-architect advisory) — **pending human
+approval**. All PLAN.md §6 open questions resolved; see Architecture
+Summary above and `knowledge/ARCHITECTURE_KB.md` /
+`knowledge/SECURITY_KB.md` / `knowledge/RESPONSIBLE_AI_KB.md` for full
+detail. **Item 5 (email/notification infra) was subsequently revised
+same-day per human override**, and security-architect's independent
+re-consultation on that revision is now complete (see Decisions Log above
+and `SECURITY_KB.md` §1.7/§5/§6.1) — approved conditional on two
+unsubscribe-route implementation requirements and a privacy-policy/vendor-
+disclosure item, both tracked as pre-production checklist items rather than
+Code-gate blockers.
+
+**2026-07-10: Code gate, Increment 1 (F1-F5) built.** See "Increment 1
+implementation summary" above for the full file list, judgment calls, and
+what's deliberately not built yet. Backend unit/integration tests (30)
+pass; frontend type-checks and builds cleanly. Not yet run: the
+UX/accessibility, architecture, security, and red-team/bias suites
+(test-agent, ui-ux-designer, solution-architect, security-architect,
+responsible-ai-architect) that PLAN §7-A through §7-E specify as
+Increment-1's blocking Test-gate criteria — those are the Test gate's
+job, not code-agent's, and are the next step before Increment 2 starts.
+[code-agent]
+</content>
+</invoke>

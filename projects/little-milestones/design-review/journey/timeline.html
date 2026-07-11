@@ -1,0 +1,50 @@
+<!-- @dsCard group="Journey" name="Life-journey river" subtitle="Revision 2: vivid palette — no norm axis (UXR-1) unchanged" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>little-milestones — The Story of Maya</title>
+<style>
+  body{font-family:-apple-system,"Segoe UI",sans-serif;background:#FDF8F2;color:#3D3833;margin:0;padding:0;line-height:1.55;max-width:420px}
+  .serif{font-family:Georgia,serif}
+  header{background:linear-gradient(180deg,#F0A574, #FDF8F2);padding:28px 20px 16px;text-align:center}
+  header h1{font-family:Georgia,serif;font-size:26px;margin:0 0 6px}
+  header .elapsed{font-size:14px;color:#8F3A1D;font-weight:700}
+  header .privacy{font-size:12.5px;color:#6E6259;margin-top:8px}
+  ol.river{list-style:none;margin:0;padding:8px 20px 40px;position:relative}
+  ol.river::before{content:"";position:absolute;left:34px;top:0;bottom:0;width:3px;border-radius:3px;background:#FF7A50;opacity:.4}
+  li{position:relative;margin:0 0 18px;padding-left:44px}
+  li::before{content:"";position:absolute;left:28px;top:14px;width:15px;height:15px;border-radius:50%;background:#FF7A50;border:3px solid #FDF8F2}
+  .moment{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(61,56,51,.08);overflow:hidden}
+  .photo{height:120px;background:linear-gradient(135deg,#FADCC5,#FF7A50);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .moment .body{padding:12px 16px}
+  .moment b{font-size:16px}
+  .moment .age{display:inline-block;font-size:12.5px;color:#6E6259;background:#FDF8F2;border-radius:999px;padding:2px 10px;margin-top:6px}
+  .star{color:#E8A317}
+  li.chapter{padding-left:0;text-align:center;margin:26px 0}
+  li.chapter::before{display:none}
+  li.chapter .serif{font-size:20px;color:#8F3A1D;font-weight:700}
+  li.chapter .flourish{color:#E8A317;font-size:14px}
+  li.birth .moment .body{text-align:center}
+</style>
+</head>
+<body>
+  <header>
+    <h1>The Story of Maya</h1>
+    <div class="elapsed">412 days of Maya — 23 moments so far</div>
+    <div class="privacy">🔒 Private to your family</div>
+  </header>
+  <ol class="river">
+    <li class="birth"><div class="moment"><div class="body"><b>Hello, world</b><br><span class="age">Day one</span></div></div></li>
+    <li><div class="moment"><div class="body"><b>First real smile <span class="star">★</span></b><br>Right at Grandpa, of all people.<br><span class="age">7 weeks (5 weeks corrected)</span></div></div></li>
+    <li class="chapter"><span class="flourish">❧</span> <span class="serif">· Six months ·</span> <span class="flourish">☀</span></li>
+    <li><div class="moment"><div class="photo">photo</div><div class="body"><b>Avocado everywhere</b><br>First solid food. The bib never stood a chance.<br><span class="age">6 months, 2 weeks</span></div></div></li>
+    <li class="chapter"><span class="flourish">❧</span> <span class="serif">· Nine months ·</span> <span class="flourish">☀</span></li>
+    <li><div class="moment"><div class="photo">photo</div><div class="body"><b>First steps! <span class="star">★</span></b><br>Three wobbly steps toward the dog.<br><span class="age">13 months, 1 week</span></div></div></li>
+  </ol>
+  <!-- UXR-1: this view is an <ol> keyed only to Maya's own dates. There is no
+       norm axis, no expected_by/status/on_track data, no typical-range band,
+       and chapter markers carry no expected-milestone content. -->
+</body>
+</html>

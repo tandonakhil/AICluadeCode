@@ -1,0 +1,28 @@
+# Usage: little-milestones
+
+Live-logged per agent call by the orchestrator (see `usage-monitor.md` for
+format) — first project tracked live from creation rather than backfilled.
+
+| Timestamp | Stage | Agent | Tokens | Running Total |
+|---|---|---|---|---|
+| 2026-07-10 | Template recommendation (pre-scaffold) | plan-agent | 10,628 | 10,628 |
+| 2026-07-10 | Intake | functional-agent (DOMAIN_KB) | 19,562 | 30,190 |
+| 2026-07-10 | Intake | industry-expert (INDUSTRY_KB) | 19,250 | 49,440 |
+| 2026-07-10 | Team Composition (pre-work estimate) | usage-monitor | 12,962 | 62,402 |
+| 2026-07-10 | Plan & Backlog | plan-agent | 36,378 | 98,780 |
+| 2026-07-10 | Plan & Backlog (revision: F1-F10 scope) | plan-agent | 47,274 | 146,054 |
+| 2026-07-10 | Experience Design | ui-ux-designer | 77,995 | 224,049 |
+| 2026-07-10 | Experience Design (revision 2: palette + full-screen wireframes) | ui-ux-designer | 87,286 | 311,335 |
+| 2026-07-10 | Experience Design (revision 3: desktop layouts) | ui-ux-designer | 97,589 | 408,924 |
+| 2026-07-10 | Experience Design (revision 4: photo personalization) | ui-ux-designer | 91,878 | 500,802 |
+| 2026-07-10 | Architecture (joint: solution + security + responsible-ai) | solution-architect | 132,266 | 633,068 |
+| 2026-07-10 | Architecture revision: F8 real email delivery | solution-architect | 66,744 | 699,812 |
+| 2026-07-10 | Architecture: independent security review of F8 revision | security-architect | 68,875 | 768,687 |
+| 2026-07-10 | Code Increment 1 (F1-F5 + schema/auth/guardrails seams) | code-agent | 196,533 | 965,220 |
+| 2026-07-11 | Test gate: unit/integration | test-agent | 93,765 | 1,058,985 |
+| 2026-07-11 | Test gate: UX/accessibility | ui-ux-designer | 90,520 | 1,149,505 |
+| 2026-07-11 | Test gate: architecture | solution-architect | 93,651 | 1,243,156 |
+| 2026-07-11 | Test gate: security | security-architect | 67,715 | 1,310,871 |
+| 2026-07-11 | Test gate: red-team/bias (blocked, static-only) | responsible-ai-architect | 34,553 | 1,345,424 |
+| 2026-07-11 | Fix 7 Test-gate findings | code-agent | 132,593 | 1,478,017 |
+| 2026-07-11 | Red-team/bias re-run live (orchestrator, direct exec: server + 6 scenarios + 3 live-found fixes) | orchestrator | 41,200 | 1,519,217 |

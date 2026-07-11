@@ -18,9 +18,17 @@ system — its pipeline gate, whether it's core or optional, its knowledge-base
 file, and its test-suite ownership. Any new agent is added through
 `/admin-panel add-agent`, never by hand-editing `.claude/agents/` directly.
 
+The human's single point of contact across every command is the
+orchestrator — the main conversation itself, not a registered agent. See
+`admin/ORCHESTRATOR.md` for its contract and `admin/LESSONS.md` for the
+persistent, cross-session log of pitfalls, proven patterns, and queued
+agent-contract feedback it maintains.
+
 ## Directory map
 
-- `admin/` — platform roadmap, changelog, agent registry, staged proposals.
+- `admin/` — platform roadmap, changelog, agent registry, staged proposals,
+  orchestrator role contract (`ORCHESTRATOR.md`), cross-session lessons
+  (`LESSONS.md`).
 - `.claude/agents/` — all subagent definitions (`mas-*` = admin/platform agents,
   everything else = project-pipeline agents).
 - `.claude/skills/` — entry-point commands.

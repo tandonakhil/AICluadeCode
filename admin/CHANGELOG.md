@@ -6,6 +6,21 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **Orchestrator role write-up + LESSONS.md (2026-07-10)**: formalized the
+  previously-implicit orchestrator role (the main conversation, not a
+  registered agent) as a documented contract at `admin/ORCHESTRATOR.md` —
+  what it does, what it explicitly delegates rather than doing itself, and
+  why it isn't and can't be a subagent (it's the caller, not a callee).
+  Added `admin/LESSONS.md`: a persistent, cross-session log distinct from
+  `ROADMAP.md`/`CHANGELOG.md` — pitfalls, proven patterns, and a
+  sub-agent-contract-feedback queue (observations pending `mas-architect`
+  review, not silently-applied changes). Seeded with real material from
+  this build rather than placeholders: 7 pitfalls (Flask template caching,
+  gitignore slash-anchoring, LangChain `content` shape, missing CORS,
+  wrong-repo-boundary writes, subagent-shell process death, unverified
+  assumptions), 5 proven patterns, and 4 contract-feedback entries (3
+  applied, 1 still open). Cross-referenced from `CLAUDE.md` and
+  `MAS_REGISTRY.md`.
 - **KB site v3 — "The Signal Path" (2026-07-10)**: full visual redesign after
   the human rejected v2 as "vanilla," benchmarked against a premium
   reference site (heavn-one.webflow.io) the human supplied. Process:

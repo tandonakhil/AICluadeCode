@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>little-milestones — Design Review</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: #FDF8F2; color: #3D3833; }
+  header { padding: 28px 32px 8px; }
+  h1 { margin: 0 0 4px; font-size: 1.5rem; }
+  .sub { color: #8A8178; font-size: 0.92rem; margin: 0 0 8px; }
+  .note { background: #F4EBDF; border-radius: 10px; padding: 10px 16px; font-size: 0.85rem;
+          display: inline-block; color: #6B6259; }
+  .rev2note { background: #FFF0E6; border: 1px solid #FFC9AD; border-radius: 10px; padding: 10px 16px;
+          font-size: 0.85rem; display: inline-block; color: #8F3A1D; margin-left: 8px; }
+  .rev3note { background: #EEF3F8; border: 1px solid #C7D9EA; border-radius: 10px; padding: 10px 16px;
+          font-size: 0.85rem; display: inline-block; color: #3D6188; margin-left: 8px; margin-top: 6px; }
+  .rev4note { background: #FBEFF2; border: 1px solid #E6B9C7; border-radius: 10px; padding: 10px 16px;
+          font-size: 0.85rem; display: inline-block; color: #6B2E42; margin-left: 8px; margin-top: 6px; }
+  nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 32px; position: sticky; top: 0;
+        background: rgba(253,248,242,0.94); backdrop-filter: blur(8px); border-bottom: 1px solid #EFE5D8; z-index: 5; }
+  nav a { text-decoration: none; color: #C1502A; font-size: 0.85rem; font-weight: 600;
+          padding: 6px 14px; border: 1px solid #E8D9C8; border-radius: 999px; }
+  nav a:hover { background: #C1502A; color: #fff; }
+  nav a.rev2 { border-color: #FF7A50; color: #C1502A; background: #FFF3EC; }
+  nav a.rev3 { border-color: #3D6188; color: #3D6188; background: #EEF3F8; }
+  nav a.rev4 { border-color: #B85C7B; color: #6B2E42; background: #FBEFF2; }
+  section { padding: 28px 32px; }
+  section.rev2-section { background: linear-gradient(180deg, #FFF6EF, transparent 220px); }
+  section.rev3-section { background: linear-gradient(180deg, #EEF3F8, transparent 220px); }
+  section.rev4-section { background: linear-gradient(180deg, #FBEFF2, transparent 220px); }
+  h2 { font-size: 1.1rem; margin: 0 0 4px; }
+  h2 .badge { display:inline-block; background:#FF7A50; color:#fff; font-size:0.65rem; font-weight:700;
+          border-radius:6px; padding:2px 8px; margin-left:8px; vertical-align:middle; letter-spacing:.03em; }
+  h2 .badge.desktop { background:#3D6188; }
+  h2 .badge.personalization { background:#B85C7B; }
+  .desc { color: #8A8178; font-size: 0.88rem; margin: 0 0 14px; max-width: 70ch; }
+  iframe { width: 100%; border: 1px solid #EFE5D8; border-radius: 14px; background: #fff; }
+  .screen-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .strategy { background:#fff; border:1px solid #E5EEF6; border-radius:12px; padding:14px 18px; margin:0 0 20px; font-size:0.85rem; color:#4A5A6B; }
+  .strategy b { color:#3D6188; }
+  .strategy.rose { border-color:#F0D5DD; color:#6E5158; }
+  .strategy.rose b { color:#6B2E42; }
+  footer { padding: 24px 32px 48px; color: #8A8178; font-size: 0.82rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>little-milestones — Experience Design Review</h1>
+  <p class="sub">Foundations/components (revision 2 palette applied throughout) plus full-screen mockups from the second design pass, full desktop-viewport layouts from the third design pass, and photo-personalized theming from the fourth design pass. Also pushed to Claude Design: project "little-milestones design system".</p>
+  <p class="note">Review each section below, then approve or request changes back in the chat.</p>
+  <p class="rev2note">Revision 2 (2026-07-10): palette made more saturated/vivid per feedback "colors need to pop more" — see UX_KB.md §4 for what changed and why. R1/R2 anxiety-aware constraints (slate-not-red, AA contrast, no norm framing) unchanged.</p>
+  <p class="rev3note">Revision 3 (2026-07-10): desktop layouts added per feedback "is there a desktop view?" — the same five key screens now have genuine ~1280–1440px responsive treatments (not stretched phone views): left sidebar nav replaces the bottom tab bar, Today becomes a 2-column grid, the journey river alternates sides, onboarding stays deliberately narrow, and the add-memory sheet becomes a centered modal. See UX_KB.md §5.</p>
+  <p class="rev4note">Revision 4 (2026-07-10): photo-personalized theming added per feedback "once a parent uploads their kid's pics we should show pictures in general theme so it looks personal. if no picture then default theme." Extracted photo accents are a decorative layer only — the slate pediatrician-note color, the single red destructive color, and body-text contrast never change, regardless of which photo is uploaded. See UX_KB.md §6.</p>
+</header>
+<nav>
+  <a href="#colors">Colors</a><a href="#type">Type</a><a href="#buttons">Buttons</a>
+  <a href="#cards">Cards</a><a href="#chat">Chat</a><a href="#journey">Life Journey</a>
+  <a href="#onboarding">Onboarding</a><a href="#trust">Trust &amp; Privacy</a>
+  <a class="rev2" href="#screens">Full Screens (rev. 2)</a>
+  <a class="rev3" href="#desktop">Desktop (rev. 3)</a>
+  <a class="rev4" href="#personalization">Photo Personalization (rev. 4)</a>
+</nav>
+
+<section id="colors"><h2>Foundations — Color <span class="badge">REV 2</span></h2>
+  <p class="desc">Warm cream base for 2am low-glare use (unchanged); accent hues (terracotta, sage, slate, gold) now more saturated for visual "pop"; new decorative-only coral accent added. Slate (not red) for pediatrician guidance remains the load-bearing anxiety-aware choice.</p>
+  <iframe src="foundations/colors.html" height="620" loading="lazy"></iframe></section>
+
+<section id="type"><h2>Foundations — Type</h2>
+  <p class="desc">Warm serif for celebration moments (chapter dividers, journey), system sans for everything functional.</p>
+  <iframe src="foundations/type.html" height="520" loading="lazy"></iframe></section>
+
+<section id="buttons"><h2>Components — Buttons</h2>
+  <p class="desc">Thumb-first sizing; red appears only in delete confirmation.</p>
+  <iframe src="components/buttons.html" height="480" loading="lazy"></iframe></section>
+
+<section id="cards"><h2>Components — Activity &amp; Product Cards <span class="badge">REV 2</span></h2>
+  <p class="desc">Activity cards with sage supervision lines (now a richer green); product cards deliberately identical in grammar (no prices/urgency/sponsored styling).</p>
+  <iframe src="components/cards.html" height="640" loading="lazy"></iframe></section>
+
+<section id="chat"><h2>Components — Milestone Chat <span class="badge">REV 2</span></h2>
+  <p class="desc">Age-context strip (corrected age always visible for preterm), calm slate pediatrician-note card (deepened for presence, still non-alarm), persistent quiet disclaimer footer.</p>
+  <iframe src="components/chat.html" height="720" loading="lazy"></iframe></section>
+
+<section id="journey"><h2>The Life Journey — "The Story of {Name}" <span class="badge">REV 2</span></h2>
+  <p class="desc">The headline feature: a vertical storybook river from "Hello, world" onward — age-at-moment badges, serif chapter dividers with gold flourishes, now a vivid coral river line. Structurally incapable of rendering the child as "behind."</p>
+  <iframe src="journey/timeline.html" height="900" loading="lazy"></iframe></section>
+
+<section id="onboarding"><h2>Onboarding — Sensitive Prematurity Screen <span class="badge">REV 2</span></h2>
+  <p class="desc">One question per screen; the born-early question leads with the parent's lived experience and offers a shame-free skip. Copy unchanged from revision 1 — only accent color updated.</p>
+  <iframe src="forms/onboarding.html" height="640" loading="lazy"></iframe></section>
+
+<section id="trust"><h2>Trust — Disclaimer, Privacy Cue, Digest Consent, Delete <span class="badge">REV 2</span></h2>
+  <p class="desc">The four trust surfaces: quiet non-medical disclaimer, photo privacy promise ("Never public, never used for AI, never scanned for faces"), default-off digest toggle, and the only red dialog in the app — red hue itself is unchanged (destructive semantics are load-bearing and were never the "muted" complaint).</p>
+  <iframe src="trust/trust.html" height="760" loading="lazy"></iframe></section>
+
+<section id="screens" class="rev2-section">
+  <h2>Full Screens (revision 2) <span class="badge">NEW</span></h2>
+  <p class="desc">Composed full-screen mockups (not isolated component cards) responding directly to the feedback "draw up some wireframes of the application." Each is a complete phone-frame screen using the revised vivid palette. See UX_KB.md §4 for the research this drew on (parent-facing vs. child-facing visual language) and the reconciliation with R1/R2 constraints.</p>
+  <div class="screen-grid">
+    <div>
+      <h2 style="font-size:1rem">Onboarding — Welcome + born-early question</h2>
+      <p class="desc">The sensitive screen composed in full, side-by-side with the welcome screen it follows.</p>
+      <iframe src="screens/onboarding-welcome.html" height="920" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Milestone Chat</h2>
+      <p class="desc">Full chat screen: status bar, age strip, bubbles, pediatrician-note card, composer, disclaimer, tab bar.</p>
+      <iframe src="screens/chat-screen.html" height="900" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Today / Activities</h2>
+      <p class="desc">This-week hero card, good-for-right-now activities, coming-next invitation card, ideas-for-this-stage, disclaimer, tab bar.</p>
+      <iframe src="screens/today-screen.html" height="1000" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Life Journey Timeline</h2>
+      <p class="desc">"The Story of Maya" composed in-frame with tab bar and quick-add action — still structurally incapable of comparison (UXR-1).</p>
+      <iframe src="screens/journey-screen.html" height="1060" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Photo Upload / Add-memory Sheet</h2>
+      <p class="desc">The retention-engine sheet: photo grid, privacy cue at the point of upload, memory-label tag chips (not an assessment checklist), one-tap save.</p>
+      <iframe src="screens/photo-upload.html" height="900" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<section id="desktop" class="rev3-section">
+  <h2>Desktop (revision 3, ~1280–1440px) <span class="badge desktop">NEW</span></h2>
+  <p class="desc">Genuine responsive layouts for the same five key screens, not stretched phone views — human feedback confirmed this is required scope for a responsive web app (PROJECT_CONTEXT.md's explicit platform decision), not an extra. Each mockup is framed as a browser window (~1320px) to make the desktop-web register explicit. Full responsive-strategy rationale per screen is in UX_KB.md §5.</p>
+  <div class="strategy">
+    <b>Nav pattern:</b> bottom tab bar (mobile, &lt;1024px) becomes a persistent left sidebar (desktop, &ge;1024px) — child switcher, Today/Chat/Journey nav, and the Add quick-action as its own pill button. &nbsp;
+    <b>Breakpoint:</b> 1024px is the one shared structural breakpoint (nav + Today's grid). &nbsp;
+    <b>Max content widths:</b> chat column 680px (reading width, not stretched), Today grid 980px (2 columns), journey river 760px (alternating sides), onboarding card 440–480px (unchanged at any width). &nbsp;
+    <b>Modal breakpoint:</b> the add-memory bottom sheet becomes a centered modal dialog at &ge;768px.
+  </div>
+  <div class="screen-grid">
+    <div>
+      <h2 style="font-size:1rem">Onboarding (desktop) — deliberately still narrow</h2>
+      <p class="desc">Confirmed, not defaulted: a short linear form doesn't benefit from width, so it stays centered at ~440–480px with no sidebar at any breakpoint.</p>
+      <iframe src="screens/desktop/onboarding-desktop.html" height="1060" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Milestone Chat (desktop)</h2>
+      <p class="desc">Left sidebar nav fills the reclaimed space with child switcher + navigation, not a cluttered dashboard; the chat column itself stays reading-width (680px) with quiet decorative fill either side.</p>
+      <iframe src="screens/desktop/chat-desktop.html" height="1000" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Today / Activities (desktop)</h2>
+      <p class="desc">The screen that most benefits from desktop space: a genuine 2-column card grid at &ge;1024px (this-week hero spans both columns), sidebar nav alongside.</p>
+      <iframe src="screens/desktop/today-desktop.html" height="1080" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Life Journey Timeline (desktop)</h2>
+      <p class="desc">The river stays centered — a narrative "storybook read" shouldn't turn into a wide dashboard — but at &ge;1024px, moments alternate left/right of the path instead of stacking, using the extra width without adding chart-like structure. UXR-1 re-verified.</p>
+      <iframe src="screens/desktop/journey-desktop.html" height="1140" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Photo Upload / Add-memory (desktop)</h2>
+      <p class="desc">The mobile bottom sheet becomes a centered modal dialog at &ge;768px (the correct responsive pattern, not just a wider sheet) with a wider photo grid.</p>
+      <iframe src="screens/desktop/photo-upload-desktop.html" height="1000" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<section id="personalization" class="rev4-section">
+  <h2>Photo Personalization (revision 4) <span class="badge personalization">NEW</span></h2>
+  <p class="desc">Human feedback: "once a parent uploads their kid's pics we should show pictures in general theme so it looks personal. if no picture then default theme." This section shows a decorative photo-derived accent layer applied to select surfaces (hero gradients, card accent borders, background wash, switcher avatar ring), the same screen in the unmodified default theme for direct contrast, and the child switcher previewing two independent per-child accents. Full design rationale, the AA-contrast guarantee for arbitrary photos, and the hard exclusion of the slate/red/text tokens are in UX_KB.md §6.</p>
+  <div class="strategy rose">
+    <b>Personalized:</b> hero/header gradients, card accent borders, top background wash, child-switcher avatar ring. &nbsp;
+    <b>Never personalized:</b> the slate pediatrician-note surface (R1/R2), the single red destructive color, all body/UI text and its contrast ratios, primary action color (terracotta stays the one tappable-affordance color everywhere). &nbsp;
+    <b>AA guarantee:</b> extracted accents are clamped to safe lightness/saturation bands, a fixed-opacity dark scrim (independent of hue) sits behind any white headline text, and an automated pre-render contrast check falls back to the default theme for that surface if a fixture photo would still fail — personalization degrades to default, never to a contrast violation. &nbsp;
+    <b>Default state:</b> no photo = the complete, unmodified rev-2 theme, not a gray placeholder. &nbsp;
+    <b>Multi-child:</b> each profile's accent is derived from its own photo only — never shared across children.
+  </div>
+  <div class="screen-grid">
+    <div>
+      <h2 style="font-size:1rem">Today — photo-personalized (Maya has an uploaded photo)</h2>
+      <p class="desc">Dusty-rose accent extracted from Maya's photo: hero gradient with a fixed dark scrim behind the white headline (the actual AA guarantee, not just the color clamp), card accent borders, top background wash, avatar ring. Annotated inline with what's personalized vs. structurally fixed.</p>
+      <iframe src="screens/personalization/today-photo-personalized.html" height="1080" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Today — default theme (Sam has no photo yet)</h2>
+      <p class="desc">The identical screen composition, unmodified rev-2 cream/terracotta/coral/sage/gold theme — placed directly beside the personalized version above for contrast. This is a complete, intentional theme, not a fallback-looking degraded state.</p>
+      <iframe src="screens/personalization/today-default-theme.html" height="1080" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">Child switcher — per-child accents previewed</h2>
+      <p class="desc">Maya (dusty-rose photo theme) and Theo (teal photo theme — a second, independently different accent) beside Sam (default theme), demonstrating that personalization is scoped per-child, never shared, and that the switcher itself is where a parent sees this at a glance.</p>
+      <iframe src="screens/personalization/child-switcher-personalized.html" height="900" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>Generated from ui-ux-designer's Experience Design gate output · little-milestones · revision 4, 2026-07-10</footer>
+</body>
+</html>

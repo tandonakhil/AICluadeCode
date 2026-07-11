@@ -1,0 +1,117 @@
+<!-- @dsCard group="Screens — Desktop" name="Life Journey (desktop)" subtitle="River stays centered with wider margins; moments alternate sides of the path at >=1024px; still UXR-1 no norm axis" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>little-milestones — Journey (desktop)</title>
+<style>
+  :root{
+    --lm-cream:#FDF8F2; --lm-card:#FFFFFF; --lm-ink:#3D3833; --lm-ink-soft:#6E6259;
+    --lm-terracotta:#C1502A; --lm-terracotta-deep:#8F3A1D; --lm-sage:#2F7A4E;
+    --lm-slate:#3D6188; --lm-gold:#E8A317; --lm-blush:#FADCC5; --lm-coral:#FF7A50;
+    --lm-peach:#F0A574;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",sans-serif;background:#E5DDCE;color:var(--lm-ink);margin:0;padding:32px 16px;line-height:1.55}
+  .caption{text-align:center;font-size:13px;color:var(--lm-ink-soft);margin:0 0 10px;font-weight:600}
+  .browser{width:1320px;max-width:100%;margin:0 auto;background:var(--lm-cream);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(61,56,51,.25)}
+  .chrome{background:#EFE7DA;padding:10px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #E3D6C6}
+  .dots{display:flex;gap:6px}
+  .dots span{width:10px;height:10px;border-radius:50%;background:#D9CBB8}
+  .addr{background:#fff;border-radius:8px;padding:5px 14px;font-size:12px;color:var(--lm-ink-soft);flex:1;max-width:340px}
+  .viewport-note{margin-left:auto;font-size:11px;color:var(--lm-ink-soft);font-weight:600}
+  .app{display:flex;min-height:960px;position:relative}
+
+  .sidebar{width:248px;flex:none;background:#fff;border-right:1px solid #F0E8DE;padding:22px 16px;display:flex;flex-direction:column}
+  .brand{font-family:Georgia,serif;font-size:18px;font-weight:700;padding:0 6px 18px;display:flex;align-items:center;gap:8px}
+  .brand .glyph{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--lm-coral),var(--lm-gold));display:flex;align-items:center;justify-content:center;font-size:14px}
+  .switcher{background:var(--lm-cream);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:18px;cursor:pointer}
+  .switcher .dot{width:30px;height:30px;border-radius:50%;background:var(--lm-coral);flex:none}
+  .switcher .who b{display:block;font-size:13.5px}
+  .switcher .who span{font-size:11.5px;color:var(--lm-ink-soft)}
+  .switcher .chev{margin-left:auto;color:var(--lm-ink-soft);font-size:12px}
+  nav.sidenav{display:flex;flex-direction:column;gap:4px}
+  .navitem{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:14px;font-weight:700;font-size:14.5px;color:var(--lm-ink-soft);text-decoration:none}
+  .navitem .ic{font-size:18px;width:20px;text-align:center}
+  .navitem.active{background:var(--lm-terracotta);color:#fff}
+  .navitem:hover:not(.active){background:#F5EDE1}
+  .add-btn{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid var(--lm-terracotta);color:var(--lm-terracotta-deep);font-weight:700;font-size:14px;border-radius:999px;padding:11px 14px;cursor:pointer}
+  .sidebar-foot{margin-top:auto;font-size:11.5px;color:var(--lm-ink-soft);padding:0 4px}
+
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .mainscroll{flex:1;overflow-y:auto}
+  .serif{font-family:Georgia,serif}
+  .jheader{background:linear-gradient(180deg,var(--lm-peach) 0%, var(--lm-blush) 55%, var(--lm-cream) 100%);padding:36px 20px 26px;text-align:center}
+  .jheader h1{font-size:32px;margin:0 0 8px}
+  .jheader .elapsed{font-size:15px;color:var(--lm-terracotta-deep);font-weight:700}
+  .jheader .privacy{font-size:12.5px;color:var(--lm-ink-soft);margin-top:8px}
+
+  /* alternating river, centered, wide margins either side */
+  .riverwrap{max-width:760px;margin:0 auto;padding:30px 20px 100px;position:relative}
+  ol.river{list-style:none;margin:0;padding:0;position:relative}
+  ol.river::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;border-radius:4px;background:var(--lm-coral);opacity:.35}
+  li{position:relative;margin:0 0 26px;width:calc(50% - 32px)}
+  li.side-l{margin-right:auto;text-align:right}
+  li.side-r{margin-left:auto;text-align:left}
+  li.side-l::after,li.side-r::after{content:"";position:absolute;top:16px;width:16px;height:16px;border-radius:50%;background:var(--lm-coral);border:3px solid var(--lm-cream)}
+  li.side-l::after{right:-40px}
+  li.side-r::after{left:-40px}
+  .moment{display:inline-block;text-align:left;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(61,56,51,.08);overflow:hidden;width:100%}
+  .photo{height:120px;background:linear-gradient(135deg,var(--lm-blush),var(--lm-coral));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+  .moment .body{padding:14px 18px}
+  .moment b{font-size:16.5px}
+  .moment .age{display:inline-block;font-size:12.5px;color:var(--lm-ink-soft);background:var(--lm-cream);border-radius:999px;padding:2px 10px;margin-top:6px}
+  .star{color:var(--lm-gold)}
+  li.chapter{width:100%;text-align:center;margin:30px 0}
+  li.chapter::after{display:none}
+  li.chapter .serif{font-size:21px;color:var(--lm-terracotta-deep);font-weight:700}
+  li.chapter .flourish{color:var(--lm-gold);font-size:15px}
+  li.birth{width:100%;text-align:center}
+  li.birth::after{display:none}
+  li.birth .moment{display:inline-block;width:auto;text-align:center}
+
+  .fab{position:absolute;right:36px;bottom:32px;width:58px;height:58px;border-radius:50%;background:var(--lm-terracotta);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(193,80,42,.4);cursor:pointer}
+</style>
+</head>
+<body>
+<p class="caption">Life Journey &middot; desktop, ~1320px browser frame &middot; river stays centered with wider margins; moments alternate left/right of the path at &ge;1024px instead of stacking</p>
+<div class="browser">
+  <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">littlemilestones.app/journey</div><div class="viewport-note">1320 × 900 &middot; ≥1024px layout</div></div>
+  <div class="app">
+    <div class="sidebar">
+      <div class="brand"><span class="glyph">🌱</span> little-milestones</div>
+      <div class="switcher"><span class="dot"></span><span class="who"><b>Maya</b><span>14 months</span></span><span class="chev">▾</span></div>
+      <nav class="sidenav">
+        <a class="navitem" href="#"><span class="ic">🏠</span>Today</a>
+        <a class="navitem" href="#"><span class="ic">💬</span>Chat</a>
+        <a class="navitem active" href="#"><span class="ic">✦</span>Journey</a>
+      </nav>
+      <button class="add-btn"><span>＋</span> Add a moment</button>
+      <div class="sidebar-foot">Signed in as owner &middot; Maya's space</div>
+    </div>
+    <div class="main">
+      <div class="mainscroll">
+        <div class="jheader">
+          <h1 class="serif">The Story of Maya</h1>
+          <div class="elapsed">412 days of Maya — 23 moments so far</div>
+          <div class="privacy">🔒 Private to your family</div>
+        </div>
+        <div class="riverwrap">
+          <ol class="river">
+            <li class="birth"><div class="moment"><div class="body"><b>Hello, world</b><br><span class="age">Day one</span></div></div></li>
+            <li class="side-r"><div class="moment"><div class="body"><b>First real smile <span class="star">★</span></b><br>Right at Grandpa, of all people.<br><span class="age">7 weeks (5 weeks corrected)</span></div></div></li>
+            <li class="chapter"><span class="flourish">❧</span> <span class="serif">· Six months ·</span> <span class="flourish">☀</span></li>
+            <li class="side-l"><div class="moment"><div class="photo">photo</div><div class="body"><b>Avocado everywhere</b><br>First solid food. The bib never stood a chance.<br><span class="age">6 months, 2 weeks</span></div></div></li>
+            <li class="chapter"><span class="flourish">❧</span> <span class="serif">· Nine months ·</span> <span class="flourish">☀</span></li>
+            <li class="side-r"><div class="moment"><div class="photo">photo</div><div class="body"><b>First steps! <span class="star">★</span></b><br>Three wobbly steps toward the dog.<br><span class="age">13 months, 1 week</span></div></div></li>
+          </ol>
+        </div>
+      </div>
+      <div class="fab" aria-label="Add a moment">＋</div>
+    </div>
+  </div>
+  <!-- UXR-1 re-verified at desktop: still keyed only to Maya's own dates; alternating layout is purely spatial, no norm axis, no second series -->
+</div>
+</body>
+</html>

@@ -1,5 +1,10 @@
 # MAS Agent Registry
 
+Every row below is something the orchestrator *calls* — see
+`admin/ORCHESTRATOR.md` for the (unregistered, non-agent) role that calls
+them, and `admin/LESSONS.md` for the cross-session log of pitfalls, proven
+patterns, and queued contract feedback the orchestrator maintains.
+
 Single source of truth for every agent in the system. Populated by
 `mas-architect`'s Founding Review (Phase 0.5, approved 2026-07-05), then
 updated by `mas-registrar` every time `/admin-panel add-agent` ships a new

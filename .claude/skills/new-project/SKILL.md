@@ -13,12 +13,19 @@ agent roster or gate order changes, not left stale.
 
 ## Procedure
 
-1. **Collect the request**: project name (slug it), one-line description,
-   and template. Confirm the template fits per its `TEMPLATE_MANIFEST.md`
-   (`genai-chatbot`, `agentic-workflow`, or `rag-knowledge-base`) — if the
-   request is genuinely ambiguous between two templates, ask rather than
-   guessing (plan-agent's own guardrail; this decision precedes plan-agent's
-   formal involvement but follows the same principle).
+1. **Collect the request**: project name (slug it) and one-line description.
+   **Do not ask the human to pick a template up front** — invoke `plan-agent`
+   with the description to get a recommended template + reasoning (it reads
+   every `TEMPLATE_MANIFEST.md` and matches the actual described need, not
+   surface keywords). Present the recommendation for a single confirm/
+   override, not a blind multiple-choice menu. Only ask the human to choose
+   between options when `plan-agent` itself reports the request genuinely
+   fits two templates equally well — that's the sole case for asking.
+   If the request describes multiple capabilities that don't fit one
+   template today (e.g. chat + document grounding + tool-using automation),
+   say so plainly: recommend a template for the MVP's actual first slice
+   and note the rest as likely `/enhance-project` work later — don't force
+   a single template to pretend it covers everything at once.
 
 2. **Scaffold the project**: `mkdir -p projects/<name>`, create
    `PROJECT_CONTEXT.md` / `FEATURES.md`, register in `memory/INDEX.md`, copy
@@ -64,14 +71,24 @@ agent roster or gate order changes, not left stale.
 5. **Plan & Backlog gate**: invoke `plan-agent` (plus `industry-expert` for
    trend-informed backlog suggestions and `functional-agent` as devil's
    advocate, if either is on the roster). Produces `PLAN.md` and a proposed
-   feature backlog. **Stop and wait for approval** — the approved subset
-   becomes this project's MVP scope, recorded in `FEATURES.md`.
+   feature backlog. **Present the backlog as the full itemized feature
+   list** — every proposed feature shown individually with a build-now vs.
+   later selection per item (multi-select), never as a summary with a
+   single approve/reject button. The human decides the now/later split
+   feature-by-feature; plan-agent's proposed split is the default
+   pre-selection, not the decision. **Stop and wait for approval** — the
+   approved subset becomes this project's MVP scope, recorded in
+   `FEATURES.md`.
 
 6. **Experience Design gate** (UI-bearing templates only, skip entirely for
    `agentic-workflow`): invoke `ui-ux-designer` to propose flows, layout, and
    visual language for the approved backlog, pushing components via
-   `DesignSync`. Writes `knowledge/UX_KB.md`. Stop and wait for approval
-   before Architecture.
+   `DesignSync`. Writes `knowledge/UX_KB.md` **and a reviewable visual
+   artifact** — rendered preview pages assembled at
+   `projects/<name>/design-review/index.html`, which the orchestrator
+   serves locally (e.g. `python3 -m http.server`) and hands the human as a
+   URL before asking for approval. Never ask for design approval from a
+   text summary alone. Stop and wait for approval before Architecture.
 
 7. **Architecture gate**: invoke `solution-architect` and `security-architect`
    jointly (if either is on the roster — if both were dropped, skip this
