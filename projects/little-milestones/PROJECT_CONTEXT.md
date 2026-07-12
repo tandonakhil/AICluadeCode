@@ -1653,6 +1653,75 @@ across all 3 commits; decision-intent match confirmed against UX_KB §8/
 §8.1a and ARCHITECTURE_KB §9.3; no cross-cutting consistency issues.
 **Proceeding to Deploy gate, Increment 4.**
 
+**2026-07-12: Test gate, Increment 5 (F13 chat history + dynamic suggested
+prompts + "Ask" rename/stage card) — unit/integration suite independently
+re-verified (test-agent).** Full structured per-scenario evidence at
+`test-evidence/unit-integration-increment5-2026-07-12.md`. Suite policy:
+blocking (no suites recorded as advisory for this project).
+
+- **Counts independently re-confirmed, both invocations agree with
+  code-agent's claim:** `python -m pytest -v` and plain `pytest -v` from
+  `dev/backend` both collect and pass **197/197**, 0 failed. `npm test --
+  --run` from `dev/frontend` passes **53/53** (9 test files). No suite here
+  has zero tests.
+- **All six ARCHITECTURE_KB §10.9 Test-gate ownership items confirmed real,
+  by reading the actual test bodies, not just names/counts:**
+  1. **Contract test** — `test_chat_response_gains_session_id_additive_only`
+     asserts the response's key set is exactly `{text, disclaimer,
+     session_id}`; `test_chat_omitting_new_session_still_works_unaffected`
+     confirms clients that never send `new_session` keep landing in the same
+     session; the pre-existing `test_chat_response_payload_contains_exact_
+     disclaimer_constant` still passes unmodified, confirming `text`/
+     `disclaimer` content, not just key names, is unchanged.
+  2. **4-hour boundary property test** — genuinely manipulates time via an
+     injectable `now=` datetime parameter on `ChatSessionStore.resolve_or_
+     create_session` (not a sleep or a decorative constant check): >4h apart
+     produces two distinct session ids and two rows in `list_for_profile`;
+     <4h apart with no forced new session reuses the same session id and
+     produces one row.
+  3. **Snippet immutability** — `test_snippet_set_once_at_creation_never_
+     recomputed` sends a second, different message into the same session
+     and asserts the snippet still equals the *first* message, with
+     `message_count` correctly incremented to 4 — a real "does it change"
+     check, not just "was it set once."
+  4. **Cascade-delete** — `test_profile_delete_cascades_chat_sessions_and_
+     messages` queries the real sqlite connection directly after a profile
+     delete and asserts zero rows remain in both `chat_sessions` and
+     `chat_messages`, extending the project's existing FK-cascade pattern.
+  5. **Family-scoping** — all three new surfaces (`GET /profiles/{id}/
+     chat_sessions`, `GET /chat_sessions/{id}/messages`, `DELETE
+     /chat_sessions/{id}`) have dedicated cross-family tests asserting 404
+     (not 403); the delete-route test additionally re-authenticates as the
+     owning family afterward and confirms the session was NOT actually
+     deleted despite the cross-family 404.
+  6. **Delete-permission** — `test_caregiver_can_delete_chat_session_not_
+     owner_only` genuinely joins a second family member via the real invite
+     flow (not the owner) and asserts that non-owner's delete returns 200,
+     per security-architect's confirmed any-caregiver decision (§10.8).
+- **Frontend spot-check, `ChatScreen.test.tsx`, assertions read directly
+  (not just test names):** session-resume-on-open asserts `listChatMessages`
+  is called with the *most-recent* session's id and that the resumed message
+  renders inside `.lm-chat-main` specifically; the dynamic suggested-prompt
+  chips test asserts the server's exact prompt text renders AND explicitly
+  asserts the static fallback pool text is absent on the success path
+  (`queryByText(...) === null`) — the stronger, correct check — with a
+  separate test confirming the static pool appears only when the fetch
+  rejects; the stage card test asserts exactly 4 `.lm-domain-chip` elements
+  all sharing the identical className (no filled/empty modifier class,
+  confirming true equal visual weight) plus a separate assertion that no
+  progressbar/ring/fill element exists; the "Ask" rename test positively
+  asserts the new heading text is present.
+- **`next build`-against-live-dev-server contamination check (3
+  crashed/resumed attempts): clean.** `git log -p --follow` on
+  `frontend/tsconfig.json` and `frontend/next-env.d.ts` shows exactly one
+  commit each across the entire dev-repo history (the original Increment-1
+  scaffold) — zero touches from either Increment-5 commit or any
+  uncommitted working-tree state; `git status` is clean and `git diff HEAD`
+  on both files is empty.
+- **Gate verdict: PASS.** No gaps found between code-agent's claimed
+  coverage and actual coverage; every mandated Test-gate item is backed by a
+  genuine, specific test. This suite does not block the gate.
+
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
 - Frontend (Next.js): `3000`
@@ -2097,3 +2166,20 @@ orchestrator rather than a 4th subagent attempt. 197/197 backend tests
 profile. Proceeding directly to Test gate — human is asleep, asked to
 review Increments 5/6/7 together at the end, so gates proceed without
 per-step pause per explicit instruction.
+
+**2026-07-12: Test gate, Increment 5 — CLOSED, 4/4 suites pass, zero
+blocking findings.** Architecture: PASS (schema, 4-hour boundary,
+snippet immutability, additive `/chat` contract, server-side
+suggested-prompts, no pagination — all verified line-by-line against
+§10). Security: PASS, live-verified by the orchestrator (cross-family
+404 on read+delete with survival confirmation, any-caregiver delete
+confirmed live via a real invited caregiver — not owner). UX/
+accessibility: APPROVE, 4 non-blocking notes (stage card omits age —
+shown elsewhere on screen; pre-existing app-wide dialog aria-label gap,
+not a new regression; a doc-only column-width typo in UX_KB; one
+inferred-not-measured touch-target note). Unit/integration: PASS,
+197/197 backend (both invocations) + 53/53 frontend independently
+re-verified, all 6 ARCHITECTURE_KB §10.9 mandated test items confirmed
+genuine by reading actual assertions, not names. Red-team/bias suite
+again deliberately skipped (chat's LLM/guardrail surface unchanged this
+increment). **Proceeding to Review gate, Increment 5.**
