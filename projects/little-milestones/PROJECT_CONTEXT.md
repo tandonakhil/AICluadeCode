@@ -1340,6 +1340,30 @@ share one dependency), invite code format/entropy not directly asserted,
 and no differential test locking in that the unsubscribe route verifies
 via hash only, never the plaintext `unsubscribe_token` column.
 
+**2026-07-11: Regression pass — live LAN/mobile-testing defects locked into
+the suite (test-agent).** After the Increment-3 gates closed, live testing
+found three code defects (dev commits 037254d hardcoded-API-host/SameSite
+cookie break, 561e452 crypto.randomUUID throw in insecure contexts, c3a2bde
+infinite "Loading…" on a rejected session check) plus one process-level
+lesson (`next build` during `next dev` corrupts `.next/` — LESSONS.md, no
+test possible). Per the human's directive, every code defect now has a
+regression test. The frontend previously had **zero** test infrastructure;
+a minimal vitest + jsdom + @testing-library/react setup was added (dev
+commit b658a2a) and is runnable as `npm test` from `dev/frontend`.
+`resolveApiBase` and `localMessageId` were exported as test seams (dev
+commit 4b4ef0b) — no behavior changes.
+
+Per-suite results:
+- **Frontend regression (new, vitest): 12/12 PASS** — 4 scenarios per
+  defect across `lib/api.test.ts`, `components/localMessageId.test.ts`,
+  `app/page.test.tsx`. Not a zero-test suite: 12 real tests collected and run.
+- **Backend unit/integration (pytest): 168/168 PASS** — unchanged, re-run to
+  confirm no interference.
+- **`tsc --noEmit`: clean.** `next build` deliberately not run (dev server
+  active for the human; see the LESSONS.md `.next/` corruption note).
+
+Structured evidence: `test-evidence/regression-live-testing-defects-2026-07-11.md`.
+
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
 - Frontend (Next.js): `3000`

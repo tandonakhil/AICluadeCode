@@ -90,6 +90,17 @@ doesn't get lost before that review happens.
   destructive `Write` is a one-command `git checkout` away from reversible
   instead of a transcript-archaeology recovery.
 
+- **2026-07-11 — Never run `next build` while the same project's `next dev`
+  server is running.** Both write to the same `.next/` directory; the build
+  overwrites the dev server's compiled chunks, after which the dev server
+  keeps serving HTML (200) whose referenced JS/CSS chunks are stale or
+  missing — the page renders an unstyled shell ("Loading…" in a serif
+  font, no hydration, zero API calls fired) with no error anywhere in the
+  server logs. Symptom is easy to misread as a backend/auth bug. Fix:
+  stop the dev server, `rm -rf .next`, restart. Prevention: verify a
+  frontend change with `tsc --noEmit` while dev is running, and only run
+  the full `next build` with the dev server stopped.
+
 ## Successful Patterns
 
 - **Verify empirically, every time a claim is checkable.** Real `pytest`
