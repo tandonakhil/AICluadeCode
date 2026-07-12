@@ -1156,6 +1156,17 @@ what F13's suggested-prompts work already requires.
 
 ### 10.8 Flagged for security-architect (joint-gate requirement, per line 3)
 
+**security-architect confirmed (2026-07-12), no disagreement.** Both new
+list routes and the session-delete route follow the exact §2.3 pattern
+(family-scoped, cross-family = 404 not 403) — a straightforward extension
+of `MemoryStore`/`PhotoStore`'s transitive-scoping shape, no new authz
+primitive needed. **Delete permission: any caregiver on the family, not
+owner-only** — chat sessions are conversational content a caregiver
+authored, analogous to memories (any-caregiver-delete), not photos/
+profile (owner-only, higher-stakes structural data); UX_KB §9.1 itself
+signals this by pairing session-delete with the lighter memory/photo
+confirm-dialog, not profile-delete's typed-confirmation.
+
 New delete/data-flow wrinkle, same class this project has consistently
 sent to security-architect rather than closing solo (F8's unsubscribe
 route, §9.3's photo replace-not-accumulate ordering): confirm the
