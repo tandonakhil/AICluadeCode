@@ -1727,3 +1727,86 @@ renamed tab bar/sidebar, stage card, domain chips, and iconed suggestion
 chips composed with the existing history rail/sheet and suggested-prompt
 chips from this increment's earlier files, at both mobile (375px) and
 desktop (≥1024px) widths.
+
+## 10. Revision — 2026-07-12 (human feedback pass): nav icons restored + desktop density
+
+Source: human live-testing feedback, two of four reported issues assigned to
+this role. Preview: `design-review/increment-5/desktop-density-and-icons.html`.
+
+### 10.1 Nav icons (Issue 2) — an approved-design regression, not a new design
+
+The rev-2 mobile mockups (tab bar: 🏠 Today · 💬 Chat · ✦ Journey · ＋ Add)
+and the human-approved rev-3 desktop sidebar (§5.1: "the same icon+label
+pairing as the tab bar"; `screens/desktop/*.html`, 18px glyph in a 20px box,
+12px gap) both specify icon+label navigation. The shipped `page.tsx` nav is
+text-only at both breakpoints — a build-time omission of approved design,
+now restored using the app's existing plain-character icon convention
+(`lib/chatDisplay.ts` DOMAIN_ICONS precedent; no SVG icon set exists).
+
+Spec — applies to BOTH the ≥1024px sidebar and the <1024px tab bar:
+- Today: 🏠 (U+1F3E0) — approved rev 2/3.
+- Ask: 💬 (U+1F4AC) — approved as Chat's icon; §9.5's rename kept it.
+  Shared glyph with the language domain chip is accepted (both mean
+  "speech"; always adjacent to a text label; different surfaces).
+- Journey: ✦ (U+2726) — Journey's mark since §1.4; text glyph inherits the
+  active terracotta.
+- Settings: ⚙︎ (U+2699 U+FE0E, text presentation so it color-inherits like
+  ✦) — NEW, flagged: Settings shipped in Increment 3 with no visual pass
+  and never had an approved icon. Not on §1.2's banned-motif list.
+
+Placement: `<span className="lm-nav-ic" aria-hidden="true">` before each
+label. Sidebar: row-flex, `font-size:18px; width:20px; text-align:center`,
+12px gap. Tab bar: column-flex, 18px icon stacked 2px above the existing
+13px label. `aria-hidden` is required — the label remains the accessible
+name (UXR-6); the glyph is never announced. Active-state styling unchanged.
+Out of scope, noted: shipped sidebar pill says "+ Add a child" where the
+rev-3 mockup showed "+ Add a moment" — pre-existing divergence, future pass.
+
+### 10.2 Desktop density (Issue 4) — validated per screen, not blanket-widened
+
+- **Ask — agreed, and a shipped bug.** No `.lm-content[data-screen="chat"]`
+  override exists, so the generic 640px cap squeezes §9.1's 230px history
+  rail + 20px gap + conversation into 640px, leaving ~390px of chat —
+  narrower than mobile and contrary to §9.1's own "rail beside the 680px
+  chat column" design. Fix: `.lm-content[data-screen="chat"]{max-width:930px}`
+  at ≥1024px (230+20+680). `.lm-chat-column` stays 680px — §5.3's
+  line-length/register reasoning re-affirmed, not relaxed.
+- **Today — agreed at large screens.** 980px/2-col kept at 1024–1439px
+  (§5.4's 3-col rejection was scoped to 980px content width and stands).
+  New ≥1440px tier: `max-width:1200px`, `.lm-today-grid` 3 columns
+  (~380px each — wider than the ~343px mobile card, so no compression);
+  hero's `grid-column:1/-1` already spans.
+- **Journey — mostly keep.** §5.5 re-affirmed: extra width must not become
+  density on the narrative river (UXR-1's layout extension). Single change:
+  760px → 860px at ≥1440px only (alternating cards ~352→~402px; the
+  Gallery's 5-col tiles inherit ~145→~166px). Spine/dot offsets are
+  relative — no recompute.
+- **Settings — keep 680px**, re-confirming the Increment-3 recorded
+  decision: a single-column form screen gains emptiness, not utility, from
+  width (§5.2's reasoning applies verbatim).
+- Fixed regardless of width: sidebar remains nav+identity only (§5.1);
+  single-column mobile; every R1/UXR rule untouched.
+
+### 10.3 Related same-pass fixes owned elsewhere (for the record)
+
+The human's other two reported issues were fixed directly by the
+orchestrator/code path in the same pass: (1) the Journey banner-photo
+shrink — a regression from F15's `.lm-photo-trigger` wrapper breaking the
+banner's negative-margin bleed, fixed by moving the bleed onto a new
+`.lm-banner-trigger` wrapper class (§7's banner design itself unchanged);
+(3) Ask now opens in new-conversation mode by explicit human direction,
+superseding §9.1's original resume-most-recent default — continuing a
+past conversation is now always an explicit choice from the history
+sheet/rail (and names the session via an additive `ChatRequest.session_id`
+so an older conversation can genuinely be continued, which the implicit
+4-hour rule alone could not do).
+
+### 10.4 Artifact, push, and coverage notes
+
+Preview at `design-review/increment-5/desktop-density-and-icons.html`
+(before/after renders + the exact CSS table for code-agent). DesignSync
+push not performed (no tool available this session; same gap class as
+§8.6/§9.3). Decisions Log cross-check performed in full before this pass:
+the responsive-web-app platform decision and the §9.5 "Ask" rename are
+both honored; this pass covers only the two assigned issues, with the
+"+ Add a child/moment" label divergence flagged, not fixed.
