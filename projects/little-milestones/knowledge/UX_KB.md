@@ -1191,6 +1191,24 @@ replaces or weakens it.
   child's name is already visible as adjacent text on all three surfaces,
   so a real `alt` would be a redundant screen-reader announcement.
 
+**Addendum (2026-07-12, human-reported):** §8.1 named `ProfileSwitcher.tsx`,
+`TodayScreen.tsx`, and `JourneyScreen.tsx` (plus §8.1a's Settings control)
+as the surfaces migrated to `Avatar`. Judgment call 3 in
+`PROJECT_CONTEXT.md`'s Increment-4 summary left `app/page.tsx`'s own
+sidebar and mobile-header switcher-*trigger* buttons unmigrated,
+reasoning they were "a different affordance" — flagged there as a guard
+against unstated scope, not a deliberate design decision that they should
+look different. The human confirmed by screenshot this reads as a visible
+break of "one child, one avatar everywhere": both trigger buttons sit
+directly beside the Today hero card's real avatar and still show the flat
+dot. Corrected: these two buttons ARE switcher rows (the always-visible
+trigger variant, not a new context), so they get the exact same `Avatar`
+treatment and `photo_accent_deep` ring convention as `ProfileSwitcher.tsx`'s
+internal rows — sidebar at 32px (matching the base `.lm-identity-dot`
+size), mobile header at 24px (matching its existing inline-sized
+footprint). No new ring convention, no new fallback behavior — this
+closes the gap rather than reopening §8.1's scope.
+
 #### 8.1a — Closing the gap: an actual upload affordance (added 2026-07-12)
 
 **Problem, confirmed by inspection:** §8.1 above specifies how a profile
