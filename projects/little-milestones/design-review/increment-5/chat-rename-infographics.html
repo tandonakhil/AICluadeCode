@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Increment 5 — Chat Rename ("Ask") + Infographic Elements</title>
+<style>
+  :root {
+    --lm-cream: #FDF8F2; --lm-card: #FFFFFF; --lm-ink: #3D3833; --lm-ink-soft: #6E6259;
+    --lm-terracotta: #C1502A; --lm-terracotta-deep: #8F3A1D; --lm-sage: #2F7A4E;
+    --lm-slate: #3D6188; --lm-slate-tint: #EEF3F8; --lm-gold: #E8A317; --lm-blush: #FADCC5;
+    --lm-coral: #FF7A50; --lm-danger: #A33B2E; --lm-peach: #F0A574; --lm-sky: #6FA8D8; --lm-moss: #7CB56C;
+    --lm-radius-card: 16px; --lm-radius-pill: 999px;
+    --lm-font-ui: "Nunito Sans", -apple-system, "Segoe UI", sans-serif;
+    --lm-font-display: Fraunces, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFE7DC; font-family: var(--lm-font-ui); color: var(--lm-ink); padding: 32px; }
+  h1 { font-family: var(--lm-font-display); font-size: 26px; margin: 0 0 4px; }
+  h2.section-h { font-family: var(--lm-font-display); font-size: 20px; margin: 36px 0 6px; }
+  .sub { color: var(--lm-ink-soft); max-width: 860px; margin: 0 0 24px; }
+  .box { background: white; border: 1px solid #E8DECF; border-radius: 14px; padding: 18px 22px; max-width: 980px; margin-bottom: 22px; font-size: 14px; }
+  .box h3 { font-size: 15.5px; margin: 0 0 8px; }
+  .box.slate { border-left: 4px solid var(--lm-slate); }
+  .box.slate h3 { color: var(--lm-slate); }
+  .box.gold { border-left: 4px solid var(--lm-gold); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid #EEE4D6; vertical-align: top; }
+  th { color: var(--lm-ink-soft); font-weight: 600; }
+  code { background: var(--lm-slate-tint); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .strike { text-decoration: line-through; color: #B0A390; }
+  .arrow { color: var(--lm-terracotta); font-weight: 700; }
+
+  .frames { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+  .frame-label { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+
+  /* ---- phone frame ---- */
+  .phone { width: 375px; border: 10px solid #2B2723; border-radius: 34px; background: var(--lm-cream); overflow: hidden; }
+  .phone-screen { min-height: 700px; display: flex; flex-direction: column; }
+  .tabbar { display: flex; border-top: 1px solid #EEE4D6; background: white; padding: 8px 0 10px; }
+  .tab { flex: 1; text-align: center; font-size: 11px; color: var(--lm-ink-soft); }
+  .tab .ic { font-size: 18px; display: block; margin-bottom: 2px; }
+  .tab.active { color: var(--lm-terracotta-deep); font-weight: 700; }
+  .tab.renamed { position: relative; }
+  .rename-flag { position: absolute; top: -10px; right: 8px; background: var(--lm-gold); color: white; font-size: 8.5px; font-weight: 700; padding: 1px 4px; border-radius: 5px; }
+
+  /* ---- desktop frame ---- */
+  .desktop { width: 1180px; border: 1px solid #D8CDBB; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  .browser-chrome { background: #E4DACB; padding: 8px 12px; display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #C9BCA6; }
+  .desktop-body { display: flex; min-height: 620px; background: var(--lm-cream); }
+  .sidebar { width: 210px; background: white; border-right: 1px solid #EEE4D6; padding: 20px 14px; flex-shrink: 0; }
+  .sidebar .brand { font-family: var(--lm-font-display); font-size: 18px; margin-bottom: 18px; }
+  .nav-item { padding: 10px 12px; border-radius: 10px; font-size: 14px; margin-bottom: 4px; color: var(--lm-ink-soft); position: relative; }
+  .nav-item.active { background: var(--lm-blush); color: var(--lm-terracotta-deep); font-weight: 700; }
+
+  .history-rail { width: 220px; background: #FBF4E9; border-right: 1px solid #EEE4D6; padding: 18px 14px; flex-shrink: 0; }
+  .history-rail h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--lm-ink-soft); margin: 0 0 10px; }
+  .new-convo-btn-d { width: 100%; border: none; background: var(--lm-terracotta); color: white; border-radius: var(--lm-radius-pill); padding: 9px; font-weight: 700; font-size: 13px; margin-bottom: 12px; cursor: pointer; }
+  .convo-row-d { padding: 8px 8px; border-radius: 10px; margin-bottom: 3px; }
+  .convo-row-d.active { background: var(--lm-blush); }
+  .convo-date-d { font-weight: 700; font-size: 12.5px; }
+  .convo-snippet-d { color: var(--lm-ink-soft); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .chat-col-desktop { flex: 1; padding: 26px 36px; display: flex; justify-content: center; }
+  .chat-col-desktop .inner { width: 100%; max-width: 640px; }
+
+  /* ---- shared chat components ---- */
+  .lm-age-strip { display: flex; align-items: center; gap: 8px; padding: 16px 16px 10px; font-weight: 700; }
+  .lm-age-strip.d { padding: 0 0 10px; }
+  .lm-age-strip .spacer { flex: 1; }
+  .lm-icon-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #E4D8C6; background: white; display: flex; align-items: center; justify-content: center; color: var(--lm-ink-soft); }
+  .lm-icon-btn svg { width: 17px; height: 17px; }
+  .chat-body { flex: 1; padding: 4px 16px; display: flex; flex-direction: column; }
+  .chat-body.d { padding: 0; }
+
+  /* ---- NEW: stage snapshot card (the "infographic" element) ---- */
+  .lm-stage-card { background: var(--lm-card); border-radius: var(--lm-radius-card); padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(61,56,51,.06); }
+  .stage-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .stage-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--lm-peach), var(--lm-coral)); flex-shrink: 0; border: 2px solid white; box-shadow: 0 0 0 1.5px var(--lm-peach); }
+  .stage-name { font-family: var(--lm-font-display); font-size: 17px; margin: 0; }
+  .stage-elapsed { font-size: 12px; color: var(--lm-ink-soft); margin-top: 1px; }
+  .stage-elapsed .spark { color: var(--lm-gold); }
+  .stage-sentence { font-size: 13.5px; color: var(--lm-ink); line-height: 1.5; margin: 0 0 12px; }
+  .domain-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .domain-chip { display: flex; align-items: center; gap: 5px; background: var(--lm-slate-tint); color: var(--lm-slate); border: none; border-radius: var(--lm-radius-pill); padding: 6px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+  .domain-chip svg { width: 14px; height: 14px; }
+  .domain-chip.primary { background: var(--lm-blush); color: var(--lm-terracotta-deep); }
+
+  .empty-hint { color: var(--lm-ink-soft); font-size: 14px; margin: 4px 0 12px; }
+  .lm-chip-row { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+  .lm-chip { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--lm-terracotta); color: var(--lm-terracotta-deep); background: white; border-radius: var(--lm-radius-pill); padding: 11px 16px; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+  .lm-chip svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .lm-chip.tag-derived { border-color: var(--lm-gold); }
+  .composer { margin-top: auto; padding: 12px 16px 18px; display: flex; gap: 8px; }
+  .composer.d { padding: 14px 0 0; margin-top: 16px; }
+  .composer input { flex: 1; border: 1.5px solid #E4D8C6; border-radius: var(--lm-radius-pill); padding: 11px 16px; font-size: 14.5px; }
+  .disclaimer-footer { font-size: 12px; color: var(--lm-ink-soft); text-align: center; padding: 4px 16px 8px; }
+</style>
+</head>
+<body>
+
+<h1>Increment 5 addendum — Renaming "Chat" + Infographic Elements</h1>
+<p class="sub">Two follow-up requests from the human's approval of §9's shared-per-profile chat-history design:
+(1) rename the Chat page to something that communicates the actual value ("age-aware guidance, grounded in CDC
+data, tied to their specific child") rather than "a chat box"; (2) make the page more visually engaging with
+infographic-style elements. Both are shown here composed with the already-approved history rail and suggested
+prompts (<code>suggested-prompts.html</code>, <code>chat-history-desktop.html</code>, <code>chat-history-mobile.html</code>)
+so this reads as one coherent screen, not a bolt-on. Read against <code>RESPONSIBLE_AI_KB.md</code> §3.1/§3.4 (R1) —
+every element below was checked against the "no expected-vs-actual visual, no progress-bar-against-norms" boundary.</p>
+
+<h2 class="section-h">1. The rename</h2>
+
+<div class="box">
+  <h3>Recommendation: rename "Chat" → <b>"Ask"</b></h3>
+  <table>
+    <tr><th>Option</th><th>Verdict</th><th>Reasoning</th></tr>
+    <tr>
+      <td><b>"Consult"</b> (human's first suggestion)</td>
+      <td style="color:var(--lm-danger);font-weight:700;">Not recommended — flagged risk</td>
+      <td>"Consult" reads as "seek a professional/medical consultation." That's in direct tension with
+      RESPONSIBLE_AI_KB §3.2's refusal boundary and the disclaimer's own load-bearing sentence
+      ("not medical advice or a developmental screening tool," §1.10) and the trust posture that the assistant
+      "has no persona pretending to be a clinician" (§1.6c). A tab labeled "Consult" sets an expectation the
+      product then has to actively walk back in nearly every reply. The value this page provides (age-aware,
+      CDC-grounded, child-specific guidance) is real — but "Consult" borrows medical-authority language to say it,
+      which is the wrong trade for a product whose R1/R2 boundaries exist specifically to avoid sounding like a
+      clinician.</td>
+    </tr>
+    <tr>
+      <td><b>"Discuss"</b> (human's second suggestion)</td>
+      <td>Safe, but weak</td>
+      <td>No R1/R2 risk — "discuss" is neutral and warm. But it's barely more purposeful than "Chat": it names the
+      *mechanism* (a back-and-forth) rather than the *value* (guidance suited to this child, right now). It would
+      be an acceptable fallback if "Ask" is rejected, but doesn't clear the bar the human set ("communicate what
+      the user gets out of the page").</td>
+    </tr>
+    <tr>
+      <td><b>"Ask"</b> (this proposal)</td>
+      <td style="color:var(--lm-sage);font-weight:700;">Recommended</td>
+      <td>Already the verb this product uses everywhere the chat is referenced: the onboarding CTA chip
+      ("<i>Ask anything</i> — try: what does a typical {age}-month-old enjoy?", §1.5 Flow 1a), the empty-state hint
+      ("<i>Ask anything</i>, or try one of these:"), and the composer placeholder ("<i>Ask about</i> {Name}...")
+      all already say "ask," not "chat." Renaming the tab to match is zero new copy vocabulary — it closes a gap
+      between what the app already calls this action and what the nav label calls the destination. "Ask" is also
+      one syllable (fits the existing one-word tab-bar convention: Today · Journey · Add) and, paired with the new
+      stage-snapshot card below, the page itself now visibly demonstrates the "age-aware, tied to your child"
+      value the human wants communicated — the single nav word doesn't have to carry that whole promise alone.</td>
+    </tr>
+  </table>
+</div>
+
+<div class="box gold">
+  <h3>Scope of the rename — explicitly bounded</h3>
+  <table>
+    <tr><th>Surface</th><th>Change?</th></tr>
+    <tr><td>Mobile bottom tab-bar label</td><td><span class="strike">Chat</span> <span class="arrow">→</span> <b>Ask</b> (icon unchanged — the existing speech-bubble glyph)</td></tr>
+    <tr><td>Desktop sidebar nav-item label</td><td><span class="strike">💬 Chat</span> <span class="arrow">→</span> <b>💬 Ask</b></td></tr>
+    <tr><td>Browser/page <code>&lt;title&gt;</code> for the route</td><td>Update to include "Ask" instead of "Chat" for consistency (e.g. "Ask — little-milestones")</td></tr>
+    <tr><td>Composer placeholder, empty-state hint, onboarding CTA chip</td><td><b>No change</b> — these already say "Ask," which is exactly why "Ask" was chosen</td></tr>
+    <tr><td>History sheet/rail title ("{Name}'s conversations")</td><td><b>No change</b> — already scoped to "conversations," not "chat"</td></tr>
+    <tr><td>Internal route path / component file name (e.g. <code>ChatScreen.tsx</code>, <code>/chat</code>)</td><td><b>Out of scope for this design pass.</b> That's a code-identifier decision, not a UI-copy decision — code-agent/Architecture's call whether to rename the file/route to match or leave the internal name as-is with only the rendered label changed. Flagged here rather than silently assumed either way.</td></tr>
+    <tr><td>Any other copy referencing "chat" as a common noun (e.g. this KB's own "milestone chat" flow name)</td><td><b>No change</b> — internal documentation naming, not user-facing product copy.</td></tr>
+  </table>
+</div>
+
+<h2 class="section-h">2. Infographic elements — the "stage snapshot" card + domain iconography</h2>
+
+<div class="box">
+  <h3>Concept</h3>
+  <p style="margin:0 0 10px;">A new <code>.lm-stage-card</code> renders in the same empty-state slot as the suggested
+  prompts (<code>messages.length === 0</code> for the open conversation) — enriching the moment a parent opens a
+  fresh conversation, without adding permanent chrome to an active message thread. It bundles three things the
+  human asked for in one cohesive, non-comparison visual:</p>
+  <table>
+    <tr><th>Element</th><th>What it shows</th><th>Data source (no new LLM content)</th></tr>
+    <tr>
+      <td><b>Illustrated identity strip</b></td>
+      <td>The child's avatar (F14, §8.1 — photo or identity-dot fallback) + name + age, styled with the serif
+      display face used on the Journey header (§1.6b), so the card visually echoes the journey's already-approved
+      "storybook" register rather than inventing a new one.</td>
+      <td>Existing profile/age data</td>
+    </tr>
+    <tr>
+      <td><b>Elapsed-time micro-line</b></td>
+      <td>"342 days of Maya's story so far ✦" — a small, quiet text line under the name, reusing the Journey
+      header's exact elapsed-time phrasing pattern ("412 days of Maya — 23 moments so far," §1.6b) rather than a
+      numeric ring, dial, or segmented bar.</td>
+      <td>Existing age computation (same source as the age strip)</td>
+    </tr>
+    <tr>
+      <td><b>Current-stage sentence</b></td>
+      <td>"This month, many little ones are exploring balance, first words, and connection." — one plain sentence
+      built from the current bucket's domain tags.</td>
+      <td>Identical source and template discipline as §9.2's T1 chip (<code>milestones_cdc2022.json</code> bucket
+      <code>domain</code> field via the same fixed domain→phrase map) — literally the same data, rendered as a
+      sentence instead of a chip. No new content-origination surface.</td>
+    </tr>
+    <tr>
+      <td><b>Domain icon chips</b></td>
+      <td>A row of small tappable pill chips — one per milestone domain (movement, language, social, cognitive) —
+      each with a 2px-stroke line icon. Tapping one asks the same T1 template scoped to that domain ("Fun ways to
+      build {domain_phrase} right now").</td>
+      <td>Same T1 template/domain map, §9.2 — a visual entry point into content that already exists, not new copy.</td>
+    </tr>
+  </table>
+</div>
+
+<div class="box slate">
+  <h3>Why this stays inside R1's boundary (re-verified against RESPONSIBLE_AI_KB §3.1/§3.4)</h3>
+  <ul style="margin:6px 0 0; padding-left:20px; font-size:13.5px;">
+    <li><b>No expected-vs-actual visual.</b> Nothing on the card compares Maya to a norm, a percentile, or another
+    child. The domain chips are activity-framing entry points ("build X right now"), the same register as the
+    existing "Ideas for rainy-day play" chip and Today's activity cards — never a checklist of what Maya has or
+    hasn't done.</li>
+    <li><b>No progress-bar-against-norms.</b> The elapsed-time line is deliberately <i>text</i>, not a ring, dial,
+    or fill-bar — a segmented/partial-fill visual was considered and rejected explicitly: even an "elapsed time"
+    ring risks being misread as "percent of development complete" the moment it has any implied ceiling. Journey's
+    own header already solved this the same way (a phrase, not a bar) — this card reuses that exact solved
+    pattern rather than inventing a riskier one.</li>
+    <li><b>No checklist-with-weight on the domain chips.</b> All four domain chips render every time, at identical
+    visual weight — no filled/empty state, no checkmark, no graying-out of domains "not yet reached." Graying out
+    or checking off domains was considered and rejected: it would visually imply "areas covered vs. not," which is
+    exactly the comparison framing R1 bans. The only ordering signal is that the current bucket's most relevant
+    domain(s) sort first (a convenience, not a status — see the "primary" chip style below, which is a placement/
+    tint distinction only, never a completion state).</li>
+    <li><b>No new content-origination surface.</b> Every string on the card (the stage sentence, the domain
+    phrases, the chip templates) is sourced from the same fixed, non-LLM template library already specified and
+    cleared in §9.2 — this card is a new visual arrangement of already-approved data, not a new place the model
+    can originate framing.</li>
+  </ul>
+</div>
+
+<div class="box gold">
+  <h3>Icon legend — extending §1.2's approved motif list (flagged, not silently added)</h3>
+  <p style="margin:0 0 8px;">§1.2 approves leaves/sprout, sun/moon, stars, and footprints as motifs; two new
+  2px-stroke line icons are needed for the "language" and "social" domains and are proposed here explicitly:</p>
+  <table>
+    <tr><th>Domain</th><th>Icon</th><th>Note</th></tr>
+    <tr><td>Movement / strength</td><td>Footprint</td><td>Already an approved §1.2 motif</td></tr>
+    <tr><td>Language / talking</td><td>Speech bubble with a small soundwave</td><td><b>New</b> — proposed addition to §1.2's motif list</td></tr>
+    <tr><td>Social / connection</td><td>A simple heart outline</td><td><b>New</b> — proposed addition; a literal "two hands" icon was considered and rejected as reading too clinical/therapy-adjacent for this warm register</td></tr>
+    <tr><td>Cognitive / curiosity</td><td>A small star/spark</td><td>Reuses the already-approved "stars" motif</td></tr>
+    <tr><td>Coming-next (T2 chip)</td><td>Sunrise/leaf</td><td>Reuses the already-approved "sun/moon" + "leaves/sprout" motifs, signaling "looking ahead"</td></tr>
+    <tr><td>Memory-tag extension (T3 chip)</td><td>The existing gold ✦</td><td>No change — already shipped</td></tr>
+  </table>
+</div>
+
+<h2 class="section-h">3. Composed screen — mobile (375×667)</h2>
+<div class="frames">
+  <div>
+    <div class="frame-label">Renamed tab bar + stage card + domain chips + iconed suggestion chips</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip">
+        <span>Maya · 12 months</span>
+        <div class="spacer"></div>
+        <button class="lm-icon-btn" aria-label="Past conversations" title="History icon, unchanged from suggested-prompts.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button>
+      </div>
+      <div class="chat-body">
+
+        <div class="lm-stage-card">
+          <div class="stage-top">
+            <div class="stage-avatar"></div>
+            <div>
+              <p class="stage-name">Maya · 12 months</p>
+              <p class="stage-elapsed">342 days of Maya's story so far <span class="spark">✦</span></p>
+            </div>
+          </div>
+          <p class="stage-sentence">This month, many little ones are exploring balance, first words, and connection.</p>
+          <div class="domain-row">
+            <button class="domain-chip primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4c1 3-1 4-1 6s2 3 1 6M18 4c-1 3 1 4 1 6s-2 3-1 6"/></svg>Movement</button>
+            <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 1 1-3.3-6.5L21 4l-1 4.5"/><path d="M9 12h6M9 9h4"/></svg>Talking</button>
+            <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-4.4-9.5-8.8C.6 8.6 2.3 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.7 0 5.4 3.6 3.5 7.2C15 16.6 12 21 12 21z"/></svg>Connection</button>
+            <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg>Curiosity</button>
+          </div>
+        </div>
+
+        <p class="empty-hint">Ask anything, or try one of these:</p>
+        <div class="lm-chip-row">
+          <button class="lm-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4c1 3-1 4-1 6s2 3 1 6M18 4c-1 3 1 4 1 6s-2 3-1 6"/></svg>Fun ways to build strength &amp; movement right now</button>
+          <button class="lm-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/><path d="M5 13l.7 2 2 .7-2 .7L5 18l-.7-2-2-.7 2-.7z"/></svg>What's coming up around 15 months?</button>
+          <button class="lm-chip tag-derived"><span style="color:var(--lm-gold);">✦</span>More ideas building on 'first steps'</button>
+        </div>
+      </div>
+      <div class="composer"><input placeholder="Ask about Maya..." disabled /></div>
+      <div class="disclaimer-footer">General parenting information, not medical advice.</div>
+      <div class="tabbar">
+        <div class="tab"><span class="ic">🏠</span>Today</div>
+        <div class="tab active renamed"><span class="rename-flag">was "Chat"</span><span class="ic">💬</span>Ask</div>
+        <div class="tab"><span class="ic">✦</span>Journey</div>
+        <div class="tab"><span class="ic">➕</span>Add</div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<h2 class="section-h">4. Composed screen — desktop (≥1024px, sidebar + history rail + stage card, unchanged 640px reading column)</h2>
+<div class="desktop">
+  <div class="browser-chrome"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="desktop-body">
+    <div class="sidebar">
+      <div class="brand">little-milestones</div>
+      <div class="nav-item">🏠 Today</div>
+      <div class="nav-item active">💬 Ask<span class="rename-flag" style="top:-8px;right:-6px;">was "Chat"</span></div>
+      <div class="nav-item">✦ Journey</div>
+    </div>
+
+    <div class="history-rail">
+      <h4>Maya's conversations</h4>
+      <button class="new-convo-btn-d">+ New conversation</button>
+      <div class="convo-row-d active">
+        <div class="convo-date-d">Today</div>
+        <div class="convo-snippet-d">"Fun ways to build strength..."</div>
+      </div>
+      <div class="convo-row-d">
+        <div class="convo-date-d">Yesterday</div>
+        <div class="convo-snippet-d">"What's a good first book for..."</div>
+      </div>
+      <div class="convo-row-d">
+        <div class="convo-date-d">Tue, Jul 8</div>
+        <div class="convo-snippet-d">"More ideas building on 'first..."</div>
+      </div>
+    </div>
+
+    <div class="chat-col-desktop"><div class="inner">
+      <div class="lm-age-strip d"><span>Maya · 12 months</span><div class="spacer"></div></div>
+
+      <div class="lm-stage-card">
+        <div class="stage-top">
+          <div class="stage-avatar"></div>
+          <div>
+            <p class="stage-name">Maya · 12 months</p>
+            <p class="stage-elapsed">342 days of Maya's story so far <span class="spark">✦</span></p>
+          </div>
+        </div>
+        <p class="stage-sentence">This month, many little ones are exploring balance, first words, and connection.</p>
+        <div class="domain-row">
+          <button class="domain-chip primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4c1 3-1 4-1 6s2 3 1 6M18 4c-1 3 1 4 1 6s-2 3-1 6"/></svg>Movement</button>
+          <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 1 1-3.3-6.5L21 4l-1 4.5"/><path d="M9 12h6M9 9h4"/></svg>Talking</button>
+          <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-4.4-9.5-8.8C.6 8.6 2.3 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.7 0 5.4 3.6 3.5 7.2C15 16.6 12 21 12 21z"/></svg>Connection</button>
+          <button class="domain-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg>Curiosity</button>
+        </div>
+      </div>
+
+      <p class="empty-hint">Ask anything, or try one of these:</p>
+      <div class="lm-chip-row">
+        <button class="lm-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4c1 3-1 4-1 6s2 3 1 6M18 4c-1 3 1 4 1 6s-2 3-1 6"/></svg>Fun ways to build strength &amp; movement right now</button>
+        <button class="lm-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/><path d="M5 13l.7 2 2 .7-2 .7L5 18l-.7-2-2-.7 2-.7z"/></svg>What's coming up around 15 months?</button>
+        <button class="lm-chip tag-derived"><span style="color:var(--lm-gold);">✦</span>More ideas building on 'first steps'</button>
+      </div>
+      <div class="composer d"><input placeholder="Ask about Maya..." /></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="box" style="margin-top:28px;">
+  <h3>Coverage note</h3>
+  <p style="margin:0;">This addendum covers exactly the two follow-up requests: the page rename and the
+  infographic elements. It does not re-open or change anything already approved in §9.1/§9.2 (history model,
+  suggested-prompt template library, R1/R2 compliance of chip copy) — the stage card and domain chips are additive
+  to that design, reusing its data sources rather than introducing new ones. The rename is scoped exactly per the
+  table in §1 above; internal route/file naming is explicitly left to code-agent/Architecture. Decisions Log
+  cross-check: the full <code>PROJECT_CONTEXT.md</code> Decisions Log was re-read before finalizing this pass; no
+  decision recorded since the last Increment 5 pass bears on this addendum beyond what's already covered here.</p>
+</div>
+
+</body>
+</html>

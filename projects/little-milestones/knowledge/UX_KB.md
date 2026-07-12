@@ -1660,3 +1660,70 @@ Log was read before finalizing this pass, re-confirming the responsive-
 web-app platform decision — both mobile and a genuine ≥1024px desktop
 layout are shown for every screen in this pass, not a stretched phone
 view.
+
+### 9.5 Addendum (2026-07-12) — page rename ("Chat" → "Ask") + infographic elements
+
+Human approved §9's shared-per-profile chat-history design and added two
+requests in the same breath: rename the Chat page to communicate its
+actual value, and add infographic-style visual elements. Full proposal,
+reasoning, and R1-compliance check in
+`design-review/increment-5/chat-rename-infographics.html`.
+
+**Rename: "Chat" → "Ask".** Evaluated against the human's two
+suggestions: "Consult" is flagged as risky — it reads as "seek a
+professional/medical consultation," directly in tension with
+RESPONSIBLE_AI_KB §3.2's refusal boundary and the disclaimer's own "not
+medical advice" sentence (§1.10), so a tab labeled "Consult" would set an
+expectation the product has to walk back in nearly every reply.
+"Discuss" is safe but weak — neutral, but names the mechanism (a
+back-and-forth) rather than the value. "Ask" is recommended instead:
+it's already the verb baked into this product's existing copy (the
+onboarding CTA chip, the empty-state hint, the composer placeholder all
+already say "Ask," never "Chat"), so the rename closes a gap between
+what the app already calls this action and what the nav label calls the
+destination, at zero new copy vocabulary and one syllable (matching the
+existing one-word tab convention: Today · Journey · Add).
+
+**Scope, explicitly bounded:** mobile tab-bar label and desktop sidebar
+nav-item label change to "Ask" (icon unchanged); the route `<title>`
+updates for consistency. Composer placeholder, empty-state hint,
+onboarding CTA chip, and the history sheet/rail title ("{Name}'s
+conversations") need **no change** — they already say "Ask"/
+"conversations," not "Chat." Internal route path / component file name
+(e.g. `ChatScreen.tsx`, `/chat`) is explicitly **out of scope** for this
+design pass — a code-identifier decision left to code-agent/
+Architecture, not silently assumed either way.
+
+**Infographic elements — a new `.lm-stage-card`,** rendered in the same
+empty-state slot as the suggested prompts (`messages.length === 0`),
+bundling: an illustrated identity strip (child's avatar + name + age, in
+the Journey header's serif register); an elapsed-time micro-line reusing
+the Journey header's exact phrasing pattern ("342 days of Maya's story
+so far ✦") — deliberately **text, not a ring/dial/fill-bar**, since even
+an "elapsed time" bar risks being misread as a progress-toward-a-norm
+indicator; a current-stage sentence built from the same domain-tag data
+and template discipline as §9.2's T1 chip, rendered as prose instead of
+a chip; and a row of four tappable domain icon chips (movement/language/
+social/cognitive) that fire the same T1 template scoped to that domain.
+All four domain chips always render at identical visual weight — no
+filled/empty state, no checkmark, no graying-out of "domains not yet
+reached" — since a completion-style visual was considered and explicitly
+rejected as reproducing the comparison framing R1 bans. Suggested-prompt
+chips (T1–T4) also gain matching domain icons. Two new 2px-stroke line
+icons (speech-bubble for language, heart outline for social) are
+proposed as additions to §1.2's approved motif list (leaves/sprout, sun/
+moon, stars, footprints already cover movement/cognitive/coming-next) —
+flagged explicitly as new, not silently added.
+
+**R1 re-verification:** no element introduces an expected-vs-actual
+visual, a progress-bar-against-norms, or a checklist with pass/fail
+visual weight; every string is sourced from the same fixed, non-LLM
+template library already cleared in §9.2 — this is a new visual
+arrangement of already-approved data, not a new content-origination
+surface.
+
+**Preview:** `design-review/increment-5/chat-rename-infographics.html` —
+renamed tab bar/sidebar, stage card, domain chips, and iconed suggestion
+chips composed with the existing history rail/sheet and suggested-prompt
+chips from this increment's earlier files, at both mobile (375px) and
+desktop (≥1024px) widths.
