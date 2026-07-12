@@ -1810,3 +1810,59 @@ push not performed (no tool available this session; same gap class as
 the responsive-web-app platform decision and the §9.5 "Ask" rename are
 both honored; this pass covers only the two assigned issues, with the
 "+ Add a child/moment" label divergence flagged, not fixed.
+
+## 10.5 Revision — 2026-07-12 (human feedback follow-up): fluid adaptive desktop, superseding §10.2's fixed tiers
+
+Source: human live-testing feedback on the §10.2 pass — desktop must be
+"adaptive to screen for all four tabs, based on content it should expand,
+not grow too wide but look built for desktop." §10.2's discrete-breakpoint
+caps (Today 980→1200px, Ask 930px, Journey 760→860px, Settings 680px) are
+superseded by continuous, content-bounded rules. §10.2 is retained as the
+historical record per this file's convention. Preview (real iframes at
+1024/1440/1920 running the exact proposed CSS, plus the full change
+table), human-approved: `design-review/increment-5/adaptive-desktop.html`.
+**Implemented and shipped 2026-07-12.**
+
+Per-tab strategy:
+- **Today** — fluid grid: `repeat(auto-fit, minmax(300px, 1fr))`,
+  container 1400px cap. 2 cols @1024 → 3 @~1440 (~347px, near-exactly the
+  343px mobile card) → 4 @1920. §5.4's no-compression rule is now enforced
+  structurally by the minmax floor instead of hand-picked column counts.
+- **Ask** — the 680px `.lm-chat-column` reading measure stands (§5.3
+  re-affirmed a third time, not relaxed). Adaptive = the frame: history
+  rail `clamp(230px, 19vw, 280px)`; container `min(1080px, 100%)`
+  (280 rail + 20 gap + 680 chat + 2×48 max side padding).
+- **Journey** — split by view. Timeline: `clamp(760px, 62vw, 920px)` —
+  continuous, hard-capped; UXR-1's layout-width discipline holds at any
+  monitor. Gallery: breaks out to `min(1400px, 100%)` via
+  `:has(.lm-gallery-grid)` with `repeat(auto-fit, minmax(160px, 1fr))`
+  tiles (4/6/7 cols at 1024/1440/1920) — R1-safe to adapt aggressively
+  precisely because it is a grid of bare photos with no norm semantics,
+  not the narrative river.
+- **Settings** — `clamp(680px, 58vw, 960px)` plus a new
+  `.lm-settings-grid` wrapper (`repeat(auto-fit, minmax(330px, 1fr))`,
+  `align-items:start`) around all four cards: one column @1024 (unchanged
+  from the Increment-3 recorded decision at that width), 2-up from
+  ~1440 — the "built for desktop" composition without a new visual
+  language.
+- **Global polish, calm register only**: side padding
+  `clamp(16px, 3vw, 48px)`, card padding `clamp(20px, 1.4vw, 28px)`,
+  body type `clamp(16px, 1vw + 3px, 17.5px)`. All three resolve to
+  today's exact values below ~1300px viewports — zero mobile change. No
+  parallax, no decoration, no new tokens.
+
+Implementation: all 13 rows of the change table applied to
+`dev/frontend/app/globals.css`, including deletion of the entire §10.2
+`@media (min-width:1440px)` block (superseded, not layered) and one
+markup change in `SettingsScreen.tsx` (all four cards wrapped in
+`.lm-settings-grid`). tsc clean, 54/54 frontend tests unchanged. Fixed
+regardless: sidebar 248px nav+identity (§5.1), every R1/UXR rule, all
+fixed tokens, all <1024px behavior. `:has()` degrades gracefully
+(Gallery stays at Timeline width in an unsupporting browser).
+
+DesignSync: pushed this pass (plan `plan_172e0c51e31a46e7_ebc61a260070`,
+additive, 9 files/cards) — including the previously-flagged §8.6/§9.3/
+§10.4 backlog (all increment-4/5 previews), closing that standing gap.
+Still open, re-flagged: root `design-review/index.html` links for
+increment-4/5 sections (needs an Edit-access pass); the sidebar
+"+ Add a child/moment" label divergence (§10.1).
