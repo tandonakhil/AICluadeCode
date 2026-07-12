@@ -578,5 +578,176 @@ approved by security-architect as of this addendum, conditional on items 3
 and 4 of §1.7 and the privacy-policy/vendor-check items of §5.3 being
 tracked and completed before production sending is enabled** — consistent
 with the joint-presentation requirement ARCHITECTURE_KB §8 calls out.
-</content>
-</invoke>
+
+---
+
+## 7. F12 — Hardened auth suite (Increment 6 design, security-architect, 2026-07-12)
+
+Design pass for the human-approved F12 build (checkbox review 2026-07-12).
+Scopes F12's four sub-items against their own recorded triggers (§1.6,
+FEATURES.md F12), then designs what's in scope precisely enough for
+code-agent. This section extends §1; it does not replace §1.1's baseline.
+
+### 7.1 Scope decisions, reasoned against the triggers
+
+1. **Self-service password reset — IN SCOPE.** §1.6 trigger 2 has fired:
+   email infrastructure exists (ARCHITECTURE_KB §5, Increment 3). §1.3
+   already named this the first post-email-infra build. Constraint carried
+   from §1.3's note: the unsubscribe-token mechanism is NOT repurposed —
+   reset tokens are a separate, single-use, short-expiry mechanism (§7.2).
+2. **TOTP MFA — IN SCOPE, strictly per-user opt-in.** §1.6 trigger 3
+   (threat-model change via third-party integration) fires next increment:
+   F17 links caregiver Google accounts and grants Photos-API access, so an
+   account takeover post-F17 reaches a third-party grant, not just local
+   data. Building MFA in the dedicated security increment, before F17,
+   closes that window instead of opening it. The human's recorded intent
+   ("top of the line auth mechanism") independently supports it. §1.3's
+   friction objection is answered by opt-in-only: no user — including the
+   family owner on caregivers' behalf — can force MFA on another account;
+   the zero-friction default is preserved.
+3. **OAuth/social login — REMAINS DEFERRED.** §1.3's privacy reasoning is
+   unchanged and no concrete user-facing need has emerged. Explicitly: F17's
+   Google OAuth is a resource grant for the Photos API, not a login
+   identity — it creates no precedent for "sign in with Google" and does
+   not weaken this rejection.
+4. **Managed session store / HTTPS enforcement — REMAINS DEFERRED**
+   (trigger 1, non-local deployment, has not fired). Folded in instead, as
+   cheap hardening on the existing sessions table: session listing,
+   per-session revocation, "log out everywhere," an authenticated
+   change-password endpoint, and invalidate-all-sessions on any password
+   change or reset (§7.4). No external store, no new operational surface.
+
+### 7.2 Password reset design
+
+- **Schema:** new table
+  `password_reset_tokens(id INTEGER PK, user_id FK→users ON DELETE CASCADE,
+  token_hash TEXT UNIQUE NOT NULL, created_at, expires_at, used_at NULL)`.
+- **Token:** `secrets.token_urlsafe(32)` (matches §1.1 session tokens),
+  SHA-256 hash at rest (not a password, no slow KDF), **30-minute expiry,
+  single-use** (`used_at` set on redemption), **one active token per user**
+  (a new request invalidates any outstanding token for that user first).
+- **`POST /auth/password-reset/request` `{email}`** — always returns the
+  same generic 202 ("if an account exists for that address, we've sent a
+  link") for known email, unknown email, AND send failure (no enumeration
+  via status, body, or timing-visible branching; the Resend call happens
+  after the response path is fixed, failure logged per §2.5's no-PII rule
+  — user_id only, never the email address). Rate limits (§1.5 primitive):
+  3/hour per email + 10/hour per IP.
+- **Email:** new `email_delivery.send_password_reset_email(to_email,
+  reset_url)` — same content-free discipline as ARCHITECTURE_KB §5.7:
+  fixed subject/body, no child data, no personalization; footer per §5.6.
+  **Same delivery gating as the digest:** built and contract-tested against
+  mocked Resend; real sending contingent on the unmet domain-verification
+  precondition (ARCHITECTURE_KB §5.1). Stated posture, not a gap.
+- **`POST /auth/password-reset/confirm` `{token, new_password}`** — lookup
+  by hash (constant-time compare, mirroring session lookup), enforce
+  expiry + single-use, validate password, write new argon2id hash, mark
+  token used, and **delete ALL sessions for the user** (a reset is a
+  possible-compromise event; every existing session dies, including any
+  attacker's). Generic error for invalid/expired/used token (no
+  distinguishing which). Rate limit: 10/15min per IP. **Reset does not
+  bypass or disable TOTP** — an attacker with email access alone must not
+  be able to strip MFA; a user locked out of both email-recovery and TOTP
+  uses a recovery code (§7.3), which is what recovery codes are for.
+- **Frontend token-leak constraints** (for ui-ux-designer/code-agent, same
+  reasoning as §1.7 point 5): the reset page carries the raw token in its
+  URL — it must load no third-party resources and should strip the token
+  from the address bar (`history.replaceState`) once read.
+- **§1.3 status change:** the "no password reset" accepted gap is retired
+  by this build; the Settings copy documenting it must be removed
+  (flagged to ui-ux-designer).
+
+### 7.3 TOTP MFA design (opt-in)
+
+- **Library/parameters:** `pyotp`, RFC 6238 defaults — SHA-1, 6 digits,
+  30s step, ±1 step verification window (standard authenticator-app
+  compatibility; not a weakness at this token lifetime).
+- **Schema:** on `users`: `totp_secret_enc TEXT NULL` (secret encrypted
+  with the existing Fernet key from §2.1 — unlike a password it must be
+  recoverable to verify codes, so hashing is impossible; encryption keeps
+  it out of the §2.2 plaintext-DB surface), `totp_verified_at TIMESTAMP
+  NULL` (NULL = not enrolled or enrollment pending). New table
+  `recovery_codes(id, user_id FK→users ON DELETE CASCADE,
+  code_hash TEXT NOT NULL, used_at NULL)`.
+- **Enrollment (authenticated, Settings):** `POST /auth/totp/setup`
+  (requires current-password re-entry — a hijacked session must not be
+  able to enroll its own MFA) → generates secret, stores it encrypted with
+  `totp_verified_at=NULL`, returns the `otpauth://` provisioning URI (QR
+  rendered client-side; the server never generates a QR image). Pending
+  secrets have no effect at login. `POST /auth/totp/verify {code}` with a
+  valid code completes enrollment: sets `totp_verified_at`, generates
+  **8 recovery codes** (`secrets`-sourced, ~16 base32 chars, grouped for
+  readability), returns them **exactly once**, stores argon2id hashes
+  (short enough to be password-class, unlike 256-bit tokens — slow KDF is
+  warranted here). Re-running setup replaces any pending secret.
+- **Login flow for enrolled users:** `POST /auth/login` with a correct
+  password creates a session row with a new `sessions.mfa_pending`
+  flag set — the auth dependency (`get_current_family`) rejects pending
+  sessions for every route except `POST /auth/totp/login {code}`, which on
+  a valid TOTP or unused recovery code clears the flag (recovery code:
+  `used_at` set; response warns how many remain). **5 failed attempts
+  destroy the pending session** (fresh password login required) — this,
+  not the limiter, is the primary 6-digit brute-force control. Pending
+  sessions expire after 5 minutes regardless. Non-enrolled users' login is
+  byte-for-byte unchanged.
+- **Disable:** `POST /auth/totp/disable` requires current password AND a
+  valid TOTP or recovery code; clears secret and deletes remaining
+  recovery codes.
+- **Never forced:** no owner-mandates-MFA capability is built; per-user
+  opt-in only.
+
+### 7.4 Session hardening (folded into F12, in lieu of sub-item 4)
+
+- **Schema:** `sessions` gains `id TEXT` (uuid4 — non-enumerable, same
+  reasoning as `photo_meta.id`), `mfa_pending BOOLEAN DEFAULT 0`,
+  `last_seen_at TIMESTAMP` (updated on the existing sliding-expiry touch).
+- **Routes (all authenticated, self-scoped — a user manages only their own
+  sessions, never another caregiver's):** `GET /auth/sessions` (list:
+  created, last-seen, current-session marker; never the token or its
+  hash), `DELETE /auth/sessions/{id}` (revoke one),
+  `POST /auth/sessions/revoke-others` ("log out everywhere else").
+- **`POST /auth/password` (change, authenticated):** requires current
+  password; new argon2id hash; deletes all OTHER sessions (current
+  survives — deliberate difference from reset's delete-all, since a
+  logged-in, password-knowing change is not a compromise signal).
+
+### 7.5 Test-suite additions (extends §4, this role's suite at Test gate)
+
+- Reset token: single-use enforced; expired token rejected; second request
+  invalidates the first token; identical response body/status for
+  known-vs-unknown email on request (enumeration check).
+- Reset confirm: all sessions for the user are dead afterward (a
+  pre-reset session cookie gets 401); TOTP enrollment survives reset.
+- Reset email contract (mocked Resend): no child data in body, fixed
+  subject, reset URL present — same fixture pattern as the digest test.
+- TOTP: pending (`mfa_pending`) session gets 401 on every non-TOTP route;
+  5th failed code destroys the pending session; recovery code is
+  single-use; setup without current password is rejected; secret at rest
+  in the DB file is Fernet ciphertext, not a plaintext base32 seed.
+- Session hardening: user A cannot list or revoke user B's sessions
+  (404 per §1.1's cross-scope rule); revoke-others leaves exactly the
+  current session valid.
+- Secrets-leak sweep extended: no reset token, TOTP secret, or recovery
+  code ever appears in a log line (trigger each flow, inspect logs).
+- Rate limiters fire on reset-request (per-email and per-IP) and
+  reset-confirm.
+
+### 7.6 Revisit triggers (additive to §1.6)
+
+1. Before F17 ships: confirm MFA is live and re-assess whether the Google
+   token grant warrants recommending (not forcing) MFA enrollment in the
+   linking flow's UI copy.
+2. Before real email sending is enabled (domain verification): re-verify
+   the reset flow end-to-end with live delivery, not just mocked Resend.
+3. §1.6 triggers 1, 3, 4 remain in force unchanged; sub-items 3 and 4 of
+   F12 (OAuth, managed session store) stay parked on their own triggers.
+
+### 7.7 Joint-presentation note
+
+Schema additions (`password_reset_tokens`, `recovery_codes`, three
+`users`/`sessions` column sets) and the new `email_delivery` function
+touch ARCHITECTURE_KB §3/§5's surface — solution-architect should confirm
+they fit the store/schema conventions before code-agent starts. No
+disagreement anticipated (all patterns reuse §1.1/§2.1/§5.4 precedents),
+but per this role's contract that confirmation is theirs to record, not
+mine to assume.
