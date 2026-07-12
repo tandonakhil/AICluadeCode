@@ -958,3 +958,57 @@ behavior is confusing or objectionable enough in practice to warrant fixing
 ahead of a UX_KB revision. Until then, code-agent's existing implementation
 (§Increment 2 judgment call 2 in PROJECT_CONTEXT.md) stands as designed.
 `ARCHITECTURE_KB.md` §4.2 has been annotated to point here.
+
+### 9.3 Increment 4 — `avatar_photo_id` and profile-level photo replacement (solution-architect, 2026-07-12)
+
+Resolves UX_KB §8.4's flagged backend gap and a second gap found during
+this consult (repeated profile-level uploads via F14's Settings affordance,
+UX_KB §8.1a).
+
+**`Profile.avatar_photo_id` — derived field, not a stored column.**
+Populated at the route layer (same pattern as `age_summary`), via:
+`SELECT id FROM photo_meta WHERE profile_id = ? AND memory_id IS NULL
+ORDER BY created_at DESC LIMIT 1`. Add an index on
+`photo_meta(profile_id, memory_id, created_at)` in `schema.sql`. Not
+stored on `profiles` — storing it would require a second write path
+synchronized with `_set_profile_accent`, which this project's SQLite/
+cascade design (§3) exists to avoid.
+
+**`PhotoStore.create()` — replace-not-accumulate for `memory_id IS NULL`
+uploads.** A profile-level (avatar) upload today creates a new row/file
+but never removes the previous one, leaving permanently orphaned photo
+rows/files with no reachable delete path — a real accumulation of
+undeleted child-photo bytes once Settings makes repeated profile-level
+upload a first-class, repeated action (UX_KB §8.1a). Fix, scoped to
+`memory_id IS NULL` uploads only (memory-attached photos are unaffected):
+after the new row/file are committed, unlink the file(s) and delete the
+row(s) of any other `photo_meta` entries for that profile with
+`memory_id IS NULL AND id != new_id`, **without** calling the public
+`delete()` method (which unconditionally calls
+`_set_profile_accent(profile_id, None)` and would wipe the new photo's
+just-computed accent if it ran after `create()`'s own accent-set call).
+Correct order: create new row → clean up old profile-level row(s)/file(s)
+directly (no accent touch) → `_set_profile_accent` from the new tokens,
+exactly where `create()` already does it today.
+
+Recommend a brief security-architect confirmation of this delete-ordering
+change before code-agent builds it, consistent with this project's
+existing precedent of re-consulting security-architect on new delete/
+data-flow wrinkles (F8's unsubscribe route).
+
+**security-architect confirmed (2026-07-12), no disagreement, three
+conditions for code-agent:**
+1. The cleanup query must explicitly filter `profile_id = ?` in addition
+   to `memory_id IS NULL AND id != new_id` — not just implied by which
+   `PhotoStore` instance is called — so a uuid4 collision or refactor
+   mistake can never delete another profile's rows. Add a regression
+   test asserting cross-profile isolation (uploading to profile B never
+   touches profile A's rows).
+2. This cleanup path deliberately bypasses `delete()`'s own authz check
+   (§2.3's owner-only-delete rule) because it runs inside an
+   already-authorized upload request context — add a one-line code
+   comment saying so explicitly, so a future reader doesn't mistake the
+   bypass for an oversight.
+3. Add a regression test: upload a profile-level photo twice, assert
+   exactly one `memory_id IS NULL` row/file remains for that profile and
+   it's the new one (both DB row count and on-disk file count).
