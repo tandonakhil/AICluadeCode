@@ -1178,6 +1178,26 @@ F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
     evidence file's five browser-confirmation items (spine endpoint
     tuning, olive tint/hero look, desktop rhythm at 15 items, Today grid
     raggedness, UXD-4b preview). [code-agent]
+  9. **2026-07-12 — UXD-4(b) — closed.** The photo-band redesign left open
+     above is now implemented, per `knowledge/UX_KB.md` §7 and the approved
+     preview `design-review/journey/moment-photo-banner.html`. Journey
+     memory cards' first photo (`entry.photo_ids[0]`) renders as a
+     full-width `.lm-moment-banner` (`width: calc(100% + 40px); height:
+     120px; object-fit: cover; margin: -20px -20px 14px`) as the first
+     child of `.lm-card.lm-moment-card`, bleeding through the card's own
+     20px padding; photos 2+ (`entry.photo_ids.slice(1)`) still render in
+     the unchanged `.lm-moment-photos` thumbnail row below, and
+     single-photo memories show the banner only. Corner radius is the
+     literal `12px 12px 0 0` from the original retest fix spec, not
+     `var(--lm-radius-card)` (16px) — the human explicitly reviewed the
+     preview and confirmed the literal 12px value, accepting the small
+     sliver of card background visible at the top corners rather than
+     matching the card's own 16px radius (UX_KB §7.3).
+     `dev/frontend/app/globals.css` and
+     `dev/frontend/components/JourneyScreen.tsx` changed.
+     **Verification:** frontend `tsc --noEmit` clean; `npm test -- --run`
+     13/13 passing (unchanged count — no new test cases required by this
+     visual-only change). [code-agent]
 
 ## Test Results
 
