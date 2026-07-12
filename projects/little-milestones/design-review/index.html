@@ -21,6 +21,8 @@
           font-size: 0.85rem; display: inline-block; color: #6B2E42; margin-left: 8px; margin-top: 6px; }
   .rev5note { background: #EFF6EE; border: 1px solid #C3DCC0; border-radius: 10px; padding: 10px 16px;
           font-size: 0.85rem; display: inline-block; color: #2F7A4E; margin-left: 8px; margin-top: 6px; }
+  .inc4note { background: #EEF0FB; border: 1px solid #C7CCEE; border-radius: 10px; padding: 10px 16px;
+          font-size: 0.85rem; display: inline-block; color: #3B3E7A; margin-left: 8px; margin-top: 6px; }
   nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 32px; position: sticky; top: 0;
         background: rgba(253,248,242,0.94); backdrop-filter: blur(8px); border-bottom: 1px solid #EFE5D8; z-index: 5; }
   nav a { text-decoration: none; color: #C1502A; font-size: 0.85rem; font-weight: 600;
@@ -30,17 +32,20 @@
   nav a.rev3 { border-color: #3D6188; color: #3D6188; background: #EEF3F8; }
   nav a.rev4 { border-color: #B85C7B; color: #6B2E42; background: #FBEFF2; }
   nav a.rev5 { border-color: #2F7A4E; color: #2F7A4E; background: #EFF6EE; }
+  nav a.inc4 { border-color: #6266B8; color: #3B3E7A; background: #EEF0FB; }
   section { padding: 28px 32px; }
   section.rev2-section { background: linear-gradient(180deg, #FFF6EF, transparent 220px); }
   section.rev3-section { background: linear-gradient(180deg, #EEF3F8, transparent 220px); }
   section.rev4-section { background: linear-gradient(180deg, #FBEFF2, transparent 220px); }
   section.rev5-section { background: linear-gradient(180deg, #EFF6EE, transparent 220px); }
+  section.inc4-section { background: linear-gradient(180deg, #EEF0FB, transparent 220px); }
   h2 { font-size: 1.1rem; margin: 0 0 4px; }
   h2 .badge { display:inline-block; background:#FF7A50; color:#fff; font-size:0.65rem; font-weight:700;
           border-radius:6px; padding:2px 8px; margin-left:8px; vertical-align:middle; letter-spacing:.03em; }
   h2 .badge.desktop { background:#3D6188; }
   h2 .badge.personalization { background:#B85C7B; }
   h2 .badge.retest { background:#2F7A4E; }
+  h2 .badge.inc4 { background:#6266B8; }
   .desc { color: #8A8178; font-size: 0.88rem; margin: 0 0 14px; max-width: 70ch; }
   iframe { width: 100%; border: 1px solid #EFE5D8; border-radius: 14px; background: #fff; }
   .screen-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
@@ -50,18 +55,22 @@
   .strategy.rose b { color:#6B2E42; }
   .strategy.green { border-color:#D6E8D2; color:#3D5B39; }
   .strategy.green b { color:#2F7A4E; }
+  .strategy.indigo { border-color:#D3D6F0; color:#3B3E7A; }
+  .strategy.indigo b { color:#3B3E7A; }
+  .flag-box { background: #FFF3EC; border: 1px solid #FFC9AD; border-radius: 10px; padding: 10px 16px; font-size: 0.85rem; color: #8F3A1D; max-width: 70ch; margin: 0 0 20px; }
   footer { padding: 24px 32px 48px; color: #8A8178; font-size: 0.82rem; }
 </style>
 </head>
 <body>
 <header>
   <h1>little-milestones — Experience Design Review</h1>
-  <p class="sub">Foundations/components (revision 2 palette applied throughout) plus full-screen mockups from the second design pass, full desktop-viewport layouts from the third design pass, photo-personalized theming from the fourth design pass, and a targeted retest fix pass (revision 5).</p>
+  <p class="sub">Foundations/components (revision 2 palette applied throughout) plus full-screen mockups from the second design pass, full desktop-viewport layouts from the third design pass, photo-personalized theming from the fourth design pass, a targeted retest fix pass (revision 5), and Increment 4's Journey/Profile redesign (profile avatars, image lightbox, gallery view).</p>
   <p class="note">Review each section below, then approve or request changes back in the chat.</p>
   <p class="rev2note">Revision 2 (2026-07-10): palette made more saturated/vivid per feedback "colors need to pop more" — see UX_KB.md §4 for what changed and why. R1/R2 anxiety-aware constraints (slate-not-red, AA contrast, no norm framing) unchanged.</p>
   <p class="rev3note">Revision 3 (2026-07-10): desktop layouts added per feedback "is there a desktop view?" — the same five key screens now have genuine ~1280–1440px responsive treatments (not stretched phone views): left sidebar nav replaces the bottom tab bar, Today becomes a 2-column grid, the journey river alternates sides, onboarding stays deliberately narrow, and the add-memory sheet becomes a centered modal. See UX_KB.md §5.</p>
   <p class="rev4note">Revision 4 (2026-07-10): photo-personalized theming added per feedback "once a parent uploads their kid's pics we should show pictures in general theme so it looks personal. if no picture then default theme." Extracted photo accents are a decorative layer only — the slate pediatrician-note color, the single red destructive color, and body-text contrast never change, regardless of which photo is uploaded. See UX_KB.md §6.</p>
   <p class="rev5note">Revision 5 (2026-07-12): UXD-4(b) from the density retest (test-evidence/ux-retest-synthetic-data-2026-07-11.md, lines ~224–236) — approved for implementation. On the Journey timeline, each memory's first photo now renders as a full-width 120px banner at the top of the card instead of a 64x64 thumbnail; additional photos (2+) stay as thumbnails below, unchanged. See the new "Journey — Photo banner (retest)" section below for the reviewable preview.</p>
+  <p class="inc4note">Increment 4 (2026-07-12): F14 (real profile-photo avatar in the switcher/Today/Journey headers, falling back to the existing colored identity dot), F15 (Journey image lightbox — click a photo, it expands full-resolution in an overlay, dismiss on tap/escape/backdrop), and F16 (a toggleable Journey gallery grid, sharing F15's lightbox). Designed as one coherent pass since all three touch the same screens/files. See UX_KB.md §8 and the new "Increment 4" section below.</p>
 </header>
 <nav>
   <a href="#colors">Colors</a><a href="#type">Type</a><a href="#buttons">Buttons</a>
@@ -71,6 +80,7 @@
   <a class="rev3" href="#desktop">Desktop (rev. 3)</a>
   <a class="rev4" href="#personalization">Photo Personalization (rev. 4)</a>
   <a class="rev5" href="#photo-banner-retest">Journey Photo Banner (rev. 5)</a>
+  <a class="inc4" href="#increment-4">Increment 4 — Avatars, Lightbox, Gallery</a>
 </nav>
 
 <section id="colors"><h2>Foundations — Color <span class="badge">REV 2</span></h2>
@@ -94,7 +104,7 @@
   <iframe src="components/chat.html" height="720" loading="lazy"></iframe></section>
 
 <section id="journey"><h2>The Life Journey — "The Story of {Name}" <span class="badge">REV 2</span></h2>
-  <p class="desc">The headline feature: a vertical storybook river from "Hello, world" onward — age-at-moment badges, serif chapter dividers with gold flourishes, now a vivid coral river line. Structurally incapable of rendering the child as "behind." See the revision 5 section below for the approved photo-banner update to this view's memory cards.</p>
+  <p class="desc">The headline feature: a vertical storybook river from "Hello, world" onward — age-at-moment badges, serif chapter dividers with gold flourishes, now a vivid coral river line. Structurally incapable of rendering the child as "behind." See the revision 5 section below for the approved photo-banner update to this view's memory cards, and the new Increment 4 section for the avatar/lightbox/gallery additions on top of it.</p>
   <iframe src="journey/timeline.html" height="900" loading="lazy"></iframe></section>
 
 <section id="onboarding"><h2>Onboarding — Sensitive Prematurity Screen <span class="badge">REV 2</span></h2>
@@ -211,7 +221,7 @@
     <b>New card:</b> single-photo memory cards render banner-only (no thumbnail row). &nbsp;
     <b>Multi-photo card:</b> photo 1 is the banner; photos 2+ keep today's unchanged 64px thumbnail row. &nbsp;
     <b>Unchanged:</b> UXR-1 (no norm axis), the coral river spine/dots, chapter markers, age badges, delete affordance. &nbsp;
-    <b>Flagged for sign-off:</b> banner corner radius uses the card's own `--lm-radius-card` (16px) rather than the retest note's literal "12px" value — see the in-page flag for why.
+    <b>Flagged for sign-off:</b> banner corner radius uses the literal 12px value from the retest note (human-confirmed 2026-07-12, UX_KB §7.3) rather than the card's own 16px radius — see UX_KB.md §7.3 for the resolution.
   </div>
   <div class="screen-grid">
     <div>
@@ -222,6 +232,37 @@
   </div>
 </section>
 
-<footer>Generated from ui-ux-designer's Experience Design gate output · little-milestones · revision 5, 2026-07-12</footer>
+<section id="increment-4" class="inc4-section">
+  <h2>Increment 4 — Profile Avatars, Journey Lightbox, Journey Gallery <span class="badge inc4">F14 / F15 / F16</span></h2>
+  <p class="desc">Human-approved post-MVP bundle (2026-07-12, FEATURES.md's "Post-MVP roadmap" section) — three backlog items designed as one coherent pass since all three touch the same Journey screen and the same profile-photo display: <b>F14</b> shows the profile's real photo as an avatar in the switcher, Today header, and Journey header (falling back to the existing colored identity dot when there's no photo); <b>F15</b> lets a caregiver click any Journey photo to expand it full-resolution in an on-screen overlay instead of navigating away; <b>F16</b> adds a toggleable dense grid alternative to the chronological river, whose tiles open the exact same lightbox F15 designed. All three preview files below use the app's real fixed <code>--lm-*</code> tokens from <code>dev/frontend/app/globals.css</code>, copied verbatim, and are shown at both mobile and desktop widths. Full design intent, coverage notes, and the flagged backend/data gap: UX_KB.md §8.</p>
+  <div class="strategy indigo">
+    <b>F14 fallback contract:</b> a photo, when one exists, replaces the colored dot everywhere; the dot itself is completely unchanged as the no-photo state — same mechanism, three sizes (32px switcher, 44px Today, 56px Journey). &nbsp;
+    <b>F15 dismiss:</b> visible close button, Escape key, and backdrop click — never a tap on the image itself. Focus moves to the close control on open and returns to the exact photo that was clicked on close. &nbsp;
+    <b>F15/F16 shared component:</b> one <code>&lt;Lightbox&gt;</code>, two seed lists — the timeline scopes prev/next to one memory's photos, the gallery scopes prev/next to every photo on the profile. &nbsp;
+    <b>F16 view state:</b> client-only for this pass, defaults to Timeline, never both views rendered at once.
+  </div>
+  <div class="flag-box">
+    <b>Flagged for human/Architecture attention:</b> displaying a real profile-photo avatar (F14) needs one small additive backend surface not currently exposed — a nullable <code>avatar_photo_id</code> on the <code>Profile</code> response (or equivalent), sourced the same way as the existing "last-uploaded-wins" accent-extraction rule. No new storage, table, or encryption surface; full reasoning in the implementation note inside <code>avatar-treatment.html</code> below and in UX_KB.md §8.4. Also flagged: this pass could not push to DesignSync (no tool access in this environment) — see UX_KB.md §8.6.
+  </div>
+  <div class="screen-grid">
+    <div>
+      <h2 style="font-size:1rem">F14 — Profile avatar treatment</h2>
+      <p class="desc">Switcher rows, Today header, and Journey header, each showing a real photo avatar and the no-photo fallback dot side by side, at mobile width plus a desktop sidebar switcher variant.</p>
+      <iframe src="increment-4/avatar-treatment.html" height="2200" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">F15 — Journey image lightbox</h2>
+      <p class="desc">The lightbox open over a single-photo memory (mobile) and a multi-photo memory with prev/next controls (desktop), with the dimmed timeline visible behind the overlay in both cases.</p>
+      <iframe src="increment-4/journey-lightbox.html" height="1700" loading="lazy"></iframe>
+    </div>
+    <div>
+      <h2 style="font-size:1rem">F16 — Journey gallery view</h2>
+      <p class="desc">The Timeline/Gallery toggle switched to Gallery: a 3-column grid on mobile, a 5-column grid on desktop with the sidebar nav, and a callout showing how a tile hands off into F15's lightbox.</p>
+      <iframe src="increment-4/journey-gallery.html" height="1700" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>Generated from ui-ux-designer's Experience Design gate output · little-milestones · Increment 4, 2026-07-12</footer>
 </body>
 </html>
