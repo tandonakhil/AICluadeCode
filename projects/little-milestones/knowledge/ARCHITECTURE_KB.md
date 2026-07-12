@@ -1012,3 +1012,167 @@ conditions for code-agent:**
 3. Add a regression test: upload a profile-level photo twice, assert
    exactly one `memory_id IS NULL` row/file remains for that profile and
    it's the new one (both DB row count and on-disk file count).
+
+---
+
+## 10. Increment 5 — chat history + dynamic suggested prompts (F13) (solution-architect, 2026-07-12)
+
+Resolves the schema/scoping/perf questions UX_KB §9 flagged as Architecture's
+to decide. Human already settled chat history's sharing model at the UX gate:
+**shared per-profile**, same sharing model as memories/photos (not private
+per-caregiver) — not re-litigated here.
+
+### 10.1 Schema
+
+```sql
+CREATE TABLE chat_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    snippet TEXT NOT NULL,
+    message_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    last_message_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_chat_sessions_profile_recency ON chat_sessions (profile_id, last_message_at);
+
+CREATE TABLE chat_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id INTEGER NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
+    role TEXT NOT NULL CHECK(role IN ('user','assistant')),
+    content TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_chat_messages_session_created ON chat_messages (session_id, created_at);
+```
+
+No `family_id` column on either table — scoped transitively via `profile_id
+→ family_id`, the `MemoryStore`/`PhotoStore` pattern (§0), not `ProfileStore`'s
+direct-scoping pattern. `ChatSessionStore.list_for_profile(profile_id)`;
+message access via `list_for_session(session_id)` after confirming the
+session's `profile_id` belongs to the caller's family. `ON DELETE CASCADE`
+on both FKs: profile delete → sessions cascade → messages cascade, matching
+this project's hard-delete discipline (§3).
+
+**Id convention: plain autoincrementing INTEGER, not TEXT/uuid4** — a
+deliberate departure from the `photo_meta.id` precedent, not an
+inconsistency with it. `photo_meta.id` is TEXT/uuid4 for one specific,
+narrow reason (§3): it doubles as an on-disk filename, so it must be
+non-enumerable. Neither `chat_sessions.id` nor `chat_messages.id` is ever
+exposed as a filename or otherwise reachable outside an authenticated,
+family-scoped route — same shape as `profiles.id`/`memories.id`, both
+plain INTEGER. Applying the uuid4 exception here would extend its reasoning
+to a case it doesn't cover.
+
+`message_count` is a maintained counter (incremented on write, not
+`COUNT(*)` on read) since the history row anatomy (UX_KB §9.1) needs it on
+every list render.
+
+### 10.2 Conversation-boundary rule: 4-hour inactivity gap
+
+**Decision: N-hour inactivity gap (4 hours), not a calendar-day boundary.**
+A calendar-day boundary is wrong for this product specifically: the target
+user is "often at 2 a.m." (UX_KB §1.1), and an 11:50pm→12:10am continuation
+is one conversation by any reasonable read — a midnight boundary would
+silently split it, directly undermining the "resume your open notebook"
+continuity default (UX_KB §9.1). A 4-hour gap survives a sleep-feed-sleep
+interruption without false-splitting a continuous conversation, while still
+separating genuinely unrelated later questions. Config constant
+(`CHAT_SESSION_GAP_HOURS = 4`), not hardcoded inline — a one-line tune if
+red-team/UX testing later shows it wrong in either direction.
+
+Write-time logic: look up the profile's most-recent `chat_sessions` row by
+`last_message_at`. Create a new session if none exists, if
+`now - last_message_at > 4h`, or if the request explicitly forces a new
+session (§10.4). Otherwise append to the existing one.
+
+### 10.3 Row snippet: stored, write-time-computed. Guardrail-interaction confirmed.
+
+Stored on `chat_sessions.snippet` at session-creation time, from the
+parent's own first message (~80 chars, truncated) — never recomputed on
+read, since the value never changes after session creation.
+
+**Guardrail-replacement reasoning confirmed against the actual code, not
+just the spec:** `chat.py`'s `enforce()` transforms `raw_text` → `safe_text`
+(the assistant's output) only; the parent's own `request.message` is never
+passed through `enforce()` and is written to `chat_messages` verbatim. Since
+the snippet is defined as "the first `role='user'` message in the session,"
+guardrail replacement of assistant content has no code path that touches
+it. Confirmed, not assumed.
+
+### 10.4 `/chat` contract: unchanged on the wire, additive persistence side effect
+
+Exact change to `dev/backend/app/routes/chat.py`:
+
+- `ChatRequest` gains one **optional** field: `new_session: bool = False` —
+  the explicit "+ New conversation" trigger (UX_KB §9.1) forces a fresh
+  session even inside the 4-hour window. Additive: clients omitting it get
+  the existing implicit-resume behavior.
+- After `safe_text = enforce(...)`, before the response is built: resolve
+  or create the profile's active session (§10.2's rule, or forced-new),
+  insert one `chat_messages` row for `request.message` (role='user') and
+  one for `safe_text` (role='assistant'), update `last_message_at` and
+  `message_count` (+2), and — only on session creation — set `snippet`
+  from `request.message` (§10.3).
+- Response JSON gains one additive field: `session_id`. `text`,
+  `disclaimer`, and the `X-LM-Disclaimer` header are unchanged.
+  `request.history` (client-resent prior turns) is unchanged and remains
+  the mechanism reconstructing the LLM's context window — the new
+  persisted rows are a parallel write path for the history-browsing
+  feature, not a replacement for it.
+
+### 10.5 Suggested prompts: new endpoint, `GET /profiles/{id}/suggested_prompts`
+
+Confirmed server-side, not client-computed. The CDC-bucket + `milestone_tag`
+data UX_KB §9.2's T1–T3 templates need is not fully available client-side
+today: `/activities` exposes bucket-scoped activity content, but T1's
+`domain_phrase` mapping and T2's `next_bucket` arithmetic live in
+`milestones.py`/`ages.py` and aren't currently serialized as reusable
+frontend primitives, and T3 needs a fresh query for the profile's
+most-recently-tagged memory that no existing endpoint bundles with bucket
+data. Computing this client-side would mean a second implementation of
+age→bucket assignment in the frontend — duplicating a computation this
+project treats as safety-relevant (DOMAIN_KB R3/R4) — which centralizing
+server-side avoids. Mirrors `/activities`/`/products`'s existing
+curated-table-plus-template pattern; returns the fixed T1–T4 template
+strings (never LLM-originated, per UX_KB §9.2).
+
+### 10.6 Pagination/perf: not needed for MVP scope
+
+Right-sized against this project's "prove the simple case first" precedent
+(`admin/ROADMAP.md`'s feature-flags pattern; this KB's own restraint at
+§5.9). `GET /profiles/{id}/chat_sessions` returns the full list
+`ORDER BY last_message_at DESC`; `GET /chat_sessions/{id}/messages` returns
+the full list `ORDER BY created_at ASC`. No cursor/`LIMIT`/`OFFSET` this
+run — the indices in §10.1 keep this cheap at any realistic single-test-
+family scale. **Revisit trigger:** a Test-gate perf check or real usage
+showing the unpaginated list becoming slow or the history UI unwieldy.
+
+### 10.7 "Ask" rename + stage card: zero new backend impact
+
+Confirmed. The rename (nav label, `<title>`, no route/component-path
+change per UX_KB §9.5) touches nothing backend. The `.lm-stage-card`'s
+prose/domain chips reuse §10.5's endpoint — no second new endpoint beyond
+what F13's suggested-prompts work already requires.
+
+### 10.8 Flagged for security-architect (joint-gate requirement, per line 3)
+
+New delete/data-flow wrinkle, same class this project has consistently
+sent to security-architect rather than closing solo (F8's unsubscribe
+route, §9.3's photo replace-not-accumulate ordering): confirm the
+family-scoping authz check on the two new list routes and the session
+delete route, specifically because the human's "shared per-profile, not
+per-caregiver" scoping decision makes one caregiver's chat content newly
+visible to a co-caregiver by default — worth an explicit security sign-off
+given that's a real behavior change even though it mirrors the already-
+approved memories/photos sharing model.
+
+### 10.9 Test-gate ownership addition (extends §7)
+
+- **Contract test:** `/chat`'s pre/post-Increment-5 response shape —
+  `text`/`disclaimer` unchanged, `session_id` additive only, existing
+  callers omitting `new_session` unaffected.
+- **Design-conformance check:** the 4-hour boundary rule (property test:
+  two writes >4h apart produce two sessions; two writes <4h apart with no
+  `new_session` flag produce one); snippet immutability after session
+  creation; `chat_sessions`/`chat_messages` cascade-delete on profile
+  delete (extends the existing FK-cascade check, §7).
