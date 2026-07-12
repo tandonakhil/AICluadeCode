@@ -1112,6 +1112,73 @@ F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
     baseline — no test files touched, this was a UI/CSS-only fix pass).
     Frontend `tsc --noEmit` and `next build` both clean. [code-agent]
 
+- **2026-07-12: Code-gate fix pass on ui-ux-designer's full-app density
+  retest** (evidence: `test-evidence/ux-retest-synthetic-data-2026-07-11.md`,
+  triggered by the human-reported Journey "6 months/9 months text
+  overlapping with lines" defect at 15-memory density). All 8 findings
+  closed, in dev commits `4dbadec` (UXD-1/2/3/4a) and `fe6a53b`
+  (UXD-5/6/7/8):
+  1. **UXD-1 (blocking, the human-reported defect) — closed.** Applied the
+     evidence file's exact patch spec: removed the per-item
+     `.lm-river-line` connector segments from `JourneyScreen.tsx` and their
+     CSS rule; one continuous `.lm-river::before` spine at both breakpoints
+     (mobile `left:13px`, desktop `left:50%`); chapter-marker content
+     wrapped in a cream `.lm-chapter-label` pill (`position:relative;
+     z-index:1`) so labels break the spine instead of the spine painting
+     through them; `.lm-river-dot` gets a 3px cream masking ring
+     (`box-sizing:content-box` to preserve the 15px coral fill); desktop
+     dot-cols absolutely positioned onto the spine (±38.5px offsets,
+     recompute if the 28px gutter changes); dead `row-reverse` rule
+     deleted. Spine endpoints (26/60 mobile, 24/80 desktop) are the spec's
+     computed values — still flagged for ±4px visual tuning in a browser.
+  2. **UXD-2 (blocking) — closed.** `.lm-journey-header` gradient's first
+     stop changed from `--lm-photo-mid` to `--lm-photo-tint` (the band the
+     server pre-check already guarantees against unscrimmed ink text per
+     UX_KB §6.3.2); stale CSS comment updated. Cosmetic rider from the
+     same finding: the dead `.lm-journey-header h1` rule folded into an
+     `h2` rule (chose "fold" over "delete" from the spec's two options,
+     removing the JSX inline h2 styles — judgment call, visually
+     identical). Visual confirm that the olive tint still reads
+     "personalized" remains open for the retest.
+  3. **UXD-3 — closed** by the same UXD-1 patch (mobile spine is now
+     continuous, no more dash-gap clutter).
+  4. **UXD-4a — closed.** `loading="lazy"` on Journey memory photos.
+     UXD-4b (120px photo-band card redesign) deliberately NOT implemented
+     — it requires a design-review preview and human approval first, per
+     the evidence file.
+  5. **UXD-5 — closed.** `sendChatMessage` and `uploadPhoto` in
+     `lib/api.ts` now throw `ApiError(status, parseErrorMessage(body))`
+     like `request()` — the two sites explicitly left out of the
+     Increment-3 Finding-2b fix.
+  6. **UXD-6 — closed.** `page.tsx`'s `loadError` never renders the
+     browser's raw "Failed to fetch": non-`ApiError` rejections get the
+     calm fallback "Could not reach the server — check that the backend
+     is running, then reload." (used the fix-pass tasking's exact copy,
+     which supersedes the evidence file's draft wording — judgment call);
+     `ApiError` messages, already parsed calm, pass through verbatim.
+     `page.test.tsx` updated to the new contract plus a new ApiError
+     pass-through case (12 → 13 frontend tests) — the two prior tests
+     asserted the old raw-message behavior by design, so updating them is
+     the fix landing, not a regression.
+  7. **UXD-7 — closed.** Sidebar and mobile-header identity dots now use
+     `selected.photo_accent_mid ?? IDENTITY_HUES[...]`, matching
+     `ProfileSwitcher` (UX_KB §6.5 — one child, one color everywhere).
+     Ring left off per the spec's "ring optional".
+  8. **UXD-8 — closed.** Digest toggle label carries `minHeight: 44`
+     (UXR-6 floor), and `handleToggleDigest` now catches PATCH failures
+     with a calm terracotta-deep inline `role="alert"` error instead of
+     an unhandled rejection leaving the toggle silently stale.
+  - **Verification:** frontend `tsc --noEmit` clean; `npm test -- --run`
+    13/13 passing (was 12, +1 new UXD-6 case); isolated
+    `NEXT_DIST_DIR=.next-build npx next build` clean (dev server left
+    running untouched, per instruction — the build's incidental rewrites
+    of `next-env.d.ts`/`tsconfig.json` were reverted, not committed);
+    backend `.venv/bin/python -m pytest -q` 168/168 (regression check
+    only — no backend files touched). Re-verification should include the
+    evidence file's five browser-confirmation items (spine endpoint
+    tuning, olive tint/hero look, desktop rhythm at 15 items, Today grid
+    raggedness, UXD-4b preview). [code-agent]
+
 ## Test Results
 
 **2026-07-11: Test gate, Increment 1 (F1-F5) — unit/integration suite run

@@ -19,14 +19,22 @@ the agent ships).
 **Reuse this block verbatim in every image-generation prompt so all
 images read as the same child** (human requirement, 2026-07-11:
 "preserve the kid's profile so that it looks the same kid across the
-board"):
+board"). **Revised 2026-07-12 per human request: photorealistic, not
+cartoon — purely AI-generated synthetic person, never any real child:**
 
-> a baby girl with soft curly brown hair, big warm brown eyes, round
-> rosy cheeks, and a small pink bow in her hair, soft watercolor
-> storybook illustration, gentle pastel palette, warm light, consistent
-> character design
+> photorealistic candid family photograph of a baby girl with soft
+> curly light-brown hair, big warm brown eyes, round rosy cheeks, and a
+> small pink hair bow, natural window light, shallow depth of field,
+> shot on a modern mirrorless camera, soft warm tones, entirely
+> AI-generated synthetic person, consistent facial features across a
+> photo series
 
 Scene text is appended as: `The same baby girl {scene description}.`
+
+(The original watercolor-storybook character sheet from the 2026-07-11
+batch is superseded — that batch was fully replaced in the app on
+2026-07-12; the human's own uploaded photo on the "First Hotel Visit"
+memory was left untouched in both swaps.)
 
 ## Generation parameters (2026-07-11 batch)
 
