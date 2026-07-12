@@ -540,6 +540,141 @@ self-service password reset (documented gap, unchanged from Increment 1),
 no MFA/OAuth/magic-link (F12, later backlog per human request, already
 recorded in FEATURES.md).
 
+## Increment 4 implementation summary (code-agent, 2026-07-12)
+
+F14 (profile avatars + upload affordance), F15 (Journey lightbox), and F16
+(Journey gallery view) built against `knowledge/UX_KB.md` §8/§8.1a and
+`knowledge/ARCHITECTURE_KB.md` §9.3 in full, per the Experience Design +
+Architecture consult approved 2026-07-12. **173 backend tests pass** (up
+from 168, both `python -m pytest` and plain `pytest` agree); **34 frontend
+tests pass** (up from 13); `tsc --noEmit` and `next build` (via
+`NEXT_DIST_DIR=.next-build`, run against an isolated dist dir so the live
+`:3000` dev server was never touched) both clean.
+
+**Backend** (`dev/backend/app/`): resolves the two gaps ARCHITECTURE_KB
+§9.3 flagged pre-Code-gate.
+- `Profile.avatar_photo_id` (`profiles.py`): a derived field, not a stored
+  column, populated at the route layer (`routes/profiles.py`, same
+  pattern as `age_summary`) on create/get/list via "most recent
+  `photo_meta` row for this profile where `memory_id IS NULL`." New index
+  `idx_photo_meta_profile_memory_created` on
+  `photo_meta(profile_id, memory_id, created_at)` (`db.py`, idempotent
+  `CREATE INDEX IF NOT EXISTS`, applies to existing DBs on next startup
+  with no separate migration step needed).
+- `PhotoStore.create()` (`photos.py`): profile-level (`memory_id IS NULL`)
+  uploads now replace rather than accumulate. A new private
+  `_replace_prior_profile_level_photos()` helper runs after the new
+  row/file commit and before the accent-extraction step, unlinking
+  file(s) and deleting row(s) of any other `memory_id IS NULL` rows for
+  that exact `profile_id` (explicit filter, security-architect condition
+  1) -- deliberately not via the public `delete()` method (which would
+  reset the new photo's just-computed accent to null), with a one-line
+  comment documenting the authz-check bypass this represents and why it's
+  safe (security-architect condition 2). Memory-attached photos are
+  completely untouched by this path.
+- **Regression tests** (security-architect condition 3, `test_photos.py`):
+  repeated profile-level upload leaves exactly one row/file and it's the
+  new one (DB count and on-disk file count both asserted); a
+  memory-attached photo survives a profile-level upload unchanged;
+  cross-profile isolation (uploading to profile B never touches profile
+  A's rows/files). Two more in `test_profiles.py` cover `avatar_photo_id`
+  staying null until a profile-level upload, then matching the uploaded
+  photo's id across create/get/list, and staying null when only a
+  memory-attached photo exists.
+
+**Frontend** (`dev/frontend/`):
+- **F14**: new `Avatar.tsx` component (+ `.lm-avatar` base CSS) — renders
+  the profile's photo circularly when `avatar_photo_id` exists, with the
+  *exact* pre-existing `.lm-identity-dot` fallback (unchanged color logic)
+  otherwise; `onError` degrades to the same fallback. Wired into
+  `ProfileSwitcher.tsx` (32px, `photo_accent_deep` ring, replacing the old
+  accent-tinted-dot-as-photo-proxy render), `TodayScreen.tsx`'s new
+  `.lm-hero-heading-row` (44px, fixed translucent-white ring), and
+  `JourneyScreen.tsx`'s header (56px, cream border + shadow, new
+  `.lm-journey-avatar-row`). New "Profile photo" `.lm-card` at the top of
+  `SettingsScreen.tsx` (above "Your family"): reuses
+  `AddMemoryForm.tsx`'s hidden-file-input pattern, upload-on-select via
+  `uploadPhoto(profile.id, file)` (no `memory_id`), optimistic
+  `URL.createObjectURL` preview reverted on failure, "Uploading…"
+  disabled state, `role="alert"` error via the existing `ApiError`/
+  `parseErrorMessage` path, and the UXR-10 privacy line. New
+  `getProfile()` wrapper in `lib/api.ts` (exposes the already-existing
+  `GET /profiles/{id}` route to the frontend for the first time) refetches
+  the profile after a successful upload so `avatar_photo_id` and the
+  photo-accent tokens land together; `app/page.tsx` threads
+  `profile`/`identityColor` props into `TodayScreen`/`JourneyScreen`/
+  `SettingsScreen` and a new `handleProfileUpdated` in-place state update
+  (no full page reload).
+- **F15**: new `Lightbox.tsx` — every Journey photo `<img>` (banner and
+  `.lm-moment-photos`) wrapped in a new `.lm-photo-trigger` button. Full-
+  screen `rgba(20,16,12,.88)` backdrop, reuses the exact `photoUrl()` src
+  and `crossOrigin="use-credentials"`; dismiss via close button/Escape/
+  backdrop-click (image/caption click never dismisses); `role="dialog"
+  aria-modal="true" aria-label="{title} photo"`, focus-on-open, a
+  hand-rolled Tab/Shift+Tab focus trap (no existing dialog in this app had
+  one to copy), and focus returned to the triggering button on close;
+  `ArrowLeft`/`ArrowRight` + visible prev/next buttons + dot indicator for
+  multi-photo memories, no nav controls for single-photo ones.
+- **F16**: new `.lm-view-toggle` segmented pill in `JourneyScreen.tsx`
+  ("Timeline"/"Gallery", default Timeline, client-only state per UX_KB
+  §8.3's named scoped simplification). Gallery flattens every timeline
+  memory's `photo_ids` (already-fetched `getTimeline()` response, no new
+  API call) into one chronological `.lm-gallery-grid` (3 cols mobile, 5 at
+  the existing 1024px breakpoint, reusing `AddMemoryForm`'s photogrid
+  column precedent), bare photos only (no date/age labels, UXR-1), its own
+  empty-state copy, and a plain `<ul>` of `<button>`-wrapped images with
+  `aria-label` = the parent memory's title. Gallery tiles open the same
+  `Lightbox`, seeded with the full profile-wide chronological photo list
+  (not just one memory's) — the F15/F16 "one component, two seed-list
+  scopes" pairing requirement.
+- **New tests**: `Avatar.test.tsx` (4), `Lightbox.test.tsx` (7),
+  `JourneyScreen.test.tsx` (4, covering the toggle default, gallery
+  flattening + `aria-label`, empty state, and the shared-Lightbox
+  profile-wide seeding), `SettingsScreen.test.tsx` (6, covering Add/Change
+  copy, upload-on-select with the refetch, the Uploading… disabled state,
+  calm error handling with no avatar-state corruption on failure, and the
+  duplicated-but-expected privacy line).
+
+**Judgment calls made during Increment 4** (documented per the Code-gate
+brief, not silently decided):
+1. **`getProfile()` added to `lib/api.ts`** — not itself a new backend
+   route (the backend's `GET /profiles/{id}` has existed since Increment
+   1), just the first frontend caller of it. Chosen over reconstructing
+   the updated `Profile` client-side from the `PhotoMeta` upload response
+   because `PhotoMeta` doesn't carry the photo-accent tokens
+   `PhotoStore.create()` also just updated server-side — a full refetch
+   keeps `avatar_photo_id` and the accent tokens in the same lockstep
+   §8.4 already establishes for the read side, at the cost of one extra
+   round-trip per upload (acceptable for a settings action, not a
+   high-frequency path).
+2. **Settings' 72px avatar carries no additional ring**, unlike the other
+   three surfaces — UX_KB §8.1a specifies "the existing `object-fit:
+   cover` circle mask is the only treatment" for this surface and is
+   silent on a ring convention for it specifically (switcher/Today/
+   Journey each name one explicitly). Read literally rather than
+   inventing a fourth ring convention the KB didn't ask for.
+3. **`page.tsx`'s own sidebar-button and mobile-header identity dots were
+   left unchanged** (not migrated to `Avatar`) — UX_KB §8.1 names three
+   specific surfaces by file (`ProfileSwitcher.tsx`, `TodayScreen.tsx`,
+   `JourneyScreen.tsx`) plus Settings' new control (§8.1a); the sidebar/
+   header buttons in `page.tsx` are a different affordance (the switcher-
+   opening button, not the switcher list itself) that neither section
+   names. Left alone as an unstated-scope-addition guard, not an
+   oversight — flagged here rather than silently expanding scope to a
+   fourth/fifth surface.
+4. **No backend server restart performed this session** — the live
+   `:8000` process (left running per the task brief) was started before
+   this session's backend edits (`db.py`/`photos.py`/`profiles.py`/
+   `routes/profiles.py`) and was not reloading them live; a restart is a
+   Deploy-gate action, not a Code-gate one. Flagged explicitly so the demo
+   surface doesn't quietly diverge from what's actually committed.
+
+**Not built this increment**: F13 (chat history + suggested prompts,
+scheduled Increment 5 per FEATURES.md, needs its own Experience Design
+pass) and F12/F17 (later backlog). UX_KB §8.6's DesignSync-push gap and
+§8.4/§9.3's backend gaps are both closed by this increment's work; no new
+gaps found during implementation beyond the four judgment calls above.
+
 ## Decisions Log
 - 2026-07-10: plan-agent recommended `genai-chatbot` over `rag-knowledge-base`
   (no document corpus — recommendations are LLM-generated from the kid's
@@ -1838,3 +1973,26 @@ the entire originally-approved MVP scope for little-milestones,
 complete.** Only F11 (conditional RAG mode) and F12 (hardened auth
 suite, added 2026-07-11) remain in the later backlog, both explicitly
 deferred and neither blocking this project's MVP completion.
+
+- **2026-07-12: Code gate, Increment 4 (F14 profile avatars + upload
+  affordance, F15 Journey lightbox, F16 Journey gallery view) built and
+  committed to `dev/` in two logical commits (backend avatar_photo_id +
+  photo-replace fix; frontend F14/F15/F16), per the Experience Design +
+  Architecture consult (`knowledge/UX_KB.md` §8/§8.1a,
+  `knowledge/ARCHITECTURE_KB.md` §9.3).** See "Increment 4 implementation
+  summary" above for the full file list and four documented judgment
+  calls (none scope-changing). 173 backend tests pass (up from 168, both
+  `python -m pytest` and plain `pytest` agree); 34 frontend tests pass (up
+  from 13); `tsc --noEmit`/`next build` both clean (build run against an
+  isolated `NEXT_DIST_DIR` so the live `:3000` demo server was never
+  touched; the build's incidental `tsconfig.json`/`next-env.d.ts`
+  regeneration was reverted afterward). Both backend/security-architect
+  conditions from ARCHITECTURE_KB §9.3 (explicit `profile_id` filter on
+  the cleanup query; the authz-bypass code comment) and its required
+  regression test (upload-twice leaves exactly one row/file) are
+  implemented and verified, plus a cross-profile-isolation regression test
+  beyond what was strictly asked. No backend server restart was performed
+  this session (a Deploy-gate action) — the live `:8000` process predates
+  this session's backend edits and will not reflect them until restarted,
+  flagged explicitly rather than left implicit. [code-agent] Next: Test
+  gate.

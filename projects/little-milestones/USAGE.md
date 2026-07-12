@@ -51,3 +51,14 @@ format) — first project tracked live from creation rather than backfilled.
 | 2026-07-11 | Fix 2 blocking + 2 non-blocking UX findings (Increment 3) | code-agent | 65,963 | 3,745,452 |
 | 2026-07-11 | Review gate Increment 3 | review-agent | 104,345 | 3,849,797 |
 | 2026-07-11 | Deploy gate Increment 3 (final) | deploy-agent | 41,731 | 3,891,528 |
+| 2026-07-11/12 | Live post-Deploy fixes (orchestrator direct: LAN/mobile CORS+API-host, crypto.randomUUID, loadError, onboarding dead-end, dev-indicator, build-dir isolation, synthetic tester data + 2 image-gen batches) | orchestrator | ~180,000 (est., not individually tokenized) | ~4,071,528 |
+| 2026-07-11 | Density retest (Increment 2 pattern re-applied) + fix 8 findings | ui-ux-designer + code-agent | 205,801 | 4,277,329 |
+| 2026-07-12 | Journey photo-banner design preview + implementation | ui-ux-designer + code-agent | ~40,000 (design not self-reported) + 32,144 | 4,349,473 |
+| 2026-07-12 | mas-architect: synthetic-data-agent advisory review | mas-architect | 15,401 | 4,364,874 |
+| 2026-07-12 | mas-registrar: scaffold synthetic-data-agent | mas-registrar | 41,900 | 4,406,774 |
+| 2026-07-12 | Increment 4 Experience Design (F14+F15+F16) | ui-ux-designer | 156,530 | 4,563,304 |
+| 2026-07-12 | UX_KB.md recovery (orchestrator: transcript-archaeology splice, §1-6) | orchestrator | ~0 (no LLM call, direct file ops) | 4,563,304 |
+| 2026-07-12 | F14 profile-photo-upload design addendum (§8.1a) | ui-ux-designer | 102,798 | 4,666,102 |
+| 2026-07-12 | Architecture consult, Increment 4 | solution-architect | 115,126 | 4,781,228 |
+| 2026-07-12 | Security confirm: avatar-replace delete ordering | security-architect | 45,357 | 4,826,585 |
+| 2026-07-12 | Code gate, Increment 4 (backend + frontend) | code-agent | 211,949 | 5,038,534 |
