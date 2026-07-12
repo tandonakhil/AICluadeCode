@@ -1187,3 +1187,117 @@ approved memories/photos sharing model.
   `new_session` flag produce one); snippet immutability after session
   creation; `chat_sessions`/`chat_messages` cascade-delete on profile
   delete (extends the existing FK-cascade check, §7).
+
+## 11. F12 hardened auth suite — architecture confirmation (Increment 6, solution-architect, 2026-07-12)
+
+Confirmation pass on SECURITY_KB.md §7's schema/route design, per §7.7's
+joint-presentation note. Checked against this project's established
+conventions: the `Store[T]` interface discipline (§0), the SQLite schema/
+cascade conventions (§3), and the most recent precedent, `chat_sessions`/
+`chat_messages` (§10.1). No scope re-litigation — SECURITY_KB §7's design
+decisions stand; this is "does it fit," not "should it exist."
+
+### 11.1 Id conventions — confirmed for the two new tables; one flag on `sessions.id`
+
+- **`password_reset_tokens.id` / `recovery_codes.id` — confirmed, plain
+  `INTEGER PRIMARY KEY AUTOINCREMENT` is correct, no conflict.** This matches
+  the tier-1 convention §10.1 established for `chat_sessions`/`chat_messages`:
+  plain autoincrement is correct whenever a row is reachable only via an
+  authenticated, scoped route and its `id` never doubles as a filesystem path
+  or other externally-meaningful token — both new tables meet that bar (the
+  security-bearing identity lives in `token_hash`/`code_hash`, not `id`). This
+  does **not** conflict with the tier-2 uuid4 precedent (`photo_meta.id`, §3)
+  — that tier exists specifically because `photo_meta.id` doubles as an
+  on-disk filename, bypassing the authz layer entirely if guessed. Neither
+  new table shares that property, so applying tier-2 to them would have been
+  the actual inconsistency; SECURITY_KB correctly did not.
+
+- **`sessions.id TEXT` (uuid4), added by SECURITY_KB §7.4 — flagged, resolved
+  below in §11.1a.** SECURITY_KB justified this as "non-enumerable, same
+  reasoning as `photo_meta.id`," but that reasoning does not actually
+  transfer: `photo_meta.id`'s uuid4 requirement is narrowly about naming a
+  file on disk outside the authz layer. `sessions.id` is exposed only through
+  authenticated, self-scoped routes (`GET /auth/sessions`,
+  `DELETE /auth/sessions/{id}`) — structurally identical in exposure shape to
+  `chat_sessions.id`, which §10.1 explicitly reasoned should stay plain
+  `INTEGER` despite living in a URL, because cross-scope access already
+  returns 404 regardless of id sequentiality.
+
+**§11.1a Resolution (orchestrator + security-architect design intent,
+2026-07-12):** keep `sessions.id TEXT` (uuid4), overriding strict adherence
+to the `chat_sessions.id` precedent, for one stated reason beyond the
+`photo_meta.id` analogy: session rows sit adjacent to authentication
+material (`token_hash`) in a way `chat_sessions` rows do not, and session
+enumeration has a materially different blast radius than chat-session
+enumeration (walking sequential integers against `/auth/sessions/{id}`
+during an active login is a live session-hijack probe, not merely an
+information leak about conversation existence). This is a deliberate,
+now-explicit departure from the plain-autoincrement default, not a silent
+inconsistency — recorded here so it isn't later "fixed" back to INTEGER by
+a future pass mis-reading §10.1 as an unconditional rule. Code-agent should
+implement `sessions.id` as uuid4 TEXT as SECURITY_KB §7.4 originally
+specified.
+
+### 11.2 Store-class organization — apply the `ChatSessionStore` pattern, not raw SQL in routes
+
+SECURITY_KB §7 describes route bodies in query-shorthand (e.g. `UPDATE users
+SET digest_opt_in...`-style descriptions inherited from §1.7's unsubscribe
+precedent) without specifying store-class shape for the three new schema
+surfaces. Confirmed: these should follow the `ChatSessionStore` class
+pattern (§10.1), each with narrow, single-purpose methods — not ad hoc SQL
+in `routes/auth.py`. This is a direct extension of an already-decided
+principle (§1.7 point 3's "structural absence of the capability" standard,
+originally applied to the unsubscribe route), now applying to a larger
+surface:
+- `PasswordResetTokenStore`: `create(user_id)` (invalidating any outstanding
+  token first, per §7.2), `get_by_token_hash`, `mark_used`.
+- `RecoveryCodeStore`: `create_batch(user_id, codes)`, `verify_and_consume`,
+  `delete_all_for_user`.
+- `SessionStore` (extends the existing sessions handling): `list_for_user`,
+  `delete(id, user_id)` (self-scoped, cross-user = 404 per §1.1),
+  `delete_all_for_user(user_id, except_id=None)` — one method, parameterized,
+  rather than separate near-duplicate "delete all" vs. "delete all but
+  current" implementations, since §7.4's reset-vs-change-password distinction
+  (delete-all vs. delete-all-but-current) is exactly the `except_id` toggle.
+
+### 11.3 FK/cascade — confirmed, no concern
+
+`password_reset_tokens.user_id` and `recovery_codes.user_id`, both
+`FK→users ON DELETE CASCADE` — confirmed consistent with §3/§10.1's
+hard-delete discipline (user delete, if it ever ships, cleanly cascades
+both new tables with no orphaned rows).
+
+### 11.4 Indexes — two minor, non-blocking additions recommended
+
+Not called out in SECURITY_KB §7; cheap to add now while `schema.sql` is
+being written, same discipline as §10.1's explicit `chat_sessions`/
+`chat_messages` indexes:
+- `password_reset_tokens(user_id)` — supports the "invalidate any
+  outstanding token for this user" lookup on every new reset request.
+- `recovery_codes(user_id)` — supports lookup during TOTP-code verification
+  and `delete_all_for_user` on disable.
+- `sessions(user_id)` — supports `GET /auth/sessions`' listing query, if not
+  already present from the pre-F12 sessions design (ARCHITECTURE_KB §3 didn't
+  specify one).
+
+None of these are correctness issues at this project's scale (matches
+§10.6's "prove the simple case first" precedent) — flagged as cheap
+schema.sql additions, not a gate condition.
+
+### 11.5 TOTP secret encryption reuse — confirmed
+
+`totp_secret_enc` reusing the existing Fernet key (`crypto.py`, §2.1 of
+SECURITY_KB) rather than introducing a second symmetric key: confirmed
+correct, no new key-management surface, consistent with this project's
+"no new operational surface" instinct already applied to `.env`
+secrets-handling throughout (§5.8, §2.5).
+
+### 11.6 Overall verdict
+
+**Confirmed, fit for Code to start.** §11.1's `sessions.id` type question is
+resolved in §11.1a (keep uuid4, stated reason recorded). Everything else in
+SECURITY_KB §7's schema (id conventions on the two brand-new tables,
+FK/cascade shape, encryption-key reuse) is consistent with this project's
+established conventions with no architecture objection. §11.2's store-class
+guidance and §11.4's index recommendations are additive clarifications for
+code-agent, not changes to SECURITY_KB §7's design.
