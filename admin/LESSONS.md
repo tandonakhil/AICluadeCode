@@ -89,6 +89,24 @@ doesn't get lost before that review happens.
   to git after every gate the same way `dev/`/`prod/` commits happen, so a
   destructive `Write` is a one-command `git checkout` away from reversible
   instead of a transcript-archaeology recovery.
+  - **Recurred 2026-07-12, same project, `knowledge/UX_KB.md` this time**:
+    a `ui-ux-designer` pass meant to append §7 instead called `Write` with
+    content that started mid-sentence, destroying §1-§6 (458 lines of
+    approved, human-reviewed design rationale). This is the SAME open
+    item above, still not applied — the recommended fix (grant `Edit`,
+    not `Write`, for append-to KB files) was queued 2026-07-11 and never
+    landed before this recurred one day later. Recovered again via
+    transcript archaeology (the pre-corruption `Write` call was still in
+    this session's own subagent logs, and happened to end in the exact
+    sentence the corrupted file picked up mid-word, making a byte-exact
+    splice possible) — but a fix that only works "if this session's logs
+    still exist" is not a fix. **Escalating, not just re-queuing**: this
+    should be treated as confirmed-recurring, not hypothetical, the next
+    time `mas-architect`/`mas-registrar` touch any agent's KB-file tool
+    grants — `ui-ux-designer`, `solution-architect`, and any other agent
+    with `Write` (not `Edit`) on a `knowledge/*_KB.md` file all carry this
+    exact risk today, not just the one agent that happened to trigger it
+    twice.
 
 - **2026-07-11 — Never run `next build` while the same project's `next dev`
   server is running.** Both write to the same `.next/` directory; the build
