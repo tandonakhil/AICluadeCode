@@ -184,6 +184,45 @@ backend from JSON files to SQLite. See PLAN.md §6.
     happened for a redesigned chat screen yet.
   _Source: human request 2026-07-11._
 
+- **F14 — Profile avatar display (added 2026-07-11, human request —
+  PRIORITIZED, first pick for the next /enhance-project pass).** The data
+  layer already supports a profile-level photo (a `photo_meta` row with
+  `memory_id=null` exists for the tester profile today), but the UI never
+  displays it — the profile switcher shows a colored identity dot, the
+  Today/Journey headers show no photo. Show the profile photo as a real
+  avatar (switcher rows, Today header, Journey header), falling back to
+  the identity dot when no profile photo exists. Must respect the existing
+  photo constraints: served only through the family-scoped API route
+  (SECURITY_KB §2.3, no static mount), decrypt-on-serve, `crossOrigin`
+  credentialed `<img>` per the existing JourneyScreen pattern.
+  _Source: human request 2026-07-11._
+
+- **F15 — Journey image lightbox (added 2026-07-11, human request).**
+  Clicking a photo in the Journey timeline expands it in-place to a
+  full-resolution lightbox overlay on the same screen (dismiss on
+  tap/escape/backdrop). Keyboard/focus-trap accessibility per the
+  existing dialog patterns (UX_KB §1.9); the full-res image still streams
+  through the family-scoped route.
+  _Source: human request 2026-07-11._
+
+- **F16 — Journey gallery view (added 2026-07-11, human request).** A
+  toggleable grid/gallery layout for Journey so photos can be browsed
+  densely, complementing the chronological river. Pairs naturally with
+  F15's lightbox.
+  _Source: human request 2026-07-11._
+
+- **F17 — Google Photos import (added 2026-07-11, human request).**
+  Securely link a caregiver's Google Photos and import *selected* images
+  into memories. Real compliance/architecture surface: OAuth to a
+  third-party (INDUSTRY_KB §2.2's third-party-disclosure flag),
+  photo bytes transiting Google's API, scope minimization (read-only,
+  picker-based selection, never library-wide access), and the imported
+  bytes must land in the existing encrypt-at-rest pipeline
+  (EXIF-stripped, no static serving). Requires the full Architecture +
+  security-architect + responsible-ai/industry review — NOT a
+  frontend-only feature.
+  _Source: human request 2026-07-11._
+
 ## Ready for Release
 
 ## Released
