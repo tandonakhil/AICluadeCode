@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Increment 5 — Dynamic Suggested Prompts</title>
+<style>
+  :root {
+    --lm-cream: #FDF8F2; --lm-card: #FFFFFF; --lm-ink: #3D3833; --lm-ink-soft: #6E6259;
+    --lm-terracotta: #C1502A; --lm-terracotta-deep: #8F3A1D; --lm-sage: #2F7A4E;
+    --lm-slate: #3D6188; --lm-slate-tint: #EEF3F8; --lm-gold: #E8A317; --lm-blush: #FADCC5;
+    --lm-coral: #FF7A50; --lm-danger: #A33B2E; --lm-peach: #F0A574; --lm-sky: #6FA8D8; --lm-moss: #7CB56C;
+    --lm-radius-card: 16px; --lm-radius-pill: 999px;
+    --lm-font-ui: "Nunito Sans", -apple-system, "Segoe UI", sans-serif;
+    --lm-font-display: Fraunces, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFE7DC; font-family: var(--lm-font-ui); color: var(--lm-ink); padding: 32px; }
+  h1 { font-family: var(--lm-font-display); font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--lm-ink-soft); max-width: 780px; margin: 0 0 24px; }
+  .box { background: white; border: 1px solid #E8DECF; border-radius: 14px; padding: 20px 24px; max-width: 900px; margin-bottom: 28px; }
+  .box h2 { font-size: 16px; margin: 0 0 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #EEE4D6; vertical-align: top; }
+  th { color: var(--lm-ink-soft); font-weight: 600; }
+  code { background: var(--lm-slate-tint); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .frames { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+  .frame-label { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+
+  /* ---- phone frame ---- */
+  .phone { width: 375px; border: 10px solid #2B2723; border-radius: 34px; background: var(--lm-cream); overflow: hidden; }
+  .phone-screen { min-height: 640px; display: flex; flex-direction: column; }
+
+  /* ---- desktop frame ---- */
+  .desktop { width: 1040px; border: 1px solid #D8CDBB; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  .browser-chrome { background: #E4DACB; padding: 8px 12px; display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #C9BCA6; }
+  .desktop-body { display: flex; min-height: 560px; background: var(--lm-cream); }
+  .sidebar { width: 210px; background: white; border-right: 1px solid #EEE4D6; padding: 20px 14px; flex-shrink: 0; }
+  .sidebar .brand { font-family: var(--lm-font-display); font-size: 18px; margin-bottom: 18px; }
+  .nav-item { padding: 10px 12px; border-radius: 10px; font-size: 14px; margin-bottom: 4px; color: var(--lm-ink-soft); }
+  .nav-item.active { background: var(--lm-blush); color: var(--lm-terracotta-deep); font-weight: 700; }
+  .chat-col-desktop { flex: 1; padding: 28px 40px; display: flex; justify-content: center; }
+  .chat-col-desktop .inner { width: 100%; max-width: 640px; }
+
+  /* ---- chat components (real class names, matching ChatScreen.tsx) ---- */
+  .lm-age-strip { display: flex; align-items: center; gap: 8px; padding: 16px 16px 8px; font-weight: 700; }
+  .lm-age-strip .spacer { flex: 1; }
+  .lm-icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #E4D8C6; background: white; display: flex; align-items: center; justify-content: center; color: var(--lm-ink-soft); cursor: pointer; }
+  .lm-icon-btn svg { width: 18px; height: 18px; }
+  .chat-body { flex: 1; padding: 8px 16px; display: flex; flex-direction: column; }
+  .empty-hint { color: var(--lm-ink-soft); font-size: 14px; margin: 12px 0 14px; }
+  .lm-chip-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .lm-chip { border: 1.5px solid var(--lm-terracotta); color: var(--lm-terracotta-deep); background: white; border-radius: var(--lm-radius-pill); padding: 12px 16px; font-size: 14.5px; font-weight: 600; text-align: left; cursor: pointer; }
+  .lm-chip.tag-derived::before { content: "✦ "; color: var(--lm-gold); }
+  .lm-chip.fallback { border-color: #E4D8C6; color: var(--lm-ink-soft); font-weight: 500; }
+  .composer { margin-top: auto; padding: 14px 16px 20px; display: flex; gap: 8px; }
+  .composer input { flex: 1; border: 1.5px solid #E4D8C6; border-radius: var(--lm-radius-pill); padding: 12px 16px; font-size: 15px; }
+  .disclaimer-footer { font-size: 12.5px; color: var(--lm-ink-soft); text-align: center; padding: 6px 16px 10px; }
+
+  .tag-flag { display: inline-block; background: #EEF3F8; color: var(--lm-slate); font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; }
+  .newborn-note { background: var(--lm-slate-tint); color: var(--lm-slate); font-size: 13px; padding: 10px 12px; border-radius: 10px; margin: 8px 0 16px; }
+</style>
+</head>
+<body>
+
+<h1>Increment 5 — Dynamic, Age/History-Aware Suggested Prompts (F13, part 2)</h1>
+<p class="sub">Replaces <code>ChatScreen.tsx</code>'s static <code>SUGGESTION_CHIPS</code> constant (3 fixed generic strings)
+with chips assembled from a small, fixed, non-LLM template library — filled only with curated data
+(<code>milestones_cdc2022.json</code> bucket content already served via <code>/profiles/{id}/activities</code>) and the
+profile's own logged <code>Memory.milestone_tag</code> values. No chip copy is ever model-generated. Empty-state only
+(<code>messages.length === 0</code>), exactly where the current chips already render.</p>
+
+<div class="box">
+  <h2>Fixed template library (design-owned copy, same discipline as F9's catalog-only product cards)</h2>
+  <table>
+    <tr><th>ID</th><th>Trigger</th><th>Template</th><th>Data source</th><th>R1/R2 note</th></tr>
+    <tr>
+      <td><b>T1</b><br>current-stage</td>
+      <td>Always (has a defined current bucket)</td>
+      <td><code>"Fun ways to build {domain_phrase} right now"</code></td>
+      <td>Current bucket's milestone <code>domain</code> field (movement→"strength &amp; movement", language→"talking &amp; sounds", social→"connection", cognitive→"curiosity") — a fixed domain→phrase map, not free text</td>
+      <td>Activity framing only, same register as the existing "Ideas for rainy-day play" chip — never references a specific pass/fail milestone</td>
+    </tr>
+    <tr>
+      <td><b>T2</b><br>coming-next</td>
+      <td>A next bucket exists (not already past 36mo)</td>
+      <td><code>"What's coming up around {next_bucket} months?"</code></td>
+      <td>Next CDC bucket number — identical "invitation, never deadline" register already shipped for Today's "Things to look forward to" (§1.5/UXR-8)</td>
+      <td>No "should," "by now," "due" — reuses existing UXR-8-cleared copy pattern verbatim</td>
+    </tr>
+    <tr>
+      <td><b>T3</b><br>memory-tag extension</td>
+      <td>Profile has ≥1 memory with a non-empty <code>milestone_tag</code></td>
+      <td><code>"More ideas building on '{tag}'"</code></td>
+      <td>Most recently logged memory's own <code>milestone_tag</code> — the parent's own words, truncated to ~30 chars with ellipsis (field already capped at 60 chars server-side)</td>
+      <td>Celebratory extension of what the <em>parent chose to log</em> — never "is this on track," never a status/comparison word. Sanitized for display exactly like every other rendered memory field.</td>
+    </tr>
+    <tr>
+      <td><b>T4</b><br>evergreen fallback</td>
+      <td>Always available; fills remaining slot(s) when T3 has no data, or wholly replaces T1/T2 in newborn/out-of-range mode</td>
+      <td>Fixed pool: "Ideas for rainy-day play" · "What's a good first book?" · "Fun ways to build strength"</td>
+      <td>None — literal carry-over of the current static chip pool</td>
+      <td>Already-shipped, already-cleared copy</td>
+    </tr>
+  </table>
+  <p style="font-size:13px;color:var(--lm-ink-soft);margin-top:12px;">
+    <b>Selection rule (design intent, exact code seam left to Architecture/code-agent):</b> show <b>3 chips</b> —
+    T1 + T2 + (T3 if a tagged memory exists, else a T4 pick). <b>Newborn/out-of-range mode:</b> T1/T2 have no
+    meaningful bucket to reference, so chips fall back to 2–3 T4 picks only, matching the existing out-of-range
+    context-strip tone already in <code>ChatScreen.tsx</code> ("milestone content covers birth to 3, but ask me
+    about activities anytime").
+  </p>
+</div>
+
+<div class="box" style="border-left:4px solid var(--lm-slate);">
+  <h2 style="color:var(--lm-slate);">Flagged for Architecture (not decided here)</h2>
+  <p style="font-size:14px;margin:0;">Whether this templating runs as a <b>new small backend endpoint</b>
+  (e.g. <code>GET /profiles/{id}/suggested_prompts</code>, mirroring the existing <code>/activities</code>/<code>/products</code>
+  pattern — same curated-table-plus-template-function shape, zero LLM code path) or is <b>computed client-side</b>
+  from data the frontend already fetches (<code>ageInfo</code> from <code>getActivities</code>, plus a new/reused
+  memories fetch) is an implementation-symmetry decision, not a visual one. Recommendation: a backend endpoint,
+  for the same reason F9's catalog filtering is server-side — keeps "what data can produce a chip" centralized
+  and testable in one place rather than duplicated into the frontend. Not prescribing further; Architecture's call.</p>
+</div>
+
+<h2 style="font-family:var(--lm-font-display);">Mobile — dynamic chips (Maya, 12 months, has a "first steps" memory)</h2>
+<div class="frames">
+  <div>
+    <div class="frame-label">375×667 — empty-state chat, dynamic chips</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip">
+        <span>Maya · 12 months</span>
+        <div class="spacer"></div>
+        <button class="lm-icon-btn" aria-label="Past conversations" title="History icon (new, see chat-history-*.html)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button>
+      </div>
+      <div class="chat-body">
+        <p class="empty-hint">Ask anything, or try one of these:</p>
+        <div class="lm-chip-row">
+          <button class="lm-chip">Fun ways to build strength &amp; movement right now</button>
+          <button class="lm-chip">What's coming up around 15 months?</button>
+          <button class="lm-chip tag-derived">More ideas building on 'first steps'</button>
+        </div>
+      </div>
+      <div class="composer"><input placeholder="Ask about Maya..." disabled /></div>
+      <div class="disclaimer-footer">General parenting information, not medical advice.</div>
+    </div></div>
+  </div>
+
+  <div>
+    <div class="frame-label">375×667 — newborn/out-of-range mode: evergreen fallback only</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip"><span>Theo · 3 weeks</span><div class="spacer"></div>
+        <button class="lm-icon-btn" aria-label="Past conversations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button></div>
+      <div class="chat-body">
+        <div class="newborn-note">Theo is a newborn — milestone content starts at 2 months, but ask me about activities anytime.</div>
+        <p class="empty-hint">Try one of these:</p>
+        <div class="lm-chip-row">
+          <button class="lm-chip fallback">Ideas for rainy-day play</button>
+          <button class="lm-chip fallback">What's a good first book?</button>
+          <button class="lm-chip fallback">Fun ways to build strength</button>
+        </div>
+      </div>
+      <div class="composer"><input placeholder="Ask about Theo..." disabled /></div>
+      <div class="disclaimer-footer">General parenting information, not medical advice.</div>
+    </div></div>
+  </div>
+</div>
+
+<h2 style="font-family:var(--lm-font-display);margin-top:36px;">Desktop — dynamic chips (≥1024px, sidebar nav, 680px chat column unchanged)</h2>
+<div class="desktop">
+  <div class="browser-chrome"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="desktop-body">
+    <div class="sidebar">
+      <div class="brand">little-milestones</div>
+      <div class="nav-item">🏠 Today</div>
+      <div class="nav-item active">💬 Chat</div>
+      <div class="nav-item">✦ Journey</div>
+    </div>
+    <div class="chat-col-desktop"><div class="inner">
+      <div class="lm-age-strip" style="padding-left:0;">
+        <span>Maya · 12 months</span><div class="spacer"></div>
+        <button class="lm-icon-btn" aria-label="Past conversations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button>
+      </div>
+      <p class="empty-hint">Ask anything, or try one of these:</p>
+      <div class="lm-chip-row">
+        <button class="lm-chip">Fun ways to build strength &amp; movement right now</button>
+        <button class="lm-chip">What's coming up around 15 months?</button>
+        <button class="lm-chip tag-derived">More ideas building on 'first steps'</button>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+</body>
+</html>

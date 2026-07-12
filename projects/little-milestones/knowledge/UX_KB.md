@@ -1493,3 +1493,170 @@ that decision and this KB's own §5/§3 (rev-3) desktop-layout precedent.
 No decision recorded since then bears on avatars/lightbox/gallery
 specifically beyond what FEATURES.md's Increment 4 entry itself already
 scopes.
+
+## 9. Revision — 2026-07-12: Increment 5 — chat history + dynamic suggested prompts (F13)
+
+Source: FEATURES.md's F13, human-approved 2026-07-12, sequenced as Increment 5
+specifically because it needs a real schema decision (chat is currently
+stateless server-side) plus its own Experience Design pass, separate from
+Increment 4's F14/F15/F16 bundle. Two related but distinct pieces.
+
+### 9.1 Historical chats — the UX, not the schema
+
+**Model: discrete conversations, not one continuous log.** Matches the
+app's existing "chaptered" idiom (Journey's chapter markers) better than
+an infinite scroll — a caregiver scanning for "that time we talked about
+walking" benefits from date-grouped chunks. A new History icon (clock
+glyph, 2px-stroke line icon per §1.2's iconography rules) sits in the
+existing `.lm-age-strip`, in the same position as the corrected-age "i"
+affordance (both can coexist).
+
+**Mobile:** tapping the icon opens the existing `.lm-sheet-backdrop`/
+`.lm-sheet` bottom-sheet component (already shipped for `AddMemoryForm`
+and the profile switcher — no new sheet pattern invented), titled
+"{Name}'s conversations," with a pinned "+ New conversation" pill at top
+and a list below.
+
+**Desktop (≥1024px):** a new, screen-scoped 230px history rail sits
+between the existing 248px nav sidebar and the 640px-capped chat column
+(§5.3) — visible only on the Chat route. This is deliberately **not**
+folded into the main nav sidebar, which §5.1 explicitly scopes to "nav +
+identity, nothing else"; the rail is a separate, additive surface. It
+uses the reclaimed horizontal margin space §5.3 previously filled with a
+purely decorative wash — content there is not a regression of that
+decision, since chat is the one screen that now has real content to put
+there. Rows show hover-reveal delete (matching the existing desktop-hover
+convention, UXR-6 extension) with `:focus-within` parity for keyboard
+users, not hover-only.
+
+**Row anatomy (both breakpoints):** relative date ("Today," "Yesterday,"
+"Tue, Jul 8"), a **literal snippet of the parent's own first message** in
+that conversation — never an AI-generated summary, no new
+LLM-origination surface — and a message-count badge. Active/open
+conversation gets a `--lm-blush` background tint (existing, non-meaning-
+bearing surface, not a new color).
+
+**Continuity default:** opening Chat resumes the most recent conversation
+automatically, like returning to an open notebook. The dynamic
+suggestion chips (§9.2) render only when the *currently open* conversation
+has zero messages — the identical trigger condition `ChatScreen.tsx`
+already uses (`messages.length === 0`), now scoped per-conversation
+instead of per-app-load.
+
+**Delete:** the existing two-button confirm-dialog pattern already used
+for photo/memory delete — **not** profile-delete's heavier typed-
+confirmation — since deleting one conversation is lower-stakes than
+deleting a child's entire profile/photos/memories at once. Still the
+single red surface (UXR-9). Copy: "Delete this conversation? This
+permanently deletes every message in this conversation — immediately,
+with no copies kept. This can't be undone."
+
+**Retention:** no artificial cap on how far back a caregiver can browse
+from the UX side — same "kept until the caregiver deletes it" discipline
+already applied to memories/photos.
+
+**Flagged for Architecture (not decided here):**
+- Exact `chat_sessions`/`chat_messages` schema shape.
+- The precise conversation-boundary staleness rule (explicit "+ New
+  conversation" is settled; the implicit auto-new-conversation threshold
+  — e.g. calendar-day boundary vs. an N-hour inactivity gap — is not).
+- Whether the row snippet is a stored column or computed on read.
+- Pagination/performance once a family has many stored conversations.
+- **Flagged for Architecture + human explicitly, not UX's call alone:**
+  does chat history scope per-profile (shared across all caregivers on
+  that child, consistent with how memories/photos already work under
+  F10) or per-(profile, caregiver)? This design's default recommendation
+  is per-profile for scoping consistency, but chat content is more
+  personal than a logged memory — a caregiver's own worried 2am
+  questions being visible to a co-caregiver by default is a real privacy
+  call this file does not make unilaterally.
+
+### 9.2 Suggested prompts — dynamic, age/history-aware, never LLM-originated
+
+Replaces `ChatScreen.tsx`'s static `SUGGESTION_CHIPS` (3 fixed generic
+strings) with chips assembled from a **fixed, non-LLM template library**,
+filled only with curated data already available server-side
+(`milestones_cdc2022.json` bucket content, already served via
+`/profiles/{id}/activities`) and the profile's own logged
+`Memory.milestone_tag` values — the identical never-raw-LLM-origination
+discipline already applied to F9's product-category cards. Renders in the
+same empty-state slot as today (`messages.length === 0`), now scoped per
+open conversation (§9.1).
+
+**Template library (fixed, design-owned copy):**
+- **T1 — current-stage:** `"Fun ways to build {domain_phrase} right now"`
+  — `{domain_phrase}` from a fixed map of the current bucket's milestone
+  `domain` field (movement→"strength & movement", language→"talking &
+  sounds", social→"connection", cognitive→"curiosity"). Same activity-
+  framing register as the existing "Ideas for rainy-day play" chip —
+  never references a specific pass/fail milestone.
+- **T2 — coming-next:** `"What's coming up around {next_bucket} months?"`
+  — reuses the exact "invitation, never deadline" register already
+  shipped for Today's "Things to look forward to" (§1.5d, UXR-8). Not
+  shown once past the 36-month bucket (no next bucket to reference).
+- **T3 — memory-tag extension:** `"More ideas building on '{tag}'"` —
+  `{tag}` is the most recently logged memory's own `milestone_tag`, the
+  parent's own words, truncated to ~30 chars with ellipsis (already
+  capped at 60 chars server-side). Only shown if the profile has ≥1
+  tagged memory. Celebratory extension of what the parent chose to log —
+  never "is this on track," never a status/comparison word.
+- **T4 — evergreen fallback:** the existing fixed pool ("Ideas for
+  rainy-day play" / "What's a good first book?" / "Fun ways to build
+  strength") — literal carry-over of today's static chips.
+
+**Selection:** 3 chips shown — T1 + T2 + (T3 if available, else another
+T4 pick). **Newborn/out-of-range mode:** T1/T2 have no meaningful bucket
+to reference, so chips fall back to 2–3 T4 picks only, matching the
+existing out-of-range context-strip tone already in `ChatScreen.tsx`.
+
+**RESPONSIBLE_AI_KB R1/R2 compliance (this content is app-originated, so
+the same boundaries as chat replies apply to prompt copy itself, per
+RESPONSIBLE_AI_KB §3.1/§3.4):** no template contains or can be filled
+with "behind," "ahead," "on track," "not on track," a percentile, or any
+comparison word; T3's user-supplied `milestone_tag` text is rendered
+as-is (the parent's own words) inside a fixed celebratory wrapper that
+cannot turn it into an assessment claim, sanitized for display exactly
+like every other rendered memory field in the app.
+
+**Flagged for Architecture (not decided here):** whether this templating
+runs as a small new backend endpoint (e.g. `GET
+/profiles/{id}/suggested_prompts`, mirroring the existing
+`/activities`/`/products` curated-table-plus-template pattern — the
+recommended option, for the same centralization reason F9's catalog
+filtering is server-side) or is computed client-side from data the
+frontend already fetches. Implementation-symmetry decision, not visual.
+
+### 9.3 Preview mockups produced (design-review artifact required before implementation)
+
+Written to `projects/little-milestones/design-review/increment-5/`:
+
+| File | Shows |
+|---|---|
+| `increment-5/suggested-prompts.html` | The fixed T1–T4 template table; mobile empty-state chat with dynamic chips (Maya, 12mo, has a "first steps" tagged memory); mobile newborn/out-of-range fallback (Theo, 3wk, evergreen-only chips); desktop rendering with sidebar nav, same dynamic chips. |
+| `increment-5/chat-history-mobile.html` | History icon in the age strip; the "Past conversations" bottom sheet (active/inactive rows, snippet, count, delete affordance); the delete-confirmation dialog; the empty-history state. |
+| `increment-5/chat-history-desktop.html` | The new 230px history rail between sidebar and chat column, hover-reveal delete, active-row highlight, callout explaining the one new structural desktop surface this pass adds. |
+| `increment-5/index.html` | Assembles all three into one scrollable review page via embedded iframes, plus a "settled vs. flagged-for-Architecture" summary box. |
+
+**Not linked from the root `design-review/index.html`** this pass — this
+session had Write-only (no Edit) access to that existing file, and given
+this project's two prior file-destruction incidents from careless `Write`
+calls on large append-only files (this same KB, and `ARCHITECTURE_KB.md`
+— see `admin/LESSONS.md`), the safer call was to leave the root index
+untouched and flag the missing link as a follow-up for a pass with Edit
+access, rather than risk a third incident. **DesignSync push also not
+performed** — no DesignSync tool was available in this session's tool
+set, same class of gap already on record at §8.6.
+
+### 9.4 Coverage note (what this pass does and doesn't cover)
+
+This pass covers F13 exactly as scoped in FEATURES.md's Increment 5 entry
+— design only (flows, layout, the two flagged real Architecture/privacy-
+scoping questions above), no backend or frontend code written. It does
+not resolve the schema decision (explicitly Architecture's, per FEATURES.md
+itself) or the DesignSync/root-index-link gaps flagged above — both are
+handed off, not silently absorbed. **Decisions Log cross-check (per this
+role's completeness guardrail):** the full `PROJECT_CONTEXT.md` Decisions
+Log was read before finalizing this pass, re-confirming the responsive-
+web-app platform decision — both mobile and a genuine ≥1024px desktop
+layout are shown for every screen in this pass, not a stretched phone
+view.

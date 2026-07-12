@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Increment 5 — Chat History (desktop)</title>
+<style>
+  :root {
+    --lm-cream: #FDF8F2; --lm-card: #FFFFFF; --lm-ink: #3D3833; --lm-ink-soft: #6E6259;
+    --lm-terracotta: #C1502A; --lm-terracotta-deep: #8F3A1D; --lm-sage: #2F7A4E;
+    --lm-slate: #3D6188; --lm-slate-tint: #EEF3F8; --lm-gold: #E8A317; --lm-blush: #FADCC5;
+    --lm-coral: #FF7A50; --lm-danger: #A33B2E;
+    --lm-radius-card: 16px; --lm-radius-pill: 999px;
+    --lm-font-ui: "Nunito Sans", -apple-system, "Segoe UI", sans-serif;
+    --lm-font-display: Fraunces, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFE7DC; font-family: var(--lm-font-ui); color: var(--lm-ink); padding: 32px; }
+  h1 { font-family: var(--lm-font-display); font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--lm-ink-soft); max-width: 820px; margin: 0 0 24px; }
+  .box { background: white; border: 1px solid #E8DECF; border-radius: 14px; padding: 18px 22px; max-width: 980px; margin-bottom: 24px; font-size: 14px; }
+  .box h2 { font-size: 16px; margin: 0 0 8px; }
+
+  .desktop { width: 1180px; border: 1px solid #D8CDBB; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.08); margin-bottom: 30px; }
+  .browser-chrome { background: #E4DACB; padding: 8px 12px; display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #C9BCA6; }
+  .desktop-body { display: flex; min-height: 600px; background: var(--lm-cream); }
+
+  .sidebar { width: 210px; background: white; border-right: 1px solid #EEE4D6; padding: 20px 14px; flex-shrink: 0; }
+  .sidebar .brand { font-family: var(--lm-font-display); font-size: 18px; margin-bottom: 18px; }
+  .nav-item { padding: 10px 12px; border-radius: 10px; font-size: 14px; margin-bottom: 4px; color: var(--lm-ink-soft); }
+  .nav-item.active { background: var(--lm-blush); color: var(--lm-terracotta-deep); font-weight: 700; }
+
+  /* ---- NEW: history rail, chat-screen-only, right of the nav sidebar,
+     left of the chat column. Does not touch the sidebar's existing
+     "nav + identity only" contract (§5.1) -- this is a screen-scoped
+     panel, not a nav element. ---- */
+  .history-rail { width: 230px; background: #FBF4E9; border-right: 1px solid #EEE4D6; padding: 18px 14px; flex-shrink: 0; }
+  .history-rail h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--lm-ink-soft); margin: 0 0 10px; }
+  .new-convo-btn-d { width: 100%; border: none; background: var(--lm-terracotta); color: white; border-radius: var(--lm-radius-pill); padding: 10px; font-weight: 700; font-size: 13.5px; margin-bottom: 14px; cursor: pointer; }
+  .convo-row-d { padding: 10px 8px; border-radius: 10px; margin-bottom: 4px; cursor: pointer; position: relative; }
+  .convo-row-d.active { background: var(--lm-blush); }
+  .convo-row-d:hover:not(.active) { background: #F3E9D8; }
+  .convo-date-d { font-weight: 700; font-size: 13px; }
+  .convo-snippet-d { color: var(--lm-ink-soft); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .convo-delete-d { position: absolute; right: 6px; top: 8px; width: 26px; height: 26px; border-radius: 50%; border: none; background: white; color: var(--lm-ink-soft); display: none; align-items: center; justify-content: center; }
+  .convo-row-d:hover .convo-delete-d { display: flex; }
+  .hover-callout { position: absolute; top: 40px; right: -160px; background: var(--lm-ink); color: white; font-size: 11px; padding: 6px 10px; border-radius: 8px; width: 150px; }
+  .hover-callout::before { content: ""; position: absolute; left: -6px; top: 8px; border: 6px solid transparent; border-right-color: var(--lm-ink); }
+
+  .chat-col-desktop { flex: 1; padding: 24px 40px; display: flex; justify-content: center; }
+  .chat-col-desktop .inner { width: 100%; max-width: 640px; }
+  .lm-age-strip { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 10px; }
+  .lm-age-strip .spacer { flex: 1; }
+  .lm-icon-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #E4D8C6; background: white; color: var(--lm-ink-soft); display: none; }
+  .lm-bubble { border-radius: 16px; padding: 10px 14px; margin-bottom: 10px; max-width: 78%; font-size: 14.5px; }
+  .lm-bubble-user { background: white; border: 1.5px solid #EEE4D6; margin-left: auto; }
+  .lm-bubble-assistant { background: var(--lm-blush); }
+  .composer-d { display: flex; gap: 8px; margin-top: 16px; }
+  .composer-d input { flex: 1; border: 1.5px solid #E4D8C6; border-radius: var(--lm-radius-pill); padding: 11px 16px; font-size: 14.5px; }
+</style>
+</head>
+<body>
+
+<h1>Increment 5 — Chat History Browsing (desktop, ≥1024px), F13 part 1</h1>
+<p class="sub">Mobile uses an icon-triggered bottom sheet (see <code>chat-history-mobile.html</code>); desktop has
+real horizontal space, so history gets its own persistent 230px rail — visible only on the Chat screen, sitting
+between the existing 248px-class nav sidebar and the 640px-capped chat column (§5.3). This deliberately does
+<b>not</b> fold history into the main nav sidebar, which §5.1 explicitly scopes to "nav + identity, nothing else" —
+adding a per-screen browsing list there would violate that existing, reviewed constraint. Chat's own reading
+column keeps its 640px cap unchanged; the rail uses space the sidebar/margin design already reserved as
+"decorative wash" (§5.3) for a surface that, on Chat specifically, now has real content to put there.</p>
+
+<div class="desktop">
+  <div class="browser-chrome"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="desktop-body">
+    <div class="sidebar">
+      <div class="brand">little-milestones</div>
+      <div class="nav-item">🏠 Today</div>
+      <div class="nav-item active">💬 Chat</div>
+      <div class="nav-item">✦ Journey</div>
+    </div>
+
+    <div class="history-rail">
+      <h2>Maya's conversations</h2>
+      <button class="new-convo-btn-d">+ New conversation</button>
+
+      <div class="convo-row-d active">
+        <div class="convo-date-d">Today</div>
+        <div class="convo-snippet-d">"Fun ways to build strength..."</div>
+      </div>
+      <div class="convo-row-d" style="position:relative;">
+        <div class="convo-date-d">Yesterday</div>
+        <div class="convo-snippet-d">"What's a good first book for..."</div>
+        <button class="convo-delete-d" aria-label="Delete conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>
+        </button>
+        <div class="hover-callout">Hover reveals delete — matches the existing desktop-hover convention (§1.9 UXR-6 extension)</div>
+      </div>
+      <div class="convo-row-d">
+        <div class="convo-date-d">Tue, Jul 8</div>
+        <div class="convo-snippet-d">"More ideas building on 'first..."</div>
+      </div>
+      <div class="convo-row-d">
+        <div class="convo-date-d">Sat, Jul 5</div>
+        <div class="convo-snippet-d">"Is it normal for her to..."</div>
+      </div>
+    </div>
+
+    <div class="chat-col-desktop"><div class="inner">
+      <div class="lm-age-strip"><span>Maya · 12 months</span><div class="spacer"></div></div>
+      <div class="lm-bubble lm-bubble-user">Fun ways to build strength &amp; movement right now</div>
+      <div class="lm-bubble lm-bubble-assistant">Lots of babies this age love cruising along low furniture and
+      reaching for toys just out of grasp. A few ideas: clear a stretch of couch for supported cruising, stack
+      two soft blocks and cheer when she knocks them down, or roll a ball back and forth while she's sitting.</div>
+      <div class="composer-d"><input placeholder="Ask about Maya..." /></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="box" style="border-left:4px solid var(--lm-slate);">
+  <h2 style="color:var(--lm-slate);">Note on this desktop-only structural addition</h2>
+  <p style="margin:0;">This is the one place this pass adds new desktop layout surface beyond what §5's existing
+  responsive system specifies (sidebar nav, 640/680px reading columns, 2-col Today grid). It's scoped tightly:
+  visible only on the Chat route, uses the app's existing hover/active-state and card-tint conventions rather
+  than inventing new ones, and does not change the chat column's own width or content. Same accessibility bar as
+  everywhere else in this KB applies (UXR-6): rail rows are a real <code>&lt;nav&gt;</code>/<code>&lt;ul&gt;</code>
+  of focusable, keyboard-reachable buttons with visible focus rings, not a mouse-only affordance — the delete
+  button's hover-reveal on desktop must also appear on keyboard focus (<code>:focus-within</code>), not hover
+  alone.</p>
+</div>
+
+</body>
+</html>

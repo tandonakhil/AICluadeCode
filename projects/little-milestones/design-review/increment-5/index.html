@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>little-milestones — Increment 5 Design Review (F13)</title>
+<style>
+  body { margin: 0; font-family: "Nunito Sans", -apple-system, "Segoe UI", sans-serif; background: #EFE7DC; color: #3D3833; }
+  header { background: #FDF8F2; padding: 28px 32px 20px; border-bottom: 1px solid #E4D8C6; }
+  header h1 { font-family: Fraunces, Georgia, serif; margin: 0 0 6px; font-size: 28px; }
+  header p { max-width: 900px; color: #6E6259; margin: 0; }
+  nav { display: flex; gap: 12px; padding: 14px 32px; background: white; border-bottom: 1px solid #E4D8C6; flex-wrap: wrap; position: sticky; top: 0; }
+  nav a { text-decoration: none; color: #8F3A1D; font-weight: 700; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid #C1502A; }
+  .badge { display: inline-block; background: #3D6188; color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; vertical-align: middle; }
+  section { padding: 30px 32px; }
+  section h2 { font-family: Fraunces, Georgia, serif; font-size: 22px; margin: 0 0 4px; }
+  section .desc { color: #6E6259; max-width: 900px; margin: 0 0 16px; }
+  .flag-box { background: white; border-left: 4px solid #3D6188; border-radius: 10px; padding: 14px 18px; max-width: 900px; margin-bottom: 18px; font-size: 14px; }
+  .flag-box b { color: #3D6188; }
+  iframe { width: 100%; height: 900px; border: 1px solid #D8CDBB; border-radius: 10px; background: white; }
+  iframe.tall { height: 1500px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>little-milestones — Increment 5 Design Review <span class="badge">F13</span></h1>
+  <p>Chat history browsing + dynamic age/history-aware suggested prompts. Approved backlog item, human
+  checkbox review 2026-07-12. Read against <code>UX_KB.md</code> §1 (chat's original design intent) and §8/§8.1a
+  (this project's current desktop/hover/avatar/dialog conventions, reused here rather than reinvented) and
+  <code>RESPONSIBLE_AI_KB.md</code> R1/R2 (a suggested prompt is content the app originates — the "never imply
+  behind/ahead" rule applies to prompt copy, not just chat replies).</p>
+</header>
+
+<nav>
+  <a href="#prompts">Suggested Prompts</a>
+  <a href="#history-mobile">Chat History — Mobile</a>
+  <a href="#history-desktop">Chat History — Desktop</a>
+  <a href="#open">Open Questions Summary</a>
+</nav>
+
+<section id="prompts">
+  <h2>1. Dynamic Suggested Prompts</h2>
+  <p class="desc">Replaces the static <code>SUGGESTION_CHIPS</code> constant in <code>ChatScreen.tsx</code> with
+  chips assembled from a fixed, non-LLM template library filled with curated CDC-2022 milestone-table data and
+  the profile's own logged memories. Shows the normal dynamic case, the newborn/out-of-range fallback, and the
+  desktop rendering.</p>
+  <iframe class="tall" src="suggested-prompts.html" title="Suggested prompts preview"></iframe>
+</section>
+
+<section id="history-mobile">
+  <h2>2a. Chat History — Mobile</h2>
+  <p class="desc">History icon in the age strip, the "Past conversations" bottom sheet, the delete-confirmation
+  dialog, and the empty state.</p>
+  <iframe class="tall" src="chat-history-mobile.html" title="Chat history mobile preview"></iframe>
+</section>
+
+<section id="history-desktop">
+  <h2>2b. Chat History — Desktop</h2>
+  <p class="desc">A new, screen-scoped 230px history rail between the nav sidebar and the chat column — the one
+  new structural desktop surface this pass adds.</p>
+  <iframe class="tall" src="chat-history-desktop.html" title="Chat history desktop preview"></iframe>
+</section>
+
+<section id="open">
+  <h2>Open Questions Summary — what's settled vs. what Architecture must decide</h2>
+  <div class="flag-box">
+    <b>Settled here (pure UX/visual, no further design work needed):</b> discrete per-conversation grouping
+    (not one infinite log); row anatomy (relative date, literal-snippet, message count); resume-most-recent
+    default; delete = the existing two-button confirm-dialog pattern (not typed-confirmation); the fixed
+    suggested-prompt template library (T1–T4) and its R1/R2-compliant copy; the History icon placement, the
+    mobile sheet, and the desktop rail's placement/behavior.
+  </div>
+  <div class="flag-box">
+    <b>Flagged for Architecture (real schema/implementation decisions):</b>
+    <ol style="margin:6px 0 0; padding-left:18px;">
+      <li>Exact <code>chat_sessions</code>/<code>chat_messages</code> schema shape (not prescribed here).</li>
+      <li>Conversation-boundary rule — the precise staleness threshold that starts a new conversation implicitly.</li>
+      <li>Whether the conversation-list snippet is stored or computed on read.</li>
+      <li>Pagination/performance for a caregiver with many stored conversations.</li>
+      <li>Whether suggested-prompt templating is a new backend endpoint (recommended, mirrors <code>/activities</code>/
+        <code>/products</code>) or computed client-side from already-fetched data.</li>
+      <li><b>Needs explicit Architecture + human confirmation, not just Architecture's:</b> does chat history
+        scope per-profile (shared across caregivers, matching F10's existing memory/photo precedent — this
+        design's default recommendation) or per-(profile, caregiver)? Chat content is more personal than a
+        logged memory, so this default should be confirmed rather than inherited silently.</li>
+    </ol>
+  </div>
+</section>
+
+</body>
+</html>

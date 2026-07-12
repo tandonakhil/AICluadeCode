@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Increment 5 — Chat History (mobile)</title>
+<style>
+  :root {
+    --lm-cream: #FDF8F2; --lm-card: #FFFFFF; --lm-ink: #3D3833; --lm-ink-soft: #6E6259;
+    --lm-terracotta: #C1502A; --lm-terracotta-deep: #8F3A1D; --lm-sage: #2F7A4E;
+    --lm-slate: #3D6188; --lm-slate-tint: #EEF3F8; --lm-gold: #E8A317; --lm-blush: #FADCC5;
+    --lm-coral: #FF7A50; --lm-danger: #A33B2E;
+    --lm-radius-card: 16px; --lm-radius-pill: 999px;
+    --lm-font-ui: "Nunito Sans", -apple-system, "Segoe UI", sans-serif;
+    --lm-font-display: Fraunces, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFE7DC; font-family: var(--lm-font-ui); color: var(--lm-ink); padding: 32px; }
+  h1 { font-family: var(--lm-font-display); font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--lm-ink-soft); max-width: 780px; margin: 0 0 24px; }
+  .box { background: white; border: 1px solid #E8DECF; border-radius: 14px; padding: 18px 22px; max-width: 900px; margin-bottom: 24px; font-size: 14px; }
+  .box h2 { font-size: 16px; margin: 0 0 8px; }
+  .frames { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+  .frame-label { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+  .phone { width: 375px; border: 10px solid #2B2723; border-radius: 34px; background: var(--lm-cream); overflow: hidden; position: relative; }
+  .phone-screen { min-height: 640px; display: flex; flex-direction: column; position: relative; }
+
+  .lm-age-strip { display: flex; align-items: center; gap: 8px; padding: 16px 16px 8px; font-weight: 700; }
+  .lm-age-strip .spacer { flex: 1; }
+  .lm-icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #E4D8C6; background: white; display: flex; align-items: center; justify-content: center; color: var(--lm-ink-soft); cursor: pointer; }
+  .lm-icon-btn svg { width: 18px; height: 18px; }
+  .lm-icon-btn.callout { border-color: var(--lm-terracotta); color: var(--lm-terracotta); box-shadow: 0 0 0 3px rgba(193,80,42,.15); }
+
+  /* ---- bottom sheet (reuses .lm-sheet-backdrop/.lm-sheet pattern already
+     shipped for AddMemoryForm/ProfileSwitcher — same grabber + rounded-top
+     card, per UX_KB's established component vocabulary) ---- */
+  .lm-sheet-backdrop { position: absolute; inset: 0; background: rgba(20,16,12,.45); display: flex; align-items: flex-end; }
+  .lm-sheet { background: var(--lm-card); width: 100%; border-radius: 20px 20px 0 0; padding: 10px 18px 20px; max-height: 78%; overflow-y: auto; }
+  .lm-sheet-grabber { width: 40px; height: 4px; background: #E4D8C6; border-radius: 999px; margin: 4px auto 14px; }
+  .lm-sheet h2 { font-family: var(--lm-font-display); font-size: 19px; margin: 0 0 4px; }
+  .lm-sheet .sheet-sub { font-size: 13px; color: var(--lm-ink-soft); margin: 0 0 14px; }
+  .new-convo-btn { width: 100%; border: none; background: var(--lm-terracotta); color: white; border-radius: var(--lm-radius-pill); padding: 12px; font-weight: 700; font-size: 15px; margin-bottom: 16px; min-height: 44px; }
+
+  .convo-row { display: flex; align-items: center; gap: 10px; padding: 12px 6px; border-radius: 12px; }
+  .convo-row + .convo-row { border-top: 1px solid #F1E8D9; }
+  .convo-row.active { background: var(--lm-blush); }
+  .convo-main { flex: 1; min-width: 0; }
+  .convo-date { font-weight: 700; font-size: 14.5px; }
+  .convo-snippet { color: var(--lm-ink-soft); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .convo-count { font-size: 11px; color: var(--lm-ink-soft); background: #F2EAD9; border-radius: 999px; padding: 2px 8px; margin-left: 6px; white-space: nowrap; }
+  .convo-delete { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: var(--lm-ink-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .empty-history { text-align: center; color: var(--lm-ink-soft); font-size: 13.5px; padding: 30px 10px; }
+
+  /* ---- destructive confirm dialog: the ONLY red surface (UXR-9),
+     same anatomy as the profile-delete / memory-delete dialogs ---- */
+  .dlg-backdrop { position: absolute; inset: 0; background: rgba(20,16,12,.55); display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .dlg { background: white; border-radius: 18px; padding: 22px 20px; width: 100%; }
+  .dlg h3 { margin: 0 0 8px; font-size: 17px; }
+  .dlg p { font-size: 14px; color: var(--lm-ink-soft); margin: 0 0 18px; line-height: 1.5; }
+  .dlg-actions { display: flex; gap: 10px; }
+  .dlg-actions button { flex: 1; border-radius: var(--lm-radius-pill); padding: 11px; font-weight: 700; border: none; min-height: 44px; }
+  .btn-cancel { background: transparent; border: 1.5px solid #E4D8C6 !important; color: var(--lm-ink); }
+  .btn-danger { background: var(--lm-danger); color: white; }
+</style>
+</head>
+<body>
+
+<h1>Increment 5 — Chat History Browsing (mobile), F13 part 1</h1>
+<p class="sub">A new History icon (clock glyph, 2px-stroke line icon per §1.2) sits in the age-context strip next to
+the existing corrected-age "i" affordance. Tapping it opens a bottom sheet — the same <code>.lm-sheet-backdrop</code>/
+<code>.lm-sheet</code> grabber-card component already shipped for <code>AddMemoryForm</code> and the profile switcher —
+listing past conversations for the current child, newest first.</p>
+
+<div class="box">
+  <h2>Design calls made here (pure UX, not Architecture's)</h2>
+  <ul style="margin:0; padding-left:18px;">
+    <li><b>Discrete conversations, not one continuous log.</b> Matches this app's existing "chaptered" idiom
+      (Journey's chapter markers) better than an infinite scroll — a parent scanning for "that time we talked
+      about walking" benefits from date-grouped chunks, not one giant transcript.</li>
+    <li><b>Row anatomy:</b> relative date ("Today," "Yesterday," "Tue, Jul 8"), a literal snippet of the
+      <em>parent's own first message</em> in that conversation (never an AI-generated summary — no new
+      LLM-origination surface), and a message-count badge.</li>
+    <li><b>Continuity default:</b> opening Chat resumes the most recent conversation automatically (like
+      returning to an open notebook) — the dynamic suggestion chips (see <code>suggested-prompts.html</code>)
+      only appear when the <em>open</em> conversation has zero messages, exactly the same trigger condition as
+      today, just scoped per-conversation instead of per-app-load.</li>
+    <li><b>Delete = the existing photo/memory-delete dialog pattern</b> (two-button confirm, no typed name) —
+      not the heavier typed-confirmation profile-delete pattern, since deleting one conversation is lower-stakes
+      than deleting a child's entire profile/photos/memories in one action. Still the single red surface
+      (UXR-9); copy states permanence plainly.</li>
+    <li><b>No cap on how far back a caregiver can browse</b> from the UX side — same "kept until the caregiver
+      deletes it" retention discipline as memories/photos. Whether the list paginates/infinite-scrolls at high
+      volume is a performance/implementation question, not a visual one (flagged below).</li>
+  </ul>
+</div>
+
+<div class="box" style="border-left:4px solid var(--lm-slate);">
+  <h2 style="color:var(--lm-slate);">Flagged for Architecture (real schema/behavior decisions, not decided here)</h2>
+  <ul style="margin:0; padding-left:18px;">
+    <li><b>Conversation-boundary rule.</b> Design intent: a new conversation starts either (a) explicitly, via
+      "+ New conversation," or (b) implicitly, when a caregiver opens Chat and the most recent conversation is
+      "stale" — but the exact staleness threshold (e.g. a calendar-day boundary vs. an N-hour inactivity gap) is
+      Architecture's call, not specified here.</li>
+    <li><b>Snippet storage.</b> Whether the row's snippet is a stored column (denormalized at write time) or
+      computed on read from the first stored message is an implementation detail with no UX-visible difference
+      — Architecture's call.</li>
+    <li><b>Pagination / list-size performance</b> once a family has dozens of conversations — not designed here;
+      UX only specifies the row anatomy and that nothing is hidden by an artificial cap.</li>
+    <li><b>Real open question, not just Architecture's — needs explicit confirmation (Architecture + human):
+      does chat history scope per-profile (shared across all caregivers on that child, matching how memories/
+      photos already work under F10) or per-(profile, caregiver)?</b> Default recommendation below leans
+      per-profile for consistency with the existing memory/photo scoping precedent, but chat is different from a
+      logged memory — a caregiver's own worried 2am questions are more personal than a milestone entry, and
+      showing them to a co-caregiver by default is a real privacy call this design does not make unilaterally.</li>
+  </ul>
+  <p style="margin:10px 0 0;"><b>Default recommendation (not a decision):</b> per-profile, shared across caregivers
+  — consistent with existing F10 scoping for every other data type in this app — <em>unless</em> the human/
+  Architecture wants a different, more private default for chat specifically.</p>
+</div>
+
+<div class="frames">
+  <div>
+    <div class="frame-label">375×667 — history icon in the age strip</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip">
+        <span>Maya · 12 months</span><div class="spacer"></div>
+        <button class="lm-icon-btn callout" aria-label="Past conversations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button>
+      </div>
+      <div style="padding:16px;color:var(--lm-ink-soft);font-size:14px;">↑ New affordance, unchanged position for
+      the existing corrected-age info button when present (this profile isn't preterm, so only the history icon
+      shows). Tapping it opens the sheet at right.</div>
+    </div></div>
+  </div>
+
+  <div>
+    <div class="frame-label">375×667 — "Past conversations" sheet open</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip"><span>Maya · 12 months</span><div class="spacer"></div>
+        <button class="lm-icon-btn callout" aria-label="Past conversations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </button></div>
+      <div class="lm-sheet-backdrop">
+        <div class="lm-sheet">
+          <div class="lm-sheet-grabber"></div>
+          <h2>Maya's conversations</h2>
+          <p class="sheet-sub">Private to your family.</p>
+          <button class="new-convo-btn">+ New conversation</button>
+
+          <div class="convo-row active">
+            <div class="convo-main">
+              <div class="convo-date">Today</div>
+              <div class="convo-snippet">"Fun ways to build strength &amp; movement..."</div>
+            </div>
+            <span class="convo-count">4</span>
+            <button class="convo-delete" aria-label="Delete conversation">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>
+            </button>
+          </div>
+          <div class="convo-row">
+            <div class="convo-main">
+              <div class="convo-date">Yesterday</div>
+              <div class="convo-snippet">"What's a good first book for..."</div>
+            </div>
+            <span class="convo-count">2</span>
+            <button class="convo-delete" aria-label="Delete conversation">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>
+            </button>
+          </div>
+          <div class="convo-row">
+            <div class="convo-main">
+              <div class="convo-date">Tue, Jul 8</div>
+              <div class="convo-snippet">"More ideas building on 'first..."</div>
+            </div>
+            <span class="convo-count">6</span>
+            <button class="convo-delete" aria-label="Delete conversation">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <div>
+    <div class="frame-label">375×667 — delete-confirm dialog (the one red surface)</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip"><span>Maya · 12 months</span></div>
+      <div class="dlg-backdrop">
+        <div class="dlg" role="dialog" aria-modal="true">
+          <h3>Delete this conversation?</h3>
+          <p>This permanently deletes every message in this conversation — immediately, with no copies kept.
+          This can't be undone.</p>
+          <div class="dlg-actions">
+            <button class="btn-cancel">Cancel</button>
+            <button class="btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <div>
+    <div class="frame-label">375×667 — empty state (no conversations yet)</div>
+    <div class="phone"><div class="phone-screen">
+      <div class="lm-age-strip"><span>Sam · 3 months</span></div>
+      <div class="lm-sheet-backdrop">
+        <div class="lm-sheet">
+          <div class="lm-sheet-grabber"></div>
+          <h2>Sam's conversations</h2>
+          <p class="sheet-sub">Private to your family.</p>
+          <button class="new-convo-btn">+ New conversation</button>
+          <div class="empty-history">No conversations yet — ask a question and it'll show up here.</div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+</body>
+</html>
