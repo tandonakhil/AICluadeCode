@@ -1866,3 +1866,128 @@ additive, 9 files/cards) — including the previously-flagged §8.6/§9.3/
 Still open, re-flagged: root `design-review/index.html` links for
 increment-4/5 sections (needs an Edit-access pass); the sidebar
 "+ Add a child/moment" label divergence (§10.1).
+
+## 11. Revision — 2026-07-12: Increment 6 — hardened auth suite (F12)
+
+Source: `SECURITY_KB.md` §7 (2026-07-12), the human-approved F12 build.
+Four UI surfaces flagged at §7's "what ui-ux-designer needs to design"
+list. Preview: `design-review/increment-6/index.html` (assembles
+`login-totp.html`, `forgot-password.html`, `settings-security.html`).
+
+### 11.1 Login additions
+
+A "Forgot password?" quiet link sits directly under the password field
+(attached to that field, not floating below the primary button) on
+`AuthScreen.tsx`'s login mode only. For TOTP-enrolled accounts
+(`totp_verified_at` set, SECURITY_KB §7.3), a correct password reveals a
+second step reusing `.lm-onboarding`/`.lm-field`: a 6-digit code entry
+(large, monospace, centered) with "Verify," and a quiet "Use a recovery
+code instead" link swapping the input for a text field. Error copy
+matches the existing calm-terracotta convention exactly (never
+`--lm-danger`, per UXR-9) and states remaining attempts factually ("That
+code didn't work — 4 attempts left") rather than alarming. A wrong
+password never distinguishes TOTP-enrolled from not (the TOTP step is
+only reachable after password verification, preserving the existing
+generic "invalid email or password" error for that failure mode). A
+successful recovery-code login shows a one-time toast on entering the app
+("Signed in with a recovery code — 7 codes left..."), reusing the
+existing toast pattern.
+
+### 11.2 Forgot-password flow
+
+Four states, all reusing `.lm-onboarding`/`.lm-field`/`.lm-btn-primary`/
+`.lm-btn-quiet` verbatim: (A) request — email entry; (B) "Check your
+email" — copy is byte-identical whether the account exists, doesn't
+exist, or the send failed server-side (SECURITY_KB §7.2's no-enumeration
+rule); the email address echoed back is simply what the user typed, not
+an account-existence signal; (C) reset — new password + confirm, reached
+via the emailed token, with a generic "no longer valid" error for
+expired/used/invalid tokens (no distinguishing detail); (D) success —
+"Password updated... you've been signed out of every device," routing to
+login.
+
+**Functional (non-aesthetic) requirement on state C, carried from
+SECURITY_KB §7.2:** the reset page must load no third-party resources
+(no font CDN, no analytics, no external embed) and must strip the raw
+token from the visible address bar via `history.replaceState` immediately
+after reading it into component state, before the form renders — the same
+Referer-leak discipline already required of the F8 unsubscribe
+confirmation page (SECURITY_KB §1.7 point 5), applied here because a
+password-reset token is materially more sensitive than an opt-out token.
+
+### 11.3 Settings → Security section
+
+A new "Security" `.lm-card`, placed inside the existing `.lm-settings-grid`
+2-up desktop layout (§10.5) between "Weekly digest" and "Privacy."
+Contains: change-password (inline expand: current/new/confirm fields);
+two-step verification status (a sage "On"/neutral "Off" status chip —
+sage reused from its existing non-gamified confirmation role, §1.3 — with
+a secondary-button CTA when off, a quiet "Turn off" CTA plus a passive
+"{n} recovery codes remaining" line when on); active-sessions list
+(device/browser + last-seen, a sage "Current" tag on the active session,
+per-row "Log out," and "Log out everywhere else").
+
+**TOTP enrollment** is a 4-step flow reusing existing overlay patterns
+exactly (sheet on mobile, centered dialog on desktop per §5.6's
+established split, not a new pattern): (1) password-confirm dialog before
+setup starts (SECURITY_KB §7.3); (2) QR code + "Can't scan? Enter this
+code manually" monospace secret fallback, in an `.lm-sheet`; (3) 6-digit
+verify-code step; (4) one-time recovery-codes display — 8 codes in a
+2-column grid, a "Copy all codes" secondary button, and a **forced**
+acknowledgment checkbox ("I've saved these recovery codes somewhere
+safe") that gates "Done" — disabled until checked, not merely suggested,
+since these codes are the only recovery path if both password and
+authenticator are lost.
+
+**TOTP disable** requires password + a current code in one dialog,
+explicitly **not** styled as destructive (UXR-9 reserves `--lm-danger` for
+permanent-data-loss confirmations; disabling MFA is a reversible setting
+change, not data loss).
+
+**Copy retirement (SECURITY_KB §7.2's "§1.3 status change"):** the
+Privacy card's "No password reset yet — losing your password means losing
+access..." sentence is removed outright, not replaced with compensating
+copy — the capability it disclaimed now lives as real, discoverable
+controls (the login "Forgot password?" link, the Settings "Change
+password" control). Before/after shown in the preview.
+
+### 11.4 Reused, unchanged (named explicitly, not silently assumed)
+
+`.lm-sheet`/`.lm-sheet-backdrop`, `.lm-dialog`/`.lm-dialog-backdrop`,
+`.lm-card`, all `.lm-btn` variants, `.lm-field`/input styles, the
+calm-terracotta (never `--lm-danger`) error convention, the 44px
+touch-target floor, and the sheet-on-mobile/centered-dialog-on-desktop
+split already established for `AddMemoryForm`/photo-upload (§5.6). No new
+component vocabulary is introduced anywhere in this increment.
+
+### 11.5 Preview mockups produced
+
+Written to `projects/little-milestones/design-review/increment-6/`:
+
+| File | Shows |
+|---|---|
+| `login-totp.html` | Login form + "Forgot password?"; TOTP code step + error state; recovery-code fallback. Mobile + desktop. |
+| `forgot-password.html` | Request, uniform check-your-email confirmation, reset (+ invalid-token error state), success. Mobile + desktop, with the token-leak/address-bar constraint annotated inline. |
+| `settings-security.html` | Security card, not-enrolled and enrolled states (mobile + desktop with sidebar); full 4-step TOTP enrollment sheet/dialog flow incl. recovery codes with forced checkbox; disable dialog; active sessions; change-password form; Privacy-copy before/after. |
+| `index.html` | Assembles all three via iframes, strategy summary, Decisions-Log cross-check note. |
+
+### 11.6 DesignSync push — not performed this pass, flagged
+
+Same gap class as §8.6/§9.3/§10.4: no DesignSync tool was available in
+this session's tool set. Flagged for whichever future pass has DesignSync
+access to push these three new paths additively to project
+`172e0c51-e31a-46e7-aedb-bead17b38868` — no existing path needs to change.
+
+### 11.7 Coverage note
+
+This pass covers exactly the four UI surfaces SECURITY_KB §7 flagged
+(login additions, forgot-password flow, Settings Security section, copy
+retirement) plus the reset-page functional constraints. It does not
+design any backend/token/schema behavior (security-architect's, per §7)
+and does not touch F17 (deferred, later increment). Decisions Log
+cross-check performed in full before finalizing — no recorded decision
+since the last UX_KB pass changes anything about auth screens beyond
+SECURITY_KB §7 itself; the responsive-web-app platform decision is
+honored (every screen shown mobile + desktop, auth staying narrow/
+centered per the established §5.2 split, Settings staying in the
+sidebar+2-up-grid shell per §10.5).

@@ -1,0 +1,5 @@
+Shared token/class block copied verbatim from dev/frontend/app/globals.css and
+reused identically across login-totp.html, forgot-password.html, and
+settings-security.html in this directory (increment-6). Not a build artifact
+— reference note only, per the pattern already established for
+journey/moment-photo-banner.html (UX_KB §7.4).
