@@ -157,6 +157,33 @@ backend from JSON files to SQLite. See PLAN.md §6.
   (above) decides when it actually gets picked up.
   _Source: human request 2026-07-11; SECURITY_KB §1.3, §1.6._
 
+- **F13 — Chat history + age/history-aware suggested prompts (added
+  2026-07-11 per human request — "chat page is very dull").** Two related
+  but distinct pieces, likely one `/enhance-project` pass since they touch
+  the same screen:
+  - **Historical chats**: persist and let a caregiver browse past `/chat`
+    conversations, not just the current in-memory session. Needs a schema
+    decision (a `chat_sessions`/`chat_messages` table, family+profile
+    scoped, same hard-delete discipline as memories/photos) — currently
+    `/chat` is stateless server-side (PLAN §4.1/ARCHITECTURE_KB §6.1: the
+    client resends full history each turn, nothing persists). This is a
+    real architecture decision, not a frontend-only change.
+  - **Suggested prompts**: on opening chat, surface a handful of starter
+    questions tailored to the child's current age bucket and — where
+    available — their logged memory/milestone history (e.g. a prompt
+    referencing a recently-logged milestone_tag, or the next unreached
+    CDC bucket). Must stay inside R1/R2's existing guardrail boundaries
+    (RESPONSIBLE_AI_KB §3) — a suggested prompt is still content the app
+    originates, so "never imply behind/ahead" applies to prompt copy too,
+    not just chat responses. Content source: derive from
+    `milestones_cdc2022.json` + the profile's own memories, not
+    LLM-originated suggestions (same never-raw-LLM-origination discipline
+    already applied to F9's product recommendations).
+  - Both should go through Experience Design (ui-ux-designer) before
+    Architecture, same as any UI-bearing feature — no design review has
+    happened for a redesigned chat screen yet.
+  _Source: human request 2026-07-11._
+
 ## Ready for Release
 
 ## Released
