@@ -2063,3 +2063,16 @@ deferred and neither blocking this project's MVP completion.
   this session's backend edits and will not reflect them until restarted,
   flagged explicitly rather than left implicit. [code-agent] Next: Test
   gate.
+
+**2026-07-12: Increment 4 (F14 avatars+upload, F15 lightbox, F16
+gallery) is deployed (dev, local).** Test (4/4 suites), Review
+(approved), and Deploy gates all closed. Backend restarted on current
+code and live-verified (`avatar_photo_id` confirmed present on a real
+profile response); frontend confirmed serving current markup. One
+caveat carried forward: no browser tool available this session, so
+F14/F15/F16's actual visual rendering (avatar circles, lightbox overlay,
+gallery grid) has not been screenshot-verified — functionally verified
+via 36/36 frontend tests + live backend checks, but a human/browser
+look is still the final confirmation. Both `dev/` and outer-repo history
+are fully committed. Proceeding to Increment 5 (F13, chat history +
+suggested prompts).
