@@ -2,6 +2,26 @@
 
 ## In Development
 
+### Post-MVP roadmap, approved 2026-07-12 (human checkbox review — 4 increments, sequenced by file overlap to avoid concurrent-edit conflicts)
+
+- **Increment 4 (next, starting now)**: F14 + F15 + F16, bundled into one
+  Experience Design pass and one Code gate — all three touch the same
+  files (`JourneyScreen.tsx`, `globals.css`, `ProfileSwitcher.tsx`), so
+  building them separately would mean each pass re-editing what the last
+  just changed. Frontend-only, no new backend surface.
+- **Increment 5**: F13 alone — needs a real schema decision (chat is
+  currently stateless server-side) plus its own Experience Design pass.
+- **Increment 6**: F12 alone — security-critical, needs security-architect
+  design work before code (MFA/OAuth/password-reset).
+- **Increment 7**: F17 alone, last — largest scope, real OAuth/third-party
+  integration, needs solution-architect + security-architect +
+  responsible-ai-architect + industry-expert sign-off before code starts.
+- **F11 not selected** for this roadmap pass — stays conditional, no
+  trigger yet.
+- Each increment gets its own full Test/Review/Deploy gate cycle, same
+  discipline as the original F1-F10 build.
+_Source: human checkbox review 2026-07-12._
+
 ### Approved MVP backlog (Plan & Backlog gate, 2026-07-10 — approved by human via itemized review)
 
 Priority order. Each item traces to its source(s): the human's stated
