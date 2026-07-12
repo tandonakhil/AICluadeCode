@@ -2190,3 +2190,45 @@ artifacts from the 3 interrupted background-agent attempts (clean
 working tree, no dead code, no stray files, tsc clean). Decision-intent
 match confirmed against UX_KB §9/§9.1/§9.2/§9.5 and ARCHITECTURE_KB §10
 line-for-line. **Proceeding to Deploy gate, Increment 5.**
+
+**2026-07-12: Deploy gate, Increment 5 — verified against already-running
+instances, no restart performed (human asleep, explicit instruction not to
+restart).** Backend (`:8000`, pid 46853, `uvicorn app.main:app --host
+0.0.0.0 --port 8000`) had already been restarted by the orchestrator on
+current Increment-5 code post-Code-gate; frontend (`:3000`, pid 35824,
+`next-server` dev, hot-reloading) had been running continuously with clean
+compiles throughout the build. Both confirmed still `LISTEN`ing via `lsof`
+before any check. Live curl verification against the real tester account
+(`tester@example.com`), all against `localhost` since both bind
+`0.0.0.0`:
+1. `GET /health` → 200 `{"status":"ok"}`.
+2. `POST /auth/login` → 200, session cookie set; `GET /auth/me` → 200,
+   confirms session works (note: endpoint is `/auth/login`, not `/login`
+   — a plain `/login` probe correctly 404s, visible in the log).
+3. `GET /profiles/6/suggested_prompts` → 200, real dynamic content (3
+   templated prompts keyed to Emma's actual domain/stage/age, not
+   empty/stubbed).
+4. `POST /chat` (profile 6, real message) → 200, full guarded LLM
+   response with `session_id: 2`.
+5. `GET /profiles/6/chat_sessions` → 200, includes session 2 just
+   created (snippet, message_count 2, timestamps).
+6. `GET /chat_sessions/2/messages` → 200, both turns present (user +
+   assistant, correct roles/content).
+7. `GET http://localhost:3000/` → 200, serving current markup
+   (`<title>little-milestones</title>` confirmed).
+8. Backend log (`/private/tmp/lm-backend.log`, 147 lines, starts at this
+   restart's `Started server process [46853]`) reviewed in full: zero
+   errors/tracebacks/exceptions. Only non-200 entries are expected
+   ones — 401 on an unauthenticated probe, 404s on a stale/nonexistent
+   session id, and 8x `400 Bad Request` on `OPTIONS /auth/me` from a LAN
+   client (`192.168.1.32`) that self-resolved (subsequent `OPTIONS
+   /auth/me` calls from the same session succeeded 200) — noted as a
+   minor pre-existing pattern worth a look, not a Deploy blocker since
+   every check in this gate's own scope returned clean.
+
+**Deploy gate: ready.** Ports unchanged (`8000`/`3000`, recorded above).
+Both servers left running (not restarted, not stopped) per instruction.
+Current Status is intentionally left as previously recorded — Deploy
+gate does not set it; that update is gated on the human's approval,
+which is still pending (asked to review Increments 5/6/7 together).
+[deploy-agent]
