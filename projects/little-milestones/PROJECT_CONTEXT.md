@@ -1586,6 +1586,70 @@ Per-suite results:
 
 Structured evidence: `test-evidence/regression-live-testing-defects-2026-07-11.md`.
 
+**2026-07-12: Test gate, Increment 4 (F14 profile avatars+upload, F15
+Journey lightbox, F16 Journey gallery) — unit/integration suite
+independently re-verified (test-agent).** Full structured per-scenario
+evidence at `test-evidence/unit-integration-increment4-2026-07-12.md`.
+Suite policy: blocking (no suites recorded as advisory for this project).
+
+- **Counts independently re-confirmed, both invocations agree with
+  code-agent's claim:** `python -m pytest -v` and plain `pytest -v` from
+  `dev/backend` both collect and pass **173/173**, 0 failed (the
+  Increment-1-era bare-`pytest`-vs-stale-installed-package gotcha noted
+  above no longer reproduces). `npm test -- --run` from `dev/frontend`
+  passes **34/34**. No suite here has zero tests.
+- **Both security-architect-mandated regression tests (ARCHITECTURE_KB
+  §9.3) exist and are meaningful, not just present:**
+  `test_repeated_profile_level_upload_replaces_not_accumulates` asserts
+  exactly one `memory_id IS NULL` row/file remains after a second
+  profile-level upload, checking both the DB row count and the on-disk
+  file count (not just one or the other); `test_avatar_replacement_is_cross_profile_isolated`
+  asserts profile B's uploads never touch profile A's rows/files.
+- **Both security-architect code-level conditions confirmed by direct code
+  read, not by trusting a comment:** the cleanup query's `profile_id`
+  filter is explicit in the actual SQL (`app/photos.py`, both the SELECT
+  and DELETE), and the deliberate `delete()`-authz-bypass is documented in
+  an explicit docstring comment at the same call site.
+- **Frontend spot-check, Avatar.tsx and Lightbox.tsx:** fallback-to-dot on
+  image load error and per-surface size/ring are both directly exercised
+  in `Avatar.test.tsx`; Escape/backdrop dismiss and multi-photo vs.
+  single-photo nav are directly exercised in `Lightbox.test.tsx`. **Gap
+  found:** Lightbox's Tab-trap (keyboard focus cycling among dialog
+  controls) and its focus-return-to-trigger-on-close behavior are both
+  implemented (confirmed in `Lightbox.tsx`/`JourneyScreen.tsx`) and named
+  in the Increment-4 commit message as delivered, but neither has an
+  actual regression test — no `Tab`/`Shift+Tab` keydown assertion, no
+  post-close `document.activeElement` assertion. Sent back to code-agent
+  to add the two missing test cases.
+- **`next build`-against-live-dev-server contamination check: clean.** No
+  incidental `tsconfig.json`/`next-env.d.ts` diff in the Increment-4
+  frontend commit; `next.config.js`'s `NEXT_DIST_DIR` isolation is in
+  place and working tree is clean.
+- **Gate verdict: hold.** Everything else re-verified and passing; the one
+  Lightbox test-coverage gap is a missing-test gap (the underlying
+  implementation reads correctly on inspection), not a failing/broken
+  behavior, but it is being treated as blocking per this project's default
+  policy (no advisory suites recorded) until code-agent adds the two tests.
+
+**2026-07-12: Test gate, Increment 4 — CLOSED, 4/4 suites pass.**
+Architecture: PASS, verified `avatar_photo_id`'s derived-field design,
+the new index, and the exact create→cleanup→accent-set ordering
+line-by-line against §9.3. Security: PASS, all 3 conditions confirmed in
+shipped code; the suite's own live-check caveat (no Bash that session)
+was closed directly by the orchestrator — real double-upload against
+the running backend confirmed exactly one `memory_id IS NULL` row/file
+survives, old file genuinely unlinked from disk. UX/accessibility: PASS,
+0 blocking, 2 non-blocking (optimistic-preview `onError` gap; shell
+switcher-trigger buttons still show the flat dot even with a photo —
+both flagged as future-increment candidates, not this scope). Unit/
+integration: held for one missing (not broken) test pair — Lightbox's
+Tab-trap and focus-return-to-trigger were implemented but untested;
+code-agent added both, 34 → 36 frontend tests, all passing. Red-team/
+bias suite deliberately skipped — zero LLM surface in F14/F15/F16, same
+reasoning as Increment 3's auth-activation pass. **Red-team/bias suite
+deliberately skipped**, same reasoning as Increment 3. **All findings
+closed. Proceeding to Review gate, Increment 4.**
+
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
 - Frontend (Next.js): `3000`
