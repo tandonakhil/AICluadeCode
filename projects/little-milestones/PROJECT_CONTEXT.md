@@ -2076,3 +2076,24 @@ via 36/36 frontend tests + live backend checks, but a human/browser
 look is still the final confirmation. Both `dev/` and outer-repo history
 are fully committed. Proceeding to Increment 5 (F13, chat history +
 suggested prompts).
+
+**2026-07-12: Increment 5 (F13) Code gate — built and committed.**
+Experience Design (UX_KB §9/§9.5, including the human-requested "Ask"
+rename + stage-card infographic addendum) and Architecture consult
+(ARCHITECTURE_KB §10, security-architect-confirmed) both complete
+before code started. Backend: `chat_sessions`/`chat_messages` schema,
+4-hour conversation-boundary rule, additive `/chat` contract
+(`session_id` in response, optional `new_session` in request), new
+`GET /profiles/{id}/chat_sessions`, `GET /chat_sessions/{id}/messages`,
+`DELETE /chat_sessions/{id}` (any caregiver), `GET
+/profiles/{id}/suggested_prompts`. Frontend build hit 3 consecutive
+transient background-agent crashes/stalls (infrastructure issues, not
+code problems — each left the working tree in a safe, verified,
+tsc-clean partial state); resumed and completed directly by the
+orchestrator rather than a 4th subagent attempt. 197/197 backend tests
+(both `python -m pytest`/plain `pytest` agree), 53/53 frontend tests
+(16 new). Backend restarted on current code; live-verified
+`/suggested_prompts` and `/chat_sessions` against the real tester
+profile. Proceeding directly to Test gate — human is asleep, asked to
+review Increments 5/6/7 together at the end, so gates proceed without
+per-step pause per explicit instruction.
