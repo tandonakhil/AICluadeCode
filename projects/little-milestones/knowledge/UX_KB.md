@@ -1191,6 +1191,101 @@ replaces or weakens it.
   child's name is already visible as adjacent text on all three surfaces,
   so a real `alt` would be a redundant screen-reader announcement.
 
+#### 8.1a — Closing the gap: an actual upload affordance (added 2026-07-12)
+
+**Problem, confirmed by inspection:** §8.1 above specifies how a profile
+photo *displays* once one exists, but no screen anywhere lets a parent
+create one at the profile level. `uploadPhoto(profileId, file, memoryId?)`
+(`lib/api.ts`) already supports a `memory_id`-less call — the backend needs
+nothing new — but the only caller in the app, `AddMemoryForm.tsx`, always
+passes a `memory_id`. Human-confirmed: this affordance folds into F14's
+scope, not a separate feature.
+
+**Where it lives — Settings only, this pass.** A new "Profile photo"
+`.lm-card` section at the **top** of `SettingsScreen.tsx`, above the
+existing "Your family" card, scoped to the **currently-selected child**
+(`app/page.tsx` already holds `selected: Profile` in scope where
+`<SettingsScreen>` renders — add a `profile: Profile` prop there, same as
+`TodayScreen`/`ChatScreen`/`JourneyScreen` already receive). A one-line
+subtitle, "For {profile.display_name}," makes the per-child scope explicit
+since the rest of Settings today is family-scoped, not child-scoped —
+without that line a parent could reasonably assume a family-wide setting.
+**Onboarding's "ready" screen is not extended this pass** — Settings-only
+is sufficient scope for a single small affordance; the ready screen is a
+short, linear, one-CTA-forward flow (§5.2's onboarding-stays-narrow
+reasoning applies here too), and adding an optional second CTA there would
+mean building and testing two entry points into the same upload logic for
+one small feature. If usage data later shows parents want it at first-run,
+that's a follow-up, named here rather than silently decided.
+
+**The control — reuses `AddMemoryForm.tsx`'s exact file-input pattern, not
+a new picker.** Same hidden `<input type="file"
+accept="image/jpeg,image/png,image/webp,image/heic" />` behind a clickable
+element (there, an `.lm-ptile-add` tile; here, a visible `.lm-btn
+lm-btn-secondary` button labeled **"Change photo"** when a photo already
+exists or **"Add photo"** when it doesn't — copied language pattern from
+the tag-chip / add-photo affordances already in that form). Layout: the
+existing `.lm-avatar` (photo) / `.lm-identity-dot` (fallback) element at
+72px, left of the button, in a flex row — the exact same fallback contract
+§8.1 already specifies (same color logic, same "complete theme, not a
+placeholder" story from §6.4), just a new size for this one screen (join
+the switcher's 32px, Today's 44px, and Journey's 56px as a fourth,
+documented size). No crop/reposition UI this pass — the existing
+`object-fit: cover` circle mask is the only treatment, matching how every
+other avatar surface in the app already handles arbitrary source photos.
+
+**Behavior — upload on selection, no separate "Save" step**, matching this
+KB's standing "friction ≈ 0" ethos for photo actions (§1.6 Flow 2a/2c):
+choosing a file immediately calls `uploadPhoto(profile.id, file)` (no
+`memory_id`). While the request is in flight, the button reads "Uploading…"
+and is disabled (same `submitting`-state pattern already used for
+`AddMemoryForm`'s save button and `SettingsScreen`'s own digest toggle);
+the avatar preview optimistically shows the local
+`URL.createObjectURL(file)` image immediately on selection, then swaps to
+the real served photo once the response resolves. On success, the parent
+shell's profile state updates in place (no full page reload) — see the
+data-plumbing note below. No toast/confirmation banner beyond the avatar
+itself visibly updating; that visual change *is* the confirmation, the
+same "the moment lands" principle §1.6 already uses for memory saves, just
+without the settle-animation (this is a settings action, not a journey
+moment).
+
+**Errors:** identical treatment to every other error surface in this file
+— a `role="alert"` paragraph in `--lm-terracotta-deep`, rendering
+`err.message` from the `ApiError` thrown by `uploadPhoto` (already routed
+through `parseErrorMessage`, so this needs no new copy, no raw HTTP text
+ever surfaces) — same pattern as `SettingsScreen`'s existing
+`inviteError`/`digestError` state and `AddMemoryForm`'s own upload-failure
+message. A failed upload leaves the previous avatar state exactly as it
+was (no silent partial state); the optimistic local preview reverts to the
+last-known-good state (existing photo, or the fallback dot) on failure.
+
+**Privacy cue:** the same verbatim line UXR-10 already requires "at the
+upload control" wherever one exists — "Photos stay private to your family.
+Never public, never used for AI, never scanned for faces." with the lock
+glyph — sits directly under the control. This is not a new copy decision;
+it's the existing requirement extending to a new upload control, so no new
+UXR is needed, though the UXR-10 test assertion's location list should be
+understood as now including this Settings section.
+
+**Out of scope, named rather than silently dropped:** no "remove photo"
+control this pass (a natural follow-on once there's a delete affordance
+question to design — deleting a profile's *only* avatar photo has a
+slightly different feel than deleting one of many memory photos, worth its
+own small pass rather than bolting on now); no crop/zoom/reposition; no
+onboarding-flow entry point (see above). None of these block F14's own
+display logic, which already has its own documented fallback for the
+zero-photo state.
+
+**Data-plumbing dependency — reinforces, doesn't duplicate, §8.4's flagged
+gap:** displaying "a photo already exists" on page load (to decide
+Change-photo vs. Add-photo copy, and to render the existing `.lm-avatar`)
+needs the same `avatar_photo_id` field on `Profile` that §8.4 already
+flagged as missing from the backend response. The upload action itself
+needs nothing new (`uploadPhoto` works today), but this section's *read*
+side depends on that same fix landing — one more reason to resolve §8.4
+before code-agent builds F14, not a second, independent gap.
+
 ### 8.2 F15 — Journey image lightbox
 
 **Problem:** clicking a photo in the Journey timeline today does nothing
