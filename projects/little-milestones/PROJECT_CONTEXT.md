@@ -2720,3 +2720,25 @@ which is still pending (asked to review Increments 5/6/7 together).
   needed changes for a pure styling fix). **Increment 7 (F17) Test gate
   is now fully closed — all 5 suites pass, both real findings resolved.**
   [code-agent]
+
+- 2026-07-13: **Increment 7 (F17) Review gate: approved, no changes
+  requested.** Diff hygiene clean across all three commits (20-file,
+  3402-insertion diff entirely attributable to F17; the `d5700ab` fix
+  commit itself scoped to exactly 3 files/26 insertions); zero debug
+  artifacts; the schema and `requests`-over-`httpx` judgment calls
+  confirmed properly recorded in the Decisions Log, not silent drift;
+  test-file naming/structure matches project convention. [review-agent]
+
+- 2026-07-13: **Increment 7 (F17) Deploy gate: pass.** Verified (without
+  restarting either process) that the already-running dev servers serve
+  exactly the reviewed code: `dev/` HEAD `d5700ab`, working tree clean;
+  backend `:8000` confirmed serving all 9 F17 routes (openapi.json);
+  frontend `:3000` confirmed current; process cwd for both matches this
+  project, not a stale copy; end-to-end smoke cycle (signup → login →
+  `GET /auth/google-photos/status` returning `{connected: false}` for a
+  fresh test user) passed against the live backend. **Increment 7 (F17,
+  Google Photos import) is deployed (dev, local).**
+
+  **All three increments from this batch (5, 6, 7) are now fully shipped
+  — every gate closed, per the human's "I will see 5.6 and 7 together. do
+  not stop" instruction.** [deploy-agent]
