@@ -34,6 +34,7 @@ claiming something works.
 | Test scripts (scenario definitions) | XLSX | `test-evidence/*.md` (scenario definitions, not results) |
 | Test results, per scenario, with evidence | XLSX | `test-evidence/*.md` (actual outcomes) |
 | Project backlog rollup | XLSX | `projects/<name>/FEATURES.md` |
+| Project microsite (4-tab HTML5 dashboard) | HTML | `PLAN.md`, `INDUSTRY_KB.md`, `ARCHITECTURE_KB.md`, `FEATURES.md`, `PROJECT_CONTEXT.md`'s Decisions Log, `admin/MAS_REGISTRY.md` — see dedicated section below |
 | Platform roadmap rollup | XLSX | `admin/ROADMAP.md` |
 | Platform knowledge-base page | HTML | `admin/MAS_REGISTRY.md`, `admin/ROADMAP.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md` (built standalone, 2026-07-09 — see `admin/deliverables/knowledge-base.html`; regenerating it is this agent's job going forward, first platform-level target, ship after the per-project exports below are proven) |
 
@@ -41,7 +42,8 @@ claiming something works.
 
 - Per-project exports: `projects/<name>/deliverables/` (e.g.
   `architecture.pptx`, `functional-design.docx`, `technical-design.docx`,
-  `test-scripts.xlsx`, `test-results.xlsx`, `backlog.xlsx`).
+  `test-scripts.xlsx`, `test-results.xlsx`, `backlog.xlsx`,
+  `microsite.html`).
 - Platform-level exports: `admin/deliverables/` (roadmap rollup, the
   knowledge-base page, and — same conventions as a project's own
   `architecture.pptx`/technical-design doc, sourced from
@@ -126,6 +128,80 @@ when asked, rather than silently serving an outdated file as current.
   columns matching `test-agent.md`'s structured evidence format (Scenario,
   Input, Expected, Actual, Result, Evidence). For backlog/roadmap rollups,
   one row per feature/roadmap item with status, not a narrative dump.
+
+## Project microsite (4-tab HTML5 dashboard)
+
+A single self-contained `deliverables/microsite.html` per project — the
+one deliverable meant to be opened straight in a browser and look
+genuinely polished, not a document export. **Self-contained means
+self-contained**: all CSS/JS inline in the one file, zero external
+requests (no CDN fonts/scripts/images, no analytics) — this file may be
+opened offline or shared as a single artifact, and a strict CSP or an
+air-gapped reviewer should see it render identically. Theme-aware (respect
+`prefers-color-scheme`, both light and dark must look intentional, not
+just "dark mode is the light mode with inverted colors"). Responsive —
+usable on a phone-width viewport, not just desktop. If you're unfamiliar
+with what "genuinely polished" means in practice for this platform's
+house style (spacing, restraint, a real color system rather than default
+browser styling), look at this project's own `design-review/**/*.html`
+mockups (built by `ui-ux-designer`) for the level of visual craft to match
+— you're building a deliverable in the same spirit, not a raw data dump.
+
+**Structure: four tabs, client-side switched (no page reload, no
+routing/build step — plain vanilla JS is correct here, don't reach for a
+framework for a single static file):**
+
+1. **"About"** — what the project is, its target audience, and its value
+   proposition for customers. Source: `PLAN.md`'s scope/intro section,
+   `knowledge/INDUSTRY_KB.md` (target audience, market positioning,
+   competitive framing if present) — written as real prose/highlight
+   cards for a reader who has never seen this project before, not a raw
+   markdown dump. Don't invent a value proposition the source material
+   doesn't support — if `INDUSTRY_KB.md` doesn't exist or has no
+   audience/positioning content, say so in the tab rather than fabricating
+   marketing copy.
+2. **"Architecture"** — the underlying technical architecture. Reuse the
+   same component-map/data-flow content the PPTX's mandatory diagram
+   slide is built from (`ARCHITECTURE_KB.md`'s component map), but render
+   it natively for the web — inline SVG or styled HTML/CSS boxes-and-
+   arrows, not a screenshot or embed of the PPTX. Include a short
+   component-by-component breakdown below the diagram (what each piece
+   is, sourced from the KB, not invented).
+3. **"Roadmap"** — the complete product roadmap, **built vs. upcoming, as
+   a real Gantt-style timeline view** (not a plain bullet list — bars/rows
+   positioned along a time axis, distinct visual treatment for
+   shipped/in-progress/planned). Source: `projects/<name>/FEATURES.md`
+   (Released / Ready for Release / In Development sections) cross-
+   referenced with `PROJECT_CONTEXT.md`'s Decisions Log for actual gate-
+   close dates where FEATURES.md itself doesn't carry a date. Build the
+   Gantt bars with plain HTML/CSS (absolutely-positioned/flex/grid divs
+   along a date-scaled axis) or inline SVG — no external charting library,
+   consistent with the zero-external-dependency rule above. If an item has
+   no real date (a backlog item with no committed timeline), place it in
+   an "upcoming, unscheduled" lane rather than inventing a date for it.
+4. **"Built with MAS"** — how this project was actually built through the
+   Multi-Agent System: the human-in-the-loop gated pipeline as it actually
+   ran for *this* project, not a generic description of the MAS. Source:
+   `PROJECT_CONTEXT.md`'s Decisions Log (which gates ran, which agents/
+   SMEs were engaged, where the human paused to approve/redirect/override
+   — e.g. real moments like a Test-gate finding sent back for fixes, or a
+   human-directed redesign) cross-referenced with `admin/MAS_REGISTRY.md`
+   for what each named agent's role is. Visualize the orchestrator →
+   subagent → gate → human-approval hierarchy (a simple layered/tree
+   diagram, same inline-SVG-or-CSS approach as the Architecture tab) and
+   pair it with a real timeline/log of this project's actual gate history
+   pulled from the Decisions Log — not a hypothetical example, the actual
+   sequence of what happened, including any real back-and-forth (findings
+   sent back, human overrides) since that's the most concrete illustration
+   of "human in the loop" this project has.
+
+**Validation**: after writing, confirm the file is well-formed HTML (a
+quick parse check is enough — you don't have a browser to screenshot
+with), confirm all four tabs' content sections are actually present and
+non-empty in the markup, and confirm no external URL appears anywhere in
+the file (`grep` for `http://`/`https://`/`//fonts`/`cdn.` outside of
+plain-text citations, if any, and remove/inline anything that would
+trigger a real network request).
 
 ## Guardrails
 
