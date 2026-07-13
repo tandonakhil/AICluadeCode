@@ -1475,6 +1475,75 @@ F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
 
 ## Test Results
 
+**2026-07-13: Test gate, Increment 7 (F17: Google Photos import) —
+unit/integration suite + live smoke run (test-agent).** Full structured
+per-scenario evidence at
+`test-evidence/unit-integration-increment7-2026-07-13.md`. Suite policy:
+blocking (no advisory marking on record for this suite). Commits under
+test: backend `8a76d55`, frontend `0056069`.
+
+- **Backend unit/integration: PASS, 275/275** (`.venv/bin/python -m pytest
+  -q`), matching code-agent's reported 275, 0 failed, only pre-existing
+  non-blocking deprecation warnings (unrelated to F17).
+- **Frontend: PASS, 80/80** (`npm test -- --run`); `tsc --noEmit` clean.
+- **Genuine-test spot-check, both sides: PASS.** Read
+  `tests/test_google_photos.py` (317 lines) and
+  `tests/test_google_photos_routes.py` (656 lines) in full: real SQLite
+  fixture assertions (OAuth-state single-use/expiry/wrong-user CSRF
+  rejection via direct DB row manipulation), real Fernet-ciphertext-at-rest
+  checks, mocked-Google-HTTP via a genuine FastAPI `dependency_overrides`
+  seam (never a hand-waved monkeypatch), a real Pillow-encoded JPEG fixture
+  driving the actual EXIF-strip/encrypt/content-hash pipeline, a
+  content-minimization guardrail test that feeds fake
+  `peopleGrouping`/`labels`/`description` fields and asserts none leak
+  into the API response, and a static AST import-graph check confirming no
+  path into `app.llm`/`app.prompts`/`app.guardrails`. Read
+  `GooglePhotosCard.test.tsx` (147 lines) and
+  `GooglePhotosImportDialog.test.tsx` (184 lines) in full: real RTL
+  DOM/role assertions across not-connected/connected/cancelled/error
+  states, a real disconnect-confirm-dialog design-system-contract check
+  (non-destructive button class, not `lm-btn-destructive`), and a full
+  picker-hand-off → preview → import → partial-failure-retry flow driven
+  by real `fireEvent` clicks. **This is genuine regression coverage, not
+  name-only tests** — closes the gap class the Increment 6 (F12) Test gate
+  found (F12 shipped with zero committed tests for a security-sensitive
+  feature); F17 does not repeat that gap.
+- **Live backend smoke: BLOCKED by a stale running process (environment
+  finding, not a code defect).** Every F17 route
+  (`/auth/google-photos/status`, `/connect`, `/callback` with
+  bogus/missing state) returned 404 against the already-running `:8000`
+  uvicorn process. Root cause confirmed: that process started
+  2026-07-12 21:25:39, ~38 minutes *before* the F17 backend commit
+  (22:03:42) landed, and was started without `--reload`, so it is serving
+  a stale build with no knowledge of the new router — confirmed via
+  `openapi.json` (zero `google` paths) and a direct read of `main.py`
+  (which *does* correctly mount `google_photos.router` in the committed
+  code). Per this task's explicit "do NOT restart them" instruction, the
+  process was left running rather than restarted. The in-process pytest
+  suite (which imports a fresh `app.main.app`, not the long-lived uvicorn
+  process) is the authoritative confirmation these routes work correctly
+  today — all of `/connect`'s 302-with-scope-and-state, bogus/missing-state
+  `/callback` rejection (generic error redirect, no stack trace),
+  cross-family 404, and unauthenticated 401 on every new route are covered
+  and passing there. **Recommend deploy-agent (or an explicit
+  human-approved restart) bring `:8000` current before any further live
+  curl-based smoke pass on F17.**
+- **Live frontend smoke: PARTIAL PASS**, same framing as the Increment 6
+  (F12) precedent — authenticated root request returns 200, the frontend
+  dev server's compile log shows zero errors and no failed compiles since
+  the F17 frontend commit landed (Next's dev server recompiles per-request
+  on file change and is not subject to the backend's staleness), `tsc
+  --noEmit` is clean. Full DOM-level confirmation that the Settings screen
+  actually renders the Google Photos card after client-side auth requires
+  browser automation this environment doesn't have, so this is not claimed
+  as a full pass.
+- **Google OAuth live round-trip: not attempted, consistent with the
+  already-recorded known limitation** — no live Google credentials exist
+  in this environment. Not re-litigated as a new finding; matches
+  ARCHITECTURE_KB §12.3's "Testing"-mode / go-live-checklist framing.
+- Scratch files (cookie jar, temp HTML fetches) cleaned up before
+  finishing; `git status` on `dev/` is clean.
+
 **2026-07-11: Test gate, Increment 1 (F1-F5) — unit/integration suite run
 (test-agent).** Full structured per-scenario evidence at
 `test-evidence/unit-integration-2026-07-11.md`. Suite policy: blocking (no
@@ -2608,3 +2677,46 @@ which is still pending (asked to review Increments 5/6/7 together).
   the authoritative schema; no code change needed, no re-litigation
   required — code-agent's choice was correct under the project's
   standing resolution hierarchy. [orchestrator]
+
+- 2026-07-13: **Increment 7 (F17) Test gate: 5 suites run, 2 real defects
+  found and fixed, all closed.** Unit/integration (test-agent): 275/275
+  backend, 80/80 frontend, spot-checked as genuine (real mocked HTTP via
+  FastAPI `dependency_overrides`, real Pillow-fixture-driven EXIF/hash
+  pipeline, real AST import-graph check, real content-minimization
+  guardrail test with injected fake face/label metadata) — closes the
+  coverage-gap class F12's Test gate found. Security (security-architect,
+  SECURITY_KB §8.12): pass on all 9 items, verified directly against
+  code (token encryption, CSRF/state binding, PKCE round-trip, exact
+  scope-string match, revocation ordering, rate limits, cross-user
+  authz), one non-blocking observation (picker-session sub-routes have
+  no rate limit of their own, matching original scope). Architecture
+  (solution-architect, ARCHITECTURE_KB §12.12): pass on all 7 items, no
+  defects. Responsible AI (responsible-ai-architect, RESPONSIBLE_AI_KB
+  §8.6): pass on all 4 items, confirmed the content-minimization
+  guardrail is a real enforced choke point (`_extract_minimal_item_
+  fields`), not just documented intent. UX/accessibility (ui-ux-designer,
+  UX_KB §12.10): **2 real defects found** — disconnect dialog rendered
+  destructive-red (missing `lm-dialog-neutral`, contradicting UXR-9 since
+  disconnect is reversible) and the duplicate-badge/"Added"-tag reused a
+  plain-gray chip instead of the designed slate/sage semantic roles.
+  Environment finding (not a code defect): the running `:8000` process
+  predated the F17 commit by ~38 minutes and needed a restart to serve
+  the new routes — restarted by the orchestrator, confirmed all 9
+  `google-photos` paths live via `openapi.json`. [test-agent,
+  security-architect, solution-architect, responsible-ai-architect,
+  ui-ux-designer, orchestrator]
+
+- 2026-07-13: **F17 UX defects fixed, commit `d5700ab`.** code-agent
+  added `lm-dialog-neutral` to the disconnect dialog (matching
+  `SecurityCard.tsx`'s TOTP-disable dialog precedent exactly), added
+  `.lm-duplicate-badge` (slate) and `.lm-sage-tag` (sage) — both reusing
+  existing `--lm-slate`/`--lm-slate-tint`/`--lm-sage` custom properties,
+  no new colors invented — and applied them to the duplicate badge and
+  "Added" tag respectively ("Skipped"/"Couldn't import" left unchanged).
+  Also picked up two optional non-blocking polish items from the same
+  finding: "Import photos" changed to `lm-btn-primary` per UX_KB §12.2,
+  and the results-state "✦" given the gold accent UX_KB §12.5 specifies.
+  `tsc --noEmit` clean, 80/80 frontend tests still passing (no test files
+  needed changes for a pure styling fix). **Increment 7 (F17) Test gate
+  is now fully closed — all 5 suites pass, both real findings resolved.**
+  [code-agent]
