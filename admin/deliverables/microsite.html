@@ -1,0 +1,452 @@
+<!--
+  Design pass: ui-ux-designer, 2026-07-13 — "the roundtable ring."
+  A ring of specialist agents around a central orchestrator/human, violet
+  (core/convened) vs. ember (optional/invited) vs. brass (ceremony/identity
+  only), evoking a formal chamber of deliberation rather than a SaaS
+  dashboard. Re-consult ui-ux-designer if this design materially changes.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conclave — Platform Microsite</title>
+<style>
+  :root {
+    --bg: #f6f4f0; --bg-card: #ffffff; --ink: #1c1b1f; --ink-soft: #5c5a63; --border: #dcd8d0;
+    --brass: #a8792f; --violet: #5b3a7a; --ember: #c1502e; --verdant: #2f7a4f; --slateblue: #5b6b82;
+    --slateblue-tint: #eef1f5;
+    --shadow: 0 1px 2px rgba(28,27,31,0.06), 0 6px 22px rgba(28,27,31,0.07);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #17151a; --bg-card: #201d24; --ink: #f2f0eb; --ink-soft: #a39fae; --border: #38333f;
+    --brass: #c99a4a; --violet: #9b7bc4; --ember: #e07a52; --verdant: #4fae7a; --slateblue: #8b9bb5;
+    --slateblue-tint: #262b36;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 26px rgba(0,0,0,0.45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17151a; --bg-card: #201d24; --ink: #f2f0eb; --ink-soft: #a39fae; --border: #38333f;
+      --brass: #c99a4a; --violet: #9b7bc4; --ember: #e07a52; --verdant: #4fae7a; --slateblue: #8b9bb5;
+      --slateblue-tint: #262b36;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 26px rgba(0,0,0,0.45);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height:1.6; }
+
+  header.hero { padding: 60px 24px 30px; text-align: center; border-bottom: 1px solid var(--border); }
+  .ring-emblem { width: 190px; height: 190px; margin: 0 auto 18px; }
+  header.hero .wordmark {
+    font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 5vw, 44px);
+    letter-spacing: 0.07em; text-transform: uppercase; margin: 0 0 10px;
+  }
+  header.hero .tagline {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 26px;
+  }
+  nav.tabs { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  nav.tabs button {
+    appearance: none; border: 1px solid var(--border); background: var(--bg-card); color: var(--ink-soft);
+    font-family: var(--sans); font-size: 13.5px; font-weight: 600; padding: 9px 18px; border-radius: 999px;
+    cursor: pointer; box-shadow: var(--shadow); transition: background .15s, color .15s, border-color .15s;
+  }
+  nav.tabs button[aria-selected="true"] { background: var(--violet); color: #fff; border-color: transparent; }
+  nav.tabs button:hover { border-color: var(--violet); }
+
+  main { max-width: 980px; margin: 0 auto; padding: 34px 22px 90px; }
+  section.panel { display: none; animation: fade .28s ease; }
+  section.panel[data-active="true"] { display: block; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+  @media (prefers-reduced-motion: reduce) { section.panel { animation: none !important; } }
+  h2.panel-title { font-family: var(--serif); font-weight:400; font-size: 25px; letter-spacing: -0.01em; margin: 4px 0 6px; }
+  p.panel-sub { color: var(--ink-soft); font-size: 13px; margin: 0 0 26px; max-width: 620px; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .card h3 { margin: 0 0 8px; font-size: 15.5px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  code.mono, .id { font-family: var(--mono); font-size: 12.5px; background: var(--slateblue-tint); padding: 1px 6px; border-radius: 5px; color: var(--ink); }
+  .chip { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; padding:3px 11px; border-radius:999px; margin:2px 5px 2px 0; }
+  .chip.core { background: rgba(91,58,122,.12); color: var(--violet); }
+  .chip.optional { background: rgba(193,80,46,.12); color: var(--ember); }
+  .chip i { width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .chip.core i { background: var(--violet); }
+  .chip.optional i { background: var(--ember); }
+
+  table.reg { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.reg th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  table.reg td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.reg tr:last-child td { border-bottom: none; }
+
+  .diagram-wrap { overflow-x: auto; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:12px; color:var(--ink-soft); }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .legend i { width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+  /* Roadmap grid gantt */
+  .gantt-row { display:grid; grid-template-columns: 230px 1fr; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--border); }
+  .gantt-row:last-child { border-bottom:none; }
+  .gantt-label { font-size: 13px; font-weight:600; }
+  .gantt-label .id { display:block; margin-top:2px; font-weight:400; }
+  .gantt-track { position:relative; height:24px; background: var(--slateblue-tint); border-radius:7px; min-width:420px; }
+  .gantt-bar { position:absolute; top:3px; bottom:3px; border-radius:6px; font-size:10.5px; color:#fff; display:flex; align-items:center; padding:0 8px; white-space:nowrap; }
+  .bar-built { background: var(--verdant); }
+  .bar-planned { background: transparent; border: 1.5px dashed var(--slateblue); color: var(--slateblue); }
+
+  /* Ring diagram arc (Architecture + Built-with-MAS) */
+  .ring-svg text { font-family: var(--sans); }
+  .ring-svg .mono-label { font-family: var(--mono); font-size: 10px; }
+
+  footer { text-align:center; padding:26px; color: var(--ink-soft); font-size:12px; border-top: 1px solid var(--border); }
+  .theme-toggle {
+    position: fixed; top: 14px; right: 14px; border: 1px solid var(--border); background: var(--bg-card);
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--ink); box-shadow: var(--shadow); z-index: 20;
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" type="button">🌓 Theme</button>
+
+<header class="hero">
+  <svg class="ring-emblem" viewBox="0 0 200 200" role="img" aria-label="Conclave ring emblem">
+    <circle cx="100" cy="100" r="86" fill="none" stroke="var(--brass)" stroke-width="1.5" opacity="0.55"/>
+    <circle cx="100" cy="100" r="78" fill="none" stroke="var(--brass)" stroke-width="1" opacity="0.35"/>
+    <g id="nodes"></g>
+    <circle cx="100" cy="100" r="22" fill="none" stroke="var(--brass)" stroke-width="1.5"/>
+    <path d="M92 96 L100 104 L112 88" stroke="var(--brass)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1 class="wordmark">Conclave</h1>
+  <p class="tagline">A governed multi-agent SDLC</p>
+  <nav class="tabs" role="tablist" aria-label="Platform sections">
+    <button role="tab" aria-selected="true" data-tab="about">About</button>
+    <button role="tab" aria-selected="false" data-tab="architecture">Architecture</button>
+    <button role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
+    <button role="tab" aria-selected="false" data-tab="mas">Built with MAS</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ TAB 1: ABOUT ============ -->
+  <section class="panel" data-panel="about" data-active="true">
+    <h2 class="panel-title">What Conclave is</h2>
+    <p class="panel-sub">Source: CLAUDE.md, admin/MAS_REGISTRY.md</p>
+
+    <div class="card">
+      <h3>The pitch</h3>
+      <p>Conclave is a Multi-Agent System that builds and operates a portfolio of
+      AI-centric applications for the energy industry — GenAI chatbots, agentic
+      workflows, RAG/knowledge-base apps — through a <strong>gated, human-in-the-loop
+      SDLC pipeline</strong>, not an unsupervised autonomous builder. A roster of
+      specialist agents is convened per project, deliberating under one orchestrator,
+      with the human always holding final say at every gate.</p>
+      <span class="chip core"><i></i>Governed, not autonomous</span>
+      <span class="chip optional"><i></i>Human approves every gate</span>
+    </div>
+
+    <div class="card">
+      <h3>Who it serves</h3>
+      <p style="font-size:14px;">Teams building AI-centric applications for the energy
+      industry who need real engineering discipline — architecture review, security
+      review, test coverage, human sign-off — without hand-rolling that process for
+      every new project. Conclave supplies the specialist roster and the gate structure;
+      the human supplies judgment and final approval at each step.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Two axes, never mixed</h3>
+        <p style="font-size:13.5px;"><code class="mono">/new-project</code>,
+        <code class="mono">/enhance-project</code>, <code class="mono">/modify-feature</code>,
+        <code class="mono">/consult</code> build and evolve individual applications.
+        <code class="mono">/admin-panel</code> evolves Conclave itself — never reachable
+        from a project command, never touches <code class="mono">projects/</code>.</p>
+      </div>
+      <div class="card">
+        <h3>The value proposition</h3>
+        <p style="font-size:13.5px;">Every project gets the same disciplined pipeline —
+        Plan, Architecture, Code, Test, Review, Deploy — with the right specialist
+        SMEs convened for its actual risk profile, and a human who never loses the
+        ability to stop, redirect, or override at any gate.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: ARCHITECTURE ============ -->
+  <section class="panel" data-panel="architecture">
+    <h2 class="panel-title">The convened-pipeline architecture</h2>
+    <p class="panel-sub">Source: admin/MAS_REGISTRY.md, CLAUDE.md. Violet = core/always-convened gate. Ember = optional/invited specialist.</p>
+
+    <div class="card diagram-wrap">
+      <svg class="ring-svg" viewBox="0 0 640 640" width="100%" height="560" id="pipelineRing" role="img" aria-label="Conclave 9-gate pipeline as a ring around the orchestrator"></svg>
+      <div class="legend">
+        <span><i style="background:var(--violet)"></i> Core pipeline gate</span>
+        <span><i style="background:var(--ember)"></i> Optional SME gate</span>
+        <span><i style="background:var(--brass)"></i> Orchestrator / human touchpoint</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Agent roster, by category</h3>
+      <table class="reg">
+        <tr><th>Category</th><th>Agents</th></tr>
+        <tr><td>Core pipeline (non-droppable)</td><td><span class="id">plan-agent</span> <span class="id">code-agent</span> <span class="id">test-agent</span> <span class="id">review-agent</span> <span class="id">deploy-agent</span></td></tr>
+        <tr><td>Core for UI-bearing templates</td><td><span class="id">ui-ux-designer</span></td></tr>
+        <tr><td>Optional SME (droppable at Team Composition)</td><td><span class="id">functional-agent</span> <span class="id">industry-expert</span> <span class="id">solution-architect</span> <span class="id">security-architect</span> <span class="id">responsible-ai-architect</span></td></tr>
+        <tr><td>Cross-cutting / infra</td><td><span class="id">usage-monitor</span> <span class="id">release-manager</span> <span class="id">enhance-agent</span> <span class="id">synthetic-data-agent</span> <span class="id">deliverables-agent</span></td></tr>
+        <tr><td>Admin / platform (<code class="mono">mas-</code> prefix)</td><td><span class="id">mas-architect</span> <span class="id">mas-registrar</span> <span class="id">mas-release-manager</span></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: ROADMAP ============ -->
+  <section class="panel" data-panel="roadmap">
+    <h2 class="panel-title">Platform roadmap — built vs. planned</h2>
+    <p class="panel-sub">Source: admin/ROADMAP.md. Verdant = shipped. Slate-blue dashed = planned, not yet triggered.</p>
+
+    <div class="card">
+      <div class="gantt-row">
+        <div class="gantt-label">Core 5 pipeline agents<span class="id">plan/code/test/review/deploy</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:0%;width:20%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Templates + <code class="mono">/new-project</code><span class="id">3 scaffolds, full gate order</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:0%;width:26%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">SME roster + Intake/Architecture<span class="id">ui-ux/solution/security/functional/industry</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:14%;width:24%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">enhance-agent + release-manager<span class="id">/enhance-project, /cut-release</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:30%;width:20%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">usage-monitor + <code class="mono">/consult</code><span class="id">tracking, soft budgets, auto-pause/resume</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:44%;width:18%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">deliverables-agent<span class="id">PPTX/DOCX/XLSX + microsite</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:52%;width:16%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">synthetic-data-agent<span class="id">QA/demo data generation</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:64%;width:14%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Multi-suite Test Policy + conflict triage<span class="id">advisory suites, proximity/semantic conflicts</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:64%;width:20%;">Shipped</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Cloud <code class="mono">target_env</code><span class="id">local-only proven first, deliberately deferred</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-planned" style="left:88%;width:12%;">Planned</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Feature flags<span class="id">designed, no release has needed it yet</span></div>
+        <div class="gantt-track"><div class="gantt-bar bar-planned" style="left:88%;width:12%;">Planned</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>Sequencing discipline</h3>
+      <p style="font-size:13.5px;">Every deferred item follows the same rule: prove the
+      simple case first, build the harder version only once a real need surfaces —
+      applied consistently (usage-monitor tracking before auto-pause/resume, conflict
+      detection before automated resolution, feature flags deferred until a release
+      actually needs surgical rollback).</p>
+    </div>
+  </section>
+
+  <!-- ============ TAB 4: BUILT WITH MAS ============ -->
+  <section class="panel" data-panel="mas">
+    <h2 class="panel-title">How Conclave governs and extends itself</h2>
+    <p class="panel-sub">Source: CLAUDE.md, admin/MAS_REGISTRY.md. Conclave builds itself using the same governed process it applies to every project — self-hosting its own discipline.</p>
+
+    <div class="card diagram-wrap">
+      <svg viewBox="0 0 640 200" width="100%" height="200" role="img" aria-label="admin-panel add-agent flow">
+        <rect x="20" y="70" width="150" height="60" rx="10" fill="var(--ember)" opacity="0.85"/>
+        <text x="95" y="96" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">Proposal</text>
+        <text x="95" y="114" font-size="10.5" text-anchor="middle" fill="#fff" opacity="0.9">mas-architect advisory</text>
+
+        <line x1="170" y1="100" x2="235" y2="100" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+        <rect x="235" y="60" width="170" height="80" rx="10" fill="var(--brass)"/>
+        <text x="320" y="94" font-size="12.5" text-anchor="middle" fill="#1c1b1f" font-weight="700">Human approval</text>
+        <text x="320" y="112" font-size="10.5" text-anchor="middle" fill="#1c1b1f" opacity="0.85">the ceremonial gate —</text>
+        <text x="320" y="126" font-size="10.5" text-anchor="middle" fill="#1c1b1f" opacity="0.85">no agent self-approves</text>
+
+        <line x1="405" y1="100" x2="470" y2="100" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+        <rect x="470" y="70" width="150" height="60" rx="10" fill="var(--violet)"/>
+        <text x="545" y="96" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">Registry write</text>
+        <text x="545" y="114" font-size="10.5" text-anchor="middle" fill="#fff" opacity="0.9">mas-registrar scaffolds</text>
+
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="card">
+      <h3>Real precedent: how deliverables-agent and synthetic-data-agent got built</h3>
+      <p style="font-size:13.5px;"><code class="mono">mas-architect</code> gave advisory
+      review of each proposed role (checking for overlap with existing agents, deciding
+      core-vs-optional status and gate placement) — purely advisory, never self-approving.
+      The human reviewed and approved each recommendation explicitly before
+      <code class="mono">mas-registrar</code> scaffolded the actual agent file and updated
+      <code class="mono">admin/MAS_REGISTRY.md</code>. <code class="mono">synthetic-data-agent</code>'s
+      full path: proposed 2026-07-11 from a real concrete need, advisory-reviewed, human-approved
+      via checkbox roadmap review 2026-07-12, then built — no step skipped.</p>
+    </div>
+
+    <div class="card">
+      <h3>The same discipline, at every scale</h3>
+      <p style="font-size:13.5px;">Whether a human is approving one project's Architecture
+      gate or approving a new agent's addition to the platform's own roster, the shape is
+      identical: an agent (or a small roster of them) proposes, the orchestrator surfaces
+      it clearly, and only the human's explicit approval moves it forward. Conclave never
+      grants itself permission to change its own roster — the same rule it enforces on
+      every project it builds.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>Conclave — generated by deliverables-agent, design by ui-ux-designer, 2026-07-13 · this file makes zero external network requests</footer>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('nav.tabs button');
+  var panels = document.querySelectorAll('section.panel');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.removeAttribute('data-active'); });
+      btn.setAttribute('aria-selected', 'true');
+      document.querySelector('section.panel[data-panel="' + btn.dataset.tab + '"]').setAttribute('data-active', 'true');
+    });
+  });
+
+  var toggle = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  toggle.addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    if (current === 'dark') { root.setAttribute('data-theme', 'light'); }
+    else if (current === 'light') { root.setAttribute('data-theme', 'dark'); }
+    else {
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'light' : 'dark');
+    }
+  });
+
+  // Hero ring emblem nodes
+  (function () {
+    var ns = document.getElementById('nodes');
+    var roles = [
+      {core:true}, {core:true}, {core:true}, {core:false},
+      {core:true}, {core:false}, {core:false}, {core:true}
+    ];
+    var cx = 100, cy = 100, r = 82;
+    roles.forEach(function (role, i) {
+      var angle = (i / roles.length) * Math.PI * 2 - Math.PI / 2;
+      var x = cx + r * Math.cos(angle);
+      var y = cy + r * Math.sin(angle);
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', x); line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'var(--brass)'); line.setAttribute('stroke-width', '0.8'); line.setAttribute('opacity', '0.35');
+      ns.appendChild(line);
+      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', 7);
+      circle.setAttribute('fill', role.core ? 'var(--violet)' : 'var(--ember)');
+      ns.appendChild(circle);
+    });
+  })();
+
+  // Architecture tab: 9-gate pipeline ring, built lazily so it's visible when the tab is opened
+  (function () {
+    var svg = document.getElementById('pipelineRing');
+    var gates = [
+      {name: 'Intake', core: true},
+      {name: 'Team Composition', core: true},
+      {name: 'Plan & Backlog', core: true},
+      {name: 'Experience Design', core: false},
+      {name: 'Architecture', core: false},
+      {name: 'Code', core: true},
+      {name: 'Test', core: true},
+      {name: 'Review', core: true},
+      {name: 'Deploy', core: true}
+    ];
+    var cx = 320, cy = 300, r = 220;
+    var ns = 'http://www.w3.org/2000/svg';
+
+    var hub = document.createElementNS(ns, 'circle');
+    hub.setAttribute('cx', cx); hub.setAttribute('cy', cy); hub.setAttribute('r', 58);
+    hub.setAttribute('fill', 'var(--brass)'); hub.setAttribute('opacity', '0.15');
+    svg.appendChild(hub);
+    var hubRing = document.createElementNS(ns, 'circle');
+    hubRing.setAttribute('cx', cx); hubRing.setAttribute('cy', cy); hubRing.setAttribute('r', 58);
+    hubRing.setAttribute('fill', 'none'); hubRing.setAttribute('stroke', 'var(--brass)'); hubRing.setAttribute('stroke-width', '1.5');
+    svg.appendChild(hubRing);
+    var hubText = document.createElementNS(ns, 'text');
+    hubText.setAttribute('x', cx); hubText.setAttribute('y', cy - 4);
+    hubText.setAttribute('text-anchor', 'middle'); hubText.setAttribute('font-size', '13'); hubText.setAttribute('font-weight', '700');
+    hubText.setAttribute('fill', 'var(--ink)');
+    hubText.textContent = 'Orchestrator';
+    svg.appendChild(hubText);
+    var hubText2 = document.createElementNS(ns, 'text');
+    hubText2.setAttribute('x', cx); hubText2.setAttribute('y', cy + 14);
+    hubText2.setAttribute('text-anchor', 'middle'); hubText2.setAttribute('font-size', '10.5'); hubText2.setAttribute('fill', 'var(--ink-soft)');
+    hubText2.textContent = 'human’s single point of contact';
+    svg.appendChild(hubText2);
+
+    gates.forEach(function (g, i) {
+      var angle = (i / gates.length) * Math.PI * 2 - Math.PI / 2;
+      var x = cx + r * Math.cos(angle);
+      var y = cy + r * Math.sin(angle);
+
+      var line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', x); line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'var(--ink-soft)'); line.setAttribute('stroke-width', '1'); line.setAttribute('opacity', '0.3');
+      svg.appendChild(line);
+
+      var node = document.createElementNS(ns, 'circle');
+      node.setAttribute('cx', x); node.setAttribute('cy', y); node.setAttribute('r', 30);
+      node.setAttribute('fill', g.core ? 'var(--violet)' : 'var(--ember)');
+      svg.appendChild(node);
+
+      var label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', x); label.setAttribute('y', y + 4);
+      label.setAttribute('text-anchor', 'middle'); label.setAttribute('font-size', '10.5'); label.setAttribute('font-weight', '700');
+      label.setAttribute('fill', '#fff');
+      // wrap long names onto two lines
+      var words = g.name.split(' ');
+      if (words.length > 1 && g.name.length > 9) {
+        label.setAttribute('y', y);
+        var t1 = document.createElementNS(ns, 'tspan');
+        t1.setAttribute('x', x); t1.setAttribute('dy', '-2');
+        t1.textContent = words.slice(0, Math.ceil(words.length/2)).join(' ');
+        var t2 = document.createElementNS(ns, 'tspan');
+        t2.setAttribute('x', x); t2.setAttribute('dy', '12');
+        t2.textContent = words.slice(Math.ceil(words.length/2)).join(' ');
+        label.appendChild(t1); label.appendChild(t2);
+      } else {
+        label.textContent = g.name;
+      }
+      svg.appendChild(label);
+    });
+  })();
+})();
+</script>
+
+</body>
+</html>

@@ -1,3 +1,12 @@
+<!--
+  Design pass: ui-ux-designer, 2026-07-13 — "the storybook's back cover."
+  The product's own river/journey motif (UX_KB §1.6) becomes the spine of
+  the whole microsite; shipped work gets a gold celebration flourish
+  (UX_KB §1.6/§4.2 --lm-gold) instead of a progress bar; hero type uses a
+  serif stack reserved the same way the product reserves Fraunces for
+  journey-chapter headings (UX_KB §1.4). Re-consult ui-ux-designer if this
+  design materially changes before regenerating.
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,595 +15,402 @@
 <title>little-milestones — Project Microsite</title>
 <style>
   :root {
-    --bg: #faf7f2;
-    --bg-card: #ffffff;
-    --ink: #2b2620;
-    --ink-soft: #6b6459;
-    --border: #e7e0d4;
-    --peach: #f3a877;
-    --sky: #7fb3c9;
-    --moss: #8fae7c;
-    --terracotta: #c0603f;
-    --sage: #6f9b6f;
-    --slate: #64748b;
-    --slate-tint: #eef1f5;
-    --gold: #c9971f;
-    --accent: #c0603f;
-    --shadow: 0 1px 2px rgba(43,38,32,0.06), 0 4px 16px rgba(43,38,32,0.06);
+    --bg: #FDF8F2;
+    --bg-card: #FFFFFF;
+    --ink: #3D3833;
+    --ink-soft: #6E6259;
+    --border: #E7DDCF;
+    --terracotta: #C1502A;
+    --terracotta-deep: #8F3A1D;
+    --sage: #2F7A4E;
+    --slate: #3D6188;
+    --slate-tint: #E7EEF5;
+    --gold: #E8A317;
+    --blush: #FADCC5;
+    --shadow: 0 1px 2px rgba(61,56,51,0.06), 0 6px 20px rgba(61,56,51,0.06);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   :root[data-theme="dark"] {
-    --bg: #1c1917;
-    --bg-card: #24211d;
-    --ink: #f2ede4;
-    --ink-soft: #a8a094;
-    --border: #3a352c;
-    --slate-tint: #26303d;
-    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.35);
+    --bg: #211D1A; --bg-card: #2A2521; --ink: #F2ECE3; --ink-soft: #B5AA9C;
+    --border: #3E362D; --terracotta: #E27249; --terracotta-deep: #F08F68;
+    --sage: #4FAF77; --slate: #6C93BE; --slate-tint: #26313d; --gold: #F0B940; --blush: #3A2E24;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.4);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #1c1917;
-      --bg-card: #24211d;
-      --ink: #f2ede4;
-      --ink-soft: #a8a094;
-      --border: #3a352c;
-      --slate-tint: #26303d;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.35);
+      --bg: #211D1A; --bg-card: #2A2521; --ink: #F2ECE3; --ink-soft: #B5AA9C;
+      --border: #3E362D; --terracotta: #E27249; --terracotta-deep: #F08F68;
+      --sage: #4FAF77; --slate: #6C93BE; --slate-tint: #26313d; --gold: #F0B940; --blush: #3A2E24;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.4);
     }
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.55;
+  body { margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; font-size: 16px; }
+  .spine-wrap { position: relative; }
+  .spine {
+    position: absolute; left: 22px; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(var(--terracotta) 0 0);
+    opacity: .28; border-radius: 3px;
   }
-  header.hero {
-    padding: 48px 24px 28px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
+  @media (max-width: 640px) { .spine { left: 10px; } }
+
+  header.hero { position: relative; padding: 64px 24px 36px 64px; }
+  @media (max-width: 640px) { header.hero { padding: 48px 18px 28px 42px; } }
   header.hero h1 {
-    font-size: clamp(28px, 4vw, 40px);
-    margin: 0 0 8px;
-    letter-spacing: -0.01em;
+    font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em;
+    font-size: clamp(32px, 5vw, 48px); margin: 0 0 10px; color: var(--ink);
   }
-  header.hero p {
-    color: var(--ink-soft);
-    margin: 0;
-    font-size: 15px;
+  header.hero p.tagline { color: var(--ink-soft); margin: 0 0 22px; font-size: 16px; max-width: 520px; }
+  .tab-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tab-pills button {
+    appearance: none; border: 1px solid var(--border); background: var(--bg-card);
+    color: var(--ink-soft); font-size: 13.5px; font-weight: 600; font-family: var(--sans);
+    padding: 8px 16px 8px 14px; border-radius: 999px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow);
+    transition: background .15s, color .15s, border-color .15s;
   }
-  nav.tabs {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
-    flex-wrap: wrap;
-  }
-  nav.tabs button {
-    appearance: none;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--ink-soft);
-    font-size: 14px;
-    font-weight: 600;
-    padding: 9px 16px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background .15s, color .15s;
-  }
-  nav.tabs button:hover { background: var(--slate-tint); }
-  nav.tabs button[aria-selected="true"] {
-    background: var(--ink);
-    color: var(--bg);
-  }
-  main {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 32px 20px 80px;
-  }
-  section.panel { display: none; animation: fade .25s ease; }
+  .tab-pills button .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .tab-pills button[aria-selected="true"] { background: var(--terracotta); color: #fff; border-color: transparent; }
+  .tab-pills button[aria-selected="true"] .dot { background: #fff; }
+  .tab-pills button:hover { border-color: var(--terracotta); }
+
+  main { position: relative; max-width: 940px; margin: 0 auto; padding: 8px 24px 90px 64px; }
+  @media (max-width: 640px) { main { padding: 8px 18px 70px 42px; } }
+  section.panel { display: none; animation: fade .28s ease; }
   section.panel[data-active="true"] { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
-  h2.panel-title { font-size: 22px; margin: 0 0 6px; }
-  p.panel-sub { color: var(--ink-soft); margin: 0 0 28px; font-size: 14.5px; max-width: 640px; }
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px 24px;
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-  }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  h2.panel-title { font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 22px 0 6px; }
+  p.panel-sub { color: var(--ink-soft); margin: 0 0 26px; font-size: 13.5px; max-width: 620px; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
   .card h3 { margin: 0 0 8px; font-size: 16px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
-  .chip {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 999px;
-    background: var(--slate-tint);
-    color: var(--slate);
-    margin: 2px 4px 2px 0;
-  }
-  .value-prop {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin: 20px 0 8px;
-  }
+
+  .value-prop { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0 8px; }
   @media (max-width: 720px) { .value-prop { grid-template-columns: 1fr; } }
-  .value-prop .vp-card {
-    border-radius: 12px;
-    padding: 18px;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-  }
-  .value-prop .vp-card .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    display: inline-block; margin-bottom: 10px;
-  }
+  .value-prop .vp-card { border-radius: 14px; padding: 20px; background: var(--blush); border: 1px solid transparent; }
+  :root[data-theme="dark"] .value-prop .vp-card, @media (prefers-color-scheme: dark) { }
+  .vp-icon { width: 30px; height: 30px; margin-bottom: 12px; }
+  .vp-icon svg { width: 100%; height: 100%; stroke: var(--terracotta); fill: none; stroke-width: 1.6; }
+
+  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--slate-tint); color: var(--slate); margin: 2px 4px 2px 0; }
+  code.inline { background: var(--slate-tint); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
   ul.compact { margin: 8px 0 0; padding-left: 20px; }
-  ul.compact li { margin-bottom: 6px; font-size: 14.5px; }
-  code.inline {
-    background: var(--slate-tint);
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-size: 13px;
-  }
-  svg text { fill: var(--ink); font-family: inherit; }
+  ul.compact li { margin-bottom: 6px; font-size: 14px; }
+
   .diagram-wrap { overflow-x: auto; }
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12.5px; color: var(--ink-soft); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 
-  /* Gantt */
-  .gantt { overflow-x: auto; }
-  .gantt-row { display: grid; grid-template-columns: 200px 1fr; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
-  .gantt-row:last-child { border-bottom: none; }
-  .gantt-label { font-size: 13.5px; font-weight: 600; }
-  .gantt-label small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 11.5px; }
-  .gantt-track { position: relative; height: 26px; background: var(--slate-tint); border-radius: 7px; min-width: 480px; }
-  .gantt-bar {
-    position: absolute; top: 3px; bottom: 3px; border-radius: 6px;
-    font-size: 11px; color: #fff; display: flex; align-items: center;
-    padding: 0 8px; white-space: nowrap; overflow: hidden;
-  }
-  .bar-shipped { background: var(--sage); }
-  .bar-upcoming { background: repeating-linear-gradient(45deg, var(--ink-soft), var(--ink-soft) 6px, transparent 6px, transparent 12px); opacity: .55; color: var(--ink); }
-  .gantt-axis { display: grid; grid-template-columns: 200px 1fr; margin-bottom: 6px; }
-  .gantt-axis-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-soft); min-width: 480px; }
+  /* River-threaded Gantt */
+  .river-gantt { position: relative; padding-left: 34px; }
+  .river-gantt::before { content:""; position:absolute; left:14px; top:6px; bottom:6px; width:2.5px; background:var(--terracotta); opacity:.35; border-radius:2px; }
+  .rg-row { position: relative; padding: 12px 0; }
+  .rg-row::before { content:""; position:absolute; left:-24px; top:19px; width:9px; height:9px; border-radius:50%; background:var(--terracotta); }
+  .rg-label { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
+  .rg-label small { display:block; font-weight:400; color:var(--ink-soft); font-size:11.5px; margin-top:2px; }
+  .rg-bar-track { height: 26px; position: relative; }
+  .rg-bar { position: absolute; top:2px; height: 22px; border-radius: 7px; display:flex; align-items:center; padding:0 10px; font-size:11px; white-space:nowrap; }
+  .rg-bar.shipped { background: var(--sage); color:#fff; }
+  .rg-bar.upcoming { border: 1.5px dashed var(--slate); color: var(--slate); background: transparent; }
+  .rg-star { margin-left: 6px; color: var(--gold); }
 
-  /* MAS hierarchy */
-  .hier { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 10px 0 26px; }
-  .hier .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .hier .node {
-    border: 1px solid var(--border); background: var(--bg-card);
-    border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 600;
-    box-shadow: var(--shadow);
-  }
-  .hier .node.human { background: var(--peach); color: #2b2620; border-color: transparent; }
-  .hier .node.orch { background: var(--sky); color: #14313a; border-color: transparent; }
-  .hier .arrow-down { font-size: 18px; color: var(--ink-soft); }
+  /* MAS hierarchy / gate log threaded on spine */
+  .river-log { position: relative; padding-left: 34px; }
+  .river-log::before { content:""; position:absolute; left:14px; top:6px; bottom:6px; width:2.5px; background:var(--terracotta); opacity:.35; border-radius:2px; }
+  .rl-entry { position: relative; padding-bottom: 24px; }
+  .rl-entry::before { content:""; position:absolute; left:-24px; top:3px; width:11px; height:11px; border-radius:50%; background:var(--sage); border: 2px solid var(--bg); box-shadow:0 0 0 1px var(--sage); }
+  .rl-entry.human::before { background: var(--gold); box-shadow:0 0 0 1px var(--gold); }
+  .rl-entry.redo::before { background: var(--terracotta); box-shadow:0 0 0 1px var(--terracotta); }
+  .rl-date { font-size: 11px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .rl-title { font-weight: 700; margin: 3px 0 4px; font-size: 14.5px; }
+  .rl-desc { font-size: 13.5px; color: var(--ink-soft); }
+  .rl-flourish { color: var(--gold); margin-left: 4px; }
 
-  .log {
-    border-left: 2px solid var(--border);
-    margin-left: 6px;
-    padding-left: 20px;
-  }
-  .log .entry { position: relative; padding-bottom: 22px; }
-  .log .entry::before {
-    content: "";
-    position: absolute; left: -25px; top: 4px;
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--sage);
-  }
-  .log .entry.redo::before { background: var(--terracotta); }
-  .log .entry.human::before { background: var(--peach); }
-  .log .entry .date { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-  .log .entry .title { font-weight: 700; margin: 2px 0 4px; font-size: 14.5px; }
-  .log .entry .desc { font-size: 13.5px; color: var(--ink-soft); }
-  footer {
-    text-align: center; padding: 24px; color: var(--ink-soft); font-size: 12px;
-    border-top: 1px solid var(--border);
-  }
+  footer { text-align: center; padding: 26px; color: var(--ink-soft); font-size: 12px; border-top: 1px solid var(--border); }
   .theme-toggle {
-    position: fixed; top: 14px; right: 14px;
-    border: 1px solid var(--border); background: var(--bg-card);
-    border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer;
-    color: var(--ink); box-shadow: var(--shadow); z-index: 20;
+    position: fixed; top: 14px; right: 14px; border: 1px solid var(--border); background: var(--bg-card);
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--ink); box-shadow: var(--shadow); z-index: 20;
   }
+  @media (prefers-reduced-motion: reduce) { .panel { animation: none !important; } }
 </style>
 </head>
 <body>
 
 <button class="theme-toggle" id="themeToggle" type="button">🌓 Theme</button>
 
-<header class="hero">
-  <h1>little-milestones</h1>
-  <p>A calm, age-aware companion for tracking your child's earliest years — project microsite, generated 2026-07-13</p>
-</header>
+<div class="spine-wrap">
+  <div class="spine" aria-hidden="true"></div>
 
-<nav class="tabs" role="tablist" aria-label="Project sections">
-  <button role="tab" aria-selected="true" data-tab="about">About</button>
-  <button role="tab" aria-selected="false" data-tab="architecture">Architecture</button>
-  <button role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
-  <button role="tab" aria-selected="false" data-tab="mas">Built with MAS</button>
-</nav>
+  <header class="hero">
+    <h1>little-milestones</h1>
+    <p class="tagline">A calm, age-aware companion for your child's earliest years — every milestone, memory, and moment threaded onto one gentle timeline.</p>
+    <nav class="tab-pills" role="tablist" aria-label="Project sections">
+      <button role="tab" aria-selected="true" data-tab="about"><span class="dot" style="background:var(--terracotta)"></span>About</button>
+      <button role="tab" aria-selected="false" data-tab="architecture"><span class="dot" style="background:var(--slate)"></span>Architecture</button>
+      <button role="tab" aria-selected="false" data-tab="roadmap"><span class="dot" style="background:var(--sage)"></span>Roadmap</button>
+      <button role="tab" aria-selected="false" data-tab="mas"><span class="dot" style="background:var(--gold)"></span>Built with MAS</button>
+    </nav>
+  </header>
 
-<main>
+  <main>
 
-  <!-- ============ TAB 1: ABOUT ============ -->
-  <section class="panel" data-panel="about" data-active="true">
-    <h2 class="panel-title">What little-milestones is</h2>
-    <p class="panel-sub">Source: PLAN.md §1–§2, knowledge/INDUSTRY_KB.md §1</p>
+    <!-- ============ TAB 1: ABOUT ============ -->
+    <section class="panel" data-panel="about" data-active="true">
+      <h2 class="panel-title">What little-milestones is</h2>
+      <p class="panel-sub">Source: PLAN.md §1–§2, knowledge/INDUSTRY_KB.md §1</p>
 
-    <div class="card">
-      <h3>The pitch</h3>
-      <p>
-        little-milestones is a consumer parenting web app that turns a child's
-        birthdate into an <strong>age- and corrected-age-aware milestone chat</strong>,
-        a private <strong>photo &amp; memory journal</strong>, and a
-        <strong>multi-caregiver family space</strong> — explicitly
-        <em>not</em> a healthcare or clinical product, and explicitly private-by-default
-        with a child's photos and data.
-      </p>
-      <span class="chip">Consumer parenting / family tech</span>
-      <span class="chip">Chat-first, genai-chatbot template</span>
-      <span class="chip">Non-clinical, non-medical</span>
-    </div>
-
-    <div class="card">
-      <h3>Target audience</h3>
-      <p>Parents and caregivers of infants and toddlers (0–~3 years), in the same
-      market segment as BabyCenter, Huckleberry, Wonder Weeks, and Qeepsake —
-      direct-to-consumer, mobile/web-first, no clinical gatekeeping.</p>
-      <ul class="compact">
-        <li><strong>Primary user:</strong> a first-time or early-stage parent who wants
-        reassurance and structure without a pediatric-grade tracker's clinical tone.</li>
-        <li><strong>Household shape:</strong> multi-caregiver by design (F10) — the product
-        assumes two or more adults (parents, grandparents, nannies) share access to one
-        child's space, not a single-user account.</li>
-        <li><strong>Premature-birth families</strong> are explicitly designed for, not an
-        afterthought — corrected-age computation (F2) exists specifically because an app
-        keyed only to birthdate systematically mis-ages preterm infants (DOMAIN_KB R4).</li>
-      </ul>
-    </div>
-
-    <h3 style="margin:26px 0 4px;">Value proposition</h3>
-    <div class="value-prop">
-      <div class="vp-card">
-        <span class="dot" style="background:var(--peach)"></span>
-        <h3>Age-true, not generic</h3>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0">
-          Milestone chat and activity suggestions are conditioned on the child's real,
-          corrected age — not a one-size-fits-all script. Matches the 2026 market's shift
-          from chat-only to predictive/personalized AI (Huckleberry SweetSpot, Sprouty's
-          leap calendar).
-        </p>
-      </div>
-      <div class="vp-card">
-        <span class="dot" style="background:var(--sky)"></span>
-        <h3>The memory keeper</h3>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0">
-          Photo upload + life-journey timeline is the emotional core proven to retain
-          parents for years (Qeepsake, Lifecake precedent) — long after sleep-tracking
-          apps get abandoned around 12–18 months.
-        </p>
-      </div>
-      <div class="vp-card">
-        <span class="dot" style="background:var(--moss)"></span>
-        <h3>Private by construction</h3>
-        <p style="font-size:13.5px;color:var(--ink-soft);margin:0">
-          No face processing, no AI training on child photos, encryption at rest,
-          EXIF/location stripped on every upload — including photos imported from
-          Google Photos. Trust is the product, not a footnote.
-        </p>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Why now (market framing)</h3>
-      <p style="font-size:14px;">
-        The 2026 baby-tracker category has moved past chat-only AI toward tools that
-        anticipate a child's stage and compound in value the more a family logs. Memory-
-        keeping is the proven long-horizon retention engine in this category; multi-
-        caregiver sharing extends value beyond a single parent. little-milestones is built
-        around both, deliberately declining to lead with commerce or clinical claims.
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ TAB 2: ARCHITECTURE ============ -->
-  <section class="panel" data-panel="architecture">
-    <h2 class="panel-title">Underlying technical architecture</h2>
-    <p class="panel-sub">Source: knowledge/ARCHITECTURE_KB.md §0–§12 (MVP through Increment 7 / Google Photos import)</p>
-
-    <div class="card diagram-wrap">
-      <svg viewBox="0 0 900 480" width="100%" height="480" role="img" aria-label="little-milestones architecture diagram">
-        <!-- Client layer -->
-        <rect x="30" y="20" width="840" height="70" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-        <text x="44" y="14" font-size="11" fill="var(--ink-soft)">CLIENT</text>
-        <rect x="60" y="35" width="220" height="40" rx="8" fill="var(--sky)" opacity="0.85"/>
-        <text x="170" y="59" font-size="13" text-anchor="middle" fill="#12303a" font-weight="700">Next.js frontend (App Router)</text>
-        <rect x="620" y="35" width="220" height="40" rx="8" fill="var(--sky)" opacity="0.55"/>
-        <text x="730" y="59" font-size="12" text-anchor="middle" fill="#12303a" font-weight="600">Browser: Google OAuth redirect + Picker</text>
-
-        <!-- API layer -->
-        <rect x="30" y="130" width="840" height="150" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-        <text x="44" y="124" font-size="11" fill="var(--ink-soft)">API (FastAPI backend)</text>
-        <rect x="60" y="150" width="200" height="42" rx="8" fill="var(--peach)"/>
-        <text x="160" y="176" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">auth.py / sessions.py</text>
-        <rect x="280" y="150" width="200" height="42" rx="8" fill="var(--peach)"/>
-        <text x="380" y="176" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">chat.py + guardrails.py</text>
-        <rect x="500" y="150" width="180" height="42" rx="8" fill="var(--peach)"/>
-        <text x="590" y="176" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">photos.py</text>
-        <rect x="700" y="150" width="160" height="42" rx="8" fill="var(--peach)"/>
-        <text x="780" y="176" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">google_photos.py</text>
-        <rect x="60" y="210" width="200" height="42" rx="8" fill="var(--peach)" opacity="0.75"/>
-        <text x="160" y="236" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">scheduler.py (digest)</text>
-        <rect x="280" y="210" width="200" height="42" rx="8" fill="var(--peach)" opacity="0.75"/>
-        <text x="380" y="236" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">totp.py / crypto.py</text>
-        <rect x="500" y="210" width="180" height="42" rx="8" fill="var(--peach)" opacity="0.75"/>
-        <text x="590" y="236" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">memories.py</text>
-        <rect x="700" y="210" width="160" height="42" rx="8" fill="var(--peach)" opacity="0.75"/>
-        <text x="780" y="236" font-size="12.5" text-anchor="middle" fill="#2b2620" font-weight="700">profiles.py</text>
-
-        <!-- Data / external layer -->
-        <rect x="30" y="330" width="840" height="130" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-        <text x="44" y="324" font-size="11" fill="var(--ink-soft)">DATA &amp; EXTERNAL SERVICES</text>
-        <rect x="60" y="350" width="170" height="42" rx="8" fill="var(--moss)"/>
-        <text x="145" y="376" font-size="12.5" text-anchor="middle" fill="#122712" font-weight="700">SQLite DB</text>
-        <rect x="250" y="350" width="190" height="42" rx="8" fill="var(--moss)"/>
-        <text x="345" y="376" font-size="12" text-anchor="middle" fill="#122712" font-weight="700">Encrypted photo store (Fernet)</text>
-        <rect x="460" y="350" width="150" height="42" rx="8" fill="var(--slate)" opacity="0.85"/>
-        <text x="535" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Anthropic / OpenAI</text>
-        <rect x="630" y="350" width="110" height="42" rx="8" fill="var(--slate)" opacity="0.85"/>
-        <text x="685" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Resend</text>
-        <rect x="760" y="350" width="100" height="42" rx="8" fill="var(--slate)" opacity="0.85"/>
-        <text x="810" y="376" font-size="11.5" text-anchor="middle" fill="#fff" font-weight="700">Google Photos</text>
-
-        <!-- arrows client -> api -->
-        <line x1="170" y1="75" x2="170" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="178" y="115" font-size="10.5" fill="var(--ink-soft)">HTTPS / JSON (+ streaming chat)</text>
-        <line x1="730" y1="75" x2="780" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="700" y="115" font-size="10.5" fill="var(--ink-soft)">OAuth2 + Picker session (F17)</text>
-
-        <!-- arrows api -> data -->
-        <line x1="160" y1="252" x2="145" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="10" y="310" font-size="10.5" fill="var(--ink-soft)">SQL (Store interfaces)</text>
-        <line x1="590" y1="192" x2="345" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="440" y="270" font-size="10.5" fill="var(--ink-soft)">EXIF-strip + Fernet encrypt</text>
-        <line x1="380" y1="192" x2="535" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="470" y="200" font-size="10.5" fill="var(--ink-soft)">LLM chat completion</text>
-        <line x1="160" y1="252" x2="685" y2="350" stroke="var(--ink-soft)" stroke-width="1.2" marker-end="url(#arrow)" opacity="0.6"/>
-        <text x="640" y="315" font-size="10.5" fill="var(--ink-soft)">Reset / digest email</text>
-        <line x1="780" y1="192" x2="810" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-        <text x="770" y="270" font-size="10.5" fill="var(--ink-soft)">Media fetch (server-side only)</text>
-
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
-          </marker>
-        </defs>
-      </svg>
-      <div class="legend">
-        <span><i style="background:var(--sky)"></i> Client (Next.js)</span>
-        <span><i style="background:var(--peach)"></i> API (FastAPI modules)</span>
-        <span><i style="background:var(--moss)"></i> First-party data (SQLite / encrypted store)</span>
-        <span><i style="background:var(--slate)"></i> External services</span>
-      </div>
-    </div>
-
-    <div class="grid-2">
       <div class="card">
-        <h3>Frontend</h3>
-        <p style="font-size:13.5px;">Next.js (App Router) + TypeScript, fluid/adaptive
-        CSS (<code class="inline">clamp()</code>/<code class="inline">minmax()</code>/
-        <code class="inline">auto-fit</code>) rebuilt from fixed breakpoints in
-        Increment 5 after human review of a live mockup.</p>
+        <h3>The pitch</h3>
+        <p>little-milestones is a consumer parenting web app that turns a child's birthdate
+        into an <strong>age- and corrected-age-aware milestone chat</strong>, a private
+        <strong>photo &amp; memory journal</strong>, and a <strong>multi-caregiver family
+        space</strong> — explicitly not a healthcare or clinical product, and private-by-default
+        with a child's photos and data.</p>
+        <span class="chip">Consumer parenting / family tech</span>
+        <span class="chip">Chat-first, genai-chatbot template</span>
+        <span class="chip">Non-clinical, non-medical</span>
       </div>
+
       <div class="card">
-        <h3>Backend</h3>
-        <p style="font-size:13.5px;">FastAPI + SQLite, a <code class="inline">Store[T]</code>
-        interface convention across every domain object, idempotent schema migrations
-        applied on every startup (safe against the already-populated dev DB).</p>
+        <h3>Target audience</h3>
+        <p>Parents and caregivers of infants and toddlers (0–~3 years), in the same market
+        segment as BabyCenter, Huckleberry, Wonder Weeks, and Qeepsake — direct-to-consumer,
+        mobile/web-first, no clinical gatekeeping.</p>
+        <ul class="compact">
+          <li><strong>Primary user:</strong> a first-time or early-stage parent who wants
+          reassurance and structure without a pediatric-grade tracker's clinical tone.</li>
+          <li><strong>Household shape:</strong> multi-caregiver by design (F10) — the product
+          assumes two or more adults share access to one child's space, not a single-user account.</li>
+          <li><strong>Premature-birth families</strong> are explicitly designed for — corrected-age
+          computation (F2) exists specifically because an app keyed only to birthdate systematically
+          mis-ages preterm infants.</li>
+        </ul>
       </div>
+
+      <h3 style="margin:26px 0 4px; font-family:var(--serif); font-weight:400; font-size:19px;">Value proposition</h3>
+      <div class="value-prop">
+        <div class="vp-card">
+          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-4 3-6 5-9z"/></svg></span>
+          <h3>Age-true, not generic</h3>
+          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">Milestone chat and activity
+          suggestions are conditioned on the child's real, corrected age — matching the market's
+          shift from chat-only to predictive/personalized AI.</p>
+        </div>
+        <div class="vp-card">
+          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M4 12c3-6 6-9 8-9s5 3 8 9c-3 6-6 9-8 9s-5-3-8-9z"/><circle cx="12" cy="12" r="2.3"/></svg></span>
+          <h3>The memory keeper</h3>
+          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">Photo upload + a life-journey
+          timeline is the emotional core proven to retain parents for years — long after
+          sleep-tracking apps get abandoned.</p>
+        </div>
+        <div class="vp-card">
+          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.6 6.4 6.9.5-5.3 4.5 1.7 6.8L12 16.9l-5.9 3.3 1.7-6.8-5.3-4.5 6.9-.5z"/></svg></span>
+          <h3>Private by construction</h3>
+          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">No face processing, no AI
+          training on child photos, encryption at rest, EXIF/location stripped on every upload —
+          including photos imported from Google Photos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 2: ARCHITECTURE ============ -->
+    <section class="panel" data-panel="architecture">
+      <h2 class="panel-title">Underlying technical architecture</h2>
+      <p class="panel-sub">Source: knowledge/ARCHITECTURE_KB.md §0–§12</p>
+
+      <div class="card diagram-wrap">
+        <svg viewBox="0 0 900 460" width="100%" height="460" role="img" aria-label="little-milestones architecture diagram">
+          <rect x="30" y="20" width="840" height="70" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
+          <text x="44" y="14" font-size="11" fill="var(--ink-soft)">CLIENT</text>
+          <rect x="60" y="35" width="220" height="40" rx="8" fill="var(--slate)" opacity="0.85"/>
+          <text x="170" y="59" font-size="13" text-anchor="middle" fill="#fff" font-weight="700">Next.js frontend</text>
+          <rect x="620" y="35" width="220" height="40" rx="8" fill="var(--slate)" opacity="0.5"/>
+          <text x="730" y="59" font-size="11.5" text-anchor="middle" fill="var(--ink)" font-weight="600">Browser: Google OAuth + Picker</text>
+
+          <rect x="30" y="130" width="840" height="150" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
+          <text x="44" y="124" font-size="11" fill="var(--ink-soft)">API (FastAPI backend)</text>
+          <rect x="60" y="150" width="200" height="42" rx="8" fill="var(--terracotta)"/>
+          <text x="160" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">auth.py / sessions.py</text>
+          <rect x="280" y="150" width="200" height="42" rx="8" fill="var(--terracotta)"/>
+          <text x="380" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">chat.py + guardrails.py</text>
+          <rect x="500" y="150" width="180" height="42" rx="8" fill="var(--terracotta)"/>
+          <text x="590" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">photos.py</text>
+          <rect x="700" y="150" width="160" height="42" rx="8" fill="var(--terracotta)"/>
+          <text x="780" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">google_photos.py</text>
+          <rect x="60" y="210" width="200" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
+          <text x="160" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">scheduler.py</text>
+          <rect x="280" y="210" width="200" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
+          <text x="380" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">totp.py / crypto.py</text>
+          <rect x="500" y="210" width="180" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
+          <text x="590" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">memories.py</text>
+          <rect x="700" y="210" width="160" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
+          <text x="780" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">profiles.py</text>
+
+          <rect x="30" y="330" width="840" height="110" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
+          <text x="44" y="324" font-size="11" fill="var(--ink-soft)">DATA &amp; EXTERNAL SERVICES</text>
+          <rect x="60" y="350" width="170" height="42" rx="8" fill="var(--sage)"/>
+          <text x="145" y="376" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">SQLite DB</text>
+          <rect x="250" y="350" width="190" height="42" rx="8" fill="var(--sage)"/>
+          <text x="345" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Encrypted photo store</text>
+          <rect x="460" y="350" width="150" height="42" rx="8" fill="var(--ink-soft)"/>
+          <text x="535" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Anthropic / OpenAI</text>
+          <rect x="630" y="350" width="110" height="42" rx="8" fill="var(--ink-soft)"/>
+          <text x="685" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Resend</text>
+          <rect x="760" y="350" width="100" height="42" rx="8" fill="var(--ink-soft)"/>
+          <text x="810" y="376" font-size="11.5" text-anchor="middle" fill="#fff" font-weight="700">Google Photos</text>
+
+          <line x1="170" y1="75" x2="170" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="178" y="115" font-size="10.5" fill="var(--ink-soft)">HTTPS / JSON</text>
+          <line x1="730" y1="75" x2="780" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="700" y="115" font-size="10.5" fill="var(--ink-soft)">OAuth2 + Picker</text>
+          <line x1="160" y1="252" x2="145" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="10" y="310" font-size="10.5" fill="var(--ink-soft)">SQL</text>
+          <line x1="590" y1="192" x2="345" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="420" y="270" font-size="10.5" fill="var(--ink-soft)">EXIF-strip + encrypt</text>
+          <line x1="380" y1="192" x2="535" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="470" y="200" font-size="10.5" fill="var(--ink-soft)">LLM completion</text>
+          <line x1="160" y1="252" x2="685" y2="350" stroke="var(--ink-soft)" stroke-width="1.2" marker-end="url(#arrow)" opacity="0.6"/>
+          <text x="640" y="315" font-size="10.5" fill="var(--ink-soft)">Reset / digest email</text>
+          <line x1="780" y1="192" x2="810" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+          <text x="770" y="270" font-size="10.5" fill="var(--ink-soft)">Media fetch</text>
+
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="legend">
+          <span><i style="background:var(--slate)"></i> Client</span>
+          <span><i style="background:var(--terracotta)"></i> API (FastAPI)</span>
+          <span><i style="background:var(--sage)"></i> First-party data</span>
+          <span><i style="background:var(--ink-soft)"></i> External services</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card"><h3>Frontend</h3><p style="font-size:13.5px;">Next.js (App Router) + TypeScript, fluid/adaptive CSS rebuilt from fixed breakpoints in Increment 5 after human review of a live mockup.</p></div>
+        <div class="card"><h3>Backend</h3><p style="font-size:13.5px;">FastAPI + SQLite, a <code class="inline">Store[T]</code> interface convention, idempotent schema migrations on every startup.</p></div>
+        <div class="card"><h3>Auth &amp; security</h3><p style="font-size:13.5px;">Session-cookie auth, opt-in TOTP MFA, Fernet-encrypted secrets, argon2id recovery codes, rate-limited sensitive routes.</p></div>
+        <div class="card"><h3>Photos</h3><p style="font-size:13.5px;">Every photo — direct upload or Google-imported — goes through one pipeline: sniff → EXIF-strip → encrypt → write. No parallel path.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 3: ROADMAP ============ -->
+    <section class="panel" data-panel="roadmap">
+      <h2 class="panel-title">Product roadmap — built vs. upcoming</h2>
+      <p class="panel-sub">Source: FEATURES.md, PROJECT_CONTEXT.md Decisions Log. Gold ✦ marks a shipped moment, the same way the product celebrates a memory — never a percentage bar.</p>
+
       <div class="card">
-        <h3>Auth &amp; security</h3>
-        <p style="font-size:13.5px;">Session-cookie auth, opt-in TOTP MFA with
-        Fernet-encrypted secrets and argon2id-hashed recovery codes, password reset with
-        full session invalidation, rate-limited sensitive routes.</p>
+        <div class="river-gantt">
+          <div class="rg-row">
+            <div class="rg-label">MVP — F1–F10<small>Profiles, milestone chat, photos, digest, auth</small></div>
+            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:0%;width:26%;">Shipped Jul 10 <span class="rg-star">✦</span></div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">Increment 4 — F14/F15/F16<small>Avatars, lightbox, gallery</small></div>
+            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:34%;width:18%;">Shipped Jul 12 <span class="rg-star">✦</span></div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">Increment 5 — F13<small>Chat history + "Ask" redesign</small></div>
+            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:38%;width:20%;">Shipped Jul 12 <span class="rg-star">✦</span></div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">Increment 6 — F12<small>Hardened auth: MFA, reset, sessions</small></div>
+            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:46%;width:26%;">Shipped Jul 12/13 <span class="rg-star">✦</span></div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">Increment 7 — F17<small>Google Photos import</small></div>
+            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:58%;width:30%;">Shipped Jul 13 <span class="rg-star">✦</span></div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">F11 — conditional RAG mode<small>No trigger yet</small></div>
+            <div class="rg-bar-track"><div class="rg-bar upcoming" style="left:88%;width:12%;">Not yet on the river</div></div>
+          </div>
+          <div class="rg-row">
+            <div class="rg-label">Google OAuth production verification<small>Go-live checklist item</small></div>
+            <div class="rg-bar-track"><div class="rg-bar upcoming" style="left:88%;width:12%;">Not yet on the river</div></div>
+          </div>
+        </div>
       </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3>What's built</h3>
+        <p style="font-size:13.5px;">F1–F10 (core MVP), F14–F16 (avatars, lightbox, gallery), F13 (chat history + "Ask"), F12 (hardened auth suite), F17 (Google Photos import). Every increment closed its own full Test/Review/Deploy gate cycle.</p>
+        <h3 style="margin-top:16px;">What's next</h3>
+        <p style="font-size:13.5px;">F11 (conditional RAG mode) stays in the backlog with no trigger yet. Google OAuth's production app-verification is a tracked go-live item, not a blocker to the current dev/local deployment.</p>
+      </div>
+    </section>
+
+    <!-- ============ TAB 4: BUILT WITH MAS ============ -->
+    <section class="panel" data-panel="mas">
+      <h2 class="panel-title">How this was built with the MAS</h2>
+      <p class="panel-sub">Source: PROJECT_CONTEXT.md Decisions Log, admin/MAS_REGISTRY.md. Gold marks a moment the human personally approved or redirected.</p>
+
       <div class="card">
-        <h3>Photos</h3>
-        <p style="font-size:13.5px;">Every photo — direct upload or Google-imported —
-        goes through one pipeline: content-sniff → EXIF/GPS strip → Fernet encrypt →
-        disk write. No parallel storage path exists for any source.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Structural guarantee: no photo ever reaches the LLM layer</h3>
-      <p style="font-size:13.5px;">
-        <code class="inline">photos.py</code> / <code class="inline">google_photos.py</code>
-        have zero import path into <code class="inline">llm.py</code> /
-        <code class="inline">prompts.py</code> — verified by a static AST import-graph
-        check at every Test gate, not just documented intent.
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ TAB 3: ROADMAP ============ -->
-  <section class="panel" data-panel="roadmap">
-    <h2 class="panel-title">Product roadmap — built vs. upcoming</h2>
-    <p class="panel-sub">Source: FEATURES.md, PROJECT_CONTEXT.md Decisions Log (actual gate-close dates)</p>
-
-    <div class="card gantt">
-      <div class="gantt-axis">
-        <div></div>
-        <div class="gantt-axis-labels">
-          <span>Jul 10</span><span>Jul 11</span><span>Jul 12</span><span>Jul 13</span><span>Upcoming →</span>
+        <h3>This project's actual gate history (selected real moments)</h3>
+        <div class="river-log">
+          <div class="rl-entry human">
+            <div class="rl-date">2026-07-10</div>
+            <div class="rl-title">Human approves F1–F10 MVP scope <span class="rl-flourish">✦</span></div>
+            <div class="rl-desc">Itemized checkbox review of plan-agent's proposed backlog — a much larger scope than the first-slice F1–F5 proposal.</div>
+          </div>
+          <div class="rl-entry redo">
+            <div class="rl-date">2026-07-11</div>
+            <div class="rl-title">Increment 2 Test gate: 2 blocking failures sent back</div>
+            <div class="rl-desc">Architecture and UX/accessibility suites both failed; 13 findings sent to code-agent for a fix pass rather than proceeding to Review.</div>
+          </div>
+          <div class="rl-entry human">
+            <div class="rl-date">2026-07-12</div>
+            <div class="rl-title">Human overrides shipped desktop layout mid-stream <span class="rl-flourish">✦</span></div>
+            <div class="rl-desc">"we need desktop view to be adaptive... not grow too wide but look built for desktop" — required reviewing a live mockup before rebuilding.</div>
+          </div>
+          <div class="rl-entry">
+            <div class="rl-date">2026-07-12</div>
+            <div class="rl-title">Live-testing feedback: 4 real bugs, all fixed same day</div>
+            <div class="rl-desc">Shrunk banner photos, missing nav icons, wrong chat-continuity default, desktop space usage — all traced to root cause and fixed.</div>
+          </div>
+          <div class="rl-entry redo">
+            <div class="rl-date">2026-07-12</div>
+            <div class="rl-title">Increment 6 (F12) Test gate: zero committed tests found</div>
+            <div class="rl-desc">Working auth/MFA code existed with no regression coverage. Human chose "send back for tests" over an override — 35 new tests added.</div>
+          </div>
+          <div class="rl-entry">
+            <div class="rl-date">2026-07-13</div>
+            <div class="rl-title">Increment 7: 4-SME Architecture pass, run in parallel</div>
+            <div class="rl-desc">solution-architect, security-architect, responsible-ai-architect, and industry-expert each produced an independent design pass for the Google Photos OAuth integration.</div>
+          </div>
+          <div class="rl-entry redo">
+            <div class="rl-date">2026-07-13</div>
+            <div class="rl-title">Increment 7 Test gate: UX suite finds 2 real defects</div>
+            <div class="rl-desc">A disconnect dialog rendered in destructive red and two status chips lost their semantic color coding — found, fixed, re-verified.</div>
+          </div>
+          <div class="rl-entry human">
+            <div class="rl-date">2026-07-13</div>
+            <div class="rl-title">All three increments (5, 6, 7) shipped together <span class="rl-flourish">✦</span></div>
+            <div class="rl-desc">Per the human's explicit instruction to build all three without intermediate approval and review them as one batch at the end.</div>
+          </div>
         </div>
       </div>
 
-      <div class="gantt-row">
-        <div class="gantt-label">MVP — F1–F10<small>Profiles, milestone chat, photos, digest, auth</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-shipped" style="left:0%;width:22%;">Shipped 2026-07-10</div></div>
+      <div class="card">
+        <h3>The hierarchy behind every gate</h3>
+        <p style="font-size:13.5px;">Human (product owner) → orchestrator (this conversation, the human's single point of contact) → gate-owning agents (plan-agent, ui-ux-designer, solution-architect, security-architect, responsible-ai-architect, industry-expert, code-agent, test-agent, review-agent, deploy-agent). Every stage transition paused for explicit human approval — the orchestrator never auto-advances a gate, and a genuinely blocking Test-gate finding stops for a human decision rather than silently passing.</p>
       </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Increment 4 — F14/F15/F16<small>Avatars, lightbox, gallery</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-shipped" style="left:55%;width:14%;">Shipped 2026-07-12</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Increment 5 — F13<small>Chat history + "Ask" redesign</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-shipped" style="left:55%;width:16%;">Shipped 2026-07-12</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Increment 6 — F12<small>Hardened auth: MFA, reset, sessions</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-shipped" style="left:60%;width:22%;">Shipped 2026-07-12/13</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Increment 7 — F17<small>Google Photos import</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-shipped" style="left:70%;width:24%;">Shipped 2026-07-13</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">F11 — conditional RAG mode<small>No trigger yet</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-upcoming" style="left:88%;width:12%;">Unscheduled</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Google OAuth production verification<small>Go-live checklist, not a Code-gate blocker</small></div>
-        <div class="gantt-track"><div class="gantt-bar bar-upcoming" style="left:88%;width:12%;">Unscheduled</div></div>
-      </div>
-    </div>
-    <div class="legend">
-      <span><i style="background:var(--sage)"></i> Shipped, deployed (dev, local)</span>
-      <span><i style="background:var(--ink-soft);opacity:.55"></i> Upcoming / unscheduled</span>
-    </div>
+    </section>
 
-    <div class="card" style="margin-top:18px;">
-      <h3>What's built</h3>
-      <p style="font-size:13.5px;">F1–F10 (core MVP), F14–F16 (avatars, lightbox, gallery),
-      F13 (chat history + "Ask"), F12 (hardened auth suite), F17 (Google Photos import).
-      Every increment closed its own full Test/Review/Deploy gate cycle.</p>
-      <h3 style="margin-top:16px;">What's next</h3>
-      <p style="font-size:13.5px;">F11 (conditional RAG mode) stays in the backlog with no
-      trigger yet. Google OAuth's production app-verification is a tracked go-live item
-      (real credentials + Google's restricted-scope review), not a blocker to the current
-      dev/local deployment.</p>
-    </div>
-  </section>
+  </main>
+</div>
 
-  <!-- ============ TAB 4: BUILT WITH MAS ============ -->
-  <section class="panel" data-panel="mas">
-    <h2 class="panel-title">How this was built with the MAS</h2>
-    <p class="panel-sub">Source: PROJECT_CONTEXT.md Decisions Log, admin/MAS_REGISTRY.md</p>
-
-    <div class="card">
-      <h3>The human-in-the-loop hierarchy, as it actually ran on this project</h3>
-      <div class="hier">
-        <div class="node human">Human (product owner)</div>
-        <div class="arrow-down">↓ approves / redirects at every gate</div>
-        <div class="node orch">Orchestrator (this conversation)</div>
-        <div class="arrow-down">↓ dispatches, one gate at a time</div>
-        <div class="row">
-          <div class="node">plan-agent</div>
-          <div class="node">ui-ux-designer</div>
-          <div class="node">solution-architect</div>
-          <div class="node">security-architect</div>
-          <div class="node">responsible-ai-architect</div>
-          <div class="node">industry-expert</div>
-        </div>
-        <div class="arrow-down">↓</div>
-        <div class="row">
-          <div class="node">code-agent</div>
-          <div class="node">test-agent</div>
-          <div class="node">review-agent</div>
-          <div class="node">deploy-agent</div>
-        </div>
-      </div>
-      <p style="font-size:13px;color:var(--ink-soft);">
-        Every stage transition paused for explicit human approval — the orchestrator never
-        auto-advances a gate. Test-gate findings that were genuinely blocking stopped for a
-        human decision rather than silently passing.
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>This project's actual gate history (selected real moments)</h3>
-      <div class="log">
-        <div class="entry human">
-          <div class="date">2026-07-10</div>
-          <div class="title">Human approves F1–F10 MVP scope</div>
-          <div class="desc">Itemized checkbox review of plan-agent's proposed backlog — a
-          much larger scope than the first-slice F1–F5 proposal.</div>
-        </div>
-        <div class="entry redo">
-          <div class="date">2026-07-11</div>
-          <div class="title">Increment 2 Test gate: 2 blocking failures sent back</div>
-          <div class="desc">Architecture and UX/accessibility suites both failed;
-          13 findings sent to code-agent for a fix pass rather than proceeding to Review.</div>
-        </div>
-        <div class="entry human">
-          <div class="date">2026-07-12</div>
-          <div class="title">Human overrides shipped desktop layout mid-stream</div>
-          <div class="desc">"we need desktop view to be adaptive to screen... not grow too
-          wide but look built for desktop" — explicitly required reviewing a live mockup
-          before rebuilding, rather than approving text-only.</div>
-        </div>
-        <div class="entry">
-          <div class="date">2026-07-12</div>
-          <div class="title">Live-testing feedback: 4 real bugs, all fixed same day</div>
-          <div class="desc">Human tested the running app directly and reported shrunk
-          banner photos, missing nav icons, wrong chat-continuity default, and desktop
-          space usage — all four traced to root cause and fixed, not deferred.</div>
-        </div>
-        <div class="entry redo">
-          <div class="date">2026-07-12</div>
-          <div class="title">Increment 6 (F12) Test gate: zero committed tests found</div>
-          <div class="desc">Working auth/MFA code existed but had no regression test
-          coverage. Human chose "send back for tests" over an override — 35 new tests
-          added before Review/Deploy closed.</div>
-        </div>
-        <div class="entry">
-          <div class="date">2026-07-13</div>
-          <div class="title">Increment 7 (F17): 4-SME Architecture pass, run in parallel</div>
-          <div class="desc">solution-architect, security-architect, responsible-ai-architect,
-          and industry-expert each produced an independent design pass for the Google
-          Photos OAuth integration — required by this feature's own scope, not routine.</div>
-        </div>
-        <div class="entry redo">
-          <div class="date">2026-07-13</div>
-          <div class="title">Increment 7 Test gate: UX suite finds 2 real defects</div>
-          <div class="desc">A disconnect dialog rendered in destructive red and two status
-          chips lost their semantic color coding — found, fixed, and re-verified before
-          Review gate.</div>
-        </div>
-        <div class="entry human">
-          <div class="date">2026-07-13</div>
-          <div class="title">All three increments (5, 6, 7) shipped together</div>
-          <div class="desc">Per the human's explicit instruction to build all three without
-          intermediate approval and review them as one batch at the end.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<footer>little-milestones — generated by deliverables-agent, 2026-07-13 · this file makes zero external network requests</footer>
+<footer>little-milestones — generated by deliverables-agent, design by ui-ux-designer, 2026-07-13 · this file makes zero external network requests</footer>
 
 <script>
 (function () {
-  var tabs = document.querySelectorAll('nav.tabs button');
+  var tabs = document.querySelectorAll('.tab-pills button');
   var panels = document.querySelectorAll('section.panel');
   tabs.forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -604,7 +420,6 @@
       document.querySelector('section.panel[data-panel="' + btn.dataset.tab + '"]').setAttribute('data-active', 'true');
     });
   });
-
   var toggle = document.getElementById('themeToggle');
   var root = document.documentElement;
   toggle.addEventListener('click', function () {
