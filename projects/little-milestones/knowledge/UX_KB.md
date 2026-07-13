@@ -2039,6 +2039,14 @@ access to, under F10's existing caregiver permission model.
   privacy-cue line restating that nothing syncs automatically.
 - Both states carry the exact `.lm-privacy-note` lock-glyph pattern
   already established (§1.6 Flow 2c / UXR-10 / §8.1a).
+- **Lapsed/externally-revoked connection** (ARCHITECTURE_KB §12.8's
+  flagged gap — a caregiver revoked this app's access directly from their
+  Google Account settings, outside this app, so a subsequent refresh
+  attempt fails): renders as the plain **not-connected state**, copy
+  unchanged — no separate "connection expired" messaging. A lapsed and a
+  never-connected state are functionally identical from the caregiver's
+  side (both require clicking Connect again), so a distinct copy
+  treatment would add a state without adding useful information.
 
 ### 12.3 OAuth connect flow
 

@@ -1433,6 +1433,42 @@ guessing at it.
 
 ### 12.3 Scope minimization
 
+**Verification addendum (orchestrator, WebSearch, 2026-07-12) — resolves
+the flag below for Code-gate purposes:**
+1. Scope string confirmed current and correct as named:
+   `https://www.googleapis.com/auth/photospicker.mediaitems.readonly` is
+   the documented scope for `sessions.create` and `mediaItems.list`
+   ([Google Photos APIs — Authorization
+   scopes](https://developers.google.com/photos/overview/authorization),
+   [sessions.create
+   reference](https://developers.google.com/photos/picker/reference/rest/v1/sessions/create)).
+   No code-agent action needed beyond using this exact string.
+2. OAuth app verification: **confirmed required before production/
+   real-user use** — Google Photos API scopes are in the
+   sensitive/restricted category, requiring formal review (explanation of
+   use + a demo video of the OAuth flow) before an app can be published
+   from "Testing" to "Production" ([Restricted scope
+   verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification),
+   [Sensitive scope
+   verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification)).
+   **Not a blocker for this project's current `local`-only target_env**:
+   Google's consent screen "Testing" mode supports up to 100 explicitly-
+   allowlisted test-user Google accounts with zero verification
+   requirement, which covers Code/Test/Review/Deploy at local scope
+   fully. **Confirmed go-live checklist item** (same class as Resend's
+   domain verification, SECURITY_KB §5.1) before any real caregiver
+   outside a manually-added test-user list can use this feature — record
+   in `FEATURES.md`/deploy-agent's pre-production checklist, not a
+   Code-gate gap.
+
+Sources: [Authorization
+scopes](https://developers.google.com/photos/overview/authorization),
+[sessions.create](https://developers.google.com/photos/picker/reference/rest/v1/sessions/create),
+[Restricted scope
+verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification),
+[Sensitive scope
+verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification).
+
 **Decision: request the narrowest scope the Picker flow needs —
 `https://www.googleapis.com/auth/photospicker.mediaitems.readonly`** —
 never `photoslibrary.readonly` or any Photos Library API scope, per
