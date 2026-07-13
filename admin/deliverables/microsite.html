@@ -1,13 +1,17 @@
 <!--
-  Design pass: ui-ux-designer, 2026-07-13 — "Governed Clarity" v2, a
-  new-age AI-product direction synthesized from featherless.ai/lovable.dev/
-  diamo.ai (not copied from any one of them). Human chose Copper + Dark as
-  the default palette and approved scroll-triggered reveal animations
-  after reviewing admin/design-review/conclave-v2-preview.html (5-theme
-  comparison). Converted from a tabbed layout to a single scrolling page
-  with anchor-nav, matching the reference genre's own structure and
-  letting the reveal-on-scroll animations do real work. Re-consult
-  ui-ux-designer if this design materially changes.
+  Design pass: ui-ux-designer, 2026-07-13 — "Governed Clarity" v3.
+  End-to-end storyboard evaluation (skeptical-buyer beats) drove a full
+  restructure: journey promoted to slot 3, Roadmap Gantt cut and reframed
+  as "Proof: Conclave is built by Conclave," footer became the conversion
+  moment, floating glassmorphic pill nav with scroll-spy, copper
+  connective thread between sections, three-placement contact CTA
+  (mailto). Web research (2025-26 premium AI/SaaS pages) added: copper
+  constellation canvas (agents-as-network, thematically load-bearing),
+  SVG grain overlay, stat count-up, cursor-spotlight card hovers, scroll
+  progress bar, headline shimmer. All motion honors prefers-reduced-motion
+  (freeze, not remove). Copper + Dark default per human choice.
+  HUMAN TODO before sharing externally: replace hello@conclave.example
+  with a real contact address (.example never delivers mail).
 -->
 <!doctype html>
 <html lang="en" data-theme="dark" data-palette="copper">
@@ -26,6 +30,7 @@
     --green: #1EA672; --amber: #B58A00;
     --primary: #B15A2B; --primary-glow-a: rgba(177,90,43,0.16); --primary-glow-b: rgba(212,150,90,0.10);
     --core: #14161A; --optional: #C98A4E;
+    --net-rgb: 177,90,43;
   }
   :root[data-theme="dark"] {
     --bg: #0E0F13; --surface: #16181E; --border: #262932; --hairline: #1c1e25;
@@ -35,37 +40,84 @@
     --green: #3DDC97; --amber: #E0B23A;
     --primary: #E08849; --primary-glow-a: rgba(224,136,73,0.24); --primary-glow-b: rgba(240,180,120,0.12);
     --core: #E8E9ED; --optional: #E0A96E;
+    --net-rgb: 224,136,73;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 92px; }
   body { margin:0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height:1.6; }
 
-  nav.top {
-    position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 32px; background: transparent; transition: background .25s, backdrop-filter .25s, box-shadow .25s, border-color .25s;
-    border-bottom: 1px solid transparent;
+  /* ===== Ambient layers: constellation canvas + drifting blobs + grain ===== */
+  #net { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .55; }
+  .ambient-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .ambient-bg .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; will-change: transform; }
+  .ambient-bg .blob-1 { width: 560px; height: 560px; top: -140px; left: -120px;
+    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 70%);
+    animation: driftA 34s ease-in-out infinite alternate; }
+  .ambient-bg .blob-2 { width: 460px; height: 460px; top: 30%; right: -180px;
+    background: radial-gradient(circle, var(--primary-glow-b) 0%, transparent 70%);
+    animation: driftB 41s ease-in-out infinite alternate; }
+  .ambient-bg .blob-3 { width: 380px; height: 380px; bottom: -140px; left: 30%;
+    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 72%);
+    animation: driftC 27s ease-in-out infinite alternate; }
+  .ambient-bg .blob-4 { width: 420px; height: 420px; top: 62%; left: -160px;
+    background: radial-gradient(circle, var(--primary-glow-b) 0%, transparent 70%);
+    animation: driftB 44s ease-in-out infinite alternate-reverse; opacity: 0.4; }
+  @keyframes driftA { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(90px,60px) scale(1.15); } }
+  @keyframes driftB { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-70px,-50px) scale(1.1); } }
+  @keyframes driftC { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(60px,-70px) scale(1.2); } }
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:2; opacity:.05; background-size:180px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  nav.top.scrolled {
-    background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-color: var(--border); box-shadow: var(--shadow);
-  }
-  nav.top .brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; display:flex; align-items:center; gap:8px; }
-  nav.top .brand .mark { width: 20px; height: 20px; border-radius: 6px; background: var(--primary); display:inline-block; }
-  nav.top .links { display: flex; gap: 26px; font-size: 14px; font-weight: 600; color: var(--body); }
-  nav.top .links a { color: inherit; text-decoration: none; cursor: pointer; }
-  nav.top .links a:hover { color: var(--ink); }
-  nav.top .cta-row { display: flex; align-items: center; gap: 12px; }
-  @media (max-width: 720px) { nav.top .links { display: none; } }
 
-  .theme-toggle {
-    border: 1px solid var(--border); background: var(--surface); border-radius: 999px;
-    padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--ink);
+  /* ===== Scroll progress bar ===== */
+  #progress { position: fixed; top: 0; left: 0; height: 2px; width: 0; background: var(--primary); z-index: 60; }
+
+  /* ===== Floating pill nav ===== */
+  nav.pill {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
+    width: max-content; max-width: calc(100vw - 32px);
+    display: flex; align-items: center; gap: 4px; padding: 6px 8px 6px 14px;
+    border-radius: 999px; background: var(--glass-bg);
+    backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid var(--glass-border); box-shadow: var(--shadow);
   }
-  .btn { appearance:none; border-radius: 10px; font-family: var(--sans); font-weight: 700; font-size: 14.5px; cursor: pointer; padding: 11px 22px; }
+  nav.pill .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: var(--ink); text-decoration: none; margin-right: 6px; }
+  nav.pill .brand .mark { width: 18px; height: 18px; border-radius: 6px; background: var(--primary); display: inline-block; }
+  nav.pill .links { display: flex; gap: 2px; }
+  nav.pill .links a {
+    padding: 8px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--body);
+    text-decoration: none; transition: color .2s, background .2s;
+  }
+  nav.pill .links a:hover { color: var(--ink); }
+  nav.pill .links a.active { color: var(--primary); background: var(--primary-glow-a); }
+  nav.pill .links a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  nav.pill .theme-toggle { border: none; background: transparent; padding: 6px 8px; font-size: 13px; cursor: pointer; color: var(--ink); }
+  nav.pill .cta {
+    background: var(--primary); color: #fff; border-radius: 999px; padding: 8px 16px;
+    font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
+  }
+  nav.pill .menu-btn { display: none; border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--ink); cursor: pointer; padding: 6px 10px; }
+  nav.pill .current-label { display: none; font-size: 12.5px; color: var(--primary); font-weight: 700; }
+  @media (max-width: 720px) {
+    nav.pill { flex-wrap: wrap; }
+    nav.pill .links { display: none; width: 100%; flex-direction: column; padding: 8px 0 4px; }
+    nav.pill.open { border-radius: 24px; }
+    nav.pill.open .links { display: flex; }
+    nav.pill .links a { text-align: center; }
+    nav.pill .menu-btn { display: inline-block; }
+    nav.pill .current-label { display: inline-block; }
+    nav.pill .cta { display: none; }
+    nav.pill.open .cta { display: block; text-align: center; width: 100%; margin: 4px 0 6px; }
+  }
+  @media (max-width: 480px) { nav.pill .brand span.word { display: none; } }
+
+  .btn { appearance:none; border-radius: 10px; font-family: var(--sans); font-weight: 700; font-size: 14.5px; cursor: pointer; padding: 11px 22px; text-decoration: none; display: inline-block; }
   .btn-primary { background: var(--primary); color: #fff; border: none; box-shadow: 0 4px 14px var(--primary-glow-a); }
   .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
 
-  .hero { position: relative; overflow: hidden; padding: 90px 32px 70px; text-align: center; }
+  /* ===== Hero ===== */
+  .hero { position: relative; overflow: hidden; padding: 130px 32px 70px; text-align: center; z-index: 1; }
   .hero .glow {
     position: absolute; top: -220px; right: -160px; width: 620px; height: 620px; border-radius: 50%;
     background: radial-gradient(circle, var(--primary-glow-a) 0%, var(--primary-glow-b) 45%, transparent 72%);
@@ -81,121 +133,119 @@
     margin: 0 0 20px; max-width: 800px; margin-left:auto; margin-right:auto; position: relative; z-index: 1;
     opacity: 0; transform: translateY(16px); animation: heroIn .8s cubic-bezier(.16,.8,.3,1) .12s forwards;
   }
-  .hero h1 .accent { color: var(--primary); }
+  .hero h1 .accent {
+    background: linear-gradient(100deg, var(--primary) 30%, var(--optional) 50%, var(--primary) 70%);
+    background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: heroIn .8s cubic-bezier(.16,.8,.3,1) .12s forwards, shimmer 9s linear 1.2s infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
   .hero .lede {
     font-size: clamp(17px, 2vw, 21px); font-weight: 400; color: var(--body); max-width: 580px; margin: 0 auto 34px;
     position: relative; z-index: 1;
     opacity: 0; transform: translateY(16px); animation: heroIn .8s cubic-bezier(.16,.8,.3,1) .22s forwards;
   }
   .hero .cta-row {
-    display:flex; gap:14px; justify-content:center; margin-bottom: 46px; position: relative; z-index: 1;
+    display:flex; gap:14px; justify-content:center; margin-bottom: 46px; position: relative; z-index: 1; flex-wrap: wrap;
     opacity: 0; transform: translateY(16px); animation: heroIn .8s cubic-bezier(.16,.8,.3,1) .32s forwards;
   }
   @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
-
   .stat-strip {
-    position: relative; z-index: 1; max-width: 640px; margin: 0 auto;
+    position: relative; z-index: 1; max-width: 660px; margin: 0 auto;
     background: var(--glass-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--glass-border); border-radius: 18px; box-shadow: var(--shadow);
     display: flex; padding: 22px 10px;
     opacity: 0; transform: translateY(16px); animation: heroIn .8s cubic-bezier(.16,.8,.3,1) .42s forwards;
   }
-  .stat-strip .stat { flex: 1; text-align: center; border-right: 1px solid var(--border); }
+  .stat-strip .stat { flex: 1; text-align: center; border-right: 1px solid var(--border); padding: 0 8px; }
   .stat-strip .stat:last-child { border-right: none; }
   .stat-strip .num { font-size: 26px; font-weight: 700; color: var(--ink); }
   .stat-strip .label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-top: 3px; }
 
-  main { max-width: 1060px; margin: 0 auto; padding: 90px 28px; }
-  section { margin-bottom: 120px; scroll-margin-top: 90px; }
+  /* ===== Main + copper thread ===== */
+  main { position: relative; max-width: 1060px; margin: 0 auto; padding: 64px 28px 90px; z-index: 1; }
+  main::before {
+    content:""; position:absolute; left:50%; top:-40px; bottom:0; width:1px; transform:translateX(-0.5px); z-index:0;
+    background: linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--primary) 30%, transparent) 60px, color-mix(in srgb, var(--primary) 30%, transparent) calc(100% - 60px), transparent 100%);
+    pointer-events:none;
+  }
+  section { position: relative; z-index: 1; margin-bottom: 72px; scroll-margin-top: 92px; }
   section:last-child { margin-bottom: 40px; }
   .section-head { text-align:center; max-width: 640px; margin: 0 auto 46px; }
-  .section-head .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display:block; }
+  .section-head .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--primary); background: var(--bg); border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+    padding: 6px 14px; border-radius: 999px; display: inline-block; margin-bottom: 12px;
+  }
   .section-head h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -0.015em; margin: 0 0 10px; }
   .section-head p { font-size: 15.5px; color: var(--body); margin: 0; }
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  /* ===== Cards + cursor spotlight ===== */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px;
+    box-shadow: var(--shadow); margin-bottom: 16px; position: relative; overflow: hidden;
+    transition: transform .25s cubic-bezier(.16,.8,.3,1), border-color .25s;
+  }
+  .card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--primary) 30%, var(--border)); }
+  .card::before {
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition: opacity .3s;
+    background: radial-gradient(280px at var(--mx, 50%) var(--my, 50%), rgba(var(--net-rgb), .09), transparent);
+  }
+  .card:hover::before { opacity: 1; }
   .card h3 { margin: 0 0 8px; font-size: 15.5px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
   code.mono, .id { font-family: var(--mono); font-size: 12.5px; background: var(--hairline); padding: 1px 6px; border-radius: 5px; color: var(--ink); }
 
-  .chip { display:inline-flex; align-items:center; gap:8px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 9px 16px 9px 12px; font-size: 13px; font-weight: 600; margin: 3px; }
-  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--core); }
-  .chip.optional .dot { background: transparent; border: 1.5px dashed var(--optional); }
-  .roster { display: flex; flex-wrap: wrap; justify-content: center; }
-
   table.reg { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.reg th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border); }
   table.reg td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
   table.reg tr:last-child td { border-bottom: none; }
-  .diagram-wrap { overflow-x: auto; }
 
-  /* Layered system-architecture diagram: Human -> Orchestrator -> agent
-     lanes by category -> shared knowledge/state. Distinct from the
-     Pipeline section's horizontal gated timeline (a process view) — this
-     is a structural view of what talks to what. */
+  /* Architecture / team */
   .arch-diagram { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 6px; }
   .arch-tier { text-align: center; max-width: 620px; }
-  .arch-node {
-    display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px;
-    box-shadow: var(--shadow);
-  }
+  .arch-node { display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: var(--shadow); }
   .arch-node-human { background: var(--primary); color: #fff; }
   .arch-node-orch { background: var(--core); color: var(--bg); }
-  .arch-node-state { background: var(--surface); border: 1.5px dashed var(--border); color: var(--ink); }
   .arch-sub { font-weight: 400; opacity: 0.75; font-size: 12.5px; }
   .arch-caption { font-size: 12px; color: var(--muted); margin-top: 8px; max-width: 560px; line-height: 1.5; }
   .arch-arrow { font-size: 12px; color: var(--muted); margin: 6px 0; font-weight: 600; }
 
-  .arch-lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; margin: 6px 0; }
-  @media (max-width: 820px) { .arch-lanes { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 480px) { .arch-lanes { grid-template-columns: 1fr; } }
-  .arch-lane { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
-  .arch-lane-title { font-size: 12.5px; font-weight: 700; margin-bottom: 2px; }
-  .arch-lane-title.core-title { color: var(--core); }
-  .arch-lane-title.optional-title { color: var(--optional); }
-  .arch-lane-sub { font-size: 10.5px; color: var(--muted); margin-bottom: 10px; }
-  .arch-lane-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-  .arch-lane-chips .chip { padding: 5px 10px 5px 8px; font-size: 11px; margin: 0; }
-
-  /* Consumer-facing "meet the desk" cards, replacing the technical lane grid */
   .section-subhead { text-align: center; margin: 44px 0 22px; }
   .section-subhead h3 { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
   .section-subhead p { font-size: 13.5px; color: var(--muted); margin: 0; }
   .team-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
   @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 560px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
-  .team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 14px; text-align: center; box-shadow: var(--shadow); }
+  .team-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 14px;
+    text-align: center; box-shadow: var(--shadow); transition: transform .25s cubic-bezier(.16,.8,.3,1), border-color .25s;
+  }
+  .team-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--primary) 30%, var(--border)); }
   .team-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 12px; }
-  .team-icon.core-icon { background: var(--core); }
-  :root[data-theme="light"] .team-icon.core-icon, .team-icon.core-icon { background: color-mix(in srgb, var(--core) 12%, transparent); }
+  .team-icon.core-icon { background: color-mix(in srgb, var(--core) 12%, transparent); }
   .team-icon.optional-icon { background: transparent; border: 2px dashed var(--optional); }
   .team-card h4 { font-size: 13.5px; font-weight: 700; margin: 0 0 6px; }
   .team-card p { font-size: 12px; color: var(--body); margin: 0; line-height: 1.5; }
   .fine-print { font-size: 12.5px; color: var(--muted); max-width: 640px; margin: 22px auto 0; text-align: center; line-height: 1.6; }
 
-  .tech-disclosure { margin-top: 28px; }
+  .tech-disclosure { margin-top: 28px; text-align: center; }
   .tech-disclosure summary {
     cursor: pointer; font-size: 13px; font-weight: 700; color: var(--muted);
-    padding: 10px 16px; border: 1px solid var(--border); border-radius: 999px; display: inline-block;
-    list-style: none;
+    padding: 10px 16px; border: 1px solid var(--border); border-radius: 999px; display: inline-block; list-style: none;
   }
   .tech-disclosure summary::-webkit-details-marker { display: none; }
   .tech-disclosure summary:hover { color: var(--ink); border-color: var(--ink); }
   .tech-disclosure summary::before { content: "▸ "; }
   .tech-disclosure[open] summary::before { content: "▾ "; }
+  .tech-disclosure .card { text-align: left; }
 
-  /* Journey timeline reuses .log/.entry visual language, just aliased */
-  .journey .entry::before { background: var(--primary); }
-  .journey .entry .date { color: var(--primary); }
-
-  /* Pipeline — horizontal gated timeline */
+  /* Pipeline */
   .pipeline-wrap { overflow-x: auto; padding: 10px 4px 4px; }
   .pipeline { position: relative; display: flex; justify-content: space-between; min-width: 760px; padding: 0 6px; }
   .pipeline::before { content:""; position:absolute; top: 19px; left: 24px; right: 24px; height: 2px; background: var(--border); }
   .p-node { position: relative; display: flex; flex-direction: column; align-items: center; width: 90px; }
-  .p-dot { width: 38px; height: 38px; border-radius: 50%; background: var(--core); display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700; position: relative; z-index: 1; }
-  :root[data-theme="dark"] .p-dot { color: #0E0F13; }
+  .p-dot { width: 38px; height: 38px; border-radius: 50%; background: var(--core); display:flex; align-items:center; justify-content:center; color: var(--bg); font-size:12px; font-weight:700; position: relative; z-index: 1; }
   .p-node.optional .p-dot { background: var(--surface); color: var(--optional); border: 2px dashed var(--optional); }
   .p-check { width: 18px; height: 18px; border-radius: 50%; background: var(--primary); color: #fff; display:flex; align-items:center; justify-content:center; font-size: 10px; margin-top: 8px; }
   .p-name { font-size: 11.5px; font-weight: 700; text-align: center; margin-top: 8px; line-height:1.25; color: var(--ink); }
@@ -203,38 +253,31 @@
   .pipeline-legend span { display:inline-flex; align-items:center; gap:7px; }
   .pipeline-legend i { width: 12px; height: 12px; border-radius: 50%; display:inline-block; }
 
-  /* Roadmap gantt */
-  .gantt-row { display:grid; grid-template-columns: 240px 1fr; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed var(--border); }
-  .gantt-row:last-child { border-bottom:none; }
-  .gantt-label { font-size: 13px; font-weight:600; }
-  .gantt-label .id { display:block; margin-top:2px; font-weight:400; }
-  .gantt-track { position:relative; height:24px; background: var(--hairline); border-radius:7px; min-width:400px; }
-  .gantt-bar { position:absolute; top:3px; bottom:3px; border-radius:6px; font-size:10.5px; color:#fff; display:flex; align-items:center; padding:0 8px; white-space:nowrap; }
-  .bar-built { background: var(--green); }
-  .bar-planned { background: transparent; border: 1.5px dashed var(--muted); color: var(--muted); }
-
-  /* Self-governance flow diagram */
-  .flow-svg { width: 100%; height: auto; }
-
+  /* Journey timeline */
   .log { border-left: 2px solid var(--border); margin-left: 6px; padding-left: 22px; }
   .log .entry { position: relative; padding-bottom: 22px; }
   .log .entry::before { content:""; position:absolute; left:-27px; top:4px; width:10px; height:10px; border-radius:50%; background: var(--primary); }
-  .log .entry .date { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+  .log .entry .date { font-size: 11.5px; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
   .log .entry .title { font-weight: 700; margin: 2px 0 4px; font-size: 14.5px; }
   .log .entry .desc { font-size: 13.5px; color: var(--body); }
 
-  footer.bookend { position: relative; overflow: hidden; text-align: center; padding: 80px 28px 50px; border-top: 1px solid var(--border); }
+  /* Footer */
+  footer.bookend { position: relative; overflow: hidden; text-align: center; padding: 80px 28px 50px; border-top: 1px solid var(--border); z-index: 1; }
+  footer.bookend::before { content:""; position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:var(--primary); }
   footer.bookend .glow2 {
     position: absolute; bottom: -180px; left: 50%; transform: translateX(-50%); width: 520px; height: 520px; border-radius: 50%;
     background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 70%); pointer-events:none;
   }
-  footer.bookend h3 { font-size: 26px; font-weight: 700; margin: 0 0 10px; position:relative; }
-  footer.bookend p.meta { color: var(--muted); font-size: 12px; margin-top: 30px; position:relative; }
+  footer.bookend h3 { font-size: 28px; font-weight: 700; margin: 0 0 10px; position:relative; }
+  footer.bookend p.pitch { color: var(--body); font-size: 15px; max-width: 460px; margin: 0 auto 26px; position: relative; }
+  footer.bookend .btn-primary { padding: 14px 30px; font-size: 15.5px; box-shadow: 0 6px 22px var(--primary-glow-a); position: relative; }
+  footer.bookend p.fallback { font-size: 13px; color: var(--muted); margin-top: 14px; position: relative; }
+  footer.bookend p.meta { color: var(--muted); font-size: 12px; margin-top: 30px; position: relative; }
 
   /* Scroll-reveal */
-  [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.16,.8,.3,1), transform .7s cubic-bezier(.16,.8,.3,1); }
+  [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.16,.8,.3,1), transform .7s cubic-bezier(.16,.8,.3,1); }
   [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
-  [data-reveal="stagger"] > * { opacity: 0; transform: translateY(18px); transition: opacity .55s cubic-bezier(.16,.8,.3,1), transform .55s cubic-bezier(.16,.8,.3,1); }
+  [data-reveal="stagger"] > * { opacity: 0; transform: translateY(14px); transition: opacity .55s cubic-bezier(.16,.8,.3,1), transform .55s cubic-bezier(.16,.8,.3,1); }
   [data-reveal="stagger"].is-visible > * { opacity: 1; transform: translateY(0); }
   [data-reveal="stagger"].is-visible > *:nth-child(1) { transition-delay: .02s; }
   [data-reveal="stagger"].is-visible > *:nth-child(2) { transition-delay: .07s; }
@@ -243,74 +286,51 @@
   [data-reveal="stagger"].is-visible > *:nth-child(n+5) { transition-delay: .22s; }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-reveal], [data-reveal="stagger"] > *, .hero .eyebrow, .hero h1, .hero .lede, .hero .cta-row, .stat-strip {
-      opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important;
-    }
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    [data-reveal], [data-reveal="stagger"] > * { opacity: 1 !important; transform: none !important; }
+    .hero .eyebrow, .hero h1, .hero .lede, .hero .cta-row, .stat-strip { opacity: 1 !important; transform: none !important; }
     html { scroll-behavior: auto; }
-    .ambient-bg .blob { animation: none !important; }
   }
-
-  /* Ambient background: 3 large, heavily-blurred blobs drifting slowly and
-     continuously behind the whole page — not scroll-triggered, running the
-     moment the page opens, the way the reference sites' hero backgrounds
-     stay alive rather than sitting static. Fixed behind everything, very
-     low opacity so body text never loses contrast; paused entirely under
-     prefers-reduced-motion (handled above) rather than just slowed down. */
-  .ambient-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-  .ambient-bg .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; }
-  .ambient-bg .blob-1 {
-    width: 560px; height: 560px; top: -140px; left: -120px;
-    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 70%);
-    animation: driftA 34s ease-in-out infinite alternate;
-  }
-  .ambient-bg .blob-2 {
-    width: 460px; height: 460px; top: 40%; right: -160px;
-    background: radial-gradient(circle, var(--primary-glow-b) 0%, transparent 70%);
-    animation: driftB 40s ease-in-out infinite alternate;
-  }
-  .ambient-bg .blob-3 {
-    width: 380px; height: 380px; bottom: -140px; left: 30%;
-    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 72%);
-    animation: driftC 28s ease-in-out infinite alternate;
-  }
-  @keyframes driftA { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(90px,60px) scale(1.15); } }
-  @keyframes driftB { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-70px,-50px) scale(1.1); } }
-  @keyframes driftC { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(60px,-70px) scale(1.2); } }
-
-  nav.top, .hero, main, footer.bookend { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 
+<div id="progress" aria-hidden="true"></div>
+<canvas id="net" aria-hidden="true"></canvas>
 <div class="ambient-bg" aria-hidden="true">
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
 </div>
 
-<nav class="top" id="nav">
-  <div class="brand"><span class="mark"></span>Conclave</div>
-  <div class="links">
-    <a href="#about">About</a><a href="#architecture">Architecture</a><a href="#pipeline">Pipeline</a><a href="#roadmap">Roadmap</a><a href="#mas">Built with MAS</a>
+<nav class="pill" id="pillNav" aria-label="Site">
+  <a class="brand" href="#top"><span class="mark"></span><span class="word">Conclave</span></a>
+  <span class="current-label" id="currentLabel"></span>
+  <div class="links" id="navLinks">
+    <a href="#build">How it works</a>
+    <a href="#team">Team</a>
+    <a href="#outcomes">What you get</a>
+    <a href="#proof">Proof</a>
   </div>
-  <div class="cta-row">
-    <button class="theme-toggle" id="themeToggle" type="button">🌓</button>
-  </div>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">🌓</button>
+  <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false">Menu</button>
+  <a class="cta" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Talk to us</a>
 </nav>
 
-<section class="hero" id="about">
+<section class="hero" id="top">
   <div class="glow" id="heroGlow" aria-hidden="true"></div>
   <span class="eyebrow">A governed multi-agent SDLC</span>
   <h1>Ship AI products with <span class="accent">a human approving every gate.</span></h1>
-  <p class="lede">Conclave is a 9-gate multi-agent system that plans, designs, builds, and tests AI-centric applications for the energy industry — and stops for your sign-off at every one of them. A roster of specialist agents convened per project, deliberating under one orchestrator, with the human always holding final say.</p>
+  <p class="lede">Conclave is a 9-gate multi-agent system that plans, designs, builds, and tests AI-centric applications for the energy industry — and stops for your sign-off at every one of them.</p>
   <div class="cta-row">
-    <button class="btn btn-primary" onclick="document.getElementById('architecture').scrollIntoView()">See the pipeline</button>
-    <button class="btn btn-ghost" onclick="document.getElementById('mas').scrollIntoView()">Built with MAS</button>
+    <a class="btn btn-primary" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Start the conversation</a>
+    <a class="btn btn-ghost" href="#build">See how a build runs</a>
   </div>
-  <div class="stat-strip">
-    <div class="stat"><div class="num">9</div><div class="label">Gates</div></div>
-    <div class="stat"><div class="num">17</div><div class="label">Agents</div></div>
-    <div class="stat"><div class="num">100%</div><div class="label">Human-approved</div></div>
+  <div class="stat-strip" id="statStrip">
+    <div class="stat"><div class="num" data-count="9">0</div><div class="label">Gates</div></div>
+    <div class="stat"><div class="num" data-count="0">0</div><div class="label">Lines shipped unapproved</div></div>
+    <div class="stat"><div class="num" data-count="100" data-suffix="%">0</div><div class="label">Human-approved</div></div>
   </div>
 </section>
 
@@ -324,8 +344,8 @@
     </div>
     <div class="grid-2">
       <div class="card">
-        <h3>Two axes, never mixed</h3>
-        <p style="font-size:13.5px;"><code class="mono">/new-project</code>, <code class="mono">/enhance-project</code>, <code class="mono">/modify-feature</code>, <code class="mono">/consult</code> build and evolve individual applications. <code class="mono">/admin-panel</code> evolves Conclave itself — never reachable from a project command, never touches <code class="mono">projects/</code>.</p>
+        <h3>What "governed" means here</h3>
+        <p style="font-size:13.5px;">Nothing is autonomous end-to-end. Every stage — plan, design, architecture, code, test, review, deploy — ends at a gate that waits for a human yes. You can stop, redirect, or send work back at any of them, and every decision is written down where you can read it later.</p>
       </div>
       <div class="card">
         <h3>The value proposition</h3>
@@ -334,9 +354,87 @@
     </div>
   </section>
 
-  <section id="architecture" data-reveal>
+  <section id="build" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">How it's staffed</span>
+      <span class="eyebrow">A build, gate by gate</span>
+      <h2>Here's what it's actually like to build something.</h2>
+      <p>Nine gates, in order — a gate only opens once you've approved the one before it. Walked through as if you're the one asking Conclave to build it: say, a customer-facing outage-status chatbot for your utility.</p>
+    </div>
+
+    <div class="card">
+      <div class="pipeline-wrap">
+        <div class="pipeline" data-reveal="stagger">
+          <div class="p-node"><div class="p-dot">1</div><div class="p-check">✓</div><div class="p-name">Intake</div></div>
+          <div class="p-node"><div class="p-dot">2</div><div class="p-check">✓</div><div class="p-name">Team<br>Composition</div></div>
+          <div class="p-node"><div class="p-dot">3</div><div class="p-check">✓</div><div class="p-name">Plan &amp;<br>Backlog</div></div>
+          <div class="p-node optional"><div class="p-dot">4</div><div class="p-check">✓</div><div class="p-name">Experience<br>Design</div></div>
+          <div class="p-node optional"><div class="p-dot">5</div><div class="p-check">✓</div><div class="p-name">Architecture</div></div>
+          <div class="p-node"><div class="p-dot">6</div><div class="p-check">✓</div><div class="p-name">Code</div></div>
+          <div class="p-node"><div class="p-dot">7</div><div class="p-check">✓</div><div class="p-name">Test</div></div>
+          <div class="p-node"><div class="p-dot">8</div><div class="p-check">✓</div><div class="p-name">Review</div></div>
+          <div class="p-node"><div class="p-dot">9</div><div class="p-check">✓</div><div class="p-name">Deploy</div></div>
+        </div>
+      </div>
+      <div class="pipeline-legend">
+        <span><i style="background:var(--core)"></i>Core gate</span>
+        <span><i style="background:var(--surface);border:2px dashed var(--optional)"></i>Optional SME may engage</span>
+        <span><i style="background:var(--primary)"></i>Human approval checkpoint</span>
+      </div>
+    </div>
+
+    <div class="log journey" data-reveal="stagger">
+      <div class="entry">
+        <div class="date">Gate 1 — Intake</div>
+        <div class="title">You describe what you want, in plain language</div>
+        <div class="desc">You tell Conclave: an outage-status chatbot so customers can check outages by address. It asks a couple of grounding questions — what does the actual lookup workflow need to handle, which industry rules apply to customer-facing utility tools — and you just answer in plain language. No spec document required from you.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 2 — Team Composition</div>
+        <div class="title">You choose who's on the build</div>
+        <div class="desc">Conclave proposes a roster: the core build/test/review/deploy path, plus a designer because it's customer-facing, plus a security architect because customers will be looking up their own address. You see the recommended team and can add or drop specialists before anyone starts work.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 3 — Plan &amp; Backlog</div>
+        <div class="title">You approve the plan before code exists</div>
+        <div class="desc">You get a written, prioritized backlog — outage lookup by address, estimated restoration time, SMS opt-in — ranked by what actually matters first. You can approve it, reorder it, or cut a feature entirely, and none of it has been built yet.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 4 — Experience Design</div>
+        <div class="title">You review an actual mockup, not a description</div>
+        <div class="desc">Before any code is written, you're shown a real, clickable preview of the chatbot — the screens, the flow, the colors — as an actual webpage, not a paragraph describing one. You approve it, or send it back: "put the outage map above the fold" — and get a revised version to look at.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 5 — Architecture</div>
+        <div class="title">You see how it's actually built, in plain terms</div>
+        <div class="desc">You're shown, without jargon, how the system will hold together — what happens to a customer's address when they type it in, how login works if there is any — and you sign off on that shape before a single line of code is written against it.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 6 — Code</div>
+        <div class="title">It gets built exactly to what you approved</div>
+        <div class="desc">This is the one step you're not in the room for — but everything implemented here is what was already approved upstream. Nothing gets invented on the fly that you didn't see first.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 7 — Test</div>
+        <div class="title">You're shown a real failure, and asked what to do about it</div>
+        <div class="desc">You see actual test results, scenario by scenario. Say the outage-lookup test finds that addresses with hyphenated street names break the search. Conclave doesn't hide that or quietly ship around it — it surfaces the failure and asks: send it back to be fixed, or accept the limitation and ship anyway. You decide.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 8 — Review</div>
+        <div class="title">A second, independent pass, before you ever see it live</div>
+        <div class="desc">Someone other than the builder checks the finished work against what Plan and Architecture actually approved — did anything drift, is it consistent with the rest of the product. You see those findings before Deploy, not discovered after.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 9 — Deploy</div>
+        <div class="title">You give the final go</div>
+        <div class="desc">Only now does the outage chatbot actually go live — and it's your approval that puts it there. If anything about the industry or domain assumptions got flagged along the way, that advisor's sign-off shows up here too, before launch, not after.</div>
+      </div>
+    </div>
+    <p class="fine-print" data-reveal>Nine checkpoints. You're the approver at every one of them — not just once at the start and once at the end.</p>
+  </section>
+
+  <section id="team" data-reveal>
+    <div class="section-head">
+      <span class="eyebrow">The team</span>
       <h2>Think of it like a newsroom, not a machine.</h2>
       <p>One managing editor coordinates. A publisher signs off on every story before it runs. A staff is always on the desk, and outside experts get pulled in only when a story actually needs them — nobody talks sideways, everything goes through the editor and one shared assignment board.</p>
     </div>
@@ -347,7 +445,7 @@
           <div class="arch-node arch-node-human">You — the publisher</div>
           <div class="arch-caption">Nothing runs without your sign-off. Every gate stops and waits for you, not the other way around.</div>
         </div>
-        <div class="arch-arrow" data-reveal>↕ you review, you approve, you can always send it back</div>
+        <div class="arch-arrow">↕ you review, you approve, you can always send it back</div>
         <div class="arch-tier arch-orch">
           <div class="arch-node arch-node-orch">The managing editor <span class="arch-sub">(this conversation)</span></div>
           <div class="arch-caption">Every specialist reports here, and only here — never to each other. One coordinator, always.</div>
@@ -415,183 +513,141 @@
     </details>
   </section>
 
-  <section id="pipeline" data-reveal>
+  <section id="outcomes" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">Pipeline</span>
-      <h2>Nine gates. Sequential, not cyclical.</h2>
-      <p>This is the process the architecture above actually executes — every project moves left to right through the same pipeline, and a gate only opens once the one before it is human-approved.</p>
+      <span class="eyebrow">What you get</span>
+      <h2>Every build leaves you holding real artifacts.</h2>
+      <p>Not a demo and a promise — a working application plus the paper trail that lets you defend every decision behind it.</p>
+    </div>
+    <div class="grid-2" data-reveal="stagger">
+      <div class="card">
+        <h3>A working application</h3>
+        <p style="font-size:13.5px;">Deployed to your environment only on your final go: a GenAI chatbot, an agentic workflow, or a RAG knowledge app, built feature-by-feature against the backlog you approved.</p>
+      </div>
+      <div class="card">
+        <h3>The full decision record</h3>
+        <p style="font-size:13.5px;">Every gate decision, every approval, every "send it back" — appended to one written record as it happened. When someone asks "why does it work this way?", the answer is on file.</p>
+      </div>
+      <div class="card">
+        <h3>Test evidence, including the failures</h3>
+        <p style="font-size:13.5px;">Scenario-by-scenario results with the evidence attached — and the failures you chose to fix or consciously accepted, on the record, not discovered in production.</p>
+      </div>
+      <div class="card">
+        <h3>Design you saw before it was built</h3>
+        <p style="font-size:13.5px;">For anything with a screen: the clickable previews you approved at the design gate, kept alongside a running log of how the design performs after launch.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="proof" data-reveal>
+    <div class="section-head">
+      <span class="eyebrow">Proof</span>
+      <h2>Conclave is built by Conclave.</h2>
+      <p>The strongest test of a governed pipeline is whether its makers trust it with their own product. Every capability of this platform — including the specialists you just met, and this very page — went through the same nine gates you'd use.</p>
     </div>
     <div class="card">
-      <div class="pipeline-wrap">
-        <div class="pipeline" data-reveal="stagger">
-          <div class="p-node"><div class="p-dot">1</div><div class="p-check">✓</div><div class="p-name">Intake</div></div>
-          <div class="p-node"><div class="p-dot">2</div><div class="p-check">✓</div><div class="p-name">Team<br>Composition</div></div>
-          <div class="p-node"><div class="p-dot">3</div><div class="p-check">✓</div><div class="p-name">Plan &amp;<br>Backlog</div></div>
-          <div class="p-node optional"><div class="p-dot">4</div><div class="p-check">✓</div><div class="p-name">Experience<br>Design</div></div>
-          <div class="p-node optional"><div class="p-dot">5</div><div class="p-check">✓</div><div class="p-name">Architecture</div></div>
-          <div class="p-node"><div class="p-dot">6</div><div class="p-check">✓</div><div class="p-name">Code</div></div>
-          <div class="p-node"><div class="p-dot">7</div><div class="p-check">✓</div><div class="p-name">Test</div></div>
-          <div class="p-node"><div class="p-dot">8</div><div class="p-check">✓</div><div class="p-name">Review</div></div>
-          <div class="p-node"><div class="p-dot">9</div><div class="p-check">✓</div><div class="p-name">Deploy</div></div>
+      <div class="log" data-reveal="stagger">
+        <div class="entry">
+          <div class="date">Shipped continuously</div>
+          <div class="title">Eight platform capabilities since launch</div>
+          <div class="desc">The core pipeline, the SME roster, enhancement and release flows, usage monitoring, synthetic test data — each one planned, built, tested, reviewed, and human-approved through the pipeline itself.</div>
+        </div>
+        <div class="entry">
+          <div class="date">Simple case first, always</div>
+          <div class="title">Nothing speculative gets built</div>
+          <div class="desc">Cloud deployment and feature flags are designed and deliberately parked until a real project needs them — discipline you'll recognize in how your own backlog gets sequenced.</div>
+        </div>
+        <div class="entry">
+          <div class="date">This page, too</div>
+          <div class="title">What you're reading is the process's own output</div>
+          <div class="desc">The site you're reading went through Experience Design, review, and human approval like any other deliverable — including a live design preview with selectable themes, reviewed and chosen by a human before this build.</div>
         </div>
       </div>
-      <div class="pipeline-legend">
-        <span><i style="background:var(--core)"></i>Core gate</span>
-        <span><i style="background:var(--surface);border:2px dashed var(--optional)"></i>Optional SME may engage</span>
-        <span><i style="background:var(--primary)"></i>Human approval checkpoint</span>
-      </div>
     </div>
-  </section>
-
-  <section id="roadmap" data-reveal>
-    <div class="section-head">
-      <span class="eyebrow">Roadmap</span>
-      <h2>Platform roadmap — built vs. planned.</h2>
-      <p>Source: admin/ROADMAP.md. Sequencing discipline: prove the simple case first, build the harder version only once a real need surfaces.</p>
-    </div>
-    <div class="card">
-      <div class="gantt-row">
-        <div class="gantt-label">Core 5 pipeline agents<span class="id">plan/code/test/review/deploy</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:0%;width:22%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Templates + /new-project<span class="id">3 scaffolds, full gate order</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:0%;width:28%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">SME roster + Intake/Architecture<span class="id">ui-ux/solution/security/functional/industry</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:16%;width:24%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">enhance-agent + release-manager<span class="id">/enhance-project, /cut-release</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:32%;width:20%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">usage-monitor + /consult<span class="id">tracking, soft budgets, auto-pause/resume</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:46%;width:18%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">deliverables-agent<span class="id">PPTX/DOCX/XLSX + microsite</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:54%;width:16%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">synthetic-data-agent<span class="id">QA/demo data generation</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:66%;width:14%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Multi-suite Test Policy + conflict triage<span class="id">advisory suites, proximity/semantic conflicts</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-built" style="left:66%;width:20%;">Shipped</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Cloud target_env<span class="id">local-only proven first, deliberately deferred</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-planned" style="left:88%;width:12%;">Planned</div></div>
-      </div>
-      <div class="gantt-row">
-        <div class="gantt-label">Feature flags<span class="id">designed, no release has needed it yet</span></div>
-        <div class="gantt-track"><div class="gantt-bar bar-planned" style="left:88%;width:12%;">Planned</div></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="mas" data-reveal>
-    <div class="section-head">
-      <span class="eyebrow">Built with MAS</span>
-      <h2>Here's what it's actually like to build something.</h2>
-      <p>Walked through as if you're the one asking Conclave to build it — say, a customer-facing outage-status chatbot for your utility. Nine gates, and you're the one who says go at every one of them.</p>
-    </div>
-
-    <div class="log journey" data-reveal="stagger">
-      <div class="entry">
-        <div class="date">Gate 1 — Intake</div>
-        <div class="title">You describe what you want, in plain language</div>
-        <div class="desc">You tell Conclave: an outage-status chatbot so customers can check outages by address. It asks a couple of grounding questions — what does the actual lookup workflow need to handle, which industry rules apply to customer-facing utility tools — and you just answer in plain language. No spec document required from you.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 2 — Team Composition</div>
-        <div class="title">You choose who's on the build</div>
-        <div class="desc">Conclave proposes a roster: the core build/test/review/deploy path, plus a designer because it's customer-facing, plus a security architect because customers will be looking up their own address. You see the recommended team and can add or drop specialists before anyone starts work.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 3 — Plan &amp; Backlog</div>
-        <div class="title">You approve the plan before code exists</div>
-        <div class="desc">You get a written, prioritized backlog — outage lookup by address, estimated restoration time, SMS opt-in — ranked by what actually matters first. You can approve it, reorder it, or cut a feature entirely, and none of it has been built yet.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 4 — Experience Design</div>
-        <div class="title">You review an actual mockup, not a description</div>
-        <div class="desc">Before any code is written, you're shown a real, clickable preview of the chatbot — the screens, the flow, the colors — as an actual webpage, not a paragraph describing one. You approve it, or send it back: "put the outage map above the fold" — and get a revised version to look at.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 5 — Architecture</div>
-        <div class="title">You see how it's actually built, in plain terms</div>
-        <div class="desc">You're shown, without jargon, how the system will hold together — what happens to a customer's address when they type it in, how login works if there is any — and you sign off on that shape before a single line of code is written against it.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 6 — Code</div>
-        <div class="title">It gets built exactly to what you approved</div>
-        <div class="desc">This is the one step you're not in the room for — but everything implemented here is what was already approved upstream. Nothing gets invented on the fly that you didn't see first.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 7 — Test</div>
-        <div class="title">You're shown a real failure, and asked what to do about it</div>
-        <div class="desc">You see actual test results, scenario by scenario. Say the outage-lookup test finds that addresses with hyphenated street names break the search. Conclave doesn't hide that or quietly ship around it — it surfaces the failure and asks: send it back to be fixed, or accept the limitation and ship anyway. You decide.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 8 — Review</div>
-        <div class="title">A second, independent pass, before you ever see it live</div>
-        <div class="desc">Someone other than the builder checks the finished work against what Plan and Architecture actually approved — did anything drift, is it consistent with the rest of the product. You see those findings before Deploy, not discovered after.</div>
-      </div>
-      <div class="entry">
-        <div class="date">Gate 9 — Deploy</div>
-        <div class="title">You give the final go</div>
-        <div class="desc">Only now does the outage chatbot actually go live — and it's your approval that puts it there. If anything about the industry or domain assumptions got flagged along the way, that advisor's sign-off shows up here too, before launch, not after.</div>
-      </div>
-    </div>
-
-    <p class="fine-print" data-reveal style="text-align:center;">Nine checkpoints. You're the approver at every one of them — not just once at the start and once at the end.<br>Conclave applies this exact same nine-gate process to extending itself — including building the roster of specialists you just met, and this page.</p>
   </section>
 
 </main>
 
 <footer class="bookend">
   <div class="glow2" aria-hidden="true"></div>
-  <h3>Every gate. Every time. A human decides.</h3>
-  <div class="cta-row" style="justify-content:center; position:relative;">
-    <button class="btn btn-primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</button>
-  </div>
+  <h3>Tell us what you want to build.</h3>
+  <p class="pitch">One email starts it. Describe the product in plain language — the first gate is just a conversation.</p>
+  <a class="btn btn-primary" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Start the conversation</a>
+  <p class="fallback">or write to hello@conclave.example</p>
   <p class="meta">Conclave — generated by deliverables-agent, design by ui-ux-designer, 2026-07-13 · this file makes zero external network requests</p>
 </footer>
 
 <script>
 (function () {
-  var nav = document.getElementById('nav');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+
+  /* ===== Constellation canvas (agents-as-network) ===== */
+  var canvas = document.getElementById('net');
+  var ctx = canvas.getContext('2d');
+  var pts = [], W, H, running = true;
+  function netColor() {
+    return getComputedStyle(root).getPropertyValue('--net-rgb').trim() || '177,90,43';
+  }
+  function size() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  size(); window.addEventListener('resize', size);
+  var N = window.innerWidth < 768 ? 30 : 60;
+  for (var i = 0; i < N; i++) pts.push({
+    x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+    vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18
+  });
+  var LINK = 130;
+  function draw(move) {
+    ctx.clearRect(0, 0, W, H);
+    var rgb = netColor();
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      if (move) { p.x = (p.x + p.vx + W) % W; p.y = (p.y + p.vy + H) % H; }
+      ctx.fillStyle = 'rgba(' + rgb + ',.35)';
+      ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+    }
+    for (var a = 0; a < pts.length; a++) for (var b = a + 1; b < pts.length; b++) {
+      var dx = pts[a].x - pts[b].x, dy = pts[a].y - pts[b].y, d = dx * dx + dy * dy;
+      if (d < LINK * LINK) {
+        ctx.strokeStyle = 'rgba(' + rgb + ',' + (.10 * (1 - Math.sqrt(d) / LINK)).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke();
+      }
+    }
+  }
+  function tick() {
+    if (!running || document.hidden) { requestAnimationFrame(tick); return; }
+    draw(true);
+    requestAnimationFrame(tick);
+  }
+  if (reduceMotion) { draw(false); } else { tick(); }
+
+  /* ===== Scroll progress bar + hero glow parallax ===== */
+  var progress = document.getElementById('progress');
   var heroGlow = document.getElementById('heroGlow');
   var ticking = false;
-
   window.addEventListener('scroll', function () {
-    if (window.scrollY > 12) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
-    if (!reduceMotion && heroGlow && !ticking) {
-      ticking = true;
-      window.requestAnimationFrame(function () {
-        var y = window.scrollY;
-        var heroHeight = document.querySelector('.hero').offsetHeight;
-        var progress = Math.min(y / heroHeight, 1);
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      var y = window.scrollY;
+      var docH = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = (docH > 0 ? (y / docH) * 100 : 0) + '%';
+      if (!reduceMotion && heroGlow) {
+        var heroH = document.querySelector('.hero').offsetHeight;
+        var pr = Math.min(y / heroH, 1);
         heroGlow.style.transform = 'translateY(' + (y * 0.25) + 'px)';
-        heroGlow.style.opacity = String(1 - progress * 0.9);
-        ticking = false;
-      });
-    }
+        heroGlow.style.opacity = String(1 - pr * 0.9);
+      }
+      ticking = false;
+    });
   });
 
+  /* ===== Scroll-reveal ===== */
   if (!reduceMotion && 'IntersectionObserver' in window) {
     var revealEls = document.querySelectorAll('[data-reveal]');
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
+        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
     revealEls.forEach(function (el) { io.observe(el); });
@@ -599,11 +655,86 @@
     document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('is-visible'); });
   }
 
-  var toggle = document.getElementById('themeToggle');
-  var root = document.documentElement;
-  toggle.addEventListener('click', function () {
+  /* ===== Scroll-spy for the floating pill nav ===== */
+  var navLinks = document.querySelectorAll('#navLinks a');
+  var currentLabel = document.getElementById('currentLabel');
+  var sections = ['build', 'team', 'outcomes', 'proof'].map(function (id) { return document.getElementById(id); });
+  if ('IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          navLinks.forEach(function (l) { l.classList.remove('active'); l.removeAttribute('aria-current'); });
+          var link = document.querySelector('#navLinks a[href="#' + entry.target.id + '"]');
+          if (link) {
+            link.classList.add('active'); link.setAttribute('aria-current', 'true');
+            currentLabel.textContent = link.textContent;
+          }
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    sections.forEach(function (s) { if (s) spy.observe(s); });
+  }
+
+  /* ===== Stat count-up ===== */
+  var statStrip = document.getElementById('statStrip');
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function countUp(el) {
+    var target = parseInt(el.dataset.count, 10);
+    var suffix = el.dataset.suffix || '';
+    if (reduceMotion || target === 0) { el.textContent = target + suffix; return; }
+    var start = null, dur = 1200;
+    function step(ts) {
+      if (!start) start = ts;
+      var t = Math.min((ts - start) / dur, 1);
+      el.textContent = Math.round(target * ease(t)) + suffix;
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window && statStrip) {
+    var statIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          statStrip.querySelectorAll('.num').forEach(countUp);
+          statIO.unobserve(statStrip);
+        }
+      });
+    }, { threshold: 0.4 });
+    statIO.observe(statStrip);
+  } else if (statStrip) {
+    statStrip.querySelectorAll('.num').forEach(function (el) { el.textContent = el.dataset.count + (el.dataset.suffix || ''); });
+  }
+
+  /* ===== Cursor spotlight on cards ===== */
+  if (!reduceMotion) {
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+  }
+
+  /* ===== Theme toggle ===== */
+  document.getElementById('themeToggle').addEventListener('click', function () {
     var current = root.getAttribute('data-theme');
     root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    if (reduceMotion) draw(false); /* repaint static constellation in new theme */
+  });
+
+  /* ===== Mobile menu ===== */
+  var menuBtn = document.getElementById('menuBtn');
+  var pillNav = document.getElementById('pillNav');
+  menuBtn.addEventListener('click', function () {
+    var open = pillNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.querySelectorAll('#navLinks a').forEach(function (a) {
+    a.addEventListener('click', function () { pillNav.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); });
+  });
+  document.addEventListener('click', function (e) {
+    if (!pillNav.contains(e.target)) { pillNav.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); }
   });
 })();
 </script>
