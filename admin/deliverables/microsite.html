@@ -128,6 +128,35 @@
   table.reg th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border); }
   table.reg td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
   table.reg tr:last-child td { border-bottom: none; }
+  .diagram-wrap { overflow-x: auto; }
+
+  /* Layered system-architecture diagram: Human -> Orchestrator -> agent
+     lanes by category -> shared knowledge/state. Distinct from the
+     Pipeline section's horizontal gated timeline (a process view) — this
+     is a structural view of what talks to what. */
+  .arch-diagram { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 6px; }
+  .arch-tier { text-align: center; max-width: 620px; }
+  .arch-node {
+    display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px;
+    box-shadow: var(--shadow);
+  }
+  .arch-node-human { background: var(--primary); color: #fff; }
+  .arch-node-orch { background: var(--core); color: var(--bg); }
+  .arch-node-state { background: var(--surface); border: 1.5px dashed var(--border); color: var(--ink); }
+  .arch-sub { font-weight: 400; opacity: 0.75; font-size: 12.5px; }
+  .arch-caption { font-size: 12px; color: var(--muted); margin-top: 8px; max-width: 560px; line-height: 1.5; }
+  .arch-arrow { font-size: 12px; color: var(--muted); margin: 6px 0; font-weight: 600; }
+
+  .arch-lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; margin: 6px 0; }
+  @media (max-width: 820px) { .arch-lanes { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .arch-lanes { grid-template-columns: 1fr; } }
+  .arch-lane { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .arch-lane-title { font-size: 12.5px; font-weight: 700; margin-bottom: 2px; }
+  .arch-lane-title.core-title { color: var(--core); }
+  .arch-lane-title.optional-title { color: var(--optional); }
+  .arch-lane-sub { font-size: 10.5px; color: var(--muted); margin-bottom: 10px; }
+  .arch-lane-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+  .arch-lane-chips .chip { padding: 5px 10px 5px 8px; font-size: 11px; margin: 0; }
 
   /* Pipeline — horizontal gated timeline */
   .pipeline-wrap { overflow-x: auto; padding: 10px 4px 4px; }
@@ -187,15 +216,51 @@
       opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important;
     }
     html { scroll-behavior: auto; }
+    .ambient-bg .blob { animation: none !important; }
   }
+
+  /* Ambient background: 3 large, heavily-blurred blobs drifting slowly and
+     continuously behind the whole page — not scroll-triggered, running the
+     moment the page opens, the way the reference sites' hero backgrounds
+     stay alive rather than sitting static. Fixed behind everything, very
+     low opacity so body text never loses contrast; paused entirely under
+     prefers-reduced-motion (handled above) rather than just slowed down. */
+  .ambient-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .ambient-bg .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; }
+  .ambient-bg .blob-1 {
+    width: 560px; height: 560px; top: -140px; left: -120px;
+    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 70%);
+    animation: driftA 34s ease-in-out infinite alternate;
+  }
+  .ambient-bg .blob-2 {
+    width: 460px; height: 460px; top: 40%; right: -160px;
+    background: radial-gradient(circle, var(--primary-glow-b) 0%, transparent 70%);
+    animation: driftB 40s ease-in-out infinite alternate;
+  }
+  .ambient-bg .blob-3 {
+    width: 380px; height: 380px; bottom: -140px; left: 30%;
+    background: radial-gradient(circle, var(--primary-glow-a) 0%, transparent 72%);
+    animation: driftC 28s ease-in-out infinite alternate;
+  }
+  @keyframes driftA { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(90px,60px) scale(1.15); } }
+  @keyframes driftB { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-70px,-50px) scale(1.1); } }
+  @keyframes driftC { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(60px,-70px) scale(1.2); } }
+
+  nav.top, .hero, main, footer.bookend { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 
+<div class="ambient-bg" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
 <nav class="top" id="nav">
   <div class="brand"><span class="mark"></span>Conclave</div>
   <div class="links">
-    <a href="#about">About</a><a href="#architecture">Architecture</a><a href="#roadmap">Roadmap</a><a href="#mas">Built with MAS</a>
+    <a href="#about">About</a><a href="#architecture">Architecture</a><a href="#pipeline">Pipeline</a><a href="#roadmap">Roadmap</a><a href="#mas">Built with MAS</a>
   </div>
   <div class="cta-row">
     <button class="theme-toggle" id="themeToggle" type="button">🌓</button>
@@ -241,8 +306,113 @@
   <section id="architecture" data-reveal>
     <div class="section-head">
       <span class="eyebrow">Architecture</span>
+      <h2>Layers of agents, not a single monolithic builder.</h2>
+      <p>The human approves. One orchestrator dispatches. Agents never call each other directly — every hand-off runs through the orchestrator and through shared markdown state on disk.</p>
+    </div>
+
+    <div class="card diagram-wrap">
+      <div class="arch-diagram">
+        <div class="arch-tier arch-human">
+          <div class="arch-node arch-node-human">Human</div>
+          <div class="arch-caption">approves &amp; redirects at every gate — the only decision authority in the system</div>
+        </div>
+        <div class="arch-arrow" data-reveal>↕ reviews output, approves or sends back</div>
+        <div class="arch-tier arch-orch">
+          <div class="arch-node arch-node-orch">Orchestrator <span class="arch-sub">(this conversation)</span></div>
+          <div class="arch-caption">the human's single point of contact · dispatches one agent at a time · aggregates results · never bypassed</div>
+        </div>
+        <div class="arch-arrow" data-reveal>↓ dispatches, per gate</div>
+
+        <div class="arch-lanes" data-reveal="stagger">
+          <div class="arch-lane">
+            <div class="arch-lane-title core-title">Core pipeline</div>
+            <div class="arch-lane-sub">non-droppable</div>
+            <div class="arch-lane-chips">
+              <span class="chip"><span class="dot"></span>plan</span>
+              <span class="chip"><span class="dot"></span>code</span>
+              <span class="chip"><span class="dot"></span>test</span>
+              <span class="chip"><span class="dot"></span>review</span>
+              <span class="chip"><span class="dot"></span>deploy</span>
+            </div>
+          </div>
+          <div class="arch-lane">
+            <div class="arch-lane-title optional-title">Optional SME</div>
+            <div class="arch-lane-sub">convened per project's risk profile</div>
+            <div class="arch-lane-chips">
+              <span class="chip optional"><span class="dot"></span>ui-ux</span>
+              <span class="chip optional"><span class="dot"></span>solution-arch</span>
+              <span class="chip optional"><span class="dot"></span>security-arch</span>
+              <span class="chip optional"><span class="dot"></span>resp-ai-arch</span>
+              <span class="chip optional"><span class="dot"></span>functional</span>
+              <span class="chip optional"><span class="dot"></span>industry</span>
+            </div>
+          </div>
+          <div class="arch-lane">
+            <div class="arch-lane-title">Cross-cutting / infra</div>
+            <div class="arch-lane-sub">observe or serve every gate</div>
+            <div class="arch-lane-chips">
+              <span class="chip"><span class="dot"></span>usage-monitor</span>
+              <span class="chip"><span class="dot"></span>release-mgr</span>
+              <span class="chip"><span class="dot"></span>enhance-agent</span>
+              <span class="chip"><span class="dot"></span>synthetic-data</span>
+              <span class="chip"><span class="dot"></span>deliverables</span>
+            </div>
+          </div>
+          <div class="arch-lane">
+            <div class="arch-lane-title">Admin / platform</div>
+            <div class="arch-lane-sub"><code class="mono">mas-</code> prefix, governs Conclave itself</div>
+            <div class="arch-lane-chips">
+              <span class="chip"><span class="dot"></span>mas-architect</span>
+              <span class="chip"><span class="dot"></span>mas-registrar</span>
+              <span class="chip"><span class="dot"></span>mas-release-mgr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-arrow" data-reveal>↕ each agent reads and writes its own slice — never another agent's</div>
+
+        <div class="arch-tier arch-state" data-reveal>
+          <div class="arch-node arch-node-state">Shared knowledge &amp; state <span class="arch-sub">(plain markdown on disk)</span></div>
+          <div class="arch-caption">
+            <code class="mono">knowledge/*_KB.md</code> (one file per SME) ·
+            <code class="mono">PROJECT_CONTEXT.md</code> (Decisions Log, the append-only record every agent reads) ·
+            <code class="mono">FEATURES.md</code> ·
+            <code class="mono">admin/MAS_REGISTRY.md</code> ·
+            <code class="mono">admin/ROADMAP.md</code>
+          </div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--core)"></i>Core / non-droppable</span>
+        <span><i style="background:var(--surface);border:2px dashed var(--optional)"></i>Optional / droppable</span>
+        <span><i style="background:var(--primary)"></i>Human-approval boundary</span>
+      </div>
+    </div>
+
+    <div class="card" data-reveal>
+      <h3>Two axes, kept isolated</h3>
+      <p style="font-size:13.5px;"><code class="mono">projects/&lt;name&gt;/</code> (built by <code class="mono">/new-project</code>, <code class="mono">/enhance-project</code>, <code class="mono">/modify-feature</code>, <code class="mono">/consult</code>) and <code class="mono">admin/</code> (evolved only by <code class="mono">/admin-panel</code>) never mix — a project agent never writes to <code class="mono">admin/</code>, and an admin agent never touches <code class="mono">projects/</code>. The same orchestrator serves both axes, but the state each axis reads and writes stays strictly separated.</p>
+    </div>
+
+    <div class="card" data-reveal>
+      <h3>Agent roster, by category</h3>
+      <table class="reg">
+        <tr><th>Category</th><th>Agents</th></tr>
+        <tr><td>Core pipeline (non-droppable)</td><td><span class="id">plan-agent</span> <span class="id">code-agent</span> <span class="id">test-agent</span> <span class="id">review-agent</span> <span class="id">deploy-agent</span></td></tr>
+        <tr><td>Core for UI-bearing templates</td><td><span class="id">ui-ux-designer</span></td></tr>
+        <tr><td>Optional SME (droppable at Team Composition)</td><td><span class="id">functional-agent</span> <span class="id">industry-expert</span> <span class="id">solution-architect</span> <span class="id">security-architect</span> <span class="id">responsible-ai-architect</span></td></tr>
+        <tr><td>Cross-cutting / infra</td><td><span class="id">usage-monitor</span> <span class="id">release-manager</span> <span class="id">enhance-agent</span> <span class="id">synthetic-data-agent</span> <span class="id">deliverables-agent</span></td></tr>
+        <tr><td>Admin / platform (<code class="mono">mas-</code> prefix)</td><td><span class="id">mas-architect</span> <span class="id">mas-registrar</span> <span class="id">mas-release-manager</span></td></tr>
+      </table>
+    </div>
+
+  </section>
+
+  <section id="pipeline" data-reveal>
+    <div class="section-head">
+      <span class="eyebrow">Pipeline</span>
       <h2>Nine gates. Sequential, not cyclical.</h2>
-      <p>Every project moves left to right through the same pipeline — a gate only opens once the one before it is human-approved.</p>
+      <p>This is the process the architecture above actually executes — every project moves left to right through the same pipeline, and a gate only opens once the one before it is human-approved.</p>
     </div>
     <div class="card">
       <div class="pipeline-wrap">
@@ -263,32 +433,6 @@
         <span><i style="background:var(--surface);border:2px dashed var(--optional)"></i>Optional SME may engage</span>
         <span><i style="background:var(--primary)"></i>Human approval checkpoint</span>
       </div>
-    </div>
-
-    <div class="card" data-reveal>
-      <h3>Agent roster, by category</h3>
-      <table class="reg">
-        <tr><th>Category</th><th>Agents</th></tr>
-        <tr><td>Core pipeline (non-droppable)</td><td><span class="id">plan-agent</span> <span class="id">code-agent</span> <span class="id">test-agent</span> <span class="id">review-agent</span> <span class="id">deploy-agent</span></td></tr>
-        <tr><td>Core for UI-bearing templates</td><td><span class="id">ui-ux-designer</span></td></tr>
-        <tr><td>Optional SME (droppable at Team Composition)</td><td><span class="id">functional-agent</span> <span class="id">industry-expert</span> <span class="id">solution-architect</span> <span class="id">security-architect</span> <span class="id">responsible-ai-architect</span></td></tr>
-        <tr><td>Cross-cutting / infra</td><td><span class="id">usage-monitor</span> <span class="id">release-manager</span> <span class="id">enhance-agent</span> <span class="id">synthetic-data-agent</span> <span class="id">deliverables-agent</span></td></tr>
-        <tr><td>Admin / platform (<code class="mono">mas-</code> prefix)</td><td><span class="id">mas-architect</span> <span class="id">mas-registrar</span> <span class="id">mas-release-manager</span></td></tr>
-      </table>
-    </div>
-
-    <div class="roster" data-reveal="stagger">
-      <span class="chip"><span class="dot"></span>plan-agent</span>
-      <span class="chip"><span class="dot"></span>code-agent</span>
-      <span class="chip"><span class="dot"></span>test-agent</span>
-      <span class="chip"><span class="dot"></span>review-agent</span>
-      <span class="chip"><span class="dot"></span>deploy-agent</span>
-      <span class="chip optional"><span class="dot"></span>ui-ux-designer</span>
-      <span class="chip optional"><span class="dot"></span>solution-architect</span>
-      <span class="chip optional"><span class="dot"></span>security-architect</span>
-      <span class="chip optional"><span class="dot"></span>responsible-ai-architect</span>
-      <span class="chip optional"><span class="dot"></span>functional-agent</span>
-      <span class="chip optional"><span class="dot"></span>industry-expert</span>
     </div>
   </section>
 
