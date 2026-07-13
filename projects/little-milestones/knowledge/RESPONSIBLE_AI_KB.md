@@ -510,3 +510,57 @@ content-minimization rule should be added to whatever technical spec
 solution-architect writes for the Picker-response handling code**, since
 it constrains what that code is allowed to read from the API response,
 not just what it's allowed to do with it afterward.
+
+### 8.6 Test-gate verification (2026-07-13) — code-agent's implementation
+checked against §8's design; all four points verified pass
+
+Per this role's Test-gate charter ("were these guardrails actually
+implemented, not just documented"), checked directly against commits
+`8a76d55` (backend) and `0056069` (frontend) rather than relying on
+code-agent's own final-report claim. **Verdict: all four checks pass, no
+drift from §8's design found.**
+
+1. **§8.1 content-minimization — enforced in code, not just documented.**
+   `app/routes/google_photos.py`'s `_extract_minimal_item_fields`
+   (L330–347) is the single choke point every caller (`preview_picker_
+   selection`, `get_media_thumbnail`, `import_from_google`) goes through,
+   and it reads only `id`, `mediaFile.baseUrl`/`mimeType`/`filename`, and
+   `mediaFile.mediaFileMetadata.creationTime` off Google's raw response —
+   nothing else is ever touched. `GooglePhotosClient.list_picker_media_
+   items` (`app/google_photos.py` L455–474) deliberately still returns
+   Google's raw per-item dict, with its own docstring stating the
+   minimization discipline is meant to live at the extraction choke point,
+   not be silently baked into a narrower return type that could quietly
+   grow fields later — matches this file's stated design intent exactly.
+   **Confirmed as a genuine test, not a name-only one**:
+   `tests/test_google_photos_routes.py::test_preview_only_reads_minimal_
+   fields_ignores_face_grouping_metadata` (L402–438) mocks a real Google
+   media-item response carrying a `peopleGrouping` face-box field, a
+   `labels` list, and a `description` string, hits the real `/preview`
+   route, and asserts the response's keys equal exactly
+   `{google_media_item_id, thumbnail_url, is_probable_duplicate,
+   creation_time}` with the three extra fields absent.
+2. **§8.3 duplicate-detection scoping — confirmed independently.**
+   `app/photos.py`'s `PhotoStore.find_by_content_hash` (L304–316):
+   `WHERE profile_id = ? AND content_hash = ?` — no variant of the query
+   omits `profile_id`. `test_import_duplicate_within_same_family_
+   different_child_not_flagged` (`test_google_photos_routes.py` L549–569)
+   imports identical bytes for two profiles in the same family and asserts
+   neither is flagged as the other's duplicate.
+3. **No new face/AI processing — confirmed.** `PhotoStore.create()`
+   (`app/photos.py` L243) calls the existing `photo_theme.extract_
+   accent()` on imported bytes identically to native uploads; no other ML/
+   vision call exists anywhere in `google_photos.py` or its routes file
+   (read in full). The existing static import-graph test
+   (`test_import_no_llm_import_static_graph_edge`,
+   `test_google_photos_routes.py` L631–656) AST-confirms zero import path
+   from either new module into `app.llm`/`app.prompts`/`app.guardrails`.
+4. **§8.2 disclosure-copy scope — confirmed.** `GooglePhotosCard.tsx` and
+   `GooglePhotosImportDialog.tsx`'s full copy (read in entirety) describes
+   only this app's own behavior (read-only picker access, one-time copy
+   into this app's encrypted storage, EXIF/location stripped, disconnect
+   doesn't delete already-imported photos) and makes no claim anywhere
+   about controlling, removing, or having visibility into Google-side
+   processing of the caregiver's library — as recommended.
+
+**No defect found; nothing referred back to code-agent for this feature.**

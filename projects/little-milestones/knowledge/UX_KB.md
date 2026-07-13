@@ -2191,3 +2191,51 @@ the full `PROJECT_CONTEXT.md` Decisions Log was read before finalizing
 this pass; the responsive-web-app platform decision is honored (every
 screen shown mobile + desktop); nothing recorded since Increment 6 bears
 on F17 specifically beyond FEATURES.md's own scope.
+
+### 12.10 Test-gate verification (2026-07-13)
+
+Verified against commit `0056069`'s implementation
+(`GooglePhotosCard.tsx`, `GooglePhotosImportDialog.tsx`,
+`SettingsScreen.tsx`, `page.tsx`, `globals.css`). Full per-item evidence
+in this gate's chat transcript; summary below.
+
+**Pass:** §12.2 settings entry point (both states, correct placement in
+`.lm-settings-grid`) — minor deviation: "Import photos" ships as
+`lm-btn-secondary`, not the primary action §12.2 calls for. §12.3 OAuth
+error copy (calm-terracotta, never raw HTTP/OAuth text, matches spec
+verbatim). §12.4 import-review mechanics (skip toggle, live confirm
+count, privacy copy verbatim). §12.5 partial-failure honesty and scoped
+retry. §12.6 no new component vocabulary beyond the one flagged Picker
+exception. Accessibility basics. §12.2's lapsed-connection reuse of
+plain not-connected copy (no distinct branch exists in the code).
+
+**Real defects found, not fixed here:**
+1. **Disconnect dialog renders destructive-red, contradicting §12.3.**
+   `GooglePhotosCard.tsx`'s disconnect dialog uses `className="lm-dialog"`
+   without the `lm-dialog-neutral` override `SecurityCard.tsx`'s
+   TOTP-disable dialog correctly applies for the identical
+   non-destructive case. `globals.css`'s unconditional
+   `.lm-dialog h2 { color: var(--lm-danger) }` therefore colors
+   "Disconnect Google Photos?" in the one red UXR-9 reserves for
+   permanent data loss. Fix: add `lm-dialog-neutral` to that div's
+   className.
+2. **Duplicate badge and "Added" result tag don't carry the color roles
+   §12.4/§12.5 specify.** Both reuse `.lm-theme-chip`
+   (`color: var(--lm-ink-soft)`, no background) — a plain gray label
+   originally designed for the switcher's "photo theme"/"default theme"
+   preview — instead of, respectively, the slate informational surface
+   (§12.4, matching `.lm-pediatrician-note`'s role) and a sage
+   confirmatory tag (§12.5, matching the sage already used correctly
+   elsewhere, e.g. `SecurityCard.tsx`'s password-success text). Not an
+   alarm-color violation, but it flattens three visually-distinct
+   states (duplicate-flag / added / skipped) into one identical gray
+   chip, working against the deliberate color-semantics this KB
+   otherwise treats as load-bearing.
+
+Minor, non-blocking: the full-success "✦ Added to {Name}'s journey"
+line renders unstyled instead of with the "small gold ✦ accent" §12.5
+describes.
+
+Not re-verified here (unchanged from §12.9's scope, still Architecture's):
+OAuth token storage/refresh, duplicate-detection hashing, backend
+routes/schema.

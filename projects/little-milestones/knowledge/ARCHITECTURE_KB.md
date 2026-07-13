@@ -1870,3 +1870,71 @@ sufficiency (§12.2, §12.8) — the same class of new-delete/data-flow
 wrinkle this project has consistently routed to security-architect rather
 than closing solo (F8's unsubscribe route, §9.3's photo
 replace-not-accumulate ordering, §10.8's chat-session sharing scope).
+
+### 12.12 Test-gate verification (solution-architect, 2026-07-13)
+
+Verification pass on code-agent's implementation (commits `8a76d55`
+backend, `0056069` frontend) against this section's design. Read in full:
+`app/google_photos.py`, `app/routes/google_photos.py`, `app/db.py`,
+`app/photos.py`. **Result: PASS on all seven checked items — implementation
+matches design, no architectural defects found.**
+
+1. **Pipeline reuse (§12.5 step 4) — confirmed.** `routes/google_photos.py`'s
+   `import_from_google` hands fetched bytes into the existing
+   `PhotoStore.create()` (`app/photos.py`) unchanged, via two new optional
+   kwargs (`content_hash`, `import_source`) rather than a parallel path.
+   `create()`'s internal sequence (EXIF-strip → `photo_theme.extract_accent`
+   → Fernet encrypt → write → insert row) is untouched and runs identically
+   regardless of call-site origin. No duplicate EXIF-strip/encryption logic
+   exists anywhere in `google_photos.py`/`routes/google_photos.py`.
+2. **No LLM import path — confirmed.** Full read of both new modules found
+   zero imports of `app.llm`, `app.prompts`, or `app.guardrails` — only
+   `app.crypto`, `app.auth`, `app.memories`, `app.photos`, `app.profiles`.
+   Matches §12.0's structural-isolation claim exactly.
+3. **Duplicate detection (§12.6) — confirmed.** `compute_content_hash()`
+   (`app/photos.py`) is Pillow-decode → RGB convert → resize to
+   256px-longest-side → PNG-encode → SHA-256, as designed.
+   `PhotoStore.find_by_content_hash(profile_id, content_hash)` always
+   includes `profile_id` in its `WHERE` clause with no variant that omits
+   it — cross-child/cross-family matches are structurally impossible, not
+   just conventionally avoided. Used at both preview time (non-load-bearing
+   UI badge) and confirm time (load-bearing, persisted) per design.
+4. **Data model (§12.4) — confirmed.** `db.py`'s `CREATE TABLE IF NOT
+   EXISTS` statements for `google_oauth_states`/`google_photos_connections`
+   match the designed schema (names, columns, id-tier choices) exactly. The
+   additive `photo_meta.content_hash`/`import_source` columns and their
+   index are applied via `_apply_incremental_migrations()`, which checks
+   `PRAGMA table_info(photo_meta)` before each `ALTER TABLE ADD COLUMN` —
+   idempotent and safe to run against the already-populated dev DB, the
+   same migration-safety pattern established at F12 (`unsubscribe_token`/
+   TOTP columns).
+5. **Failure handling (§12.7) — confirmed.** `/import-from-google` returns
+   `{"results": [{google_media_item_id, status, memory_id?, photo_id?,
+   error?}]}` exactly as designed (`imported`/`skipped_duplicate`/`failed`).
+   Each item runs inside its own `try/except` (both the Google fetch and
+   the Memory/Photo creation step) — one item's failure appends a `"failed"`
+   result and continues the loop rather than aborting the batch.
+   Crash-safe ordering confirmed: a `Memory` row created before a failed
+   `PhotoStore.create()` call is explicitly deleted, leaving no orphaned
+   artifact.
+6. **Schema discrepancy (dedicated `google_photos_connections` table vs.
+   security-architect's originally-sketched `users` columns) — confirmed
+   built as solution-architect's §12.4 design specifies.** Already resolved
+   in solution-architect's favor by the orchestrator (PROJECT_CONTEXT.md
+   Decisions Log, 2026-07-12); no further resolution needed at this gate.
+7. **`requests` over `httpx` (code-agent's judgment call) — confirmed
+   reasonable, not a design violation.** `pyproject.toml` lists
+   `requests>=2.31` as a real production dependency; `httpx>=0.27` is
+   listed only under `[project.optional-dependencies].dev`. This matches
+   `email_delivery.py`'s existing precedent (the project's one prior "call
+   a real third-party HTTP API" example) exactly, introduces no new
+   operational surface, and doesn't touch anything §12 treats as
+   architecture-significant — the load-bearing abstraction boundary is
+   `GooglePhotosClient` (the mockable test seam), not the underlying HTTP
+   library.
+
+**No architectural defects found.** All four reviewed files implement §12
+as designed with no parallel/duplicate storage or crypto mechanisms, no
+scope creep beyond the approved design, and idempotent migrations
+consistent with this project's established F12 precedent. Fit to proceed
+to the remainder of the Test gate.

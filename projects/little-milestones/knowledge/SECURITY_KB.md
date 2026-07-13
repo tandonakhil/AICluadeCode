@@ -1230,3 +1230,73 @@ section could not verify (§8.3's exact scope string, §8.7 point 2's
 verification-requirement question) — those two specifically should not be
 treated as resolved by either KB until confirmed against live Google
 documentation.
+
+### 8.12 Test-gate verification (security-architect, 2026-07-13)
+
+Verified the actual implementation (`8a76d55` backend, `0056069` frontend)
+against this section's design, reading the code directly rather than
+trusting the test suite alone. **All nine checked items pass, no gap
+found.**
+
+1. **Token encryption (§8.2): confirmed.** `google_photos_connections
+   .access_token_enc`/`refresh_token_enc` are Fernet ciphertext via the
+   shared `crypto.get_fernet()` key at every write site
+   (`google_photos.py:309-314`, `routes/google_photos.py:194-200`,
+   `db.py:227-228`); no code path writes either column in plaintext.
+2. **Never logged (§8.2 point 3): confirmed.** All six `logger.warning`
+   calls in `google_photos.py`/`routes/google_photos.py` carry only
+   `user_id=`/`profile_id=` — no token, authorization `code`, or `state`
+   value appears in any log line.
+3. **CSRF/state binding (§8.4): confirmed, both checks present.**
+   `routes/google_photos.py:145-156`'s callback requires
+   `get_current_session_user` (401 without a session at all); `:169`'s
+   `state_store.consume(state, session_user.id)`
+   (`google_photos.py:157-183`) independently rejects a state row bound
+   to a different `user_id`, on top of the session check — neither check
+   alone would be sufficient, and the code implements both.
+4. **PKCE: confirmed, full round-trip.** `code_verifier`/`code_challenge`
+   (S256) generated at `/connect` (`google_photos.py:106-112`, `133-141`),
+   the verifier persisted per-state-row and retrieved at `/callback`
+   (`routes/google_photos.py:169,174`), sent to Google's token endpoint at
+   exchange (`google_photos.py:364-382`).
+5. **Scope minimization (§8.3): confirmed exact match.**
+   `GOOGLE_PHOTOS_PICKER_SCOPE` (`google_photos.py:53`) is byte-for-byte
+   `https://www.googleapis.com/auth/photospicker.mediaitems.readonly`, the
+   string the orchestrator verified live against Google's docs
+   (ARCHITECTURE_KB §12.3) — a fixed constant, no widening path.
+6. **Revocation ordering (§8.5): confirmed.**
+   `routes/google_photos.py:204-229`'s `disconnect()` calls
+   `client.revoke_token` before `connection_store.delete`; a raised
+   `GooglePhotosApiError` surfaces a 502 and returns without deleting the
+   row — a failed revoke leaves the connection intact, exactly as
+   designed.
+7. **Rate limiting (§8.8): confirmed on the three named routes.**
+   `/connect` (10/hr/user), `/callback` (20/min/IP), `/import-from-google`
+   (30/min/user + 50-item batch cap) all call `check_rate_limit` with the
+   exact keying this section specified
+   (`routes/google_photos.py:129-131,157-159,490-498`). Minor, non-
+   blocking observation: the picker-session create/status/preview/
+   thumbnail routes carry no rate limit of their own — consistent with
+   this section's original scope (which only named connect/callback/
+   import), not a deviation from it; worth a look in a future increment
+   given `create_picker_session` calls Google's API per request.
+8. **Cross-user authz: confirmed.** Every route resolves `user_id`/
+   `family_id` from the authenticated session only, never from a caller-
+   supplied parameter; `OAuthStateStore.consume` independently re-checks
+   `user_id` ownership even though it's already looked up by a hashed
+   high-entropy value. A caregiver cannot reach another caregiver's
+   `google_photos_connections`/`google_oauth_states` row.
+9. **Schema resolution (dedicated `google_photos_connections` table vs.
+   this section's original `users`-columns sketch): no objection.**
+   Per PROJECT_CONTEXT.md's 2026-07-12 Decisions Log, the orchestrator
+   resolved this in ARCHITECTURE_KB §12.4's favor. Confirmed from this
+   role's lens: `user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON
+   DELETE CASCADE` (`db.py:223-232`) gives correct cascade-delete
+   behavior, and Fernet encryption is applied per-column identically to
+   what this section originally specified — the two designs differ only
+   in *where* the encrypted columns live, not in any security property,
+   so there is nothing to re-litigate here.
+
+**Net: implementation matches this section's design on every checked
+point. No blocking finding for Test gate on the security suite's F17
+scope.**
