@@ -332,3 +332,181 @@ the boundary at Review time.
   trade-off solution-architect made explicit is endorsed, not contested,
   precisely because R1/R2 are this file's highest-stakes boundaries and a
   latency cost is the correct trade against them.
+
+---
+
+## 8. Revision — 2026-07-12: Increment 7 — Google Photos import (F17)
+
+Advisory review at the Architecture gate for F17, alongside solution-
+architect and security-architect's own passes (this file does not own
+that gate). Read against `FEATURES.md`'s F17 entry, `UX_KB.md` §12 (the
+approved Experience Design for this feature), this file's own §3/§4
+(the existing content/behavior boundaries this section extends, not
+replaces), and `PROJECT_CONTEXT.md`'s Decisions Log. **Verdict: F17 as
+designed in UX_KB §12 is fine as-is, with one new explicit guardrail
+required at the import boundary (§8.1) and one scoping clarification on
+duplicate detection (§8.3) — neither is a redesign, both are additions
+this file is responsible for stating rather than leaving implicit.**
+
+### 8.1 Does F17 honor the existing no-face-processing / no-AI-training
+commitment for imported photos? Yes, by construction — plus one new rule
+this file adds at the boundary that construction doesn't cover
+
+UX_KB §12.4 confirms imported photo bytes land in the same
+`AddMemoryForm`/`photos.py` review-and-store path used by direct uploads
+(same photogrid precedent, same privacy-reassurance copy, "stored
+privately, same as every other photo here"). Since this is the identical
+code path — not a parallel one — the existing structural guardrails this
+file already relies on (ARCHITECTURE_KB §4.1: no face-detection code
+path exists at all; photo pipeline has no code path into the LLM layer;
+theme/color extraction only) cover imported photos automatically. No new
+guardrail is needed **inside** `photos.py` for this feature.
+
+**What does need an explicit new rule is the layer before that** — the
+OAuth/Picker handoff, which is a genuinely new processing surface that
+didn't exist for direct uploads (there was previously no third-party API
+response to receive at all). This is the one place a Google API
+response could carry more than raw image bytes, and where "just take
+what the API gives us" is a plausible, innocuous-looking way the
+no-face-processing commitment could quietly erode without anyone
+deciding to erode it:
+
+**New boundary (F17-specific, added to this file's content/behavior
+scope):**
+- The import path must request and ingest **only** the raw image bytes
+  and minimal file metadata (filename, MIME type, capture timestamp if
+  present) from the Google Photos Picker API response.
+- The import path must **never** request, ingest, store, or pass through
+  any Google-side people-grouping, face-grouping, label/classification,
+  or description metadata the Photos API may optionally expose for a
+  selected item — even where such a field would be low-effort to include
+  ("it's already in the response, why not store it") and even though
+  UX_KB §12's current design does not currently request it. This is
+  stated explicitly, not left to be inferred from omission, because it's
+  exactly the kind of scope creep that shows up as a one-line addition in
+  a later increment rather than a deliberate design decision.
+- solution-architect's scope-minimization design (read-only, picker-based
+  selection, INDUSTRY_KB §2.2) already points the OAuth scope choice in
+  this direction; this section makes the **content**-minimization
+  counterpart explicit as a standing rule for `code-agent`'s eventual
+  Picker-response-handling code, and as a Review-gate check (§6 of this
+  file already covers "was this actually implemented, not just
+  documented" — this rule is added to that checklist).
+
+### 8.2 Google's own AI processing on its side of the OAuth boundary —
+explicitly out of scope for this app's disclosure copy
+
+Google Photos may run its own face-grouping, content classification, or
+other processing on the caregiver's library independent of anything this
+app does. **Recommendation, stated explicitly rather than left
+ambiguous: this is out of scope for Settings/disclosure copy, and UX_KB
+§12.2 is correct to say nothing about it.** Reasoning:
+
+- The caregiver's relationship with Google Photos, and whatever
+  processing Google already applies to that library, predates and is
+  independent of this app's OAuth connection — it was consented to
+  separately, on Google's own terms, before this feature ever existed.
+- Adding disclosure copy about Google's own AI processing here would
+  imply a level of visibility into or responsibility for that processing
+  this app does not have and should not claim — a misleading signal, not
+  a protective one.
+- It would also dilute the two disclosure touchpoints that actually
+  matter and are this app's own responsibility (§12.2's not-connected-
+  state explanation, §12.4's point-of-import privacy reassurance) — both
+  are about what *this app* newly does with selected photos, which is
+  the only thing in this app's control and therefore the only thing its
+  disclosure copy should be about.
+- This is a clean "no action" call, not an oversight: the boundary this
+  file draws is around this app's own behavior, and Google's own
+  processing of a caregiver's personal library is, correctly, on the
+  other side of that boundary.
+
+### 8.3 Content-hash duplicate detection — confirmed no responsible-AI
+concern, with one scoping rule added
+
+Hashing photo content to detect duplicates (solution-architect's
+proposed mechanism, UX_KB §12.4's "Looks like a duplicate" badge) is a
+privacy-preserving dedup check, not an identification or biometric
+mechanism — confirmed explicitly rather than silently passed, per this
+gate's instruction. A content hash carries no demographic, facial, or
+identity signal; it answers "have I seen these approximate bytes
+before," nothing else, and the UX treats a match as informational
+(slate, non-alarm, fully overridable per-photo skip toggle) rather than
+as any kind of determination about the photo or child.
+
+**One scoping rule this file adds, not because the mechanism is risky
+but because unscoped comparison would be a silent behavior change with
+no product justification:** duplicate-hash comparison must be scoped to
+the **target child's own existing photos only** — never compared across
+children within the same family, and never across families. Cross-scope
+comparison isn't materially more dangerous from a bias/safety standpoint,
+but it would be answering a question ("does this photo of Child A also
+exist in Child B's collection, or in another family's") that nothing in
+FEATURES.md or UX_KB asked for, and that a hash-based system could
+technically support without anyone deciding it should. This is an
+appropriate-use boundary in the same spirit as §3.4's existing
+boundaries: available-but-undesired functionality doesn't get to ship
+just because the underlying mechanism happens to support it.
+
+### 8.4 Multi-caregiver consent for imported photos — reviewed as a real
+edge case; verdict: no new guardrail needed, reasoning stated explicitly
+
+F10's multi-caregiver model already means one caregiver can unilaterally
+add content (memories, direct photo uploads via F6/F7) that lands in the
+shared child's journey, fully visible to every other caregiver, with no
+pre-approval step from anyone else — that is F10's accepted trust model,
+not a gap introduced here. The question worth asking at this gate is
+whether F17's batch-import nature (potentially many photos in one action,
+sourced from a caregiver's personal library rather than typed/selected
+one at a time) changes that risk enough to need something beyond what
+F10 already accepts.
+
+**Assessed and rejected as a new risk requiring a new guardrail, for two
+reasons:**
+1. **The review-before-import step (UX_KB §12.4) is the correct and
+   sufficient mitigation for the risk that's actually novel here** — not
+   inter-caregiver consent (which F10 never gated in the first place),
+   but *over-inclusion*: a caregiver accidentally importing something
+   irrelevant, private, or unintended for the child's journey from a
+   large personal library. Per-photo selection in Google's own Picker,
+   plus the app's own review/confirm step before anything is written,
+   directly addresses that. This is what the review step is *for*, and
+   it's designed correctly for that purpose.
+2. **Inter-caregiver consent for content one caregiver adds without the
+   other's prior review is not a new problem F17 creates** — it is the
+   existing, already-accepted shape of F10's caregiver trust model
+   (invite-only, single-use codes, caregivers who have already been
+   explicitly granted access trust each other by design). F17 doesn't
+   expand *who* can add unreviewed content to the shared journey or
+   *what* they can add it to — it expands *where the content comes from*
+   (a caregiver's own Google library instead of their own camera roll via
+   direct upload), which is a difference in convenience and source, not
+   in the consent shape.
+
+**This is recorded here as a reasoned "no new guardrail," not a silent
+assumption** — per this gate's instruction not to rubber-stamp this
+question. If a future increment changes F10's model (e.g., an
+"other-caregiver review before it's visible" step were ever proposed for
+any content type), F17's imported photos should be swept into that
+change automatically rather than treated as a special case, since
+nothing about the import *source* changes the underlying consent
+question.
+
+### 8.5 Completeness note and relationship to solution-architect/
+security-architect's passes
+
+No disagreement found with either joint gate owner's design as reflected
+in UX_KB §12 (the Experience Design both would build against). §8.1's new
+rule is additive to solution-architect's OAuth-scope design (INDUSTRY_KB
+§2.2 compliance, already correctly minimized on the *access*-scope axis);
+this file adds the *content*-scope counterpart. §8.2's "out of scope" call
+is this file's own advisory judgment on disclosure copy, not a
+disagreement with any existing design. §8.3's scoping rule and §8.4's
+"no new guardrail" verdict are both this file's own appropriate-use
+analysis layered on top of, not contesting, solution-architect's technical
+duplicate-detection design and F10's existing caregiver-permission model.
+Flagged for the joint Architecture gate: **§8.1's Picker-response
+content-minimization rule should be added to whatever technical spec
+solution-architect writes for the Picker-response handling code**, since
+it constrains what that code is allowed to read from the API response,
+not just what it's allowed to do with it afterward.

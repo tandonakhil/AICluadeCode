@@ -1301,3 +1301,536 @@ FK/cascade shape, encryption-key reuse) is consistent with this project's
 established conventions with no architecture objection. §11.2's store-class
 guidance and §11.4's index recommendations are additive clarifications for
 code-agent, not changes to SECURITY_KB §7's design.
+
+---
+
+## 12. F17 — Google Photos import: architecture design (Increment 7, solution-architect, 2026-07-12)
+
+Designed against `FEATURES.md`'s F17 entry and `UX_KB.md` §12 (Experience
+Design, approved as this feature's spec) in full. Checked against this
+project's established conventions: `Store[T]` interface discipline (§0),
+SQLite schema/cascade conventions (§3), the tier-1/tier-2 id convention
+(§3, reconfirmed §10.1/§11.1), Fernet application-level encryption
+(`app/crypto.py`, extracted at F12 specifically for reuse, §11.5), the
+in-process/no-new-operational-surface instinct applied consistently to
+scheduling (§5.3), rate limiting (§2, Increment 3), and secrets (§5.8,
+§2.5), and the photo pipeline's structural LLM-isolation guarantee (§4.1
+step 8, §6.3). **Pending joint security-architect review** — flagged items
+below are specifically called out for that sign-off, consistent with this
+project's Architecture-gate joint-presentation requirement.
+
+### 12.0 Component map addition
+
+```
+dev/backend/app/
+  google_photos.py         — NEW: OAuth client (authz-code+PKCE, token
+                              exchange/refresh) + Picker API wrapper +
+                              GooglePhotosConnectionStore/OAuthStateStore
+  routes/google_photos.py  — NEW: connect/callback/disconnect/status,
+                              picker-session, and import routes
+  photos.py                — EXTENDED: content_hash/import_source on
+                              PhotoStore.create(), no new pipeline
+  memories.py               — EXTENDED: nothing structural, reused as-is
+    (import creates ordinary Memory rows through the existing
+    MemoryStore.create())
+```
+
+`google_photos.py` has **no import path into `llm.py`/`prompts.py`/
+`guardrails.py`**, verified by the same static-import-graph check §6.3/§7
+already runs for `photos.py`'s isolation — this is a structural absence of
+the capability, not a checked rule, the same category of control already
+established for the rest of the photo pipeline.
+
+### 12.1 Scope framing carried forward from UX_KB §12.1
+
+**Confirmed, no architecture objection.** UX_KB §12.1's "connection may
+persist, no background sync/polling/automatic import ever runs" is the
+load-bearing constraint this entire design is built to: there is
+deliberately no cron job, no `scheduler.py` registration, no APScheduler
+job for this feature (contrast with F8's digest, which genuinely needs
+recurrence — F17 does not, and adding one would contradict UX_KB's own
+one-shot framing for no benefit). Every network call to Google happens
+inside a caregiver-initiated HTTP request to this backend; nothing calls
+Google's API unattended.
+
+### 12.2 OAuth flow — server-side, authorization-code + PKCE
+
+**Decision: full-page redirect (matches UX_KB §12.3), backend-driven
+exchange, PKCE required even though this is a confidential (server-side)
+client** — PKCE is not strictly required for a server-side client holding
+a client secret, but costs nothing extra to add and closes the
+authorization-code-interception class of attack outright; treated as a
+floor, not a ceiling, on the OAuth spec's minimum for this client type
+(same "stricter than the stated requirement" instinct already applied to
+this project's EXIF-strip, §Increment-2 judgment call 3).
+
+**Routes** (new `routes/google_photos.py`; all four require an
+authenticated caregiver session — `Depends(get_current_user)`, the same
+per-user dependency `/auth/me` already uses, not just `get_current_family`,
+since the connection is per-caregiver per UX_KB §12.2):
+
+- **`GET /auth/google-photos/connect`** — generates `state`
+  (`secrets.token_urlsafe(32)`, mirroring session/invite/reset-token
+  entropy) and a PKCE `code_verifier` (`secrets.token_urlsafe(64)`,
+  `code_challenge = base64url(sha256(code_verifier))`, `S256` method).
+  Persists a row keyed by `sha256(state)` (§12.4's `google_oauth_states`
+  table — hashed at rest, same discipline as session/reset tokens, §1/§7
+  of this file), then issues a `302` to Google's OAuth consent endpoint
+  with `client_id`, `redirect_uri`, `response_type=code`, `scope` (§12.3),
+  `state`, `code_challenge`, `code_challenge_method=S256`,
+  `access_type=offline` (required to receive a `refresh_token` at all —
+  without it Google returns an access token only, which would force
+  re-consent on every expiry, contradicting UX_KB §12.1's "connect once,
+  use repeatedly"), and `prompt=consent` on first connect only (ensures a
+  refresh token is actually issued — Google's documented behavior is to
+  omit `refresh_token` on repeat consents for an already-authorized app
+  unless `prompt=consent` is forced; **flagged for pre-Code verification,
+  §12.8** since this is exactly the kind of Google-API-specific behavior
+  this pass cannot verify without web access).
+- **`GET /auth/google-photos/callback?code=...&state=...`** — looks up
+  `sha256(state)` in `google_oauth_states`, rejects (redirect to Settings
+  with a generic error query param, never raw OAuth/HTTP error text per
+  UX_KB §12.3) if missing/expired (10-minute TTL) or if the row's
+  `user_id` doesn't match the current session's user — this is the CSRF
+  protection: an attacker cannot forge a callback for a caregiver session
+  they don't control, because the state row is bound to the session that
+  initiated `/connect`. On match: deletes the state row (single-use,
+  consistent with invite-code/reset-token single-use discipline),
+  exchanges `code` + `code_verifier` for `{access_token, refresh_token,
+  expires_in}` via Google's token endpoint (`POST
+  https://oauth2.googleapis.com/token`), fetches the connected account's
+  email (Google's `userinfo` endpoint or the ID token's `email` claim —
+  needed for UX_KB §12.2's "shows the connected Google account email"),
+  encrypts both tokens with the existing Fernet key (`crypto.py`, no
+  second key — confirms the same reuse pattern §11.5 already applied to
+  the TOTP secret), and upserts one row in `google_photos_connections`
+  (§12.4) keyed by `user_id`. Redirects (`302`) back to the frontend
+  Settings route with a success/error query flag — this route is a
+  browser navigation target, not a JSON API, matching the full-page-
+  redirect decision.
+- **`POST /auth/google-photos/disconnect`** — best-effort calls Google's
+  token-revocation endpoint (`POST
+  https://oauth2.googleapis.com/revoke?token=...`) with the refresh token,
+  then deletes the `google_photos_connections` row regardless of whether
+  the revoke call succeeds (a caregiver's "Disconnect" click must not be
+  blocked by a flaky third-party call — the row deletion is what actually
+  matters for this app's own token custody). Per UX_KB §12.3: does **not**
+  touch already-imported `photo_meta`/`memories` rows — disconnect only
+  removes this app's ability to fetch further photos.
+- **`GET /auth/google-photos/status`** — returns `{connected: bool,
+  google_account_email: str | null}` for the Settings card (UX_KB §12.2's
+  not-connected/connected states). No token material in the response body,
+  ever.
+
+**Rate limiting:** `/connect` and `/callback` reuse the existing
+in-process fixed-window limiter (`check_rate_limit`, §Increment-3 judgment
+call 6) at the same class of limit already applied to
+`/digest/unsubscribe` (an unauthenticated-adjacent, write-triggering
+route) — **flagged for security-architect to confirm the exact rate**,
+consistent with the F8 unsubscribe precedent where security-architect set
+the concrete number (20 req/min/IP) rather than solution-architect
+guessing at it.
+
+### 12.3 Scope minimization
+
+**Decision: request the narrowest scope the Picker flow needs —
+`https://www.googleapis.com/auth/photospicker.mediaitems.readonly`** —
+never `photoslibrary.readonly` or any Photos Library API scope, per
+UX_KB §12's explicit "picker-based selection, never library-wide access"
+requirement and INDUSTRY_KB §2.2. This scope grants read access only to
+media items a caregiver actively selects inside a Picker session created
+under this app's own client credentials — it structurally cannot browse
+the caregiver's full library, which is the entire point (matches UX_KB
+§12.4's "Google's Picker API is designed so the app never gets broader
+access than what was picked").
+
+**Explicit verification flag (per task item 7, restated formally here):**
+the exact current scope string, its exact Picker-session/media-item API
+endpoint shapes, whether the (now-deprecated-for-broad-access) Photos
+Library API's readonly scope has been fully replaced by this
+picker-specific scope for all account types, any rate limits on session
+creation or `mediaItems.list`/download calls, and whether a **verified/
+production-mode OAuth consent screen** is required before this app can
+request this scope from non-test-user Google accounts (Google's consent
+screen has a "testing" mode capped at 100 test users that would silently
+block any caregiver outside that allowlist) — **none of this can be
+verified without web access in this session.** This is a real
+pre-Code-gate task, not a detail to guess at: **recommend a
+WebSearch-capable pass (or the human directly confirming current Google
+Cloud Console / Google Photos Picker API docs) before code-agent begins
+building `google_photos.py`**, specifically to confirm (a) the scope
+string above is current and correctly named, (b) the Picker-session API's
+exact request/response shapes assumed in §12.5 below, and (c) whether
+OAuth consent-screen verification is required for this app's planned
+caregiver base size before this feature can be used by anyone outside a
+Google-configured test-user allowlist. If verification surfaces a
+different scope name or a materially different session/download flow,
+§12.2/§12.5 of this section should be revised before code starts — the
+overall shape (server-side OAuth, Fernet-encrypted token storage, lazy
+refresh, sync per-item import) is not expected to change even if specific
+endpoint names are.
+
+### 12.4 Data model
+
+```sql
+CREATE TABLE google_oauth_states (
+    state_hash TEXT PRIMARY KEY,            -- SHA-256 of the raw state param
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_verifier TEXT NOT NULL,            -- PKCE verifier; not independently
+                                             -- exploitable without the
+                                             -- one-time-use authorization
+                                             -- code, so plaintext is
+                                             -- acceptable (same class of
+                                             -- reasoning as invites.code
+                                             -- being plaintext, §3)
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL                -- created_at + 10 minutes
+);
+CREATE INDEX idx_google_oauth_states_user ON google_oauth_states (user_id);
+
+CREATE TABLE google_photos_connections (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    google_account_email TEXT NOT NULL,
+    access_token_enc BLOB NOT NULL,         -- Fernet, existing crypto.py key
+    refresh_token_enc BLOB NOT NULL,        -- Fernet, existing crypto.py key
+    access_token_expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Extends photo_meta (§3), additive columns, no backfill required:
+ALTER TABLE photo_meta ADD COLUMN content_hash TEXT NULL;   -- §12.6
+ALTER TABLE photo_meta ADD COLUMN import_source TEXT NULL;  -- 'google_photos' | NULL
+CREATE INDEX idx_photo_meta_profile_hash ON photo_meta (profile_id, content_hash);
+```
+
+**Id-tier conventions, verified against §3/§10.1/§11.1 rather than
+reinvented:**
+- **`google_photos_connections.id` — plain `INTEGER AUTOINCREMENT`,
+  tier-1.** Reachable only via authenticated, self-scoped routes
+  (`/auth/google-photos/status`, internal lookups by `user_id`); never a
+  filesystem path, never independently security-bearing (the sensitive
+  material is `access_token_enc`/`refresh_token_enc`, not `id`) — exactly
+  the bar §11.1 set for `password_reset_tokens.id`/`recovery_codes.id`.
+  Applying the tier-2 uuid4 exception here would be the same category of
+  mistake §11.1 flagged and corrected for `sessions.id` in the other
+  direction — it doesn't apply, so plain autoincrement is correct.
+- **`google_oauth_states` uses a hashed high-entropy value as its primary
+  key (`state_hash`), not a synthetic `id`.** This mirrors
+  `sessions.token_hash`/`password_reset_tokens`' hash-at-rest discipline
+  exactly (§7.2-class reasoning) rather than `invites.code`'s
+  plaintext-primary-key pattern — the state parameter round-trips through
+  a URL an attacker could plausibly intercept via referrer/logs during the
+  redirect to Google, so it gets the stricter (hashed) treatment already
+  applied to session/reset tokens, not the lighter treatment applied to
+  invite codes (which are meant to be manually typed/shared by a second
+  human and have a much narrower blast radius if leaked).
+- **`photo_meta.content_hash`/`import_source` — additive nullable columns
+  on the existing tier-2 (uuid4) `photo_meta` table, no change to
+  `photo_meta.id`'s existing convention.** Existing (pre-F17) photo rows
+  simply carry `content_hash = NULL` and are never backfilled — consistent
+  with this project's existing precedent for additive-nullable-column
+  gaps (HEIC's `photo_exif_strip_failed` case, §Increment-2 judgment call
+  4; the multi-photo theme-source gap, §9.2) rather than writing a
+  migration/backfill job for data that doesn't need one.
+
+**No `import_batches`/`import_jobs` table — see §12.7.**
+
+### 12.5 Picker hand-off mechanism
+
+**Decision: the Google-issued media-item identifier and its download
+`baseUrl` never reach the browser at all.** The frontend only ever talks
+to this app's own backend; the backend is the sole holder of the access
+token and therefore the sole party capable of resolving a picker
+selection into actual bytes — this satisfies "the app never gets broader
+access than what was picked" at the network-topology level, not just the
+OAuth-scope level.
+
+Three backend routes realize UX_KB §12.4's three-part flow (intro sheet →
+Google's black-box picker → import review):
+
+1. **`POST /profiles/{id}/google-photos/picker-sessions`** — confirms the
+   caller's session belongs to a family that has access to profile `id`
+   (family-scoping check, same 404-not-403-on-cross-family pattern as
+   every other family-scoped route, §2.3/§10.8). Performs the lazy-refresh
+   check (§12.2's `access_token_expires_at`; if expired, `POST
+   https://oauth2.googleapis.com/token` with `grant_type=refresh_token`
+   before proceeding — see §12.2's refresh-failure handling below), then
+   calls Google's Picker-session-creation endpoint with the caregiver's
+   access token. Returns `{picker_session_id, picker_uri}` to the
+   frontend — `picker_uri` is Google's own hosted picker URL (opened by
+   the frontend per UX_KB §12.4's "black box this app launches"); the
+   access token itself never leaves the backend.
+2. **`GET /profiles/{id}/google-photos/picker-sessions/{picker_session_id}`**
+   — proxies Google's session-status check (`mediaItemsSet: bool`),
+   polled by the frontend while the intro/waiting state is shown. No new
+   DB table needed — Google's own Picker API holds session state
+   server-side on its end; this route is a thin authenticated proxy, not
+   a second source of truth.
+3. **`GET /profiles/{id}/google-photos/picker-sessions/{picker_session_id}/preview`**
+   — called once `mediaItemsSet` is true, i.e. exactly when UX_KB §12.4's
+   import-review step needs to render. For each item Google reports as
+   selected: fetches the actual bytes server-side (Google's `baseUrl` +
+   access token, download parameter for original quality), computes
+   `content_hash` (§12.6), checks it against `photo_meta` for the target
+   profile, and returns `[{google_media_item_id, thumbnail_url,
+   is_probable_duplicate, creation_time}]` — `thumbnail_url` points back
+   at a fourth, same-file proxy route
+   (`.../media/{google_media_item_id}/thumbnail`) that streams a small
+   preview server-side (never a raw Google URL handed to the browser,
+   never the access token). `google_media_item_id` itself is not
+   independently exploitable if it leaks to the browser (it grants no
+   access without the server-held access token), so it's passed through
+   directly rather than wrapped in an extra signed-token layer — flagged
+   as a deliberate simplicity choice, not an oversight, and one
+   security-architect should confirm rather than assume.
+4. **`POST /profiles/{id}/photos/import-from-google`** — body
+   `{picker_session_id, items: [{google_media_item_id, skip: bool}]}`
+   (the caregiver's final selection + duplicate-skip toggles from the
+   review screen). Backend re-fetches each non-skipped item's bytes from
+   Google (a second fetch — see §12.7's stated trade-off), and hands them
+   into the **existing** `photos.py` upload path unchanged: content-sniff
+   validation → EXIF strip (run unconditionally regardless of whatever
+   Google's own API already stripped — defense in depth, matching the
+   "floor not ceiling" instinct already applied elsewhere in this file) →
+   Fernet encryption at rest → `PhotoStore.create()`. No parallel
+   encryption/validation implementation is built for this feature.
+
+### 12.6 Duplicate detection
+
+**Decision: SHA-256 of normalized image bytes, per-child scope, computed
+at both preview (§12.5 step 3) and confirm (§12.5 step 4) time —
+deliberately simple, stated trade-off named explicitly rather than
+hidden.**
+
+- **Normalization, not raw-byte hashing:** raw bytes hashed directly would
+  fail to match a photo that was resaved/re-encoded/EXIF-touched between
+  Google's copy and this app's stored copy (e.g. this app's own
+  unconditional EXIF-strip step, §12.5 step 4, changes the byte stream).
+  `content_hash` is instead computed by decoding the image (Pillow, same
+  dependency §4.3 already established), resizing to a fixed dimension
+  (e.g. 256px longest side), converting to a single consistent format
+  (e.g. RGB PNG bytes), then SHA-256 over that normalized representation
+  — deterministic and format/re-encode-tolerant for exact-content
+  duplicates, computed identically whether the source is a fresh upload
+  (F7's existing path — **not retrofitted onto existing photos this run,
+  see §12.4's no-backfill note**) or a Google import.
+- **Named limitation, not fixed by design:** this is a normalized
+  exact-content hash, not a perceptual hash (pHash/dHash) — a genuinely
+  different photo (different crop, different edit, a burst-shot
+  near-duplicate) will **not** be flagged, only a true re-import of the
+  same underlying image. This satisfies UX_KB §12.4's "content appears to
+  match" bar for the common real-world case this feature exists to catch
+  (a caregiver re-picking a photo they already imported, or that was
+  separately uploaded natively) without adding a new heavy dependency
+  (`imagehash`/numpy) for a decorative-adjacent, non-safety-bearing
+  convenience feature. **Revisit trigger:** if red-team/UX testing at a
+  future Test gate finds near-duplicate misses common enough to be
+  annoying in practice, upgrade to a perceptual hash at that point —
+  named here as a deliberate right-sizing, matching this file's own
+  restraint precedent (§10.6, §9.2).
+- **Scope: per-child (`profile_id`), not family-wide or global** — matches
+  the task's instruction and this project's existing scoping convention
+  (`photo_meta` is already profile-scoped, §0/§3); the index
+  (`photo_meta(profile_id, content_hash)`) makes the per-child lookup
+  cheap without needing a separate dedicated table.
+- **Double-fetch trade-off, stated explicitly:** computing the hash twice
+  (preview + confirm, §12.5) means every imported photo is downloaded from
+  Google twice. Accepted because (a) typical picker-session batch sizes
+  are small (a handful of photos, not a bulk migration — this is a
+  one-shot picker action, §12.1), (b) it avoids introducing any new
+  server-side temporary-storage mechanism to bridge the preview and
+  confirm requests (which would be new operational surface for a
+  one-shot, low-volume feature, contradicting this file's established
+  restraint — §3, §5.3, §5.8's shared "no new operational surface"
+  instinct), and (c) the confirm-time hash is the one that's actually
+  persisted and load-bearing for future dedup checks; the preview-time
+  hash only ever drives a UI badge and is discarded.
+
+### 12.7 Failure / partial-failure handling — sync request/response, no job queue
+
+**Decision: `POST /profiles/{id}/photos/import-from-google` is a single
+synchronous request that returns a full per-item results array. No
+job-queue/worker/background-task system is introduced for this
+feature — right-sized against UX_KB §12.5's own per-photo-status
+requirement, which a synchronous response satisfies directly.**
+
+- **Per-item processing, per-item isolation:** the route iterates selected
+  items in a `try/except` per item — the same isolation pattern
+  `scheduler.py`'s per-user due-check loop already established (§5.3 step
+  3: one failure doesn't block the batch). For each item: fetch bytes →
+  duplicate check (skip if caller marked `skip: true` or, defensively, if
+  `is_probable_duplicate` was true and no explicit override was sent) →
+  create a new `Memory` row (`moment_date` from Google's
+  `mediaMetadata.creationTime` if present, else today; a fixed default
+  `title` such as `"A photo from Google Photos"`, no note, no
+  `milestone_tag` — matching the memory sheet's own "sensible defaults"
+  precedent, §1.6 Flow 2a) → `PhotoStore.create()` attaching the photo to
+  that new memory. **Crash-safe ordering, mirroring this project's
+  existing delete-ordering discipline in reverse:** the Memory row is only
+  committed once the photo bytes have been successfully fetched and
+  validated; if `PhotoStore.create()` itself then fails, the just-created
+  Memory row is deleted rather than left as an orphaned, photo-less
+  memory — no partial artifact survives a failed item.
+- **Response shape:**
+  ```json
+  {
+    "results": [
+      {"google_media_item_id": "...", "status": "imported", "memory_id": 123, "photo_id": "uuid..."},
+      {"google_media_item_id": "...", "status": "skipped_duplicate"},
+      {"google_media_item_id": "...", "status": "failed", "error": "fetch_failed"}
+    ]
+  }
+  ```
+  This maps directly onto UX_KB §12.5's summary line, per-row tags, and
+  scoped "Retry both failed photos" action — retry is a plain client-side
+  concern (the frontend re-POSTs the same route with only the `failed`
+  subset's `google_media_item_id`s), needing no server-side batch/job
+  record to look anything up by.
+- **Why no job record is needed, stated explicitly (per task item 6):** a
+  job/batch table would exist to let a client check status *after*
+  disconnecting and reconnecting later, or to support true background
+  processing — neither applies here. The request is synchronous, the
+  caregiver's browser is the client for the entire operation's lifetime
+  (matching UX_KB §12.5's "transitions in place, no close-and-reopen"),
+  and batch sizes are small (§12.6). **If a future revision needs
+  bulk/background import** (e.g. hundreds of photos, or import surviving
+  a closed tab), that would be a genuine new architecture surface — a job
+  queue is the right tool at that point, but building one now for this
+  feature's actual approved scope would be over-engineering against
+  UX_KB §12's own one-shot framing. Flagged here explicitly so it isn't
+  silently revisited without a stated trigger, matching this file's
+  established pattern for every other scoped-out capability (§5.9, §9.2,
+  §12.6's perceptual-hash deferral).
+- **Latency, stated as a trade-off:** a multi-photo import blocks on N
+  sequential (or bounded-concurrent — implementation detail, not an
+  architecture decision) fetch+process cycles inside one HTTP request.
+  Acceptable at this feature's actual scale (a picker session, not a bulk
+  migration) and consistent with `/chat`'s own already-accepted
+  buffer-then-check latency trade-off (§6.1) — this project has already
+  established that a bounded, honest latency cost is preferable to added
+  infrastructure complexity for features at this project's scale.
+
+### 12.8 Lazy refresh, and the lapsed-connection case (flagged, not fully resolved)
+
+**Refresh: lazy, confirmed per the task's recommendation.** No cron/
+background refresh job (§12.1). `access_token_expires_at` is checked at
+the start of `POST .../picker-sessions` (§12.5 step 1) and refreshed
+in-line if expired, using the stored (Fernet-decrypted) `refresh_token`.
+If Google's refresh response includes a new `refresh_token` value (some
+rotation policies do this — **unverified, §12.3**), the stored,
+re-encrypted value is overwritten; if it does not, the existing one is
+kept (Google's typical non-rotating behavior for this grant type).
+
+**Lapsed/revoked connection — a real gap not covered by UX_KB §12.3's
+three named error states (cancel/network/token-exchange-failure), flagged
+rather than silently resolved:** if a refresh attempt itself fails
+(`invalid_grant`, e.g. the caregiver revoked this app's access directly
+from their Google Account settings, entirely outside this app), this
+app's stored connection is no longer usable. Recommended handling: treat
+identically to disconnect (delete the `google_photos_connections` row)
+and surface the existing not-connected Settings state, since a
+freshly-revoked connection and a never-connected one are functionally the
+same from this app's point of view. **This is a new UI state (a
+connection that silently lapsed since the caregiver last saw the
+Connected card) that UX_KB §12 does not explicitly enumerate a copy
+treatment for** — recommend either a brief ui-ux-designer confirmation
+that reusing the not-connected copy verbatim is acceptable here, or a
+one-line addition to UX_KB §12.2 before Code gate closes, rather than
+code-agent inventing new copy unreviewed.
+
+### 12.9 Secrets
+
+`GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` /
+`GOOGLE_OAUTH_REDIRECT_URI` in `.env`, following the exact existing
+pattern (`PHOTO_ENCRYPTION_KEY`/`RESEND_API_KEY`/LLM provider keys, §5.8,
+§2.5) — never committed, no new secret-handling mechanism introduced.
+**Revisit trigger, inherited:** before any non-local deployment, move to a
+proper secret manager, same trigger already named for every other secret
+in this file.
+
+### 12.10 Test-gate ownership addition (extends §7)
+
+- **Contract tests:** `PhotoStore.create()`'s pre/post-F17 shape is
+  unchanged for native (non-import) callers — the `content_hash`/
+  `import_source` columns are additive-nullable and no existing call site
+  needs to change; `google_photos.py`'s token-refresh helper (mocked
+  Google token endpoint — correct grant type, correct re-encryption,
+  correct fallback when no rotated refresh token is returned); the
+  `/import-from-google` route's per-item result contract (imported/
+  skipped_duplicate/failed statuses, crash-safe Memory/Photo creation
+  ordering on a simulated mid-item failure).
+- **Design-conformance checks:** static-import-graph check confirming
+  `google_photos.py`/`routes/google_photos.py` have no import path into
+  `llm.py`/`prompts.py`/`guardrails.py` (extends the existing §6.3/§7
+  isolation check to the new module); `google_oauth_states` rows are
+  actually deleted on successful callback consumption (single-use,
+  property test: replaying a consumed `state` is rejected); the CSRF
+  binding (a callback with a valid-but-different-user's `state` row is
+  rejected); `content_hash` duplicate detection is correctly scoped
+  per-`profile_id` (a fixture proving family A's photo is never flagged
+  as a duplicate against family B's or a different child's, even given an
+  identical hash).
+- Evidence recorded per-scenario in
+  `projects/little-milestones/test-evidence/`, per test-agent's documented
+  convention, same as every other increment.
+
+### 12.11 Completeness check against this gate's mandate
+
+1. OAuth flow — designed (§12.2): server-side authz-code+PKCE, explicit
+   route shapes, hashed-state CSRF protection, Fernet-encrypted per-
+   caregiver token storage, lazy refresh (no cron), one named open gap
+   (§12.8's lapsed-connection UX state).
+2. Scope minimization — the picker-specific readonly scope named as the
+   design target, explicitly **flagged as unverified** pending a
+   WebSearch-capable pass or human confirmation (§12.3) — this is the one
+   item in this section solution-architect cannot sign off on with full
+   confidence, stated plainly rather than guessed at.
+3. Picker hand-off — designed (§12.5): Google media-item ids/baseUrls/
+   access token never reach the browser; existing `photos.py` pipeline
+   reused unchanged for validation/EXIF-strip/encryption.
+4. Duplicate detection — designed (§12.6): per-child SHA-256 of normalized
+   bytes, named perceptual-hash limitation with a stated revisit trigger,
+   double-fetch trade-off stated explicitly.
+5. Data model — designed (§12.4): two new tables
+   (`google_oauth_states`, `google_photos_connections`) plus two additive
+   nullable `photo_meta` columns; id-tier conventions reasoned against
+   §3/§10.1/§11.1 rather than asserted; no `import_batches` table (§12.7).
+6. Failure/partial-failure handling — designed (§12.7): synchronous
+   per-item results array, no job queue, explicit reasoning for why one
+   isn't warranted at this feature's approved scope, latency trade-off
+   named.
+7. API dependency risk — flagged explicitly and formally (§12.3, §12.8):
+   scope name, Picker-session/media-item API shapes, consent-screen
+   verification requirement, and refresh-token-rotation behavior are all
+   unverified without web access; recommended as a concrete pre-Code-gate
+   task, not guessed at.
+
+Cross-checked against INDUSTRY_KB §2.2 (third-party disclosure — UX_KB
+§12.2/§12.4's two disclosure touchpoints are a UX concern this section
+doesn't re-litigate; this section's job was ensuring the scope/data-flow
+those disclosures describe is actually true, which it is: read-only,
+picker-scoped, one-time copy, no ongoing sync). Cross-checked against F7's
+existing photo-pipeline guarantees (§4.1 step 8, §6.3): imported photos
+flow through the identical EXIF-strip/encrypt/no-LLM-reachability
+pipeline as natively uploaded photos, with no parallel path.
+
+**No disagreement with UX_KB §12 identified** — every UX_KB §12 flow
+(connect/settings entry, OAuth redirect, picker intro, import review with
+duplicate badges, progress/results) is directly supported by a
+corresponding backend route or existing-pipeline reuse above; the one new
+UI state this section surfaces (§12.8's lapsed connection) is a gap in
+UX_KB's coverage, not a disagreement with it, and is flagged for a small
+follow-up rather than resolved unilaterally here.
+
+**Status: pending security-architect joint review and human approval,
+same as every other Architecture-gate item.** Specific items flagged for
+security-architect: the exact rate-limit values on `/connect`/`/callback`
+(§12.2), whether `google_media_item_id` needs a signed-opaque wrapper
+before reaching the browser or plaintext pass-through is acceptable
+(§12.5 step 3), and the disconnect/lapsed-connection handling's
+sufficiency (§12.2, §12.8) — the same class of new-delete/data-flow
+wrinkle this project has consistently routed to security-architect rather
+than closing solo (F8's unsubscribe route, §9.3's photo
+replace-not-accumulate ordering, §10.8's chat-session sharing scope).

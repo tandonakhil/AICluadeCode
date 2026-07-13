@@ -202,3 +202,63 @@ contextual-only product recommendations.
 - [Loeb & Loeb: 2026 state app store, design code and social media laws](https://www.loeb.com/en/insights/publications/2026/06/childrens-online-privacy-2026-state-app-store-design-code-and-social-media-laws)
 - [Kids Code Coalition: Age-Appropriate Design Codes by state](https://kidscodecoalition.org/age-appropriate-design-codes/)
 - [Troutman: 2025 children's privacy laws and regulations](https://www.troutmanprivacy.com/2025/09/analyzing-the-2025-childrens-privacy-laws-and-regulations/)
+
+## 5. Architecture-gate review — Increment 7, F17 (Google Photos import), 2026-07-12
+
+Advisory pass alongside solution-architect and security-architect's parallel
+Architecture reviews, and responsible-ai-architect. Reviewed against
+FEATURES.md's F17 entry, `knowledge/UX_KB.md` §12 (Experience Design, approved),
+and this file's own §2.1/§2.2.
+
+### 5.1 Citation correction
+FEATURES.md cites this feature against "INDUSTRY_KB §2.2's third-party-disclosure
+flag" — the phrase "third-party disclosure" actually appears in §2.1 (the amended
+COPPA Rule's separate-consent-for-third-party-disclosure provision), which
+governs an operator *disclosing* previously-collected children's data outbound
+to a third party — the reverse of what F17 does (importing data the caregiver
+already controls, inbound, via their own OAuth consent). §2.2's applicable
+clause is narrower and does apply: "verify the processor's terms don't grant
+it training rights over uploaded images," extended by analogy to Google as the
+third-party source the bytes transit through.
+
+### 5.2 Verdict: compliance-sound as designed, no Code-gate blocker
+- **Storage-side §2.2 bar (encryption, private-by-default, no facial
+  recognition, hard delete):** satisfied per UX_KB §12.4 ("little-milestones'
+  own encrypted storage... same as every other photo here"), contingent on
+  Architecture explicitly confirming imported photos share F7's exact
+  `photo_meta`/`PhotoStore` code path (not a parallel pipeline) — a
+  confirmation, not new design work.
+- **Two disclosure touchpoints (UX_KB §12.2 pre-connect, §12.4 pre-import)**
+  are good in-product UX disclosure, consistent with §2.4's trust posture.
+  They are not a substitute for a legal Privacy Policy document — but this
+  project has none yet for *any* third-party integration (Resend included).
+  Google Photos should get the same treatment already precedented for Resend
+  in the Decisions Log (2026-07-10 security-architect re-consult): a go-live
+  checklist item ("name Google as a third-party photo source in a future
+  Privacy Policy document, light-touch API-terms check before production
+  import is enabled"), not a Code-gate blocker.
+- **COPPA:** no new gap. The OAuth consent screen is completed by the
+  caregiver's own Google account, not any child-directed surface — same
+  "collected from an adult about a child" analysis §2.1 already applied to
+  direct photo upload. Low incremental risk, confirmed explicitly rather than
+  assumed.
+- **Picker-based, not library-wide, access:** consistent with current leading
+  practice — Google has been deprecating broad library-read scopes in favor
+  of Picker-API-mediated, session-scoped selection for exactly this
+  least-privilege reason; F17's design tracks where the platform (and the
+  category) is heading, not a purely cautious internal choice.
+
+### 5.3 Follow-ups (non-blocking)
+1. Architecture to explicitly confirm imported photos land as ordinary
+   `photo_meta` rows subject to F7's existing hard-delete path (unlink-then-
+   DB-row, EXIF-strip, per-photo/per-profile cascade) — no new deletion story
+   needed if confirmed, and UX_KB §12.3's Disconnect (which correctly does
+   *not* delete already-imported photos) should stay decoupled from
+   per-photo deletion via the normal Journey flow.
+2. Go-live checklist: add Google Photos alongside Resend as a named
+   third-party processor/source requiring Privacy Policy disclosure and a
+   light vendor-terms check before production use — tracked the same way
+   as the existing Resend item, not a new process.
+3. Later-backlog candidate (trend-informed, not urgent): photo import from
+   additional sources (e.g., Apple Photos) once Google Photos import proves
+   out.

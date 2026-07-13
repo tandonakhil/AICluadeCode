@@ -751,3 +751,482 @@ they fit the store/schema conventions before code-agent starts. No
 disagreement anticipated (all patterns reuse §1.1/§2.1/§5.4 precedents),
 but per this role's contract that confirmation is theirs to record, not
 mine to assume.
+
+## 8. F17 — Google Photos import (Increment 7 design, security-architect, 2026-07-12)
+
+Design pass for the human-approved F17 build (FEATURES.md, largest-scope,
+last item in the post-MVP roadmap — requires solution-architect +
+security-architect + responsible-ai-architect + industry-expert sign-off
+before code starts). Read against `UX_KB.md` §12 (the approved Experience
+Design this section's design must fit) and this file's own §2.1/§2.5 (photo
+encryption + secrets precedent) and §7.3 (Fernet-encrypted `users` columns
+precedent, `app/crypto.py`) — this section extends those, it does not
+invent a parallel mechanism. Where solution-architect's parallel
+`ARCHITECTURE_KB.md` pass covers the same ground (schema, route shape),
+some duplication is expected and correct per this role's contract; this
+file's lens is *why* each choice is the secure one, not the wiring.
+
+### 8.1 Scope framing this design assumes (confirmed against UX_KB §12.1)
+
+UX_KB §12.1 fixes the shape this entire section depends on: a **persistent
+OAuth connection, zero automatic behavior**. No background sync, no
+polling, no import that isn't the direct result of a caregiver opening the
+Picker and confirming a selection in that same request/response cycle.
+This is a security-relevant scope constraint, not just a UX one — a
+persistent token that the app never uses without a live caregiver action
+has a categorically smaller blast radius than one that also drives a
+background job (compare: F8's digest scheduler, which *does* run
+unattended and correspondingly gets its own content-restriction design,
+ARCHITECTURE_KB §5.7). Everything below assumes this constraint holds;
+if a future revision adds background sync, this section's risk assessment
+(especially §8.4's revocation reasoning and §8.7's rate-limiting posture)
+must be re-run, not silently assumed to still apply.
+
+### 8.2 OAuth secret handling
+
+**Two distinct classes of secret, two distinct handling rules — confirmed
+against this project's existing conventions, not invented new ones:**
+
+1. **Server-side app credential (`GOOGLE_OAUTH_CLIENT_ID` /
+   `GOOGLE_OAUTH_CLIENT_SECRET`)** — one pair, shared across every
+   caregiver, identifies *this application* to Google. Goes in `.env`,
+   never committed, identical handling to every existing secret in this
+   project (`PHOTO_ENCRYPTION_KEY`, `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`,
+   `RESEND_API_KEY` — SECURITY_KB §2.5, §5.8/§6.1's "no new
+   secret-handling mechanism" precedent applies verbatim here). No new
+   `.gitignore` entry needed (`.env` is already covered); a Review-gate
+   assertion should confirm `GOOGLE_OAUTH_CLIENT_SECRET` specifically
+   never appears in a commit, the same check already applied to
+   `RESEND_API_KEY` (§4).
+2. **Per-caregiver OAuth access/refresh tokens** — distinct per user,
+   distinct from the app credential above, and materially more sensitive
+   than any existing secret in this project because they are a live grant
+   against a real third-party account, not a static app-level key.
+   **Must never be stored in plaintext.** Follows the exact precedent F12
+   already set for `users.totp_secret_enc` (SECURITY_KB §7.3): two new
+   `users` columns, `google_oauth_access_token_enc` and
+   `google_oauth_refresh_token_enc`, both Fernet-ciphertext using the
+   **same shared key** `app/crypto.py`'s `get_fernet()` already provides
+   (`PHOTO_ENCRYPTION_KEY`) — no second symmetric key, no second env var,
+   the identical "no new operational surface" reasoning already applied to
+   TOTP secrets. Like a TOTP secret and unlike a password, these tokens
+   must be *recoverable* (the app calls Google's API with the raw access
+   token, and uses the raw refresh token to mint new ones), so encryption
+   — not hashing — is the correct primitive, exactly as §7.3 reasoned for
+   TOTP secrets. A plaintext `users.google_account_email` column (the
+   *caregiver's own Google account email*, needed for UX_KB §12.2's
+   "Connected state shows the connected Google account email") is fine
+   unencrypted — it is comparable in sensitivity to the caregiver's own
+   app-login email, already stored plaintext in the same table, not a
+   credential.
+3. **Never logged, anywhere, in any form.** Confirmed against
+   `app/main.py`: no global request-logging middleware exists in this
+   codebase today (verified by reading `main.py` in full), so there is no
+   default logging path that would capture a token in a request/response
+   line. The explicit constraint carried forward for the new module (e.g.
+   `app/google_photos.py`) code-agent will write: every log call
+   (`logger.warning`/`logger.error`) in that module must follow
+   `app/photos.py`'s exact existing pattern — `profile_id`/`user_id`
+   only, **never** the token value, the authorization code, the state
+   parameter, or the callback URL's query string (which carries the
+   authorization `code` in plaintext before exchange). This is the same
+   discipline §2.5 already requires project-wide ("no secret... is ever
+   logged") and §4's Test-gate secrets-leak sweep already checks for
+   `RESEND_API_KEY`/reset tokens/TOTP secrets — extend that sweep to
+   Google tokens explicitly (§8.8).
+
+### 8.3 Scope minimization enforcement
+
+**Decision: request exactly one narrow, read-only, picker-scoped
+permission — never library-wide read access.**
+
+- **What is requested:** Google's Photos Picker API read-only scope
+  (picker-session-based selection only — the caregiver picks specific
+  photos inside Google's own UI, and this app only ever receives the
+  bytes/metadata for the exact items selected in that session). **Cannot
+  fully verify the exact current scope string without live access to
+  Google's current OAuth documentation** — flagging rather than guessing:
+  as of this project's last general knowledge, Google migrated the Photos
+  Picker API to a dedicated `photospicker.readonly`-class scope
+  distinct from (and narrower than) the older, now access-restricted
+  `photoslibrary.readonly` scope that granted broader library listing —
+  code-agent/solution-architect must confirm the exact current scope
+  string against Google's live Photos Picker API docs before
+  implementation, not copy this paragraph's name verbatim.
+- **What is explicitly rejected, and why:** any scope that grants
+  library-wide listing/search access (`photoslibrary`,
+  `photoslibrary.readonly`, or any write/append scope) — rejected on two
+  independent grounds that both point the same way: (1) INDUSTRY_KB §2.2's
+  third-party-disclosure flag ("no third-party disclosure without separate
+  consent") is easiest to satisfy honestly when the disclosure is
+  literally true — "we only ever receive the exact photos you pick" (UX_KB
+  §12.4's privacy-reassurance copy) is a claim this app can only make if
+  the OAuth grant structurally cannot see anything beyond the picker
+  selection; a library-wide scope would make that UI copy false even if
+  the app's own code never calls the broader endpoints, since the *grant*
+  itself would remain a standing risk if the token were ever compromised.
+  (2) UX_KB §12.1/§12.4's scope-minimization framing is a Design Intent
+  commitment this app has already made to the caregiver before the
+  Picker's own consent screen even appears (§12.2's not-connected-state
+  copy) — the OAuth request sent to Google must be the technical
+  enforcement of that promise, not just UI copy layered over a broader
+  grant.
+- **Enforcement is structural, not just a request-time choice**: the
+  scope requested at `GET /auth/google-photos/connect` is a fixed,
+  hardcoded constant (no user-configurable or dynamically-widened scope
+  parameter anywhere in the request-building code) — the same "no field
+  for the thing we don't want to enable" pattern ARCHITECTURE_KB §6.3
+  already applies to F9's product path and this file's §1.7 point 3
+  applies to the unsubscribe route.
+
+### 8.4 CSRF / state-parameter and PKCE design on the OAuth redirect flow
+
+Standard OAuth CSRF protection, specified concretely for this app's route
+shape (extends, does not replace, this project's existing token-generation
+conventions):
+
+- **Route shape**: `GET /auth/google-photos/connect` (authenticated,
+  caregiver-initiated — requires a valid `lm_session`, per UX_KB §12.2's
+  "signed-in caregiver's own account" framing) generates the flow and
+  redirects to Google; `GET /auth/google-photos/callback` (Google
+  redirects back here) completes it.
+- **PKCE (S256), required even though this is a confidential client**:
+  generate a `code_verifier` (`secrets.token_urlsafe(32)`, the same
+  primitive already used project-wide for every other high-entropy token —
+  session tokens, invite codes, reset tokens, unsubscribe tokens) and its
+  S256 `code_challenge`, sent at the authorization request. This is
+  current OAuth 2.1 best practice regardless of client confidentiality —
+  defense-in-depth against authorization-code interception, cheap to add,
+  no reason to skip it for a confidential server-side client.
+- **`state` parameter, bound to the initiating session — this is the CSRF
+  control specifically**: a second `secrets.token_urlsafe(32)` value,
+  generated at `/connect`, stored server-side keyed to the initiating
+  `SessionUser.id` (not just any process-global bucket — the binding to
+  the specific caregiver's `user_id` is what prevents the classic OAuth
+  CSRF failure mode: an attacker completing *their own* Google consent
+  flow and tricking a victim's browser into hitting the *victim's*
+  callback URL with the attacker's `code`, which — without a
+  session-bound `state` check — would link the attacker's Google account
+  to the victim's app account). Single-use, deleted on first use whether
+  the callback succeeds or fails, short expiry (10 minutes — generous
+  enough for a real Google consent-screen interaction, short enough to
+  bound the window an unused `state` value is live). Storage: a new
+  narrow table (`oauth_states: user_id, state_hash, code_verifier,
+  created_at`) rather than reusing the in-process rate-limit dict pattern
+  — this value must survive a real redirect round-trip to Google and back
+  (seconds to low minutes), and per-process in-memory storage would break
+  if the app runs behind multiple worker processes in any future
+  deployment (§8.9 trigger 1); a DB row is the correct-for-the-threat
+  choice here, distinct from the rate limiter's acceptable
+  process-local-memory trade-off (SECURITY_KB §1.5's own stated
+  reasoning for *that* mechanism specifically, not a blanket rule).
+- **Callback verification, both checks required**: `GET
+  /auth/google-photos/callback?code=...&state=...` must (1) require the
+  *same authenticated session* that initiated the flow (re-check
+  `get_current_session_user` here too — the callback is not exempt from
+  auth just because Google is the referrer), and (2) look up the `state`
+  value, confirm it matches an unexpired, unused row **belonging to that
+  same `user_id`**, and reject (generic error, §8.3-of-UX_KB's calm-copy
+  convention — "wasn't completed" / "went wrong," never raw OAuth/HTTP
+  error text, per UX_KB §12.3) on any mismatch, missing row, or expiry.
+  Both checks are required, not either/or — the session check alone
+  doesn't prevent a state-replay by the same logged-in user against a
+  stale flow, and the state check alone (without the session check)
+  doesn't prevent the attacker/victim account-linking scenario above.
+
+### 8.5 Token revocation on disconnect
+
+**Decision: disconnect must both delete the stored token from this app's
+DB AND revoke it with Google — deletion alone is insufficient and was
+explicitly named as such in the task brief; this section specifies the
+actual mechanism.**
+
+- **Google's revocation endpoint**: `POST
+  https://oauth2.googleapis.com/revoke` with the token (refresh token
+  preferred over access token when both exist — revoking a refresh token
+  invalidates the entire grant, including any access token minted from
+  it, whereas revoking only an access token can leave the refresh token
+  live) as a form-encoded `token` parameter. This is the standard
+  RFC 7009-shaped Google revocation call; exact current endpoint URL
+  should be reconfirmed against live Google OAuth docs before code-agent
+  hardcodes it, though this one has been stable for a long time and is
+  lower-risk to state than §8.3's scope string.
+- **Ordering: revoke-with-Google first, then delete the local DB row —
+  the opposite crash-safety intuition from photo delete (SECURITY_KB
+  §2.4's files-then-DB-row ordering), and worth stating explicitly why**:
+  the safe failure mode here is "Google-side token already revoked, but
+  the encrypted row is still sitting in this app's DB" (harmless — a dead
+  token has no capability regardless of where its ciphertext sits, and a
+  retry/cleanup job can find and delete it later); the unsafe failure
+  mode is the reverse — "app's DB row is gone, so this app believes the
+  caregiver is disconnected, but Google's grant is still live" (this
+  directly contradicts the disconnect action's own promise, and is a
+  *permanent* loss of the ability to revoke it later through this app's
+  own code, since the token needed to make the revoke call is exactly
+  what just got deleted). This is the same class of reasoning as §2.4's
+  ordering decision, correctly inverted here because which artifact is
+  "the dangerous one to lose track of" is flipped (a live third-party
+  grant vs. an orphaned local file).
+- **Failure handling, stated as a real trade-off, not silently
+  swallowed**: if the Google revoke call fails (network error, Google-side
+  5xx, already-invalid token), the DB row is **not** deleted automatically
+  — the disconnect action surfaces a calm error (UX_KB §12.3's existing
+  error-copy convention: generic, no raw HTTP detail) and the caregiver
+  can retry. This means a failed revoke leaves the caregiver's app-side
+  "Connected" state technically still showing connected, which is the
+  correct reflection of reality (the grant genuinely is still live), not
+  a bug to paper over. **Named gap, not silently accepted**: this design
+  does not build an automatic background retry/reconciliation job for a
+  stuck failed-revoke state (that would reintroduce exactly the
+  unattended-background-behavior UX_KB §12.1 rules out) — a caregiver
+  whose disconnect keeps failing has the independent fallback of revoking
+  access directly at `myaccount.google.com/permissions` (Google's own
+  UI), which should be one line of copy on the disconnect-failure state.
+- **Deleting the DB row is still required even on success**, not just
+  the revoke call — both actions from the task brief's framing, not
+  either/or, are needed: revoke removes the live grant at Google, delete
+  removes this app's own copy of the (now-dead) ciphertext, completing
+  UX_KB §12.3's "nothing already imported is deleted" promise (which is
+  about *imported photos*, already in `photos.py`'s pipeline per §8.6 —
+  distinct from the *token*, which this section deletes).
+
+### 8.6 Imported-photo pipeline security
+
+**Decision: confirmed — imported photos go through the exact same
+pipeline as every other photo in this app, with zero new/parallel storage
+path, and this constraint is structural, not a stated intention.**
+
+- **No new storage code path.** Whatever new module fetches bytes from
+  Google (the Picker API returns a per-item, access-token-authorized
+  download URL for each selected photo; this app downloads those bytes
+  server-side using the caregiver's access token as a Bearer credential —
+  never client-side, since the access token must never reach the
+  browser) must hand the raw downloaded bytes directly to
+  `PhotoStore.create()` (`app/photos.py`), the identical entry point
+  every existing upload (F7's manual upload, F14's avatar upload) already
+  uses. This means Google-sourced photos automatically inherit, with no
+  new code: content-sniff validation (`sniff_content_type` — the
+  downloaded bytes are checked exactly like any other upload, not trusted
+  because they came from an OAuth-authorized source), EXIF strip
+  (`_strip_exif`, strips the entire EXIF block including GPS, same as
+  every other photo), Fernet encryption at rest (`get_fernet()`, same
+  key, same mechanism), the temp-then-rename write and files-first-then-
+  metadata delete ordering (§2.4), and — critically — the *absence* of
+  any code path into the LLM layer (`app/photos.py`'s own file-header
+  comment already states "zero import path into `app.llm` or
+  `app.prompts`," checked at Review gate by PLAN §7-G24's static
+  import-graph assertion; a Google-sourced photo entering through this
+  same function inherits that same absence with no additional work).
+- **No face processing — confirmed not violated, with the boundary of
+  this app's control stated precisely.** INDUSTRY_KB §2.1/§2.2's
+  commitment ("never run face recognition/face-template extraction on
+  uploaded child photos") is a commitment about *this app's own
+  pipeline* — `photo_theme.py`'s color-extraction step (the only
+  bytes-touching processing step besides EXIF-strip/encrypt) does k-means
+  color quantization, not face detection, and F17 introduces no new
+  processing step at all (the Google-sourced bytes flow through the
+  identical `extract_accent()` call every other photo already gets). **What
+  this app cannot control, and must not imply it controls**: Google
+  Photos itself performs face grouping on *its own* copy of the photo, on
+  Google's infrastructure, entirely outside this app's system boundary —
+  that processing happened (if the caregiver's Google Photos account has
+  it enabled) before the photo was ever selected in the Picker, and this
+  app neither triggers, benefits from, nor has any visibility into it.
+  UX_KB §12.4's disclosure copy ("stripped of location data and stored
+  privately, same as every other photo here... a one-time copy from
+  Google Photos") is accurate as written and does not claim anything
+  about what Google's own product does — no change needed there, but
+  flagged here so a future revision doesn't accidentally add copy that
+  implies this app "cleans" or "removes" Google-side face data, which it
+  cannot do and doesn't need to.
+- **No AI training / no LLM ingestion — same structural guarantee,
+  confirmed not weakened.** Same reasoning as the face-processing point:
+  the guarantee is structural (no import path exists), and a
+  Google-sourced photo entering through `PhotoStore.create()` has the
+  exact same structural absence as a manually-uploaded one. Nothing about
+  F17 requires the LLM layer to ever see a photo (color-extraction tokens
+  are the only photo-derived data that ever leaves `photos.py`/
+  `photo_theme.py`, and those are three HSL hex values, not the image —
+  ARCHITECTURE_KB's photo-theme design, unchanged by F17).
+- **Duplicate detection (UX_KB §12.4) — flagged as a security-adjacent
+  constraint on whatever hashing mechanism solution-architect specifies**,
+  not itself designed here (that mechanism choice is solution-architect's
+  per UX_KB §12.9's own coverage note): whatever content/perceptual hash
+  is used to flag "looks like a duplicate" must (a) operate only on
+  already-in-memory bytes during the import request itself, (b) never be
+  persisted as a separate, independently-queryable fingerprint artifact
+  beyond what's needed to answer "does a match already exist for this
+  profile" at import time, and (c) not become a general-purpose
+  image-fingerprinting capability reused elsewhere in the app — scoped
+  narrowly to this one UX purpose, the same "structural absence of the
+  capability beyond its stated use" standard already applied to the
+  unsubscribe route (§1.7 point 3) and F9's product path
+  (ARCHITECTURE_KB §6.3).
+
+### 8.7 Third-party data flow disclosure
+
+**Assessment: UX_KB §12.2/§12.4's in-app disclosure copy is sufficient
+and well-designed from a compliance-posture standpoint at `local`-target
+MVP scope — genuinely two touchpoints (before-connect and
+before-import), specific about what leaves the system, and honest about
+scope limits. Two items are required before production, not blockers to
+continuing to Code gate — the same class of flag §5.3 already established
+for Resend, extended here for a materially higher-stakes third-party
+relationship:**
+
+1. **Privacy-policy/ToS disclosure required before production use** — same
+   status as §5.3 item 1: if/when this project has a privacy policy (not
+   yet confirmed to exist in this project's scope, per §5.3's own
+   original flag, still open), it must name Google Photos API as a data
+   source/sub-processor, state the exact scope requested (§8.3), and
+   state that imported photos are stored under this app's own retention/
+   deletion policy going forward (not Google's) — the same pre-production
+   go-live checklist item class as Resend and F8's mailing-address
+   requirement, tracked, not invented unilaterally by code-agent.
+2. **Google API Services User Data Policy ("Limited Use") compliance —
+   new consideration, not previously applicable to this project, flagged
+   here rather than assumed satisfied.** Any application using Google
+   Photos API/Picker API data is independently bound by Google's own
+   platform terms restricting how that data may be used (no use for
+   serving ads, no selling/transferring the data to third parties beyond
+   what's needed to provide the feature the user requested, and
+   restrictions on using the data to train generalized AI/ML models).
+   **This actually reinforces, rather than conflicts with, INDUSTRY_KB
+   §2.1's own "never use child data/photos to train models" commitment**
+   — the two requirements point the same direction, which is worth
+   recording as a confirmation, not treating as redundant noise.
+   **Cannot fully verify without live access to Google's current policy
+   docs**: whether this app's specific use case (a consumer parenting app
+   importing user-selected photos into its own storage) falls under a
+   "restricted scope" category requiring Google's formal **OAuth app
+   verification** (and possibly a third-party security assessment) before
+   real, non-test-user Google accounts can complete the consent flow —
+   flagged as an unverified, potentially real go-live blocker of the
+   same class as Resend's domain-verification precondition
+   (ARCHITECTURE_KB §5.1) or F8's mailing-address requirement, requiring
+   solution-architect/deploy-agent/human confirmation against Google
+   Cloud Console's current app-verification requirements before this
+   feature reaches real users, not before Code gate.
+
+### 8.8 Rate limiting / abuse resistance
+
+Extends this project's existing in-process fixed-window limiter
+(`app.auth.check_rate_limit`, SECURITY_KB §1.5) — no new mechanism, same
+"no external dependency needed at this scale" posture already applied to
+`/auth/login`, `/auth/join`, and `/digest/unsubscribe` (§1.7 point 4):
+
+- **`GET /auth/google-photos/connect`** (authenticated): per-user limit
+  (e.g. 10/hour) — this route talks to Google's authorization endpoint and
+  writes an `oauth_states` row per call; bounding it prevents both
+  unbounded `oauth_states` growth and unnecessary load against Google's
+  endpoint from a single caregiver's misbehaving client.
+- **`GET /auth/google-photos/callback`** (the route explicitly named in
+  the task brief): per-IP limit (e.g. 20/min/IP, matching the
+  unsubscribe-route precedent's exact numbers), for **ordinary
+  abuse/DoS resistance, not brute-force defense** — the same reasoning
+  §1.7 point 4 already states explicitly for the unsubscribe route:
+  Google's authorization `code` is single-use, short-lived, and
+  high-entropy (Google-generated, not guessable), so repeated
+  token-exchange *attempts* against this route aren't a credible
+  brute-force vector; the limiter exists so an unauthenticated,
+  write-capable, third-party-network-calling endpoint isn't left with
+  zero abuse resistance as a matter of blanket policy, consistent with
+  how every other unauthenticated-callback-shaped route in this project
+  has been treated.
+- **Picker-import route** (e.g. `POST
+  /profiles/{id}/photos/import-google`, solution-architect's exact route
+  name): per-user rate limit (e.g. 30 req/min/user, reusing the same
+  primitive) **plus** a batch-size cap on the number of photos importable
+  in one request (a concrete number — e.g. 50 — is solution-architect's
+  call given UX_KB §12.5's per-photo progress/retry design, but a cap
+  must exist) — this route both downloads bytes from Google per photo
+  *and* runs each through the full `photos.py` pipeline (EXIF-strip,
+  encrypt, disk write) per photo, so an unbounded batch size is a real
+  resource-exhaustion vector distinct from, and additive to, the existing
+  10MB-per-photo cap (§3).
+
+### 8.9 Explicit revisit triggers (additive to §1.6, §7.6)
+
+1. **Before F17 reaches real (non-test-user) Google accounts**: confirm
+   Google's current OAuth app-verification/restricted-scope requirements
+   are satisfied (§8.7 point 2) — unverified in this pass, same
+   go-live-checklist class as Resend's domain verification.
+2. **Before any non-local deployment**: `oauth_states`' DB-row-based
+   state storage (§8.4) already anticipates multi-process deployment
+   correctly (unlike the rate limiter's intentionally process-local
+   design), but re-confirm alongside §1.6 trigger 1's existing
+   `Secure`/HTTPS and `PHOTO_ENCRYPTION_KEY`-key-management revisit (§2.6
+   trigger 1) — the Google OAuth redirect URI registered with Google must
+   also be updated to the real deployed origin, a config item easy to
+   miss.
+3. **If background sync or automatic import is ever proposed** (a genuine
+   scope change from UX_KB §12.1's current one-shot design): re-run
+   §8.1's blast-radius assessment and §8.5's revocation-failure trade-off
+   in full — both assume the token is only ever used in direct response
+   to a live caregiver action, and that assumption is load-bearing.
+4. **§1.6 triggers 1, 3, 4 and §7.6's triggers remain in force
+   unchanged.** §7.1 item 2 already named F17 as the event that fired
+   §1.6 trigger 3 (threat-model change via third-party integration) —
+   this is that trigger's resolution, not a new one; F12's MFA (already
+   shipped, opt-in) is the mitigation that was built ahead of this
+   feature specifically because of it (§7.1 item 2's own stated
+   reasoning). Consistent with that, UX_KB §12's design does not force
+   MFA on a caregiver connecting Google Photos, but the linking flow's
+   UI copy should recommend enabling it if not already on (SECURITY_KB
+   §7.6 trigger 1's own stated follow-up item, now due).
+
+### 8.10 Test-suite additions (extends §4, §7.5 — this role's suite at Test gate)
+
+- **OAuth state/CSRF**: callback rejects a missing/unknown/expired/
+  already-used `state`; callback rejects a `state` that exists but
+  belongs to a different `user_id` than the current session (the
+  account-linking-CSRF scenario, §8.4); callback rejects an unauthenticated
+  request even with a technically-valid `code`+`state` pair.
+- **Token storage/secrecy**: `google_oauth_access_token_enc`/
+  `_refresh_token_enc` are Fernet ciphertext at rest, never a recognizable
+  plaintext token substring in the DB file; neither token value nor the
+  raw authorization `code`/`state` ever appears in a log line across the
+  full connect → callback → import → disconnect cycle (extends §4/§7.5's
+  secrets-leak sweep).
+- **Revocation**: disconnect issues a real call to Google's revoke
+  endpoint (mocked in tests, contract-tested the same way `email_delivery`
+  is, §7.2's precedent) before the DB row is deleted; a mocked
+  revoke-failure leaves the DB row intact and surfaces the calm-error
+  state, not a silent partial success.
+- **Scope minimization**: the authorization-request URL built by
+  `/auth/google-photos/connect` contains only the approved narrow scope
+  string, asserted by exact match — a regression test that would fail
+  loudly if a future edit widens the requested scope.
+- **Pipeline reuse (co-owned with the architecture suite, same overlap
+  pattern as §4's photo-purge item)**: an imported photo's stored bytes
+  are Fernet ciphertext, not the original bytes; EXIF is stripped on a
+  Google-sourced upload identically to a manual one; the static
+  import-graph assertion (PLAN §7-G24) is re-run and still finds zero
+  edges from the new Google-import module into `app.llm`/`app.prompts`.
+- **Rate limiters**: fire on `/auth/google-photos/connect`,
+  `/auth/google-photos/callback`, and the picker-import route, each per
+  §8.8's keying.
+- **Authz boundary**: cross-family/cross-caregiver access to another
+  user's `oauth_states` row or stored Google tokens returns 404, per this
+  role's standing §1.1 cross-scope rule — a caregiver must never be able
+  to trigger an import using another caregiver's connected Google
+  account.
+- Evidence recorded per-scenario in `projects/little-milestones/test-evidence/`, same convention as §4/§7.5.
+
+### 8.11 Joint-presentation note
+
+New schema surface (`users.google_oauth_access_token_enc`,
+`users.google_oauth_refresh_token_enc`, `users.google_account_email`, a
+new `oauth_states` table) and the new routes
+(`/auth/google-photos/connect`, `/auth/google-photos/callback`, the
+picker-import route) touch `ARCHITECTURE_KB.md`'s component/schema surface
+directly — solution-architect should confirm these fit the store/schema
+conventions and finalize the exact route names/response shapes before
+code-agent starts, per this role's standing practice (§7.7's identical
+note for F12). **No disagreement anticipated** on the technical shape;
+flagging explicitly per this role's contract rather than assuming
+solution-architect's parallel pass already covers the two items this
+section could not verify (§8.3's exact scope string, §8.7 point 2's
+verification-requirement question) — those two specifically should not be
+treated as resolved by either KB until confirmed against live Google
+documentation.
