@@ -46,7 +46,9 @@ agent roster or gate order changes, not left stale.
    plus `ui-ux-designer` if the template is UI-bearing (`genai-chatbot`,
    `rag-knowledge-base`; not applicable for `agentic-workflow`). **Optional,
    droppable**: `functional-agent`, `industry-expert`, `solution-architect`,
-   `security-architect`, `responsible-ai-architect`. Present the proposal
+   `security-architect`, `responsible-ai-architect`, `synthetic-data-agent`
+   (default-on for UI-bearing templates, default-off for `agentic-workflow`
+   — invoked just before the Test gate, not a gate of its own). Present the proposal
    (informed by the Intake answers and template) and let the human trim the
    optional portion, along with `usage-monitor`'s rough token-cost estimate
    for the full pipeline broken out by which optional agents are included

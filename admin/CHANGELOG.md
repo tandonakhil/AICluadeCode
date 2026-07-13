@@ -6,6 +6,23 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **`synthetic-data-agent` scaffolded (2026-07-12)**: new optional
+  cross-cutting agent, added via `/admin-panel add-agent` after
+  `mas-architect`'s 2026-07-11 advisory review and human approval via
+  checkbox backlog review on 2026-07-12. Generates realistic synthetic
+  test/demo data (personas/records at a chosen high/medium/low volume),
+  invoked just before the Test gate or on-demand for QA/demo prep — not a
+  new pipeline gate. Optional/droppable at Team Composition, default-on for
+  `genai-chatbot`/`rag-knowledge-base`, default-off for `agentic-workflow`.
+  Owns `knowledge/TEST_DATA_KB.md` only (read-only sourced from
+  `DOMAIN_KB.md`/`INDUSTRY_KB.md`); owns no test suite (test-agent retains
+  sole verification ownership). Tools scoped tightly: Bash usage limited to
+  invoking code-agent's own `scripts/seed-data.sh reset|reload` — no direct
+  infra/DB access, code-agent keeps ownership of that script. Re-engages on
+  `/enhance-project` only if flagged relevant (new data shape introduced).
+  Added `.claude/agents/synthetic-data-agent.md`; registry row added at
+  `built`; roadmap entry moved from Backlog to Shipped. Pure scaffolding —
+  no project has adopted this agent yet.
 - **Orchestrator role write-up + LESSONS.md (2026-07-10)**: formalized the
   previously-implicit orchestrator role (the main conversation, not a
   registered agent) as a documented contract at `admin/ORCHESTRATOR.md` —

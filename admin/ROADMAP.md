@@ -33,43 +33,26 @@ approved together.
 - **Feature flags** — **now designed (2026-07-09, via mas-architect), deliberately still deferred.** Real problem identified: today's only rollback is `git reset --hard` on an entire release train, so a bad feature can only be killed by taking down every feature bundled with it — there's no surgical per-feature kill switch. Rollout-percentage/user-targeting flags don't apply (no traffic-splitting layer for a local single-process deploy) — building those would be pure ceremony. **Recommended mechanism**: extend `release-manager` (not a new agent — no distinct gate/KB/test-suite needed), a `prod/flags.json` store, opt-in per feature (not blanket instrumentation), a toggle action that edits+commits+logs, `code-agent` wiring a guard around a flaggable feature's entry point, `deploy-agent` handling the required restart. `FEATURES.md`'s Released section gets an optional flag-state annotation sourced from `flags.json`, never a second source of truth. **Deferred deliberately**: no release has ever actually needed partial rollback — building this now would be guessing at the design's edges rather than learning them from a real failure, following the same "prove the simple case insufficient first" discipline applied to auto-pause/resume and automated conflict resolution. Build the first time a real release needs it.
 - ~~**Multi-suite Test-gate override policy**~~ **Shipped (2026-07-09)**, despite no suite ever actually having blocked something the human wanted to ship — human chose to build it now rather than wait for a trigger. Design: every suite defaults to blocking (formalizing what was already implicit — the human could always approve past a failure). A project can mark specific suites **advisory** via a recorded `Test Policy` line in `PROJECT_CONTEXT.md`'s Active Team section, human decision only, reversible anytime. Advisory failures are still fully reported, just don't force a gate stop; blocking failures still stop the gate and require either a fix or an explicit `[override]`-tagged reason in the Decisions Log. Wired into `test-agent.md`, `/new-project`'s Team Composition and Test steps, and `/enhance-project`'s Test step (respects the project's existing policy unless amended). **Verified for real**: applied retroactively to `policy-lookup-assistant` (marked UX/accessibility advisory, reasoned from its own internal-tool-first framing), re-ran its real blocking suites (5/5 pass), and confirmed the report format correctly separates Blocking from Advisory without conflating them.
 
-- **`synthetic-data-agent`** — **proposed 2026-07-11** (human request, during
-  little-milestones' manual tester-account setup — a real, concrete need:
-  a populated profile with memories/photos/timeline/digest content was
-  needed to exercise every feature, and no agent currently generates that).
-  `mas-architect` advisory review: **good future-roadmap candidate, not
-  build-now, not redundant.** Design, ready for `/admin-panel add-agent`
-  when prioritized:
-  - **Placement**: cross-cutting, invoked just before the Test gate (and
-    on-demand for QA/demo prep) — not a new pipeline gate, doesn't reorder
-    Intake→...→Test→Review→Deploy. Feeds test-agent, never replaces or
-    shortcuts test-agent's verification authority.
-  - **Core/optional**: optional/droppable; default-on for UI-bearing
-    templates (`genai-chatbot`, `rag-knowledge-base`), default-off for
-    `agentic-workflow`.
-  - **Contract**: KB file `knowledge/TEST_DATA_KB.md` (data model/personas/
-    volume presets used, sourced read-only from `DOMAIN_KB.md`/
-    `INDUSTRY_KB.md` for domain-realistic content — never duplicates their
-    KB-writing role). Owns **no test suite** (test-agent retains sole
-    ownership of verification — this is a provisioning capability only).
-    Tools: Read, Write, Bash (scoped to invoking code-agent's seed script,
-    no direct infra/DB access). Re-engagement: only if flagged relevant on
-    `/enhance-project` (a new feature introduces a new data shape), not
-    unconditional like solution-architect/security-architect.
-  - **Volume control**: high/medium/low, per the human's request, recorded
-    in `TEST_DATA_KB.md` per generation for reproducibility.
-  - **Reset/reload mechanism — division of labor** (per the human's
-    request that this coordinate with code-agent): **code-agent owns the
-    mechanism** (a git-tracked `scripts/seed-data.sh reset|reload`,
-    squarely code-agent's existing schema/storage/tooling territory);
-    **synthetic-data-agent owns the content** (generates realistic
-    persona/data payloads at the requested volume, hands them to
-    code-agent's script as input, then invokes it) — keeps this new
-    agent's blast radius to content generation only, no infra authority.
-  - Status: **planned**, not scheduled. No template/project currently
-    blocked on this — little-milestones' tester setup was done manually
-    this session as a one-off, which is exactly the kind of repeated
-    manual work this agent would eliminate next time it recurs.
+- ~~**`synthetic-data-agent`**~~ **Shipped (2026-07-12).** Proposed
+  2026-07-11 (human request, during little-milestones' manual tester-account
+  setup — a real, concrete need: a populated profile with
+  memories/photos/timeline/digest content was needed to exercise every
+  feature, and no agent generated that at the time). `mas-architect`
+  advisory review recommended it as a good future-roadmap candidate; human
+  approved it for build via checkbox backlog review on 2026-07-12. Built
+  exactly per the advisory design: cross-cutting, invoked just before the
+  Test gate (and on-demand for QA/demo prep) — not a new pipeline gate;
+  optional/droppable at Team Composition, default-on for `genai-chatbot`/
+  `rag-knowledge-base`, default-off for `agentic-workflow`; owns
+  `knowledge/TEST_DATA_KB.md` (data model/personas/volume presets, read-only
+  sourced from `DOMAIN_KB.md`/`INDUSTRY_KB.md`); owns no test suite
+  (test-agent retains sole verification ownership); high/medium/low volume
+  control recorded per generation run; Bash scoped strictly to invoking
+  code-agent's `scripts/seed-data.sh reset|reload` — no direct infra/DB
+  access, code-agent retains ownership of that script, this agent owns
+  content generation only; re-engagement on `/enhance-project` only if
+  flagged relevant (new data shape introduced), not unconditional. See
+  `.claude/agents/synthetic-data-agent.md` and `admin/MAS_REGISTRY.md`.
 
 ## Shipped
 
@@ -247,3 +230,14 @@ approved together.
   the automated "regenerate at the triggering write" trigger described in
   the original scope note is `deliverables-agent`'s job once that agent
   exists; until then, treat this as a snapshot to refresh by hand).
+- **`synthetic-data-agent` (2026-07-12)**: scaffolded per `mas-architect`'s
+  2026-07-11 advisory review, approved via checkbox backlog review
+  2026-07-12. Cross-cutting, invoked just before the Test gate or on-demand
+  for QA/demo prep — not a new pipeline gate. Optional/droppable, default-on
+  for `genai-chatbot`/`rag-knowledge-base`, default-off for
+  `agentic-workflow`. Owns `knowledge/TEST_DATA_KB.md` only (read-only
+  sourced from `DOMAIN_KB.md`/`INDUSTRY_KB.md`), owns no test suite. Bash
+  scoped to invoking code-agent's `scripts/seed-data.sh reset|reload` only —
+  no direct infra/DB access. See Backlog section above for the full design
+  and `.claude/agents/synthetic-data-agent.md` for the built contract. Pure
+  scaffolding — no project has adopted this agent yet.

@@ -2232,3 +2232,37 @@ Current Status is intentionally left as previously recorded — Deploy
 gate does not set it; that update is gated on the human's approval,
 which is still pending (asked to review Increments 5/6/7 together).
 [deploy-agent]
+
+- 2026-07-12: **Increment 6 (F12, hardened auth suite) built** per
+  SECURITY_KB §7 / ARCHITECTURE_KB §11 / UX_KB §11 exactly, two commits
+  (backend, then frontend). Two judgment calls made where the approved
+  spec didn't fully pin the implementation down:
+  1. **TOTP QR code rendered client-side (`qrcode` npm package), not via
+     a third-party QR-image API.** The `otpauth://` provisioning URI
+     carries the raw TOTP secret in plaintext; embedding it in an
+     `<img src>` pointed at an external rendering service would leak
+     that secret to the service and to any Referer/access log along the
+     way — the same secret-leak class SECURITY_KB §2.5/§7.5 guards
+     against everywhere else in this project (session tokens, reset
+     tokens, photo paths). No design doc specified the rendering
+     mechanism, so this was code-agent's call; flagged here rather than
+     silently added as a new frontend dependency (`qrcode` +
+     `@types/qrcode`).
+  2. **`sessions.id` (uuid4) added via an idempotent `ALTER TABLE` +
+     Python-side backfill, not a fresh-DB-only column**, since the dev
+     DB already has live rows from Increments 1-5. Verified against the
+     actual running dev DB (migration applied cleanly, pre-existing
+     session rows backfilled with a fresh uuid4, second run is a no-op).
+  Full backend flow smoke-tested end-to-end via FastAPI TestClient
+  (signup → TOTP enroll/verify → logout → 2-step login → recovery-code
+  login → change-password → TOTP disable → cross-user session-revoke
+  404) in addition to the full existing pytest suite (199 tests, all
+  still passing) and vitest suite (54 tests, all still passing);
+  `tsc --noEmit` clean. **Flagged for Test gate:** the running dev
+  backend (`:8000`) was started without `--reload` (a pre-existing
+  operational fact, not introduced this pass) and was NOT restarted by
+  code-agent (blocked by the permission system when a restart was
+  attempted) — it is currently serving pre-F12 code and needs a manual
+  restart before the new `/auth/*` routes are reachable live; the
+  frontend (`:3000`, `next dev`) does hot-reload and is already serving
+  current code. [code-agent]
