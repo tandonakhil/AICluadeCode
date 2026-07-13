@@ -6,6 +6,7 @@ projects/*/prod/
 __pycache__/
 *.pyc
 .venv/
+.deliverables-venv/
 .pytest_cache/
 
 # Node / Next.js
