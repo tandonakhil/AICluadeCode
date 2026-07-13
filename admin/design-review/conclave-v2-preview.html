@@ -3,13 +3,16 @@
   Design pass: ui-ux-designer, 2026-07-13 — "Governed Clarity" v2, a
   new-age AI-product direction requested by the human after reviewing
   featherless.ai / lovable.dev / diamo.ai. Structure/layout is the
-  approved direction; this build adds 5 selectable color-theme variants
-  (same layout, different accent identity) so the human can compare
-  which palette suits best before one is locked in. Light-first per the
-  design rationale: "governed" reads as composed, not breathless.
+  approved direction; 5 selectable color-theme variants let the human
+  compare palettes live. Human chose Copper + Dark as the default
+  (2026-07-13) — other 4 themes and light mode stay selectable for
+  reference. Scroll-triggered reveal animations (IntersectionObserver
+  fade/slide-up per section) and a subtle hero-glow parallax added per
+  human request, matching the reference sites' scroll behavior; both
+  honor prefers-reduced-motion.
 -->
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-palette="copper">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -186,20 +189,56 @@
   }
   footer.bookend h3 { font-size: 26px; font-weight: 700; margin: 0 0 10px; position:relative; }
   footer.bookend p { color: var(--muted); font-size: 12.5px; margin-top: 30px; position:relative; }
+
+  /* Scroll-reveal: sections fade + rise into view; hero content reveals on load */
+  [data-reveal] {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.16,.8,.3,1), transform .7s cubic-bezier(.16,.8,.3,1);
+  }
+  [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+  [data-reveal="stagger"] > * {
+    opacity: 0; transform: translateY(18px);
+    transition: opacity .55s cubic-bezier(.16,.8,.3,1), transform .55s cubic-bezier(.16,.8,.3,1);
+  }
+  [data-reveal="stagger"].is-visible > * { opacity: 1; transform: translateY(0); }
+  [data-reveal="stagger"].is-visible > *:nth-child(1) { transition-delay: .02s; }
+  [data-reveal="stagger"].is-visible > *:nth-child(2) { transition-delay: .08s; }
+  [data-reveal="stagger"].is-visible > *:nth-child(3) { transition-delay: .14s; }
+  [data-reveal="stagger"].is-visible > *:nth-child(4) { transition-delay: .20s; }
+  [data-reveal="stagger"].is-visible > *:nth-child(5) { transition-delay: .26s; }
+  [data-reveal="stagger"].is-visible > *:nth-child(n+6) { transition-delay: .30s; }
+
+  .hero .eyebrow, .hero h1, .hero .lede, .hero .cta-row, .hero .stat-strip {
+    opacity: 0; transform: translateY(16px);
+    animation: heroIn .8s cubic-bezier(.16,.8,.3,1) forwards;
+  }
+  .hero .eyebrow { animation-delay: .05s; }
+  .hero h1 { animation-delay: .12s; }
+  .hero .lede { animation-delay: .22s; }
+  .hero .cta-row { animation-delay: .32s; }
+  .hero .stat-strip { animation-delay: .42s; }
+  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal], [data-reveal="stagger"] > *, .hero .eyebrow, .hero h1, .hero .lede, .hero .cta-row, .hero .stat-strip {
+      opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important;
+    }
+    html { scroll-behavior: auto; }
+  }
 </style>
 </head>
 <body>
 
-<div class="review-banner">DESIGN REVIEW PREVIEW — not yet the live microsite. Layout = approved "Governed Clarity" direction. Pick a color theme below to compare.</div>
+<div class="review-banner">DESIGN REVIEW PREVIEW — not yet the live microsite. Copper + Dark is the chosen default; scroll down to see the reveal animations. Other themes still selectable for reference.</div>
 
 <div class="theme-picker" id="themePicker">
-  <button class="swatch-btn" data-palette="indigo" aria-pressed="true"><span class="sw" style="background:#2F5EFF"></span>Indigo</button>
+  <button class="swatch-btn" data-palette="indigo" aria-pressed="false"><span class="sw" style="background:#2F5EFF"></span>Indigo</button>
   <button class="swatch-btn" data-palette="emerald" aria-pressed="false"><span class="sw" style="background:#0E8F5E"></span>Emerald</button>
-  <button class="swatch-btn" data-palette="copper" aria-pressed="false"><span class="sw" style="background:#B15A2B"></span>Copper</button>
+  <button class="swatch-btn" data-palette="copper" aria-pressed="true"><span class="sw" style="background:#B15A2B"></span>Copper ✓ default</button>
   <button class="swatch-btn" data-palette="violet" aria-pressed="false"><span class="sw" style="background:#6B3FD6"></span>Violet</button>
   <button class="swatch-btn" data-palette="teal" aria-pressed="false"><span class="sw" style="background:#0E7A82"></span>Teal</button>
   <div class="sep"></div>
-  <button class="theme-toggle" id="themeToggle" type="button">🌓 Light/Dark</button>
+  <button class="theme-toggle" id="themeToggle" type="button">🌓 Light/Dark (dark = default)</button>
 </div>
 
 <nav class="top" id="nav">
@@ -213,7 +252,7 @@
 </nav>
 
 <section class="hero">
-  <div class="glow" aria-hidden="true"></div>
+  <div class="glow" id="heroGlow" aria-hidden="true"></div>
   <span class="eyebrow">A governed multi-agent SDLC</span>
   <h1>Ship AI products with <span class="accent">a human approving every gate.</span></h1>
   <p class="lede">Conclave is a 9-gate multi-agent system that plans, designs, builds, and tests your product — and stops for your sign-off at every one of them.</p>
@@ -230,14 +269,14 @@
 
 <main>
 
-  <section id="pipeline">
+  <section id="pipeline" data-reveal>
     <div class="section-head">
       <span class="eyebrow">Architecture</span>
       <h2>Nine gates. Sequential, not cyclical.</h2>
       <p>Every project moves left to right through the same pipeline — a gate only opens once the one before it is human-approved.</p>
     </div>
     <div class="pipeline-wrap">
-      <div class="pipeline">
+      <div class="pipeline" data-reveal="stagger">
         <div class="p-node"><div class="p-dot">1</div><div class="p-check">✓</div><div class="p-name">Intake</div></div>
         <div class="p-node"><div class="p-dot">2</div><div class="p-check">✓</div><div class="p-name">Team<br>Composition</div></div>
         <div class="p-node"><div class="p-dot">3</div><div class="p-check">✓</div><div class="p-name">Plan &amp;<br>Backlog</div></div>
@@ -256,13 +295,13 @@
     </div>
   </section>
 
-  <section id="agents">
+  <section id="agents" data-reveal>
     <div class="section-head">
       <span class="eyebrow">Agent roster</span>
       <h2>One roster, two tiers.</h2>
       <p>Core agents are never dropped. Specialist agents are convened only when a project's actual risk profile calls for them.</p>
     </div>
-    <div class="roster">
+    <div class="roster" data-reveal="stagger">
       <span class="chip"><span class="dot"></span>plan-agent</span>
       <span class="chip"><span class="dot"></span>code-agent</span>
       <span class="chip"><span class="dot"></span>test-agent</span>
@@ -277,13 +316,13 @@
     </div>
   </section>
 
-  <section id="roadmap">
+  <section id="roadmap" data-reveal>
     <div class="section-head">
       <span class="eyebrow">Roadmap</span>
       <h2>Built vs. planned.</h2>
       <p>Every roadmap item follows the same rule: prove the simple case first, build the harder version once a real need surfaces.</p>
     </div>
-    <div class="roadmap-preview">
+    <div class="roadmap-preview" data-reveal="stagger">
       <div class="rm-card"><h4>Core 5 pipeline agents</h4><span class="badge built">Built</span></div>
       <div class="rm-card"><h4>deliverables-agent</h4><span class="badge built">Built</span></div>
       <div class="rm-card"><h4>usage-monitor auto-pause/resume</h4><span class="badge built">Built</span></div>
@@ -294,7 +333,7 @@
 
 </main>
 
-<footer class="bookend">
+<footer class="bookend" data-reveal>
   <div class="glow2" aria-hidden="true"></div>
   <h3>Every gate. Every time. A human decides.</h3>
   <div class="cta-row" style="justify-content:center; position:relative;">
@@ -306,9 +345,48 @@
 <script>
 (function () {
   var nav = document.getElementById('nav');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var heroGlow = document.getElementById('heroGlow');
+  var ticking = false;
+
   window.addEventListener('scroll', function () {
     if (window.scrollY > 12) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+
+    // Subtle parallax drift on the hero glow as the page scrolls — the glow
+    // moves slower than the page (classic parallax), and fades out once the
+    // hero itself has scrolled past, so it never intrudes on later sections.
+    if (!reduceMotion && heroGlow && !ticking) {
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        var y = window.scrollY;
+        var heroHeight = document.querySelector('.hero').offsetHeight;
+        var progress = Math.min(y / heroHeight, 1);
+        heroGlow.style.transform = 'translateY(' + (y * 0.25) + 'px)';
+        heroGlow.style.opacity = String(1 - progress * 0.9);
+        ticking = false;
+      });
+    }
   });
+
+  // Scroll-reveal: fade + rise each [data-reveal] section into view once,
+  // the same "content arrives as you scroll" pattern the reference sites
+  // use. prefers-reduced-motion short-circuits this entirely (CSS already
+  // forces full-opacity/no-transform in that case; this just skips the
+  // class toggling so there's no pointless observer work).
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var revealEls = document.querySelectorAll('[data-reveal]');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('is-visible'); });
+  }
 
   var toggle = document.getElementById('themeToggle');
   var root = document.documentElement;
