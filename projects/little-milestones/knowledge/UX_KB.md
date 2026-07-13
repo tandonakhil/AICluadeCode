@@ -1991,3 +1991,195 @@ SECURITY_KB §7 itself; the responsive-web-app platform decision is
 honored (every screen shown mobile + desktop, auth staying narrow/
 centered per the established §5.2 split, Settings staying in the
 sidebar+2-up-grid shell per §10.5).
+
+## 12. Revision — 2026-07-12: Increment 7 — Google Photos import (F17)
+
+Source: `FEATURES.md`'s F17, human-approved 2026-07-11, largest scope in
+this roadmap — real OAuth/third-party integration, requiring solution-
+architect + security-architect + responsible-ai-architect + industry-expert
+sign-off before code starts (this pass is Experience Design only, ahead of
+that sign-off). Preview: `design-review/increment-7/index.html` (assembles
+`settings-entry.html`, `oauth-connect.html`, `picker-review.html`,
+`import-results.html`).
+
+### 12.1 Scope framing — one-shot connect/pick/import, not a persistent sync
+
+FEATURES.md's F17 text does not imply ongoing library sync, so this pass
+treats the feature as a deliberate, repeatable one-shot action: a
+caregiver's OAuth *connection* may persist (so they aren't re-consenting
+on Google's screen every time), but **no background sync, polling, or
+automatic import ever runs**. Every import is an explicit "open picker →
+pick → review → confirm" sequence the caregiver initiates. This is the
+load-bearing scope decision the rest of §12 is built on — a persistent
+connection with zero automatic behavior satisfies both "connect once,
+use repeatedly" convenience and FEATURES.md's scope-minimization
+constraint (INDUSTRY_KB §2.2), since nothing this app does with that
+connection happens without a caregiver-initiated picker session.
+
+### 12.2 Settings entry point
+
+New "Google Photos" `.lm-card`, placed in the existing `.lm-settings-grid`
+2-up desktop layout (§10.5) directly after the "Privacy" card — third-
+party account linking sits in the privacy-adjacent group, not the
+family/digest group. Scoped to the signed-in **caregiver's own** Google
+account (not the family or a specific child) — any caregiver can connect
+their own account and import into any child profile they already have
+access to, under F10's existing caregiver permission model.
+
+- **Not-connected state (default):** explains plainly and up front —
+  read-only access, picker-based selection only, no library-wide access,
+  off by default, no ongoing sync after import — before the caregiver
+  ever clicks Connect. This is the first of two third-party-disclosure
+  touchpoints (INDUSTRY_KB §2.2); the review step (§12.4) repeats the
+  private-storage reassurance at the point of import itself.
+- **Connected state:** shows the connected Google account email, an
+  "Import photos" primary action, and a quiet "Disconnect" control. A
+  neutral "Connected" chip (informational, not the sage security-posture
+  chip §11.3 uses for TOTP — reused role but distinct meaning) plus a
+  privacy-cue line restating that nothing syncs automatically.
+- Both states carry the exact `.lm-privacy-note` lock-glyph pattern
+  already established (§1.6 Flow 2c / UXR-10 / §8.1a).
+
+### 12.3 OAuth connect flow
+
+**Full-page redirect, not a popup** — simpler and more transparent than a
+popup this app would have to babysit for blocked-popup failures, and
+matches how OAuth flows are legible to users generally. Clicking "Connect
+Google Photos" shows a brief loading state on the button/screen ("Taking
+you to Google…"), then navigates to Google's own hosted consent screen
+(not styled by this app — shown in the mockup as a clearly labeled
+approximation of Google's own UI, since this app has no control over it),
+which redirects back to a fixed callback route on this app.
+
+**Error states, all calm-terracotta, never `--lm-danger` (UXR-9), never
+raw HTTP/OAuth error text:**
+- **User cancels/denies consent** — "Connection wasn't completed —
+  nothing was shared. You can try connecting again anytime." Framed as a
+  normal, expected outcome for an optional off-by-default feature, not a
+  fault.
+- **Network failure during redirect** and **token exchange failure
+  server-side** — both render the same generic "Something went wrong
+  connecting — please try again," matching the existing
+  `parseErrorMessage`/`AuthScreen.tsx` calm-error convention exactly (no
+  differentiated copy that would leak which failure mode occurred, same
+  discipline already applied to login errors).
+
+**Disconnect** reuses the lighter two-button confirm-dialog pattern
+already established for conversation delete (§9.1) — **not** the
+destructive-red dialog (UXR-9 reserves `--lm-danger` for permanent
+data-loss confirmations; disconnecting revokes access, it does not delete
+already-imported photos). Copy explicitly reassures: "Photos you've
+already imported into a child's journey stay exactly as they are —
+nothing already imported is deleted."
+
+### 12.4 Google Photos Picker flow — the one genuinely new component vocabulary in this pass
+
+**Flagged explicitly, not fit into an existing pattern.** Google's own
+Picker widget (launched via Google's Picker API) is a UI surface this app
+does not, and by design should not, build a substitute for — this app
+deliberately does not construct its own Google-library browsing view,
+since that would require the library-wide access FEATURES.md's scope
+minimization rules out. Everything on either side of the Picker is fully
+native to this app's existing visual language:
+
+- **Intro sheet/dialog** (before the Picker opens) — reuses `.lm-sheet`
+  on mobile / centered `.lm-dialog` on desktop (§5.6 split) exactly.
+  Copy primes the hand-off: "You'll pick photos in Google's own picker
+  window next — we only ever receive the exact photos you select there."
+- **The Picker itself** — out of this app's visual control; the mockup
+  shows a labeled, illustrative approximation only (native-looking
+  selection tiles, Google's own "Select" action), not a component spec.
+  code-agent/Architecture should treat it as a black box this app
+  launches and receives a selected-photo-id result from.
+- **Import review step** (after the Picker closes) — reuses the exact
+  photo-upload dialog/sheet treatment and `AddMemoryForm`'s 3→5 column
+  photogrid precedent (§5.6) — no new grid convention. Contents:
+  - A compact **child selector** row reusing the existing identity-dot +
+    name pattern; tapping it opens the standard child-switcher sheet
+    already shipped app-wide (no new picker component).
+  - **Duplicate detection**: a photo whose content appears to match one
+    already stored for the target child shows a slate "Looks like a
+    duplicate" badge (the established non-alarm slate information-surface
+    role, §1.3/UXR-2 — informational, never terracotta/danger) with a
+    per-photo skip toggle, defaulting to skipped but fully overridable.
+  - **Privacy reassurance**, extending the verbatim UXR-10 line with one
+    added sentence naming the third-party source explicitly: "These will
+    be stripped of location data and stored privately, same as every
+    other photo here. This is a one-time copy from Google Photos into
+    little-milestones' own encrypted storage — nothing keeps syncing, and
+    your Google Photos library is never touched or deleted from." This is
+    the second of the two third-party-disclosure touchpoints (§12.2 is
+    the first).
+  - Confirm button copy updates live with the selected count and disables
+    at zero — never a silent no-op.
+
+### 12.5 Import progress + results — partial failure shown honestly
+
+The review dialog/sheet transitions in place (no close-and-reopen)
+through: **in progress** (a progress bar + disabled "Importing…" button,
+reusing the existing `submitting`-state disabled-button convention,
+§8.1a) → a **results** state.
+
+- **Full success** reuses the existing "the moment lands on the journey"
+  settle payoff (§1.6 Flow 2a) — "Added to {Name}'s journey" phrasing and
+  a small gold ✦ accent, extended from a single-memory save to a batch
+  outcome rather than inventing new success language.
+- **Partial failure** is shown per-photo, never swallowed: a summary line
+  states the real count ("3 of 5 photos imported… 2 couldn't be
+  imported"), each row shows a sage "Added" tag or a calm-terracotta
+  "Couldn't import" tag with a scoped retry, and a "Retry both failed
+  photos" secondary action re-attempts only the failed subset.
+- **Full failure** (e.g., connection lost mid-batch) states the outcome
+  factually and preserves the caregiver's selection for a retry, rather
+  than discarding it.
+- All error/status copy reuses the same sage-confirmation /
+  calm-terracotta-error color roles already established everywhere else
+  in this app (§1.3), applied per-row instead of per-form — no new color
+  role introduced.
+
+### 12.6 Reused, unchanged (named explicitly, per this KB's own convention)
+
+`.lm-sheet`/`.lm-sheet-backdrop`, `.lm-dialog`/`.lm-dialog-backdrop` and
+the sheet-on-mobile/dialog-on-desktop split (§5.6), all `.lm-btn`
+variants, `.lm-settings-grid`/`.lm-card` (§10.5), the calm-terracotta
+(never `--lm-danger`) error convention, the lighter two-button confirm
+dialog (§9.1), the `.lm-privacy-note` lock-glyph pattern (§1.6/UXR-10/
+§8.1a), `AddMemoryForm`'s 3→5 column photogrid precedent (§5.6), and the
+existing child-switcher sheet. The one deliberate exception is named in
+§12.4.
+
+### 12.7 Preview mockups produced
+
+Written to `projects/little-milestones/design-review/increment-7/`:
+
+| File | Shows |
+|---|---|
+| `settings-entry.html` | Not-connected and connected states of the new "Google Photos" Settings card, mobile + inside the existing 2-up desktop grid. |
+| `oauth-connect.html` | Connecting loading state; a labeled approximation of Google's own consent screen; all three error states (cancelled/network/token-exchange); the disconnect confirm dialog. Mobile + desktop. |
+| `picker-review.html` | The intro hand-off sheet/dialog; a labeled, explicitly-flagged approximation of Google's Picker widget; the import-review sheet/dialog (child selector, duplicate badge + skip toggle, privacy reassurance, live confirm count). Mobile + desktop. |
+| `import-results.html` | In-progress state; full success; partial failure (per-photo status + scoped retry); full failure. Mobile + desktop. |
+| `index.html` | Assembles all four via iframes, strategy summary, and an explicit new-component-vocabulary flag box. |
+
+### 12.8 DesignSync push — not performed this pass, flagged
+
+Same gap class as §8.6/§9.3/§10.4/§11.6: no DesignSync tool was available
+in this session's tool set (Read/Write only). Flagged for whichever
+future pass has DesignSync access to push the four new
+`increment-7/*.html` files additively to project
+`172e0c51-e31a-46e7-aedb-bead17b38868` — no existing path needs to change.
+
+### 12.9 Coverage note (what this pass does and doesn't cover)
+
+This pass covers F17's UI/flow design only — screens, states, copy,
+component reuse, and the one explicitly-flagged new-component-vocabulary
+gap. It does **not** decide: the OAuth token storage/refresh mechanism,
+the duplicate-detection hashing algorithm, backend routes/schema, rate
+limiting, or any Google Photos/Picker API technical integration detail —
+all explicitly solution-architect's/security-architect's, per FEATURES.md's
+own note that F17 needs full Architecture + security-architect +
+responsible-ai-architect + industry-expert sign-off before code starts.
+**Decisions Log cross-check (per this role's completeness guardrail):**
+the full `PROJECT_CONTEXT.md` Decisions Log was read before finalizing
+this pass; the responsive-web-app platform decision is honored (every
+screen shown mobile + desktop); nothing recorded since Increment 6 bears
+on F17 specifically beyond FEATURES.md's own scope.

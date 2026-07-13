@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Increment 7 — Picker hand-off + import review (F17)</title>
+<style>
+:root{
+  --lm-cream:#FDF8F2; --lm-card:#FFFFFF; --lm-ink:#3D3833; --lm-ink-soft:#6E6259;
+  --lm-terracotta:#C1502A; --lm-terracotta-deep:#8F3A1D; --lm-sage:#2F7A4E;
+  --lm-slate:#3D6188; --lm-slate-tint:#EEF3F8; --lm-gold:#E8A317; --lm-blush:#FADCC5;
+  --lm-danger:#A33B2E; --lm-radius-card:16px;
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,"Segoe UI",Nunito Sans,sans-serif;background:#f1ede6;margin:0;padding:24px;color:var(--lm-ink);}
+h1{font-size:22px;}
+h2.section{font-size:17px;margin:36px 0 6px;}
+.note{max-width:920px;font-size:14px;color:var(--lm-ink-soft);line-height:1.6;margin-bottom:20px;}
+.flagbox{max-width:920px;background:var(--lm-slate-tint);border-left:4px solid var(--lm-slate);border-radius:8px;padding:14px 16px;font-size:13px;color:var(--lm-ink);line-height:1.6;margin-bottom:28px;}
+.row{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-bottom:44px;}
+.frame-label{font-size:12px;font-weight:700;color:var(--lm-ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.phone{width:375px;background:var(--lm-cream);border-radius:28px;border:8px solid #222;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.phone-inner{padding:0;min-height:560px;position:relative;}
+.sheet-backdrop{position:absolute;inset:0;background:rgba(20,16,12,.4);display:flex;align-items:flex-end;}
+.sheet{background:var(--lm-cream);width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:92%;overflow-y:auto;}
+.grabber{width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px;}
+.dialog-backdrop{position:absolute;inset:0;background:rgba(20,16,12,.4);display:flex;align-items:center;justify-content:center;}
+.dialog{background:#fff;border-radius:16px;padding:24px;width:88%;max-height:85%;overflow-y:auto;}
+.lm-btn{border:none;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;}
+.lm-btn-primary{background:var(--lm-terracotta);color:#fff;}
+.lm-btn-primary:disabled{background:#d9c4b8;cursor:not-allowed;}
+.lm-btn-secondary{background:#fff;color:var(--lm-terracotta);border:1.5px solid var(--lm-terracotta);}
+.lm-btn-quiet{background:transparent;color:var(--lm-ink-soft);text-decoration:underline;padding:10px 4px;}
+h3.sheet-title{margin:0 0 4px;font-size:17px;}
+.sheet-sub{font-size:13px;color:var(--lm-ink-soft);margin:0 0 16px;line-height:1.5;}
+.g-window{background:#fff;border:1px solid #dadce0;border-radius:8px;padding:18px;width:100%;text-align:left;font-family:Arial,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.15);}
+.g-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.g-dot{width:18px;height:18px;border-radius:50%;background:conic-gradient(#4285F4 0 25%,#EA4335 25% 50%,#FBBC05 50% 75%,#34A853 75% 100%);}
+.g-title{font-size:14px;color:#202124;font-weight:600;}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.g-tile{aspect-ratio:1;background:linear-gradient(135deg,#e0e0e0,#c9c9c9);border-radius:4px;position:relative;}
+.g-tile.sel{border:3px solid #1a73e8;}
+.g-check{position:absolute;top:4px;right:4px;width:16px;height:16px;background:#1a73e8;border-radius:50%;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;}
+.g-btn{padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;background:#1a73e8;color:#fff;float:right;}
+.native-flag{border:2px dashed #9aa0a6;border-radius:8px;padding:6px 8px;font-size:10.5px;color:#5f6368;text-align:center;margin-bottom:8px;}
+.child-select{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.05);}
+.dot{width:22px;height:22px;border-radius:50%;background:#F0A574;}
+.photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.desktop .photogrid{grid-template-columns:repeat(5,1fr);}
+.ptile{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#F0A574,#FADCC5);}
+.ptile.dup .badge{position:absolute;top:4px;left:4px;background:rgba(61,97,136,.92);color:#fff;font-size:9px;padding:2px 6px;border-radius:6px;}
+.ptile .skip-toggle{position:absolute;bottom:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;}
+.lm-privacy-note{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--lm-ink-soft);line-height:1.55;margin:10px 0 16px;}
+.desktop{width:1000px;background:var(--lm-cream);border-radius:10px;border:1px solid #ddd;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.desktop-content{padding:60px;min-height:480px;display:flex;justify-content:center;}
+.footer-btns{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;}
+</style>
+</head>
+<body>
+<h1>Increment 7 — F17 Picker hand-off + import review</h1>
+<p class="note">
+Three-step sequence between "Import photos" (Settings, connected state)
+and the actual import: (1) an app-styled intro sheet/dialog priming the
+hand-off, (2) Google's own Picker widget (out of this app's visual
+control, launched via Google's Picker API), (3) this app's own review-
+before-import step once the picker closes and control returns.
+</p>
+
+<h2 class="section">1. Intro sheet/dialog — primes the hand-off to Google's UI</h2>
+<div class="row">
+  <div>
+    <div class="frame-label">Mobile — bottom sheet (existing .lm-sheet pattern)</div>
+    <div class="phone"><div class="phone-inner">
+      <div class="sheet-backdrop"><div class="sheet">
+        <div class="grabber"></div>
+        <h3 class="sheet-title">Choose photos to import</h3>
+        <p class="sheet-sub">You'll pick photos in Google's own picker
+        window next — we only ever receive the exact photos you select
+        there. Nothing else in your Google Photos library is visible to
+        this app.</p>
+        <button class="lm-btn lm-btn-primary" style="width:100%;justify-content:center;">Open Google Photos picker</button>
+        <div style="text-align:center;margin-top:8px;"><button class="lm-btn lm-btn-quiet">Cancel</button></div>
+      </div></div>
+    </div></div>
+  </div>
+  <div>
+    <div class="frame-label">Desktop — centered dialog (existing §5.6 split)</div>
+    <div class="desktop"><div class="desktop-content">
+      <div class="dialog" style="width:440px;max-height:none;">
+        <h3 class="sheet-title">Choose photos to import</h3>
+        <p class="sheet-sub">You'll pick photos in Google's own picker
+        window next — we only ever receive the exact photos you select
+        there. Nothing else in your Google Photos library is visible to
+        this app.</p>
+        <div class="footer-btns">
+          <button class="lm-btn lm-btn-quiet">Cancel</button>
+          <button class="lm-btn lm-btn-primary">Open Google Photos picker</button>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<h2 class="section">2. Google's own Picker widget — genuinely new component vocabulary, flagged below</h2>
+<div class="flagbox">
+<b>Not a reused component — flagged explicitly, not silently fit into an
+existing pattern.</b> This is the one surface in the entire app where a
+foreign visual language legitimately appears: Google's Picker API opens
+its own native UI (typically a browser popup/overlay) to let the
+caregiver browse and select from their Google Photos library. This app
+does not, and by design should not, build its own library-browsing view
+for someone else's photo library — that would mean handling
+library-wide access this app deliberately doesn't request (scope
+minimization, FEATURES.md F17). The mockup below is a labeled
+approximation of that widget's shape (native-looking selection tiles,
+Google's own "Select" action), not a component this app owns, styles, or
+can theme with <code>--lm-*</code> tokens. code-agent/Architecture should
+treat it as a black box this app launches and receives a result from —
+no visual spec is being handed off here because there is nothing to
+specify beyond the two mockups on either side of it.
+</div>
+<div class="row">
+  <div>
+    <div class="frame-label">Illustrative shape of Google's Picker (their UI, not ours)</div>
+    <div class="phone"><div class="phone-inner" style="background:#f1f3f4;padding:16px;display:flex;align-items:center;">
+      <div class="g-window">
+        <div class="native-flag">↑ Google's native UI — not styled by this app ↑</div>
+        <div class="g-header"><span class="g-dot"></span><span class="g-title">Select photos to share</span></div>
+        <div class="g-grid">
+          <div class="g-tile sel"><span class="g-check">✓</span></div>
+          <div class="g-tile sel"><span class="g-check">✓</span></div>
+          <div class="g-tile"></div>
+          <div class="g-tile sel"><span class="g-check">✓</span></div>
+          <div class="g-tile"></div>
+          <div class="g-tile sel"><span class="g-check">✓</span></div>
+        </div>
+        <button class="g-btn">Select (4)</button>
+        <div style="clear:both;"></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<h2 class="section">3. Import review — this app's own step, reuses the photo-upload dialog/sheet + photogrid exactly</h2>
+<div class="row">
+  <div>
+    <div class="frame-label">Mobile — review sheet</div>
+    <div class="phone"><div class="phone-inner">
+      <div class="sheet-backdrop"><div class="sheet">
+        <div class="grabber"></div>
+        <h3 class="sheet-title">Review before importing</h3>
+        <p class="sheet-sub">4 photos selected from Google Photos.</p>
+        <div class="child-select"><span class="dot"></span> Importing into <b>Maya</b>'s journey &nbsp;▾</div>
+        <div class="photogrid">
+          <div class="ptile"></div>
+          <div class="ptile dup"><span class="badge">Looks like a duplicate</span><span class="skip-toggle">✕</span></div>
+          <div class="ptile"></div>
+          <div class="ptile"></div>
+        </div>
+        <div class="lm-privacy-note">
+          <span>🔒</span>
+          <span>These will be stripped of location data and stored
+          privately, same as every other photo here. This is a one-time
+          copy from Google Photos into little-milestones' own encrypted
+          storage — nothing keeps syncing, and your Google Photos library
+          is never touched or deleted from.</span>
+        </div>
+        <button class="lm-btn lm-btn-primary" style="width:100%;justify-content:center;">Import 3 photos to Maya's journey</button>
+        <div style="text-align:center;margin-top:8px;"><button class="lm-btn lm-btn-quiet">Cancel</button></div>
+      </div></div>
+    </div></div>
+  </div>
+  <div>
+    <div class="frame-label">Desktop — review dialog (5-col grid, matching photo-upload-desktop.html's precedent)</div>
+    <div class="desktop"><div class="desktop-content">
+      <div class="dialog" style="width:640px;max-height:none;">
+        <h3 class="sheet-title">Review before importing</h3>
+        <p class="sheet-sub">4 photos selected from Google Photos.</p>
+        <div class="child-select"><span class="dot"></span> Importing into <b>Maya</b>'s journey &nbsp;▾</div>
+        <div class="photogrid">
+          <div class="ptile"></div>
+          <div class="ptile dup"><span class="badge">Duplicate?</span><span class="skip-toggle">✕</span></div>
+          <div class="ptile"></div>
+          <div class="ptile"></div>
+        </div>
+        <div class="lm-privacy-note">
+          <span>🔒</span>
+          <span>These will be stripped of location data and stored
+          privately, same as every other photo here. One-time copy only
+          — your Google Photos library is never modified.</span>
+        </div>
+        <div class="footer-btns">
+          <button class="lm-btn lm-btn-quiet">Cancel</button>
+          <button class="lm-btn lm-btn-primary">Import 3 photos to Maya's journey</button>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<p class="note">
+<b>Duplicate detection:</b> a photo whose imported bytes appear to match
+one already stored for the target child (content-hash comparison at
+import time — exact mechanism is Architecture's to specify) shows a
+slate "Looks like a duplicate" badge (reusing the non-alarm slate
+information-surface convention, §1.3/UXR-2 — never terracotta/danger,
+since this is informational, not an error) with a per-photo skip toggle
+(✕, defaults to skipped so a caregiver doesn't accidentally double-
+import, fully overridable with one tap). <b>Child selector:</b> a compact
+row reusing the existing identity-dot + name pattern from the switcher,
+tapping it opens the standard child-switcher sheet already shipped
+app-wide — no new picker component for this. <b>Confirm button copy</b>
+updates its count live as photos are skipped/toggled, and is disabled
+when the count reaches zero (never a silent no-op). <b>Photogrid</b>
+reuses <code>AddMemoryForm</code>'s exact 3→5 column, 768px-breakpoint
+precedent (§5.6) — no new grid convention.
+</p>
+</body>
+</html>

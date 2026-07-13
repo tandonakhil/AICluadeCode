@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>little-milestones — Increment 7 design review (F17, Google Photos import)</title>
+<style>
+body{font-family:-apple-system,"Segoe UI",Nunito Sans,sans-serif;background:#f1ede6;margin:0;padding:32px;color:#3D3833;}
+h1{font-size:26px;margin-bottom:4px;}
+.sub{color:#6E6259;font-size:14px;margin-bottom:24px;max-width:900px;line-height:1.6;}
+.summary{max-width:900px;background:#fff;border-radius:16px;padding:22px 26px;margin-bottom:36px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.summary h2{font-size:16px;margin:0 0 10px;}
+.summary ul{margin:0;padding-left:20px;font-size:13.5px;line-height:1.7;color:#3D3833;}
+.flagbox{max-width:900px;background:#EEF3F8;border-left:4px solid #3D6188;border-radius:8px;padding:16px 20px;font-size:13.5px;line-height:1.7;margin-bottom:36px;}
+.flagbox h2{font-size:15px;margin:0 0 8px;color:#3D3833;}
+nav{margin-bottom:28px;}
+nav a{display:inline-block;margin-right:16px;font-size:13px;font-weight:700;color:#C1502A;text-decoration:none;background:#fff;padding:8px 14px;border-radius:999px;}
+section{margin-bottom:48px;}
+section h2{font-size:19px;border-bottom:2px solid #FADCC5;padding-bottom:8px;}
+iframe{width:100%;height:1400px;border:1px solid #ddd;border-radius:10px;background:#fff;}
+.badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.03em;padding:3px 10px;border-radius:999px;background:#8E5FB0;color:#fff;margin-left:10px;vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<h1>Increment 7 — Experience Design review <span class="badge">F17 GOOGLE PHOTOS</span></h1>
+<p class="sub">
+Google Photos import: connect a caregiver's Google account (read-only,
+picker-based, off by default), pick specific photos in Google's own
+Picker UI, review before committing, import into the existing
+encrypt-at-rest photo pipeline. Source: <code>FEATURES.md</code> F17,
+approved 2026-07-11. Covers the four screens listed below at both
+mobile and desktop widths, per the standing responsive-web-app platform
+decision (<code>PROJECT_CONTEXT.md</code> Decisions Log, 2026-07-10,
+re-confirmed unbroken by any decision recorded since).
+</p>
+
+<nav>
+  <a href="#settings">1. Settings entry</a>
+  <a href="#oauth">2. OAuth connect</a>
+  <a href="#picker">3. Picker + review</a>
+  <a href="#results">4. Import results</a>
+</nav>
+
+<div class="summary">
+<h2>Strategy summary</h2>
+<ul>
+<li><b>One-shot, not a persistent sync.</b> The OAuth connection itself
+can persist (so a caregiver isn't re-consenting on every import), but no
+background sync, polling, or auto-import ever runs — every import is an
+explicit "open picker → pick → review → confirm" action, matching
+FEATURES.md's exact scope and the human's approved framing.</li>
+<li><b>Scope minimization is visible in the copy, not just enforced
+server-side.</b> Settings entry, the intro hand-off, and the review step
+all separately state read-only/picker-only/no-library-access, satisfying
+INDUSTRY_KB §2.2's third-party-disclosure expectation at more than one
+touchpoint.</li>
+<li><b>Everything reused except one screen.</b> Sheet-on-mobile/dialog-
+on-desktop split (§5.6), <code>.lm-btn</code> variants, calm-terracotta
+(never <code>--lm-danger</code>) error convention, the privacy-cue
+lock-glyph line (UXR-10), the photo-upload grid's 3→5 column precedent,
+the lighter two-button confirm dialog (not destructive-red) already used
+for conversation delete. The one genuine exception is Google's own
+Picker widget — flagged explicitly in picker-review.html, not silently
+fit into this app's component vocabulary.</li>
+<li><b>Partial failure is shown, never swallowed.</b> The results step
+lists real per-photo outcomes with a scoped retry, matching this KB's
+standing "shown honestly" instruction and the same discipline already
+applied to every other error surface in this app.</li>
+</ul>
+</div>
+
+<div class="flagbox">
+<h2>Flagged explicitly — new component vocabulary</h2>
+<p><b>Yes — one genuinely new UI surface.</b> Google's own Photos Picker
+widget (launched via Google's Picker API) is not something this app can
+or should skin with its own tokens — it is the mechanism that makes
+scope-minimized, picker-based selection possible at all (this app
+deliberately does not build its own Google-library browsing view, since
+that would require exactly the library-wide access FEATURES.md rules
+out). Everything on either side of that widget — the intro hand-off
+sheet/dialog and the post-picker review step — is fully native to this
+app's existing storybook visual language and reuses established
+components. See picker-review.html's inline flag box for the full
+reasoning code-agent/Architecture should carry forward: this app treats
+the Picker as a black box it launches and receives a photo-id result
+from, not a surface it specifies pixel-by-pixel.</p>
+<p style="margin-bottom:0;"><b>Everything else in this pass is existing
+component vocabulary</b> — no new sheet/dialog pattern, no new button
+variant, no new error-color role, no new grid convention.</p>
+</div>
+
+<section id="settings">
+<h2>1. Settings entry point</h2>
+<iframe src="settings-entry.html" loading="lazy"></iframe>
+</section>
+
+<section id="oauth">
+<h2>2. OAuth connect flow (connect / consent hand-off / errors / disconnect)</h2>
+<iframe src="oauth-connect.html" loading="lazy"></iframe>
+</section>
+
+<section id="picker">
+<h2>3. Google Photos Picker hand-off + import review</h2>
+<iframe src="picker-review.html" loading="lazy"></iframe>
+</section>
+
+<section id="results">
+<h2>4. Import progress + results (success / partial failure / full failure)</h2>
+<iframe src="import-results.html" loading="lazy"></iframe>
+</section>
+
+</body>
+</html>
