@@ -1722,6 +1722,85 @@ blocking (no suites recorded as advisory for this project).
   coverage and actual coverage; every mandated Test-gate item is backed by a
   genuine, specific test. This suite does not block the gate.
 
+**2026-07-12: Test gate, Increment 6 (F12: hardened auth — password reset,
+opt-in TOTP MFA, session hardening) — unit/integration + live smoke run
+(test-agent).** Full structured per-scenario evidence at
+`test-evidence/unit-integration-increment6-2026-07-12.md`. Suite policy:
+blocking (no advisory marking on record for this suite).
+
+- **Backend unit/integration: PASS, 199/199** (`.venv/bin/python -m pytest
+  -q`), matching code-agent's reported 199, 0 failed, only pre-existing
+  non-blocking deprecation warnings.
+- **Frontend unit: PASS, 54/54** (`npm test -- --run`), matching
+  code-agent's reported 54; `tsc --noEmit` clean.
+- **Live backend smoke (curl, real HTTP against a freshly-started :8000):
+  PASS on every F12 flow exercised** — signup/login, TOTP setup+verify
+  (secret-derived live codes via `pyotp`, confirmed available in the venv),
+  the `mfa_pending` challenge blocking non-MFA routes until cleared,
+  TOTP-code login completion, recovery-code login with genuine single-use
+  enforcement (reused code correctly rejected with the attempt-lockout
+  counter visible), password-reset request (generic 202 response + a real
+  reset-token row confirmed server-side via read-only DB query, since no
+  `RESEND_API_KEY` is configured in this dev environment — a pre-existing,
+  documented operational precondition, not new to F12) and confirm-with-
+  invalid-token correctly rejected (400, generic message), session
+  list/revoke including a genuine cross-user 404 (not 403, and the
+  target session confirmed still present afterward) and successful
+  own-session revoke, and TOTP disable correctly requiring both password
+  and a valid code.
+- **Live frontend smoke: PASS** on `/forgot-password` and `/reset-password`
+  (both 200, real page copy present, no Next.js error-boundary markers
+  triggered). Settings' Security card client-render check is a **partial
+  PASS** — no evidence of a client error (clean `tsc`, clean dev-server
+  compile log, authenticated root request serves 200), but full behavioral
+  confirmation of the client-rendered (non-route) Security card requires
+  browser automation this environment doesn't have; flagged explicitly
+  rather than claimed as a full pass.
+- **Environment note**: both dev servers were found stopped at the start of
+  this run despite the task brief's assumption they were live — restarted
+  fresh (`uvicorn app.main:app --port 8000`, `npm run dev -- --port 3000`)
+  before smoke testing; not treated as a defect, just recorded for the
+  record.
+- **GAP — flagged, blocking suite affected**: **zero committed pytest or
+  vitest tests exist for any F12 behavior.** `dev/backend/tests/` has no
+  new test file (no `test_totp.py`/`test_password_reset.py`/
+  `test_sessions.py`), and `test_auth.py`'s 29 tests are all pre-existing
+  Increment-3 session/login/logout tests with no TOTP/reset/recovery/MFA
+  coverage added. `git show --stat e3f48e5` confirms zero files under
+  `tests/` were touched by the backend F12 commit. On the frontend,
+  `git show --stat e179012` shows new `SecurityCard.tsx` (564 lines),
+  `forgot-password`/`reset-password` pages, and `AuthScreen.tsx` MFA-step
+  changes, but `app/page.test.tsx`/`SettingsScreen.test.tsx` changed by only
+  1 line each (trivial mock adjustment, not new coverage), and no
+  `SecurityCard.test.tsx`/`AuthScreen.test.tsx`/reset-page test files exist
+  anywhere in the repo. Both commit messages are explicit that verification
+  was manual/TestClient-script-based ("new flows smoke-tested end-to-end"),
+  not committed pytest. The 199/54 passing totals above are real and
+  accurate, but contain **no regression coverage for F12 at all** — a real
+  gap for a security-sensitive feature (auth, MFA, session revocation),
+  flagged for code-agent to close, consistent with the regression-test
+  pattern set by every prior increment touching auth (e.g. Increment 3's 30
+  new auth tests, Increment 5's 3 new family-scoping tests). This is a
+  **blocking-suite finding** (no advisory marking recorded for
+  unit/integration) — the gate should stop for a human decision (send back
+  to code-agent, or an explicit recorded override) rather than proceed
+  silently, even though every F12 behavior itself was independently
+  confirmed working via live smoke testing.
+- **Secondary, smaller gap**: `email_delivery.py` has no dev-mode outbox
+  fallback, so the password-reset confirm happy path (using a real token
+  from a delivered email) could not be live-smoke-tested end-to-end locally
+  without a Resend account; the request-side behavior and invalid-token
+  rejection were both independently verified, and token creation was
+  confirmed via a direct read-only DB query, but this is a testability gap
+  worth a small follow-up (e.g., a gitignored dev outbox file) so this flow
+  doesn't require a real vendor account to verify locally in future
+  increments.
+- Scratch files (cookie jars, temp HTML fetches) cleaned up before
+  finishing; one accidental 0-byte `dev/backend/little_milestones.db`
+  (created by a diagnostic query run from the wrong directory, unrelated to
+  the real `dev/backend/data/little_milestones.db`) was also removed.
+  `git status` on `dev/` is clean.
+
 ## Ports (local dev, assigned by deploy-agent 2026-07-11)
 - Backend (FastAPI/uvicorn): `8000`
 - Frontend (Next.js): `3000`
@@ -2266,3 +2345,83 @@ which is still pending (asked to review Increments 5/6/7 together).
   restart before the new `/auth/*` routes are reachable live; the
   frontend (`:3000`, `next dev`) does hot-reload and is already serving
   current code. [code-agent]
+
+- 2026-07-12: **Backend dev server restarted with correct network binding.**
+  The orchestrator restarted `:8000` (`--host 0.0.0.0`) to pick up F12's new
+  `/auth/*` routes, confirmed live via `openapi.json`. Separately, during
+  the Test gate run below, an interrupted subagent had restarted *both*
+  dev servers itself but bound them to localhost-only (`uvicorn ... --port
+  8000` / `next dev --port 3000`, missing the `--host`/`--hostname 0.0.0.0`
+  flags) — this broke access from any device on the LAN (human-reported:
+  "server is not responding"). Diagnosed via `ps`/`lsof` (process cwd and
+  cmdline), both processes killed and relaunched correctly
+  (`--host 0.0.0.0`/`--hostname 0.0.0.0`, logging to `/tmp/lm-backend.log`
+  / `/tmp/lm-frontend.log` as before); confirmed 200 on both `:8000/docs`
+  and `:3000/`. [orchestrator]
+
+- 2026-07-12: **Increment 6 Test gate run.** Unit/integration: 199/199
+  backend pytest, 54/54 frontend vitest, `tsc --noEmit` clean — all
+  pre-existing, re-verified. Live smoke (curl/TestClient against the
+  running servers): every F12 flow verified genuinely working — TOTP
+  setup/verify (real `pyotp`-computed codes), `mfa_pending` gating,
+  TOTP-code login, recovery-code single-use enforcement, password-reset
+  request (generic response, real token row confirmed via DB query) and
+  invalid-token rejection, session list/revoke with genuine cross-user 404,
+  revoke-others, TOTP disable. Frontend smoke: `/forgot-password` and
+  `/reset-password` both 200 with real content.
+  **Blocking finding: zero committed pytest/vitest tests existed for any
+  F12 behavior** — the Code gate's verification had been manual/TestClient-
+  script-based only, never committed as regression tests, a real gap for a
+  security-sensitive feature. Per this project's Test Policy (all suites
+  blocking by default, no override on record for this one), the gate
+  stopped for a human decision rather than auto-passing. Full evidence:
+  `test-evidence/unit-integration-increment6-2026-07-12.md`. [test-agent]
+
+- 2026-07-12: **Human decision: send back for committed test coverage**
+  (not an override) — code-agent dispatched to add real pytest/vitest
+  regression tests for the full F12 surface before Review. [orchestrator]
+
+- 2026-07-12: **F12 regression-test coverage added, two commits**
+  (`01d4a37` backend, `7f44698` frontend). Backend: 20 new tests in new
+  file `tests/test_auth_hardening.py` (password reset token lifecycle +
+  generic-response/no-enumeration, TOTP setup/verify/wrong-code/lockout,
+  `mfa_pending` route-gating, TOTP-code and recovery-code login, session
+  list/revoke/cross-user-404/revoke-others, change-password's
+  delete-all-except-current vs. reset's delete-all distinction) — real
+  `pyotp`-computed codes throughout, no crypto/time mocking. Frontend: 15
+  new tests across 4 new files (`AuthScreen.test.tsx`,
+  `SecurityCard.test.tsx`, `forgot-password/page.test.tsx`,
+  `reset-password/page.test.tsx`) covering the TOTP login step, calm error
+  copy, recovery-code field swap, the 4-step enrollment flow's forced
+  acknowledgment checkbox gating "Done", the non-destructive disable
+  dialog, and the uniform forgot/reset-password states. Final: 219/219
+  backend, 69/69 frontend, `tsc --noEmit` clean. No implementation bug
+  found or fixed in the process — one test-assertion correction needed for
+  `otpauth://` URI encoding, not a product defect. Test gate's blocking
+  finding is closed. [code-agent]
+
+- 2026-07-12: **Increment 6 Review gate: approved.** Scope: diff hygiene,
+  decision-intent match, cross-cutting consistency (not re-checking
+  functional/UX/architecture/security correctness, already covered above).
+  Diff hygiene clean across all four commits — one minor nit, `e179012`'s
+  commit message doesn't mention the small accompanying
+  `backend/app/users.py` change (`+User.totp_enabled`, needed for
+  `SecurityCard.tsx`'s enrollment-status render), not a blocker. `crypto.py`
+  extraction verified correct and equivalent (no leftover `_get_fernet`
+  reference; both `photos.py` call sites updated). Both flagged deviations
+  (client-side QR rendering, `sessions.id` idempotent migration) confirmed
+  properly recorded in the Decisions Log and independently corroborated by
+  ARCHITECTURE_KB §11.1a. Implementation matches SECURITY_KB §7 and UX_KB
+  §11 line-for-line on every checked point. Test-file naming/structure
+  matches existing project convention; spot-read assertions confirmed
+  genuine, not name-only. [review-agent]
+
+- 2026-07-12: **Increment 6 Deploy gate: pass.** Verified (without
+  restarting either process) that the already-running dev servers serve
+  exactly the reviewed code: `dev/` HEAD `7f44698`, working tree clean;
+  backend `:8000` process cwd/openapi.json confirmed current, all F12
+  routes present; frontend `:3000` process cwd confirmed current, `/`,
+  `/forgot-password`, `/reset-password` all 200; end-to-end smoke cycle
+  (signup → login → session-cookie-authenticated `/auth/me`) passed against
+  the live backend. **Increment 6 (F12, hardened auth suite) is deployed
+  (dev, local).** [deploy-agent]
