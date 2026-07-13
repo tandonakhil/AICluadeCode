@@ -1,9 +1,13 @@
-# AICluadeCode — Multi-Agent SDLC System
+# Conclave — Multi-Agent SDLC System
 
-This repo is a Multi-Agent System (MAS) that builds and operates a portfolio of
-AI-centric applications for the energy industry (GenAI chatbots, agentic
-workflows, RAG/knowledge-base apps). It runs on Claude Code's own Agent SDK
-primitives — subagents, skills, and the Workflow tool.
+**Conclave** (repo: AICluadeCode) is a Multi-Agent System (MAS) that builds
+and operates a portfolio of AI-centric applications for the energy industry
+(GenAI chatbots, agentic workflows, RAG/knowledge-base apps). It runs on
+Claude Code's own Agent SDK primitives — subagents, skills, and the Workflow
+tool. The name reflects its shape: a roster of specialist agents (architects,
+security, UX, industry experts) convened per project, deliberating under one
+orchestrator, with the human always holding final say — a conclave, not a
+single monolithic builder. Named 2026-07-13, human-approved.
 
 ## Two separate axes — do not mix them
 

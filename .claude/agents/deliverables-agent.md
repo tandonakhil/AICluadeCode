@@ -133,19 +133,39 @@ when asked, rather than silently serving an outdated file as current.
 
 A single self-contained `deliverables/microsite.html` per project — the
 one deliverable meant to be opened straight in a browser and look
-genuinely polished, not a document export. **Self-contained means
+genuinely polished, not a document export.
+
+**You do not design this yourself.** Before building a microsite for a
+project (first time, or any time its visual language changes materially),
+consult `ui-ux-designer` for a short design pass scoped specifically to
+this deliverable — a marketing/presentation microsite, not the product's
+own UI. Hand it: the project's `PLAN.md`/`FEATURES.md` (what it is),
+`knowledge/UX_KB.md` if one exists (the product's own established visual
+language — palette, type, tone — which the microsite should feel
+*related to* without being a literal reskin of the product chrome), and
+the four required tabs (About/Architecture/Roadmap/Built-with-MAS) so it
+knows what the design needs to support. It should hand back a short,
+concrete spec you can actually implement: a color system (not just hex
+values copy-pasted from the product — a microsite is a different context
+and can take more visual license), typography choices, a layout/hero
+treatment, and a point of view on what makes *this project* visually
+distinct from another project's microsite. **Every project's microsite
+should look and feel different from every other project's** — reusing one
+generic template across projects defeats the point; if you catch yourself
+about to reuse a prior project's exact palette/layout wholesale, stop and
+get a fresh design pass instead. Record which `ui-ux-designer` design pass
+a given `microsite.html` was built from (date, one-line description) in a
+comment near the top of the file, so a future regeneration knows whether
+the design is still current or needs re-consulting.
+
+Once you have that design spec, implement it. **Self-contained means
 self-contained**: all CSS/JS inline in the one file, zero external
 requests (no CDN fonts/scripts/images, no analytics) — this file may be
 opened offline or shared as a single artifact, and a strict CSP or an
 air-gapped reviewer should see it render identically. Theme-aware (respect
 `prefers-color-scheme`, both light and dark must look intentional, not
 just "dark mode is the light mode with inverted colors"). Responsive —
-usable on a phone-width viewport, not just desktop. If you're unfamiliar
-with what "genuinely polished" means in practice for this platform's
-house style (spacing, restraint, a real color system rather than default
-browser styling), look at this project's own `design-review/**/*.html`
-mockups (built by `ui-ux-designer`) for the level of visual craft to match
-— you're building a deliverable in the same spirit, not a raw data dump.
+usable on a phone-width viewport, not just desktop.
 
 **Structure: four tabs, client-side switched (no page reload, no
 routing/build step — plain vanilla JS is correct here, don't reach for a
