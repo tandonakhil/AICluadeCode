@@ -158,6 +158,37 @@
   .arch-lane-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
   .arch-lane-chips .chip { padding: 5px 10px 5px 8px; font-size: 11px; margin: 0; }
 
+  /* Consumer-facing "meet the desk" cards, replacing the technical lane grid */
+  .section-subhead { text-align: center; margin: 44px 0 22px; }
+  .section-subhead h3 { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+  .section-subhead p { font-size: 13.5px; color: var(--muted); margin: 0; }
+  .team-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+  .team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 14px; text-align: center; box-shadow: var(--shadow); }
+  .team-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 12px; }
+  .team-icon.core-icon { background: var(--core); }
+  :root[data-theme="light"] .team-icon.core-icon, .team-icon.core-icon { background: color-mix(in srgb, var(--core) 12%, transparent); }
+  .team-icon.optional-icon { background: transparent; border: 2px dashed var(--optional); }
+  .team-card h4 { font-size: 13.5px; font-weight: 700; margin: 0 0 6px; }
+  .team-card p { font-size: 12px; color: var(--body); margin: 0; line-height: 1.5; }
+  .fine-print { font-size: 12.5px; color: var(--muted); max-width: 640px; margin: 22px auto 0; text-align: center; line-height: 1.6; }
+
+  .tech-disclosure { margin-top: 28px; }
+  .tech-disclosure summary {
+    cursor: pointer; font-size: 13px; font-weight: 700; color: var(--muted);
+    padding: 10px 16px; border: 1px solid var(--border); border-radius: 999px; display: inline-block;
+    list-style: none;
+  }
+  .tech-disclosure summary::-webkit-details-marker { display: none; }
+  .tech-disclosure summary:hover { color: var(--ink); border-color: var(--ink); }
+  .tech-disclosure summary::before { content: "▸ "; }
+  .tech-disclosure[open] summary::before { content: "▾ "; }
+
+  /* Journey timeline reuses .log/.entry visual language, just aliased */
+  .journey .entry::before { background: var(--primary); }
+  .journey .entry .date { color: var(--primary); }
+
   /* Pipeline — horizontal gated timeline */
   .pipeline-wrap { overflow-x: auto; padding: 10px 4px 4px; }
   .pipeline { position: relative; display: flex; justify-content: space-between; min-width: 760px; padding: 0 6px; }
@@ -305,107 +336,83 @@
 
   <section id="architecture" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">Architecture</span>
-      <h2>Layers of agents, not a single monolithic builder.</h2>
-      <p>The human approves. One orchestrator dispatches. Agents never call each other directly — every hand-off runs through the orchestrator and through shared markdown state on disk.</p>
+      <span class="eyebrow">How it's staffed</span>
+      <h2>Think of it like a newsroom, not a machine.</h2>
+      <p>One managing editor coordinates. A publisher signs off on every story before it runs. A staff is always on the desk, and outside experts get pulled in only when a story actually needs them — nobody talks sideways, everything goes through the editor and one shared assignment board.</p>
     </div>
 
     <div class="card diagram-wrap">
       <div class="arch-diagram">
         <div class="arch-tier arch-human">
-          <div class="arch-node arch-node-human">Human</div>
-          <div class="arch-caption">approves &amp; redirects at every gate — the only decision authority in the system</div>
+          <div class="arch-node arch-node-human">You — the publisher</div>
+          <div class="arch-caption">Nothing runs without your sign-off. Every gate stops and waits for you, not the other way around.</div>
         </div>
-        <div class="arch-arrow" data-reveal>↕ reviews output, approves or sends back</div>
+        <div class="arch-arrow" data-reveal>↕ you review, you approve, you can always send it back</div>
         <div class="arch-tier arch-orch">
-          <div class="arch-node arch-node-orch">Orchestrator <span class="arch-sub">(this conversation)</span></div>
-          <div class="arch-caption">the human's single point of contact · dispatches one agent at a time · aggregates results · never bypassed</div>
-        </div>
-        <div class="arch-arrow" data-reveal>↓ dispatches, per gate</div>
-
-        <div class="arch-lanes" data-reveal="stagger">
-          <div class="arch-lane">
-            <div class="arch-lane-title core-title">Core pipeline</div>
-            <div class="arch-lane-sub">non-droppable</div>
-            <div class="arch-lane-chips">
-              <span class="chip"><span class="dot"></span>plan</span>
-              <span class="chip"><span class="dot"></span>code</span>
-              <span class="chip"><span class="dot"></span>test</span>
-              <span class="chip"><span class="dot"></span>review</span>
-              <span class="chip"><span class="dot"></span>deploy</span>
-            </div>
-          </div>
-          <div class="arch-lane">
-            <div class="arch-lane-title optional-title">Optional SME</div>
-            <div class="arch-lane-sub">convened per project's risk profile</div>
-            <div class="arch-lane-chips">
-              <span class="chip optional"><span class="dot"></span>ui-ux</span>
-              <span class="chip optional"><span class="dot"></span>solution-arch</span>
-              <span class="chip optional"><span class="dot"></span>security-arch</span>
-              <span class="chip optional"><span class="dot"></span>resp-ai-arch</span>
-              <span class="chip optional"><span class="dot"></span>functional</span>
-              <span class="chip optional"><span class="dot"></span>industry</span>
-            </div>
-          </div>
-          <div class="arch-lane">
-            <div class="arch-lane-title">Cross-cutting / infra</div>
-            <div class="arch-lane-sub">observe or serve every gate</div>
-            <div class="arch-lane-chips">
-              <span class="chip"><span class="dot"></span>usage-monitor</span>
-              <span class="chip"><span class="dot"></span>release-mgr</span>
-              <span class="chip"><span class="dot"></span>enhance-agent</span>
-              <span class="chip"><span class="dot"></span>synthetic-data</span>
-              <span class="chip"><span class="dot"></span>deliverables</span>
-            </div>
-          </div>
-          <div class="arch-lane">
-            <div class="arch-lane-title">Admin / platform</div>
-            <div class="arch-lane-sub"><code class="mono">mas-</code> prefix, governs Conclave itself</div>
-            <div class="arch-lane-chips">
-              <span class="chip"><span class="dot"></span>mas-architect</span>
-              <span class="chip"><span class="dot"></span>mas-registrar</span>
-              <span class="chip"><span class="dot"></span>mas-release-mgr</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="arch-arrow" data-reveal>↕ each agent reads and writes its own slice — never another agent's</div>
-
-        <div class="arch-tier arch-state" data-reveal>
-          <div class="arch-node arch-node-state">Shared knowledge &amp; state <span class="arch-sub">(plain markdown on disk)</span></div>
-          <div class="arch-caption">
-            <code class="mono">knowledge/*_KB.md</code> (one file per SME) ·
-            <code class="mono">PROJECT_CONTEXT.md</code> (Decisions Log, the append-only record every agent reads) ·
-            <code class="mono">FEATURES.md</code> ·
-            <code class="mono">admin/MAS_REGISTRY.md</code> ·
-            <code class="mono">admin/ROADMAP.md</code>
-          </div>
+          <div class="arch-node arch-node-orch">The managing editor <span class="arch-sub">(this conversation)</span></div>
+          <div class="arch-caption">Every specialist reports here, and only here — never to each other. One coordinator, always.</div>
         </div>
       </div>
-      <div class="legend">
-        <span><i style="background:var(--core)"></i>Core / non-droppable</span>
-        <span><i style="background:var(--surface);border:2px dashed var(--optional)"></i>Optional / droppable</span>
-        <span><i style="background:var(--primary)"></i>Human-approval boundary</span>
+    </div>
+
+    <div class="section-subhead" data-reveal>
+      <h3>Always on the desk</h3>
+      <p>These five never sit out — every build goes through all of them.</p>
+    </div>
+    <div class="team-grid" data-reveal="stagger">
+      <div class="team-card"><div class="team-icon core-icon">📝</div><h4>The Planner</h4><p>Turns your idea into a real, scoped backlog before anyone writes a line of code.</p></div>
+      <div class="team-card"><div class="team-icon core-icon">🔨</div><h4>The Builder</h4><p>Writes the actual product, feature by feature, against exactly what was approved.</p></div>
+      <div class="team-card"><div class="team-icon core-icon">🧪</div><h4>The Tester</h4><p>Tries to break what got built, and reports back honestly — including what still fails.</p></div>
+      <div class="team-card"><div class="team-icon core-icon">🔍</div><h4>The Reviewer</h4><p>One more set of eyes: checks the finished work still matches what was agreed.</p></div>
+      <div class="team-card"><div class="team-icon core-icon">🚀</div><h4>The Launcher</h4><p>Puts the finished, approved work live — only after everything above signs off.</p></div>
+    </div>
+
+    <div class="section-subhead" data-reveal>
+      <h3>Called in when the story needs them</h3>
+      <p>Brought on only for builds where their expertise actually matters.</p>
+    </div>
+    <div class="team-grid" data-reveal="stagger">
+      <div class="team-card"><div class="team-icon optional-icon">🎨</div><h4>The Designer</h4><p>Shapes what you'll actually see and click — for anything with a real user interface.</p></div>
+      <div class="team-card"><div class="team-icon optional-icon">🏗️</div><h4>The Architects</h4><p>Plan how the system holds together and how it's kept secure — for anything with real technical risk.</p></div>
+      <div class="team-card"><div class="team-icon optional-icon">🌐</div><h4>The Industry Advisor</h4><p>Makes sure the build reflects how the energy industry actually works, not generic software assumptions.</p></div>
+      <div class="team-card"><div class="team-icon optional-icon">🧭</div><h4>The Domain Advisor</h4><p>Pressure-tests the plan against how the real business workflow behaves, playing devil's advocate on purpose.</p></div>
+      <div class="team-card"><div class="team-icon optional-icon">🛡️</div><h4>The Responsible-AI Reviewer</h4><p>Checks anything AI-generated for bias or harmful output before it ever reaches a real user.</p></div>
+    </div>
+    <p class="fine-print" data-reveal>A few more roles work quietly in the background — tracking usage, preparing releases, generating test data, producing reports — and only ever act when called by name, never uninvited.</p>
+
+    <div class="card" data-reveal>
+      <h3>Nothing talks sideways</h3>
+      <p style="font-size:14px;">One shared assignment board. Every one of them — desk staff and outside experts alike — reads and writes to the same running written record: what was decided, what's planned, what's done. If the tester needs something from the builder, it goes through the board and the managing editor. No reporter ever calls another reporter directly.</p>
+    </div>
+
+    <details class="tech-disclosure" data-reveal>
+      <summary>See the full technical roster</summary>
+      <div class="card" style="margin-top:12px;">
+        <h3>Two axes, kept isolated</h3>
+        <p style="font-size:13.5px;"><code class="mono">projects/&lt;name&gt;/</code> (built by <code class="mono">/new-project</code>, <code class="mono">/enhance-project</code>, <code class="mono">/modify-feature</code>, <code class="mono">/consult</code>) and <code class="mono">admin/</code> (evolved only by <code class="mono">/admin-panel</code>) never mix — a project agent never writes to <code class="mono">admin/</code>, and an admin agent never touches <code class="mono">projects/</code>. The same orchestrator serves both axes, but the state each axis reads and writes stays strictly separated.</p>
       </div>
-    </div>
-
-    <div class="card" data-reveal>
-      <h3>Two axes, kept isolated</h3>
-      <p style="font-size:13.5px;"><code class="mono">projects/&lt;name&gt;/</code> (built by <code class="mono">/new-project</code>, <code class="mono">/enhance-project</code>, <code class="mono">/modify-feature</code>, <code class="mono">/consult</code>) and <code class="mono">admin/</code> (evolved only by <code class="mono">/admin-panel</code>) never mix — a project agent never writes to <code class="mono">admin/</code>, and an admin agent never touches <code class="mono">projects/</code>. The same orchestrator serves both axes, but the state each axis reads and writes stays strictly separated.</p>
-    </div>
-
-    <div class="card" data-reveal>
-      <h3>Agent roster, by category</h3>
-      <table class="reg">
-        <tr><th>Category</th><th>Agents</th></tr>
-        <tr><td>Core pipeline (non-droppable)</td><td><span class="id">plan-agent</span> <span class="id">code-agent</span> <span class="id">test-agent</span> <span class="id">review-agent</span> <span class="id">deploy-agent</span></td></tr>
-        <tr><td>Core for UI-bearing templates</td><td><span class="id">ui-ux-designer</span></td></tr>
-        <tr><td>Optional SME (droppable at Team Composition)</td><td><span class="id">functional-agent</span> <span class="id">industry-expert</span> <span class="id">solution-architect</span> <span class="id">security-architect</span> <span class="id">responsible-ai-architect</span></td></tr>
-        <tr><td>Cross-cutting / infra</td><td><span class="id">usage-monitor</span> <span class="id">release-manager</span> <span class="id">enhance-agent</span> <span class="id">synthetic-data-agent</span> <span class="id">deliverables-agent</span></td></tr>
-        <tr><td>Admin / platform (<code class="mono">mas-</code> prefix)</td><td><span class="id">mas-architect</span> <span class="id">mas-registrar</span> <span class="id">mas-release-manager</span></td></tr>
-      </table>
-    </div>
-
+      <div class="card">
+        <h3>Agent roster, by category</h3>
+        <table class="reg">
+          <tr><th>Category</th><th>Agents</th></tr>
+          <tr><td>Core pipeline (non-droppable)</td><td><span class="id">plan-agent</span> <span class="id">code-agent</span> <span class="id">test-agent</span> <span class="id">review-agent</span> <span class="id">deploy-agent</span></td></tr>
+          <tr><td>Core for UI-bearing templates</td><td><span class="id">ui-ux-designer</span></td></tr>
+          <tr><td>Optional SME (droppable at Team Composition)</td><td><span class="id">functional-agent</span> <span class="id">industry-expert</span> <span class="id">solution-architect</span> <span class="id">security-architect</span> <span class="id">responsible-ai-architect</span></td></tr>
+          <tr><td>Cross-cutting / infra</td><td><span class="id">usage-monitor</span> <span class="id">release-manager</span> <span class="id">enhance-agent</span> <span class="id">synthetic-data-agent</span> <span class="id">deliverables-agent</span></td></tr>
+          <tr><td>Admin / platform (<code class="mono">mas-</code> prefix)</td><td><span class="id">mas-architect</span> <span class="id">mas-registrar</span> <span class="id">mas-release-manager</span></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Shared knowledge &amp; state</h3>
+        <p style="font-size:13px;">
+          <code class="mono">knowledge/*_KB.md</code> (one file per SME) ·
+          <code class="mono">PROJECT_CONTEXT.md</code> (Decisions Log, the append-only record every agent reads) ·
+          <code class="mono">FEATURES.md</code> ·
+          <code class="mono">admin/MAS_REGISTRY.md</code> ·
+          <code class="mono">admin/ROADMAP.md</code>
+        </p>
+      </div>
+    </details>
   </section>
 
   <section id="pipeline" data-reveal>
@@ -489,37 +496,59 @@
   <section id="mas" data-reveal>
     <div class="section-head">
       <span class="eyebrow">Built with MAS</span>
-      <h2>How Conclave governs and extends itself.</h2>
-      <p>Conclave builds itself using the same governed process it applies to every project — self-hosting its own discipline.</p>
+      <h2>Here's what it's actually like to build something.</h2>
+      <p>Walked through as if you're the one asking Conclave to build it — say, a customer-facing outage-status chatbot for your utility. Nine gates, and you're the one who says go at every one of them.</p>
     </div>
 
-    <div class="card">
-      <h3>The add-agent flow</h3>
-      <svg class="flow-svg" viewBox="0 0 640 160" role="img" aria-label="admin-panel add-agent flow">
-        <rect x="10" y="55" width="170" height="60" rx="10" fill="var(--optional)" opacity="0.85"/>
-        <text x="95" y="80" font-size="12.5" text-anchor="middle" fill="#14161A" font-weight="700">Proposal</text>
-        <text x="95" y="98" font-size="10.5" text-anchor="middle" fill="#14161A" opacity="0.8">mas-architect advisory</text>
-        <line x1="180" y1="85" x2="235" y2="85" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#a1)"/>
-        <rect x="235" y="45" width="170" height="80" rx="10" fill="var(--primary)"/>
-        <text x="320" y="78" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">Human approval</text>
-        <text x="320" y="96" font-size="10.5" text-anchor="middle" fill="#fff" opacity="0.9">no agent self-approves</text>
-        <line x1="405" y1="85" x2="460" y2="85" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#a1)"/>
-        <rect x="460" y="55" width="170" height="60" rx="10" fill="var(--core)"/>
-        <text x="545" y="80" font-size="12.5" text-anchor="middle" fill="var(--bg)" font-weight="700">Registry write</text>
-        <text x="545" y="98" font-size="10.5" text-anchor="middle" fill="var(--bg)" opacity="0.85">mas-registrar scaffolds</text>
-        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
-      </svg>
+    <div class="log journey" data-reveal="stagger">
+      <div class="entry">
+        <div class="date">Gate 1 — Intake</div>
+        <div class="title">You describe what you want, in plain language</div>
+        <div class="desc">You tell Conclave: an outage-status chatbot so customers can check outages by address. It asks a couple of grounding questions — what does the actual lookup workflow need to handle, which industry rules apply to customer-facing utility tools — and you just answer in plain language. No spec document required from you.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 2 — Team Composition</div>
+        <div class="title">You choose who's on the build</div>
+        <div class="desc">Conclave proposes a roster: the core build/test/review/deploy path, plus a designer because it's customer-facing, plus a security architect because customers will be looking up their own address. You see the recommended team and can add or drop specialists before anyone starts work.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 3 — Plan &amp; Backlog</div>
+        <div class="title">You approve the plan before code exists</div>
+        <div class="desc">You get a written, prioritized backlog — outage lookup by address, estimated restoration time, SMS opt-in — ranked by what actually matters first. You can approve it, reorder it, or cut a feature entirely, and none of it has been built yet.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 4 — Experience Design</div>
+        <div class="title">You review an actual mockup, not a description</div>
+        <div class="desc">Before any code is written, you're shown a real, clickable preview of the chatbot — the screens, the flow, the colors — as an actual webpage, not a paragraph describing one. You approve it, or send it back: "put the outage map above the fold" — and get a revised version to look at.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 5 — Architecture</div>
+        <div class="title">You see how it's actually built, in plain terms</div>
+        <div class="desc">You're shown, without jargon, how the system will hold together — what happens to a customer's address when they type it in, how login works if there is any — and you sign off on that shape before a single line of code is written against it.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 6 — Code</div>
+        <div class="title">It gets built exactly to what you approved</div>
+        <div class="desc">This is the one step you're not in the room for — but everything implemented here is what was already approved upstream. Nothing gets invented on the fly that you didn't see first.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 7 — Test</div>
+        <div class="title">You're shown a real failure, and asked what to do about it</div>
+        <div class="desc">You see actual test results, scenario by scenario. Say the outage-lookup test finds that addresses with hyphenated street names break the search. Conclave doesn't hide that or quietly ship around it — it surfaces the failure and asks: send it back to be fixed, or accept the limitation and ship anyway. You decide.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 8 — Review</div>
+        <div class="title">A second, independent pass, before you ever see it live</div>
+        <div class="desc">Someone other than the builder checks the finished work against what Plan and Architecture actually approved — did anything drift, is it consistent with the rest of the product. You see those findings before Deploy, not discovered after.</div>
+      </div>
+      <div class="entry">
+        <div class="date">Gate 9 — Deploy</div>
+        <div class="title">You give the final go</div>
+        <div class="desc">Only now does the outage chatbot actually go live — and it's your approval that puts it there. If anything about the industry or domain assumptions got flagged along the way, that advisor's sign-off shows up here too, before launch, not after.</div>
+      </div>
     </div>
 
-    <div class="card" data-reveal>
-      <h3>Real precedent: deliverables-agent and synthetic-data-agent</h3>
-      <p style="font-size:13.5px;"><code class="mono">mas-architect</code> gave advisory review of each proposed role — checking for overlap with existing agents, deciding core-vs-optional status and gate placement — purely advisory, never self-approving. The human reviewed and approved each recommendation explicitly before <code class="mono">mas-registrar</code> scaffolded the actual agent file. <code class="mono">synthetic-data-agent</code>'s full path: proposed 2026-07-11 from a real concrete need, advisory-reviewed, human-approved via checkbox roadmap review 2026-07-12, then built — no step skipped.</p>
-    </div>
-
-    <div class="card" data-reveal>
-      <h3>This microsite itself</h3>
-      <p style="font-size:13.5px;">Even this page followed the pattern: <code class="mono">ui-ux-designer</code> proposed a visual direction (informed by real reference sites), the human reviewed a live preview with 5 selectable color themes, chose Copper + Dark, requested scroll animations, and approved the final build — nothing shipped without that review step.</p>
-    </div>
+    <p class="fine-print" data-reveal style="text-align:center;">Nine checkpoints. You're the approver at every one of them — not just once at the start and once at the end.<br>Conclave applies this exact same nine-gate process to extending itself — including building the roster of specialists you just met, and this page.</p>
   </section>
 
 </main>
