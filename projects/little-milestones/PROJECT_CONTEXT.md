@@ -675,6 +675,145 @@ pass) and F12/F17 (later backlog). UX_KB §8.6's DesignSync-push gap and
 §8.4/§9.3's backend gaps are both closed by this increment's work; no new
 gaps found during implementation beyond the four judgment calls above.
 
+## Increment 7 implementation summary (code-agent, 2026-07-12)
+
+F17 (Google Photos import) built against `FEATURES.md`'s F17 entry,
+`knowledge/UX_KB.md` §12, `knowledge/ARCHITECTURE_KB.md` §12,
+`knowledge/SECURITY_KB.md` §8, and `knowledge/RESPONSIBLE_AI_KB.md` §8, in
+two commits (`8a76d55` backend, `0056069` frontend). **275/275 backend
+tests pass** (`.venv/bin/python -m pytest -q`, up from 219 — 56 new: 21
+unit + 35 route-level); **80/80 frontend tests pass** (`npm test -- --run`,
+up from 69 — 11 new); `tsc --noEmit` and an isolated `next build`
+(`NEXT_DIST_DIR=.next-build`) both clean, the live `:3000`/`:8000` dev
+servers were never restarted.
+
+**Backend** (`dev/backend/app/`): new `google_photos.py` (OAuth
+authz-code+PKCE client, `GooglePhotosClient` — the mockable seam over
+every real Google endpoint call, matching `email_delivery.py`'s Resend
+precedent — `OAuthStateStore`/`GooglePhotosConnectionStore` following this
+project's `Store[T]` convention, Fernet token encryption reusing the
+existing shared key, and the lazy-refresh helper with `ConnectionLapsed`
+handling for an externally-revoked connection per ARCHITECTURE_KB §12.8);
+new `routes/google_photos.py` (`/auth/google-photos/{connect,callback,
+disconnect,status}`, the picker-session create/status/preview/thumbnail
+routes, and `POST /profiles/{id}/photos/import-from-google`'s per-item
+imported/skipped_duplicate/failed contract); `db.py` (two new tables —
+`google_oauth_states`, `google_photos_connections` — plus additive
+nullable `photo_meta.content_hash`/`import_source` columns, idempotent
+migration for the live dev DB); `photos.py` (`compute_content_hash` —
+normalized-SHA-256 per ARCHITECTURE_KB §12.6 — and
+`PhotoStore.find_by_content_hash`, per-profile scoped; `PhotoStore.create()`
+extended additively); `routes/photos.py`'s native upload path now also
+computes `content_hash` going forward (§12.6 explicitly scopes this to
+"F7's existing path," not a retrofit onto pre-F17 rows), so a Google
+import can be correctly flagged as a duplicate against a natively-uploaded
+photo, not just against another import.
+
+**Frontend** (`dev/frontend/`): new `GooglePhotosCard.tsx` (Settings
+entry point, not-connected/connected states, full-page-redirect connect,
+the two OAuth error-state banners, the non-destructive disconnect confirm
+dialog); new `GooglePhotosImportDialog.tsx` (intro sheet → Google's own
+Picker in a new tab → status polling → import-review with duplicate
+badges/skip toggles/live confirm count → import → results with honest
+partial-failure rendering and a scoped retry); `lib/api.ts`/`lib/types.ts`
+extended with the full F17 route surface; `app/page.tsx` reads the OAuth
+callback's `?screen=settings&google_photos=...` redirect once on mount and
+clears it via `history.replaceState`; `SettingsScreen.tsx` now threads the
+full profile list (not just the selected child) down to the new card,
+since the import flow's child selector can target any profile.
+
+**Content-minimization guardrail (RESPONSIBLE_AI_KB §8.1), verified as a
+single choke point**: `routes/google_photos.py`'s
+`_extract_minimal_item_fields` is the only place any caller (preview,
+thumbnail proxy, import) reads fields off a Google Picker media item —
+`id`/`baseUrl`/`mimeType`/`filename`/`mediaMetadata.creationTime` only,
+regardless of what else Google's response carries. A test
+(`test_preview_only_reads_minimal_fields_ignores_face_grouping_metadata`)
+mocks a response with extra people-grouping/label/description fields and
+asserts none of them appear in the preview response.
+
+**Judgment calls made during Increment 7** (documented per the Code-gate
+brief, not silently decided):
+
+1. **Schema/token-storage design: followed ARCHITECTURE_KB §12.4's
+   dedicated `google_photos_connections` table, not SECURITY_KB §8.2's
+   proposal to add `google_oauth_access_token_enc`/
+   `_refresh_token_enc`/`google_account_email` columns directly to
+   `users`.** The two KBs specify materially different schemas for the
+   same data and were not reconciled before Code gate — SECURITY_KB §8.11
+   itself flags this ("solution-architect should confirm these fit the
+   store/schema conventions... before code-agent starts... No
+   disagreement anticipated on the technical shape") and defers the final
+   shape to solution-architect. The task brief also explicitly names
+   `GooglePhotosConnectionStore`/`OAuthStateStore` "following ARCHITECTURE_KB
+   §12.4," which only makes sense against a dedicated table. Followed
+   ARCHITECTURE_KB's design as the primary implementation spec per both
+   the task brief's own framing and this precedent; SECURITY_KB's actual
+   security requirements (Fernet encryption, never-logged, revoke-before-
+   delete ordering, exact scope string) are all satisfied identically
+   either way — the two designs differ in *where* the encrypted columns
+   live, not in any security property. Flagged for solution-architect/
+   security-architect to confirm at Review gate rather than silently
+   assumed settled.
+2. **HTTP client: `requests`, not `httpx`**, despite the task brief
+   naming `httpx` as "already a dependency." Checked `pyproject.toml`
+   directly: `httpx` is listed only under `[project.optional-dependencies]
+   .dev` (needed for FastAPI's `TestClient`, not for production code);
+   `requests` is this project's actual production HTTP-calling dependency
+   and the one `app/email_delivery.py`'s existing Resend wrapper already
+   uses. Following `email_delivery.py`'s exact precedent (the same
+   "mockable seam" pattern the task brief itself points to,
+   ARCHITECTURE_KB §12.10) keeps this module consistent with the one
+   existing real-third-party-HTTP-API example in this codebase, rather
+   than introducing a second HTTP client library for no functional
+   benefit.
+3. **The Picker-session status/media-item response shapes
+   (`pickerUri`, `mediaItemsSet`, `mediaFile.baseUrl`/`mimeType`/
+   `filename`, `mediaFileMetadata.creationTime`) are inferred from
+   ARCHITECTURE_KB §12.5's own description and general knowledge of
+   Google's Photos Picker API, not verified against live Google API
+   documentation** — no live credentials or web access were available in
+   this Code-gate session to confirm the exact field names/nesting.
+   `GooglePhotosClient`'s methods are the single seam where a shape
+   mismatch would need correcting; every route/test above them is
+   decoupled from Google's actual wire format via that seam, so a future
+   correction (once real credentials exist) should be localized to
+   `google_photos.py` and the thumbnail/preview field-extraction helper,
+   not a wider rewrite. This is the same class of gap ARCHITECTURE_KB
+   §12.11 itself already named as open pending verification — carried
+   forward, not newly introduced.
+4. **`prompt=consent` on `/connect` is decided by "does a connection row
+   already exist for this user," not by a separate "is this truly the
+   caregiver's first-ever consent" signal** — ARCHITECTURE_KB §12.2
+   specifies "first connect only." A caregiver who disconnects and
+   reconnects will see `prompt=consent` again (no row exists at that
+   point), which is the same, and arguably more correct, behavior: Google
+   may not have a live refresh grant for this app any more either, so
+   forcing consent again is the safer choice, not a deviation from the
+   stated intent.
+5. **No OAuth app-verification/consent-screen "Testing mode" enforcement
+   in code** — per ARCHITECTURE_KB §12.3's verification addendum, this is
+   a go-live checklist item (Google's own consent screen enforces the
+   100-test-user cap on its side), not something this app's code needs to
+   check or gate on locally.
+
+**Not verified against real Google endpoints (expected — no live Google
+OAuth credentials exist in this environment)**: every `GooglePhotosClient`
+method is exercised only against a mocked `FakeGooglePhotosClient`/mocked
+`requests` calls in tests, never a real network call to
+`accounts.google.com`/`oauth2.googleapis.com`/`photospicker.googleapis.com`.
+Before this feature reaches real users: (a) a real Google Cloud OAuth
+client must be created and `GOOGLE_OAUTH_CLIENT_ID`/`_CLIENT_SECRET`/
+`_REDIRECT_URI` set in `.env`; (b) the exact Picker-session/media-item
+response shapes (judgment call 3 above) should be confirmed against a
+real API response and `google_photos.py` corrected if they differ; (c)
+Google's OAuth app-verification / restricted-scope review (ARCHITECTURE_KB
+§12.3, SECURITY_KB §8.7 point 2) must be completed before any caregiver
+outside a manually-added Google "Testing" mode test-user list can
+complete the consent flow; (d) the schema/token-storage judgment call
+above (item 1) should get an explicit solution-architect/security-architect
+sign-off rather than resting on this session's own resolution.
+
 ## Decisions Log
 - 2026-07-10: plan-agent recommended `genai-chatbot` over `rag-knowledge-base`
   (no document corpus — recommendations are LLM-generated from the kid's
@@ -2425,3 +2564,47 @@ which is still pending (asked to review Increments 5/6/7 together).
   (signup → login → session-cookie-authenticated `/auth/me`) passed against
   the live backend. **Increment 6 (F12, hardened auth suite) is deployed
   (dev, local).** [deploy-agent]
+
+- 2026-07-12: **Increment 7 (F17, Google Photos import) Code gate
+  complete**, two commits (`8a76d55` backend, `0056069` frontend) — see the
+  full implementation summary above. Built against the joint solution-
+  architect/security-architect/responsible-ai-architect design in
+  `ARCHITECTURE_KB.md` §12, `SECURITY_KB.md` §8, and
+  `RESPONSIBLE_AI_KB.md` §8, plus the orchestrator's pre-Code-gate
+  verification addendum (`ARCHITECTURE_KB.md` §12.3: scope string
+  confirmed current, OAuth verification named as a go-live item not a
+  Code-gate blocker) and the lapsed-connection UX addition
+  (`UX_KB.md` §12.2: reuses the not-connected state verbatim). **One
+  unreconciled design conflict between ARCHITECTURE_KB §12.4 (a dedicated
+  `google_photos_connections` table) and SECURITY_KB §8.2 (token columns
+  added directly to `users`) was resolved by code-agent in
+  ARCHITECTURE_KB's favor** — both the task brief's own explicit
+  `GooglePhotosConnectionStore` naming and SECURITY_KB §8.11's own
+  "no disagreement anticipated, solution-architect to confirm" framing
+  point the same direction, but this was a real judgment call, not a
+  pre-settled decision, and should get explicit sign-off at Review gate.
+  Test coverage included in this gate per the task brief's explicit
+  instruction (not deferred, per F12's Test-gate finding): 56 new backend
+  tests (275/275 total), 11 new frontend tests (80/80 total). No real
+  Google OAuth credentials exist in this environment — every Google API
+  call is exercised through a mocked seam (`GooglePhotosClient`); the
+  Picker-session/media-item response shapes it assumes are inferred from
+  ARCHITECTURE_KB §12.5 and general knowledge, not verified live, and are
+  isolated to that one module for easy correction once real credentials
+  are available. [code-agent]
+
+- 2026-07-12: **F17 schema discrepancy resolved (orchestrator).**
+  code-agent flagged that SECURITY_KB §8.2 proposed Google OAuth token
+  storage as columns on `users` (mirroring F12's `totp_secret_enc`
+  precedent), while ARCHITECTURE_KB §12.4 — written in parallel by
+  solution-architect, with full id-tier/FK-cascade reasoning — specified
+  a dedicated `google_photos_connections` table instead, and code-agent
+  built the latter. Resolved per this project's own established
+  convention (SECURITY_KB §7.7/§8.11's own joint-presentation note:
+  "solution-architect should confirm... and finalize the exact... schema"
+  — the same authority split that resolved F12's `sessions.id` type
+  question in ARCHITECTURE_KB §11.1a over an initial security-architect
+  draft). ARCHITECTURE_KB §12.4's dedicated-table design is confirmed as
+  the authoritative schema; no code change needed, no re-litigation
+  required — code-agent's choice was correct under the project's
+  standing resolution hierarchy. [orchestrator]
