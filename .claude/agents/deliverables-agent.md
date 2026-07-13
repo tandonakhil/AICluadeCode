@@ -29,7 +29,8 @@ claiming something works.
 | Deliverable | Format | Source |
 |---|---|---|
 | Solution architecture | PPTX | `knowledge/ARCHITECTURE_KB.md` |
-| Design documents (plan, UX) | DOCX | `PLAN.md`, `knowledge/UX_KB.md` |
+| Functional design document | DOCX | `PLAN.md` (feature/requirement/user-flow sections), `knowledge/UX_KB.md` (flows, screens, copy) |
+| Technical design document | DOCX | `PLAN.md` (tech-stack/data-model/non-functional sections), `knowledge/ARCHITECTURE_KB.md` |
 | Test scripts (scenario definitions) | XLSX | `test-evidence/*.md` (scenario definitions, not results) |
 | Test results, per scenario, with evidence | XLSX | `test-evidence/*.md` (actual outcomes) |
 | Project backlog rollup | XLSX | `projects/<name>/FEATURES.md` |
@@ -39,10 +40,15 @@ claiming something works.
 ## Output locations
 
 - Per-project exports: `projects/<name>/deliverables/` (e.g.
-  `architecture.pptx`, `design.docx`, `test-scripts.xlsx`,
-  `test-results.xlsx`, `backlog.xlsx`).
+  `architecture.pptx`, `functional-design.docx`, `technical-design.docx`,
+  `test-scripts.xlsx`, `test-results.xlsx`, `backlog.xlsx`).
 - Platform-level exports: `admin/deliverables/` (roadmap rollup, the
-  knowledge-base page).
+  knowledge-base page, and — same conventions as a project's own
+  `architecture.pptx`/technical-design doc, sourced from
+  `admin/MAS_REGISTRY.md` + `admin/ROADMAP.md` + this file's own
+  agent-contract shape instead of a project's `ARCHITECTURE_KB.md` —
+  `mas-architecture.pptx`/`mas-technical-design.docx` covering the
+  platform's own pipeline/agent-roster architecture, on request).
 
 ## Regeneration trigger
 
@@ -61,12 +67,61 @@ when asked, rather than silently serving an outdated file as current.
 
 ## Building each format
 
-- **PPTX** (`python-pptx`): one slide per major `ARCHITECTURE_KB.md`
-  section — title slide, then a slide per design decision/component,
-  preserving the KB's own structure rather than inventing a different one.
-- **DOCX** (`python-docx`): mirror the markdown document's heading structure
-  directly — H1/H2/H3 map to Word heading styles, code blocks get a
-  monospace/shaded style, don't flatten structure into undifferentiated text.
+- **PPTX** (`python-pptx`): title slide, then **one architecture-diagram
+  slide before anything else** (see below — this is mandatory, not
+  optional), then one slide per major `ARCHITECTURE_KB.md` section/
+  component/design decision, preserving the KB's own structure rather than
+  inventing a different one.
+
+  **Architecture-diagram slide (slide 2, right after the title slide):**
+  a real visual box-and-arrow diagram built from `python-pptx`'s native
+  shapes (`slide.shapes.add_shape`, connector lines via
+  `add_connector`) — not a wall of text, not a screenshot, not skipped
+  because it's harder than a text slide. Derive the components and data
+  flow from `ARCHITECTURE_KB.md`'s own component map / "system
+  components" section (most KBs have one — e.g. frontend, backend, DB,
+  external services/APIs, auth layer) and its described request/data
+  flow between them. Minimum bar: every major component named in the KB
+  appears as a labeled box, and every data flow the KB describes between
+  two components appears as a connecting arrow, labeled with what flows
+  along it (e.g. "HTTPS/JSON", "SQL", "OAuth token") where the source
+  states it. Keep it readable — group into rough layers (client → API →
+  data/external) rather than a tangled graph, and don't cram more detail
+  onto this one slide than fits legibly; deeper detail belongs on the
+  per-component slides that follow, not squeezed into the diagram itself.
+  If a KB genuinely has no describable component/data-flow structure yet
+  (e.g. a very early-stage project), say so explicitly and skip the
+  diagram slide rather than fabricating components that aren't in the
+  source — same "don't invent content" guardrail as everywhere else in
+  this role.
+
+- **DOCX** (`python-docx`): **two separate documents, not one** —
+  `functional-design.docx` and `technical-design.docx`. Do not merge them
+  back into a single "design.docx"; a reader wanting "what does this do"
+  vs. "how is it built" should be able to open the right file without
+  wading through the other's content.
+  - `functional-design.docx`: sourced from `PLAN.md`'s feature/
+    requirement/user-facing sections (typically things like scope,
+    features, user flows, acceptance criteria — not tech-stack/data-model
+    sections) plus `knowledge/UX_KB.md` in full (screens, flows, copy,
+    visual language) if that KB exists for the project. Mirrors each
+    source document's own heading structure directly.
+  - `technical-design.docx`: sourced from `PLAN.md`'s tech-stack/
+    architecture/non-functional/data-model sections plus
+    `knowledge/ARCHITECTURE_KB.md` in full. Mirrors each source document's
+    own heading structure directly.
+  - Splitting `PLAN.md` between the two: use the document's own heading
+    text/intent to classify each top-level section as functional
+    (describes what the system does or how a user experiences it) or
+    technical (describes how it's built/deployed/structured) — don't
+    guess section-by-section from title keywords alone if the content
+    itself makes the classification obvious; when a section is genuinely
+    mixed, split at the paragraph/list-item level rather than dumping the
+    whole section into one document.
+  - Both documents: H1/H2/H3 map to Word heading styles, code blocks get
+    a monospace/shaded style, don't flatten structure into undifferentiated
+    text.
+
 - **XLSX** (`openpyxl`): one row per scenario for test scripts/results —
   columns matching `test-agent.md`'s structured evidence format (Scenario,
   Input, Expected, Actual, Result, Evidence). For backlog/roadmap rollups,
