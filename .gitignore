@@ -15,3 +15,8 @@ node_modules/
 
 # OS
 .DS_Store
+
+# Office lock/temp files (created when a generated .pptx/.docx/.xlsx is opened)
+~$*.pptx
+~$*.docx
+~$*.xlsx
