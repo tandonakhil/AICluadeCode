@@ -97,6 +97,20 @@ F13 (real contact address) remains deferred, human-owned, blocking any
 external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Post-Deploy gap fix: human flagged that several THRED-
+  reference component patterns identified during Intake/research were
+  never actually built (F12's ranking judged most as low-value/skip,
+  which undershot the original instruction to replicate every component).
+  Added directly, original content throughout: sticky in-page numbered
+  sub-nav (Home + Solutions, active-tracked), dual-CTA closing layout
+  (small text link + giant statement, was single-CTA), platform/stack
+  tab panels restyled with header band + colored-border detail cells,
+  and a functional (not decorative) footer quick-jump palette with
+  Cmd/Ctrl+K, live filter, and arrow-key navigation over real sections.
+  Deliberately did not build a fake video/media player component — no
+  real product footage exists, and fake play controls would violate the
+  project's own anti-overclaiming hard rules. 36/36 tests re-confirmed,
+  live-verified on port 8100. dev/ commit 3cb36f4. [orchestrator]
 - 2026-07-17 — Deploy gate: app launched via uvicorn (0.0.0.0:8100), all
   3 routes return 200, unknown paths return 404, confirmed live via curl
   smoke test and opened in browser. Status: deployed (dev, local). [orchestrator]

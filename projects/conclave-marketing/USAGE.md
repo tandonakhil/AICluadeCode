@@ -14,3 +14,4 @@
 | 2026-07-17 | Review | review-agent | 46,091 | 443,129 | Approved with 1 finding (stale "eight" agent count); diff hygiene, decision-intent match, consistency all clean |
 | 2026-07-17 | Targeted claims review | responsible-ai-architect | 36,317 | 479,446 | Clear to ship after 1 fix; no overclaiming, no fabricated traction, hedging consistent, stats faithful to source |
 | 2026-07-17 | Review fix (direct) | orchestrator | ~500 (est.) | ~479,946 | Corrected sr-only agent count eight→six; 36/36 tests re-confirmed |
+| 2026-07-17 | Post-Deploy gap fix (direct) | orchestrator | ~9,000 (est.) | ~488,946 | Added sticky sub-nav, dual-CTA, restyled platform panels, functional jump palette; 36/36 tests re-confirmed |
