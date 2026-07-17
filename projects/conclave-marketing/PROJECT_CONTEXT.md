@@ -50,7 +50,16 @@ Feature intent already voiced by the human (candidate backlog for Plan gate):
 (to be produced at the Architecture gate)
 
 ## Active Team
-(to be decided at the Team Composition gate)
+Approved by human 2026-07-17 (option: "Core + targeted claims review"):
+- **Core**: plan-agent, code-agent, test-agent, review-agent, deploy-agent,
+  ui-ux-designer (non-droppable, UI-bearing).
+- **Optional SMEs**: none on the roster. functional-agent and industry-expert
+  contributed Intake KBs only (read downstream, not re-invoked at gates).
+- **Targeted consult**: responsible-ai-architect performs ONE claims-accuracy
+  review of final site copy before the Deploy gate (marketing-claims
+  substantiation per FTC Operation AI Comply; not a roster member, owns no
+  recurring suite here).
+- **Test Policy**: all active suites blocking (default; no exceptions).
 
 ## Decisions Log
 - 2026-07-17 — Project created by human direction as the governed home for the
@@ -80,5 +89,5 @@ Feature intent already voiced by the human (candidate backlog for Plan gate):
   treating the v5 seed as approved direction (extend, don't reimagine).
 
 ## Current Status
-Intake complete. Team Composition gate presented to human; awaiting roster
-approval.
+Team Composition approved (core six + targeted RAI claims review). Plan &
+Backlog gate in progress.
