@@ -236,3 +236,11 @@ and edited; "Open" = observed, not yet reviewed.
   `ARCHITECTURE_KB.md` and `SECURITY_KB.md` disagreeing on a detail neither
   Architecture-gate participant caught). Flagged for a future
   `mas-architect` pass.
+- **2026-07-17 — Applied (process).** Backlog approvals: the human directed
+  that every backlog/MVP approval be presented as a **per-feature checkbox
+  list** (AskUserQuestion with multiSelect, one checkbox per feature incl.
+  deferred items so any can be pulled forward) — never a single
+  approve-the-bundle question or a small set of pre-cut scope options.
+  First applied at conclave-marketing's Plan & Backlog gate. Orchestrator
+  practice at every Plan & Backlog gate and enhancement-scope approval;
+  also queued for plan-agent's contract text at the next mas-architect pass.

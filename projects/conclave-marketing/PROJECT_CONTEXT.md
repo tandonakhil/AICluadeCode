@@ -89,5 +89,10 @@ Approved by human 2026-07-17 (option: "Core + targeted claims review"):
   treating the v5 seed as approved direction (extend, don't reimagine).
 
 ## Current Status
-Team Composition approved (core six + targeted RAI claims review). Plan &
-Backlog gate in progress.
+Plan & Backlog approved: MVP = F1–F12 (human checked every feature incl. all
+pull-forwards; F13 deferred, human-owned). Experience Design gate in progress.
+
+Additional Decisions Log entries:
+- 2026-07-17 — Plan & Backlog gate approved via per-feature checkbox list
+  (new standing approval format per human direction, recorded in
+  admin/LESSONS.md): F1–F12 all in MVP 0.1.0; F13 deferred. [human]
