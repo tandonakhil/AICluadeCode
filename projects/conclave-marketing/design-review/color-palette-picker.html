@@ -1,0 +1,144 @@
+<!--
+  Color palette review — conclave-marketing, 2026-07-17.
+  5 additional original palettes for human review, applied to real site
+  components (nav, hero, stat row, tabs, card) so choices are judged in
+  context, not as flat swatches. None of these hex values are sampled
+  from any reference site or brand — each is an original Conclave
+  exploration, distinct from the copper identity already shipped. Toggle
+  theme per-card. Zero external requests.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conclave — Color Palette Review</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, "Segoe UI", "Inter", Arial, sans-serif; background:#EDEAE2; color:#1A1712; padding: 40px 24px 80px; }
+  .page-head { max-width: 1100px; margin: 0 auto 36px; }
+  .page-head h1 { font-size: clamp(1.6rem,3vw,2.2rem); letter-spacing:-0.03em; margin:0 0 8px; }
+  .page-head p { color:#4E4A40; font-size:14px; max-width:640px; margin:0; }
+  .grid { max-width: 1100px; margin: 0 auto; display: grid; gap: 28px; }
+  .palette-card { border-radius: 14px; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.06); }
+  .p-head { display:flex; align-items:center; justify-content:space-between; padding: 14px 20px; background:#fff; border-bottom:1px solid #eee; }
+  .p-head h2 { font-size:15px; margin:0; letter-spacing:-0.01em; }
+  .p-head .swatches { display:flex; gap:6px; }
+  .p-head .sw { width:16px; height:16px; border-radius:4px; border:1px solid rgba(0,0,0,0.1); }
+  .p-head button { font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; border:1px solid #ddd; background:#fff; border-radius:999px; padding:6px 12px; cursor:pointer; }
+  .demo { --bg:#fff; --surface:#fff; --border:#eee; --ink:#111; --body:#555; --muted:#888; --primary:#000; --on-primary:#fff; background: var(--bg); color: var(--ink); padding: 28px 26px 30px; transition: background .2s, color .2s; }
+  .demo-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .demo-nav .brand { font-size:15px; letter-spacing:0; }
+  .demo-nav .brand .dot { color: var(--primary); }
+  .demo-nav .links { display:flex; gap:16px; color: var(--muted); }
+  .demo-nav .links span.active { color: var(--primary); }
+  .demo-hero h3 { font-size: clamp(1.3rem,2.4vw,1.8rem); letter-spacing:-0.03em; line-height:1.15; margin:0 0 8px; max-width:480px; }
+  .demo-hero h3 .accent { color: var(--primary); }
+  .demo-hero p { font-size:13px; color: var(--body); max-width:440px; margin:0 0 16px; }
+  .demo-cta { display:inline-flex; gap:10px; }
+  .demo-cta a { font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:8px; text-decoration:none; }
+  .demo-cta .primary { background: var(--primary); color: var(--on-primary); }
+  .demo-cta .ghost { border:1.5px solid var(--border); color: var(--ink); }
+  .demo-stats { display:flex; gap:1px; background: var(--border); border:1px solid var(--border); margin-top:20px; border-radius:8px; overflow:hidden; }
+  .demo-stats > div { flex:1; background: var(--surface); padding:10px 8px; text-align:center; }
+  .demo-stats .n { font-size:16px; font-weight:700; }
+  .demo-stats .l { font-size:8.5px; text-transform:uppercase; letter-spacing:.05em; color: var(--muted); }
+  .demo-tabs { display:flex; gap:2px; margin-top:22px; border-bottom:1px solid var(--border); }
+  .demo-tabs span { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:8px 12px; color: var(--muted); border-bottom:2px solid transparent; }
+  .demo-tabs span.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .demo-card { margin-top:14px; background: var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; font-size:12px; color: var(--body); }
+  .demo-card strong { display:block; color: var(--ink); font-size:12.5px; margin-bottom:3px; }
+  @media (max-width: 640px) { .demo-nav .links { display:none; } }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Five more directions for Conclave.</h1>
+  <p>Same layout, same components — copper (already shipped) not repeated here. Each toggles light/dark independently. Pick one, ask for a blend, or say none of them land and we keep copper.</p>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+var PALETTES = [
+  {
+    name: "Slate & Signal",
+    desc: "Cool graphite neutral, electric indigo accent — reads as technical/enterprise SaaS.",
+    light: { bg:"#F5F6F8", surface:"#FFFFFF", border:"#E1E4EA", ink:"#12151C", body:"#454B58", muted:"#6C7284", primary:"#3651E0", onPrimary:"#fff" },
+    dark:  { bg:"#0C0E14", surface:"#151824", border:"#242938", ink:"#EEF0F6", body:"#B4B9C8", muted:"#7D8399", primary:"#5B78FF", onPrimary:"#0C0E14" }
+  },
+  {
+    name: "Ember",
+    desc: "Warm charcoal, saturated red-orange accent — bolder, higher energy than copper.",
+    light: { bg:"#F9F4F1", surface:"#FFFFFF", border:"#EAE0DA", ink:"#1C1310", body:"#524039", muted:"#847169", primary:"#D8391E", onPrimary:"#fff" },
+    dark:  { bg:"#140F0D", surface:"#1F1815", border:"#332722", ink:"#F5EDE9", body:"#C2AFA6", muted:"#93807A", primary:"#F0552F", onPrimary:"#140F0D" }
+  },
+  {
+    name: "Moss",
+    desc: "Deep green-gray neutral, sage accent — calmer, sustainability-coded; fits the energy-industry audience.",
+    light: { bg:"#F4F6F2", surface:"#FFFFFF", border:"#DFE5DA", ink:"#151A12", body:"#454E3F", muted:"#6E7867", primary:"#3E7A45", onPrimary:"#fff" },
+    dark:  { bg:"#0E120D", surface:"#181D15", border:"#2A3125", ink:"#EAEFE5", body:"#B0BAA6", muted:"#7C8874", primary:"#5FA868", onPrimary:"#0E120D" }
+  },
+  {
+    name: "Ink & Gold",
+    desc: "Near-black neutral, brass/gold accent — more premium/editorial, closer to a ledger than a SaaS page.",
+    light: { bg:"#F7F5EF", surface:"#FFFFFF", border:"#E5E0D2", ink:"#171511", body:"#4C4738", muted:"#79725D", primary:"#A8823A", onPrimary:"#fff" },
+    dark:  { bg:"#0D0C0A", surface:"#18160F", border:"#2C2818", ink:"#F3EFE3", body:"#BEB59D", muted:"#8C8368", primary:"#D4A94D", onPrimary:"#0D0C0A" }
+  },
+  {
+    name: "Cobalt",
+    desc: "Cool navy neutral, classic cobalt-blue accent — the most conventional 'trustworthy enterprise' read of the five.",
+    light: { bg:"#F3F5F8", surface:"#FFFFFF", border:"#DEE4EC", ink:"#101820", body:"#3E4A58", muted:"#67788C", primary:"#1857C4", onPrimary:"#fff" },
+    dark:  { bg:"#0A0E14", surface:"#131A24", border:"#212C3A", ink:"#EAEEF4", body:"#AAB6C6", muted:"#75849A", primary:"#4C86F0", onPrimary:"#0A0E14" }
+  }
+];
+
+function renderCard(p, idx) {
+  var theme = 'light';
+  var t = p[theme];
+  var el = document.createElement('div');
+  el.className = 'palette-card';
+  function setVars(demo, t) {
+    demo.style.setProperty('--bg', t.bg); demo.style.setProperty('--surface', t.surface);
+    demo.style.setProperty('--border', t.border); demo.style.setProperty('--ink', t.ink);
+    demo.style.setProperty('--body', t.body); demo.style.setProperty('--muted', t.muted);
+    demo.style.setProperty('--primary', t.primary); demo.style.setProperty('--on-primary', t.onPrimary);
+  }
+  el.innerHTML =
+    '<div class="p-head"><h2>' + p.name + '</h2>' +
+      '<div style="display:flex;align-items:center;gap:12px;">' +
+        '<div class="swatches">' +
+          '<span class="sw" style="background:' + t.bg + '"></span>' +
+          '<span class="sw" style="background:' + t.primary + '"></span>' +
+          '<span class="sw" style="background:' + t.ink + '"></span>' +
+        '</div>' +
+        '<button data-theme-btn>Dark</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="demo">' +
+      '<div class="demo-nav"><span class="brand">Conclave<span class="dot">.</span></span><span class="links"><span class="active">Solutions</span><span>Team</span><span>Contact</span></span></div>' +
+      '<div class="demo-hero">' +
+        '<h3>AI projects fail without <span class="accent">governance</span>, not without models.</h3>' +
+        '<p>' + p.desc + '</p>' +
+        '<div class="demo-cta"><a class="primary" href="#">Convene the Conclave.</a><a class="ghost" href="#">See how a build runs</a></div>' +
+      '</div>' +
+      '<div class="demo-stats"><div><div class="n">9</div><div class="l">Gates</div></div><div><div class="n">0</div><div class="l">Unapproved</div></div><div><div class="n">100%</div><div class="l">Human-decided</div></div></div>' +
+      '<div class="demo-tabs"><span class="active">Product owner</span><span>Operations</span><span>Compliance</span><span>IT</span></div>' +
+      '<div class="demo-card"><strong>Decision record excerpt</strong>2026-07-17 — sent back for revision, human override on file.</div>' +
+    '</div>';
+  setVars(el.querySelector('.demo'), t);
+  el.querySelector('[data-theme-btn]').addEventListener('click', function (e) {
+    theme = theme === 'light' ? 'dark' : 'light';
+    t = p[theme];
+    setVars(el.querySelector('.demo'), t);
+    e.target.textContent = theme === 'light' ? 'Dark' : 'Light';
+  });
+  return el;
+}
+
+var grid = document.getElementById('grid');
+PALETTES.forEach(function (p, i) { grid.appendChild(renderCard(p, i)); });
+</script>
+</body>
+</html>

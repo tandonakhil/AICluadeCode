@@ -97,6 +97,20 @@ F13 (real contact address) remains deferred, human-owned, blocking any
 external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Human requested: redo the top menu, consolidate/deepen the
+  Solutions page ("seems very light"), reorganize content, and generate
+  5 additional color-scheme options. Clarified scope via AskUserQuestion:
+  mega-menu with dropdowns (not a flat restyle), consolidate AND add
+  substance to Solutions, swatch-picker format for palettes. Delivered:
+  design-review/color-palette-picker.html (5 original palettes: Slate &
+  Signal, Ember, Moss, Ink & Gold, Cobalt — own hex values, not sampled
+  from any reference). Human selected Moss + light theme as new default.
+  Mega-menu built (Solutions dropdown, hover+click+keyboard, 3 sub-links).
+  Solutions page's 5 sections consolidated to 3 (Governance/Platform-
+  Stack/Evaluation merged into one dense "Governed & ready to evaluate"
+  section with a new 3-column artifact row and a genuinely new
+  evaluation cell, not just repacked). dev/ commit cc4b78a. 36/36 tests
+  re-confirmed, live-verified. [orchestrator]
 - 2026-07-17 — Human requested "an exact replica of THRED for Conclave" —
   declined: reproducing a real commercial product's (Deloitte-branded)
   visual identity crosses from design inspiration into copying another
