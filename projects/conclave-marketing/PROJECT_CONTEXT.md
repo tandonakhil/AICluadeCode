@@ -97,6 +97,23 @@ F13 (real contact address) remains deferred, human-owned, blocking any
 external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Human reported menu still confusing, disliked the center
+  thread line, said pages didn't match the approved color mockup, and
+  asked for wider responsiveness — with an explicit request for
+  ui-ux-designer to do a thorough audit and log defects (not orchestrator
+  guessing). Dispatched; returned 19 logged defects (1 Critical, 8 High,
+  6 Medium, 4 Low) saved verbatim at dev/test-evidence/ux-reaudit-
+  2026-07-17.md. Root causes confirmed, not just preferences: the
+  Solutions mega-trigger was a non-navigating button (Critical — direct
+  cause of "confusing"); main::before mathematically collided with the
+  v8 pass's new wide/asymmetric grids; the live site had 3 animating
+  decorative layers (constellation, blobs, marquee) never shown in the
+  flat mockup the human approved; main's 1060px cap left 300-1500px of
+  dead space on wide viewports; the Moss palette swap introduced an
+  unchecked AA contrast regression (~4.25:1, needed 4.5:1). All
+  Critical/High items fixed same session (dev/ commit e2570ee); Medium/
+  Low items queued as follow-up polish, not blocking. 36/36 tests
+  re-confirmed, live-verified. [orchestrator]
 - 2026-07-17 — Human requested: redo the top menu, consolidate/deepen the
   Solutions page ("seems very light"), reorganize content, and generate
   5 additional color-scheme options. Clarified scope via AskUserQuestion:
