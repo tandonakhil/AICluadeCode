@@ -11,3 +11,6 @@
 | 2026-07-17 | Test (unit/integration) | test-agent | 30,300 | 336,329 | 26/26 pytest confirmed; found 2 defects: missing tests/test_content.py (F7 automated enforcement), unhedged 100% stat in home.html:88-90 |
 | 2026-07-17 | Test (UX/accessibility) | ui-ux-designer | 56,709 | 393,038 | Found 4 a11y/spec defects: sr-only trapped in aria-hidden, missing header landmark, h4-under-h2 skip, missing Contact closing-CTA |
 | 2026-07-17 | Test defect fixes (direct) | orchestrator | ~4,000 (est.) | ~397,038 | All 6 Test-gate defects fixed directly; 36/36 tests passing after fix |
+| 2026-07-17 | Review | review-agent | 46,091 | 443,129 | Approved with 1 finding (stale "eight" agent count); diff hygiene, decision-intent match, consistency all clean |
+| 2026-07-17 | Targeted claims review | responsible-ai-architect | 36,317 | 479,446 | Clear to ship after 1 fix; no overclaiming, no fabricated traction, hedging consistent, stats faithful to source |
+| 2026-07-17 | Review fix (direct) | orchestrator | ~500 (est.) | ~479,946 | Corrected sr-only agent count eight→six; 36/36 tests re-confirmed |

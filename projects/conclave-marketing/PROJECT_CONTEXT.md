@@ -96,6 +96,17 @@ Composition), so per pipeline transparency rule this is recorded explicitly
 below rather than silently skipped.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Review gate approved (review-agent) + targeted responsible-ai
+  claims review clear to ship — both run in parallel, both independently
+  found the same single issue (council-diagram sr-only text said "eight
+  specialist agents," SVG renders six) and cleared everything else: no
+  autonomy overclaiming, no fabricated customers/traction, "by design"
+  hedging applied consistently everywhere the 0/100% claims appear (not
+  just the Test-gate-fixed spot), NIST/ISO framework language correctly
+  hedged, cited stats (Gartner/Deloitte/EPRI/Itron/NERC) faithful to
+  source scope (RAI spot-verified the Gartner 30% claim via live web
+  search against the actual 2024 press release). Fixed directly (eight->
+  six); 36/36 tests re-confirmed. [orchestrator]
 - 2026-07-17 — Test gate: test-agent (26/26 pytest, found missing
   tests/test_content.py + one unhedged 100% stat) and ui-ux-designer (found
   4 defects: sr-only text trapped inside aria-hidden ancestor — invisible to
