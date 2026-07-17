@@ -89,8 +89,10 @@ Approved by human 2026-07-17 (option: "Core + targeted claims review"):
   treating the v5 seed as approved direction (extend, don't reimagine).
 
 ## Current Status
-Plan & Backlog approved: MVP = F1–F12 (human checked every feature incl. all
-pull-forwards; F13 deferred, human-owned). Experience Design gate in progress.
+Experience Design spec complete (knowledge/UX_KB.md) + rendered preview built
+(design-review/experience-design-preview.html — hash-routed 3-page demo of
+the new components: looping council, marquee, tabs, giant closing CTA,
+contrast fixes). Awaiting human approval before Architecture/Code.
 
 Additional Decisions Log entries:
 - 2026-07-17 — Plan & Backlog gate approved via per-feature checkbox list
