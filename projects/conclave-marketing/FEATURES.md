@@ -22,7 +22,8 @@ checked; F13 kept deferred). First release target: 0.1.0.
   blocks any external distribution. `hello@conclave.example` stays visibly flagged.
 
 ## In Development
-(none — Experience Design gate next)
+- F1–F12 — Code gate complete (dev/ commit 8e89a6c, 26/26 tests passing);
+  Test gate in progress.
 
 ## Ready for Release
 (none)

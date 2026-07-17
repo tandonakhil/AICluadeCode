@@ -96,6 +96,16 @@ Composition), so per pipeline transparency rule this is recorded explicitly
 below rather than silently skipped.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Code gate complete: code-agent built the real FastAPI app
+  (F1–F12) under dev/, committed 8e89a6c. Independently re-verified by
+  orchestrator: 26/26 pytest passing, live server on port 8100 returns 200
+  on all 3 routes + 404 on unknown paths, zero external URLs in rendered
+  HTML, titles/canonicals correct. content/CITATIONS.md is disciplined —
+  explicitly records claims deliberately NOT made (unverified portability
+  claim omitted per instruction) alongside every sourced stat. code-agent
+  judgment calls to review: replaced seed's unsynced "eight platform
+  capabilities" with six enumerated items from admin/ROADMAP.md, and
+  "19 agents" counted from admin/MAS_REGISTRY.md row count. [orchestrator]
 - 2026-07-17 — Experience Design (UX_KB.md + design-review/experience-
   design-preview.html) approved as-is after human reviewed the rendered
   mockup (published as Artifact for convenience). [human]
