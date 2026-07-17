@@ -96,6 +96,17 @@ Composition), so per pipeline transparency rule this is recorded explicitly
 below rather than silently skipped.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Test gate: test-agent (26/26 pytest, found missing
+  tests/test_content.py + one unhedged 100% stat) and ui-ux-designer (found
+  4 defects: sr-only text trapped inside aria-hidden ancestor — invisible to
+  screen readers; missing <header> landmark; h4-under-h2 heading-order skip
+  in ps-grid/eval-grid; missing Contact-page closing-CTA variant, dead
+  .statement-static CSS). All 6 defects fixed directly by orchestrator
+  (dev/ commit 1648c9e) per human direction to drive all gates to a final
+  outcome without further pauses. 36/36 tests passing after fixes,
+  independently re-verified live (header landmark present, sr-only text
+  reachable, zero stray h4, contact closing-cta renders, 100% stat now
+  reads "by design"). [orchestrator]
 - 2026-07-17 — Code gate complete: code-agent built the real FastAPI app
   (F1–F12) under dev/, committed 8e89a6c. Independently re-verified by
   orchestrator: 26/26 pytest passing, live server on port 8100 returns 200
