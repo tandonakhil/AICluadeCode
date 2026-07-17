@@ -89,10 +89,23 @@ Approved by human 2026-07-17 (option: "Core + targeted claims review"):
   treating the v5 seed as approved direction (extend, don't reimagine).
 
 ## Current Status
-Experience Design spec complete (knowledge/UX_KB.md) + rendered preview built
-(design-review/experience-design-preview.html — hash-routed 3-page demo of
-the new components: looping council, marquee, tabs, giant closing CTA,
-contrast fixes). Awaiting human approval before Architecture/Code.
+Experience Design approved 2026-07-17 (human reviewed the rendered preview,
+published as an Artifact for review, then approved as-is). Architecture gate
+next — no solution-architect/security-architect on the roster (Team
+Composition), so per pipeline transparency rule this is recorded explicitly
+below rather than silently skipped.
+
+Additional Decisions Log entries:
+- 2026-07-17 — Experience Design (UX_KB.md + design-review/experience-
+  design-preview.html) approved as-is after human reviewed the rendered
+  mockup (published as Artifact for convenience). [human]
+- 2026-07-17 — Architecture gate: no solution-architect/security-architect
+  on roster (Team Composition decision). Per PLAN.md §3/§6, architecture is
+  intentionally simple (static Jinja2 templates + FastAPI, no DB/auth/forms)
+  and orchestrator records it as not formally SME-reviewed, per transparency
+  rule. Two technical decisions made directly: (1) port 8100 for uvicorn
+  (8000/3000 occupied by little-milestones); (2) app layout per PLAN.md §3
+  (app/main.py, templates/, static/, content/CITATIONS.md, tests/). [orchestrator]
 
 Additional Decisions Log entries:
 - 2026-07-17 — Plan & Backlog gate approved via per-feature checkbox list
