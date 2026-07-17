@@ -89,13 +89,17 @@ Approved by human 2026-07-17 (option: "Core + targeted claims review"):
   treating the v5 seed as approved direction (extend, don't reimagine).
 
 ## Current Status
-Experience Design approved 2026-07-17 (human reviewed the rendered preview,
-published as an Artifact for review, then approved as-is). Architecture gate
-next — no solution-architect/security-architect on the roster (Team
-Composition), so per pipeline transparency rule this is recorded explicitly
-below rather than silently skipped.
+Deployed (dev, local) — 2026-07-17. All 9 gates complete: Intake, Team
+Composition, Plan & Backlog, Experience Design, Architecture, Code, Test,
+Review, Deploy. MVP F1-F12 live at http://127.0.0.1:8100/ (run via
+`cd dev && source .venv/bin/activate && uvicorn app.main:app --port 8100`).
+F13 (real contact address) remains deferred, human-owned, blocking any
+external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Deploy gate: app launched via uvicorn (0.0.0.0:8100), all
+  3 routes return 200, unknown paths return 404, confirmed live via curl
+  smoke test and opened in browser. Status: deployed (dev, local). [orchestrator]
 - 2026-07-17 — Review gate approved (review-agent) + targeted responsible-ai
   claims review clear to ship — both run in parallel, both independently
   found the same single issue (council-diagram sr-only text said "eight

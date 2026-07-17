@@ -22,11 +22,25 @@ checked; F13 kept deferred). First release target: 0.1.0.
   blocks any external distribution. `hello@conclave.example` stays visibly flagged.
 
 ## In Development
-- F1–F12 — Code gate complete (dev/ commit 8e89a6c, 26/26 tests passing);
-  Test gate in progress.
+(none)
 
 ## Ready for Release
-(none)
+(none — deployed directly to dev/local per Deploy gate; no release train cut yet)
 
 ## Released
-(none)
+- F1 — FastAPI multi-page scaffold — deployed (dev, local) 2026-07-17
+- F2 — Home page restructure, bigger branding — deployed (dev, local) 2026-07-17
+- F3 — Looping hero council animation + marquee — deployed (dev, local) 2026-07-17
+- F4 — Tabbed value-by-role module — deployed (dev, local) 2026-07-17
+- F5 — Solutions deep-dive page — deployed (dev, local) 2026-07-17
+- F6 — Contact page + giant closing CTA — deployed (dev, local) 2026-07-17
+- F7 — Claims-substantiation manifest, test-enforced — deployed (dev, local) 2026-07-17
+- F8 — Accessibility & reduced-motion hardening — deployed (dev, local) 2026-07-17
+- F9 — Verified-stats strip — deployed (dev, local) 2026-07-17
+- F10 — "Built by Conclave" proof section strengthened — deployed (dev, local) 2026-07-17
+- F11 — "Evaluation-ready" RFP resource block — deployed (dev, local) 2026-07-17
+- F12 — Remaining THRED components (word-reveal statement; rest ranked skip) — deployed (dev, local) 2026-07-17
+
+## Deferred
+- F13 — Real contact address swap + external-sharing checklist (S) — human-owned;
+  blocks any external distribution. `hello@conclave.example` stays visibly flagged.
