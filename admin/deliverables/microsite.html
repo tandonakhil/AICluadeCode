@@ -10,6 +10,13 @@
   SVG grain overlay, stat count-up, cursor-spotlight card hovers, scroll
   progress bar, headline shimmer. All motion honors prefers-reduced-motion
   (freeze, not remove). Copper + Dark default per human choice.
+  v4, 2026-07-17 — messaging architecture modeled on thred.dltoci.com/home
+  (human-provided reference): contrarian thesis hero, numbered sections
+  (01-05), attributed industry-stats block (real Gartner citations only —
+  never fabricate attributions), Problem→Solution table, persona-segmented
+  value cards, stack-compatibility strip, branded CTA verb ("Convene the
+  Conclave."), footer sitemap links. Conclave identity (copper/dark,
+  constellation, thread, newsroom, journey, proof) intentionally retained.
   HUMAN TODO before sharing externally: replace hello@conclave.example
   with a real contact address (.example never delivers mail).
 -->
@@ -261,6 +268,39 @@
   .log .entry .title { font-weight: 700; margin: 2px 0 4px; font-size: 14.5px; }
   .log .entry .desc { font-size: 13.5px; color: var(--body); }
 
+  /* ===== v4: numbered eyebrows, stats duo, problem→solution, personas, stack strip ===== */
+  .eyebrow .n { font-family: var(--mono); font-weight: 600; opacity: .6; margin-right: 7px; letter-spacing: 0; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 42px; }
+  @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .stats-grid { grid-template-columns: 1fr; } }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+  .stat-card .big { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+  .stat-card p { font-size: 12.5px; color: var(--body); margin: 6px 0 0; line-height: 1.5; }
+  .stat-card .src { display: block; font-size: 10.5px; color: var(--muted); margin-top: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+  .stat-card.industry .big { color: var(--muted); }
+  .stat-card.answer { border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--surface)), var(--surface)); }
+  .stat-card.answer .big { color: var(--primary); }
+  .ps-row { display: grid; grid-template-columns: 1fr 44px 1fr; align-items: stretch; margin-bottom: 14px; }
+  .ps-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .ps-cell h4 { margin: 0 0 6px; font-size: 14px; }
+  .ps-cell p { margin: 0; font-size: 13px; color: var(--body); line-height: 1.55; }
+  .ps-cell.problem h4 { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent); text-decoration-thickness: 1.5px; }
+  .ps-cell.solution { border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+  .ps-cell.solution h4 { color: var(--primary); }
+  .ps-arrow { display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 700; font-size: 16px; }
+  @media (max-width: 720px) { .ps-row { grid-template-columns: 1fr; } .ps-arrow { transform: rotate(90deg); padding: 4px 0; } }
+  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  @media (max-width: 640px) { .persona-grid { grid-template-columns: 1fr; } }
+  .persona-role { display: inline-block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--primary); background: var(--primary-glow-a); border-radius: 999px; padding: 4px 11px; margin-bottom: 10px; }
+  .persona-pain { font-size: 13.5px; color: var(--body); font-style: italic; margin: 0 0 10px; line-height: 1.55; }
+  .persona-win { font-size: 13px; color: var(--ink); margin: 0; line-height: 1.55; }
+  .persona-win::before { content: "→ "; color: var(--primary); font-weight: 700; }
+  .stack-strip { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+  .stack-strip span { font-family: var(--mono); font-size: 12.5px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--body); white-space: nowrap; }
+  .foot-links { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 26px; position: relative; }
+  .foot-links a { font-size: 12.5px; color: var(--muted); text-decoration: none; font-weight: 600; }
+  .foot-links a:hover { color: var(--primary); }
+
   /* Footer */
   footer.bookend { position: relative; overflow: hidden; text-align: center; padding: 80px 28px 50px; border-top: 1px solid var(--border); z-index: 1; }
   footer.bookend::before { content:""; position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:var(--primary); }
@@ -308,7 +348,8 @@
   <a class="brand" href="#top"><span class="mark"></span><span class="word">Conclave</span></a>
   <span class="current-label" id="currentLabel"></span>
   <div class="links" id="navLinks">
-    <a href="#build">How it works</a>
+    <a href="#why">Why</a>
+    <a href="#build">The build</a>
     <a href="#team">Team</a>
     <a href="#outcomes">What you get</a>
     <a href="#proof">Proof</a>
@@ -320,11 +361,11 @@
 
 <section class="hero" id="top">
   <div class="glow" id="heroGlow" aria-hidden="true"></div>
-  <span class="eyebrow">A governed multi-agent SDLC</span>
-  <h1>Ship AI products with <span class="accent">a human approving every gate.</span></h1>
-  <p class="lede">Conclave is a 9-gate multi-agent system that plans, designs, builds, and tests AI-centric applications for the energy industry — and stops for your sign-off at every one of them.</p>
+  <span class="eyebrow">Conclave — a council of AI specialists, one human verdict</span>
+  <h1>AI projects don't fail because of the models. They fail because <span class="accent">no one governs what ships.</span></h1>
+  <p class="lede">Conclave is a nine-gate multi-agent system that plans, designs, builds, and tests AI applications for the energy industry — and stops for your sign-off at every gate.</p>
   <div class="cta-row">
-    <a class="btn btn-primary" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Start the conversation</a>
+    <a class="btn btn-primary" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Convene the Conclave.</a>
     <a class="btn btn-ghost" href="#build">See how a build runs</a>
   </div>
   <div class="stat-strip" id="statStrip">
@@ -336,27 +377,114 @@
 
 <main>
 
-  <section data-reveal>
+  <section id="why" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">Who it's for</span>
-      <h2>Governed, not autonomous.</h2>
-      <p>Teams building AI-centric applications for the energy industry — GenAI chatbots, agentic workflows, RAG/knowledge-base apps — who need real engineering discipline without hand-rolling it for every new project.</p>
+      <span class="eyebrow"><i class="n">01</i>Why Conclave</span>
+      <h2>The problem isn't the AI. It's the missing governance.</h2>
+      <p>The industry keeps proving the same point: AI projects die of inadequate risk controls, not inadequate models. Conclave was designed backwards from that failure mode.</p>
     </div>
-    <div class="grid-2">
+
+    <div class="stats-grid" data-reveal="stagger" data-countup>
+      <div class="stat-card industry">
+        <div class="big"><span class="num" data-count="40" data-suffix="%+">0</span></div>
+        <p>of agentic AI projects will be canceled by end of 2027 — inadequate risk controls among the leading causes.</p>
+        <span class="src">Gartner · 2025</span>
+      </div>
+      <div class="stat-card industry">
+        <div class="big"><span class="num" data-count="30" data-suffix="%">0</span></div>
+        <p>of generative AI projects abandoned after proof of concept — cost, risk, and unclear business value.</p>
+        <span class="src">Gartner · 2024</span>
+      </div>
+      <div class="stat-card answer">
+        <div class="big"><span class="num" data-count="100" data-suffix="%">0</span></div>
+        <p>of Conclave gates end in an explicit human decision — approve, send back, or stop.</p>
+        <span class="src">How Conclave answers</span>
+      </div>
+      <div class="stat-card answer">
+        <div class="big"><span class="num" data-count="0">0</span></div>
+        <p>lines of code shipped without a human having approved the plan they came from.</p>
+        <span class="src">How Conclave answers</span>
+      </div>
+    </div>
+
+    <div data-reveal="stagger">
+      <div class="ps-row">
+        <div class="ps-cell problem">
+          <h4>Speed without accountability</h4>
+          <p>Generative AI writes fluent, plausible code faster than anyone can check it — and ships it just as fast.</p>
+        </div>
+        <div class="ps-arrow" aria-hidden="true">→</div>
+        <div class="ps-cell solution">
+          <h4>Nine human-approval gates</h4>
+          <p>Nothing advances — not a plan, a design, or a line of code — until you've approved the gate before it.</p>
+        </div>
+      </div>
+      <div class="ps-row">
+        <div class="ps-cell problem">
+          <h4>One generalist, every hat</h4>
+          <p>A single model plays product manager, architect, security reviewer, and tester at once — and grades its own homework.</p>
+        </div>
+        <div class="ps-arrow" aria-hidden="true">→</div>
+        <div class="ps-cell solution">
+          <h4>A convened council of specialists</h4>
+          <p>Planner, builder, tester, reviewer, architects, industry advisors — each with one job, none reviewing their own work.</p>
+        </div>
+      </div>
+      <div class="ps-row">
+        <div class="ps-cell problem">
+          <h4>Amnesia between sessions</h4>
+          <p>Context evaporates between conversations, so decisions get silently remade, contradicted, or lost.</p>
+        </div>
+        <div class="ps-arrow" aria-hidden="true">→</div>
+        <div class="ps-cell solution">
+          <h4>Decisions that survive, in writing</h4>
+          <p>Persistent knowledge bases and one append-only decision record, read by every later gate — nothing gets re-litigated by accident.</p>
+        </div>
+      </div>
+      <div class="ps-row">
+        <div class="ps-cell problem">
+          <h4>Demo-ware</h4>
+          <p>It worked in the demo — then it met real users, real data, and real auditors.</p>
+        </div>
+        <div class="ps-arrow" aria-hidden="true">→</div>
+        <div class="ps-cell solution">
+          <h4>Six independent test suites</h4>
+          <p>Functional, security, UX, architecture, compliance, and unit/integration — with failures surfaced to you, never shipped around.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-subhead" data-reveal>
+      <h3>What that means for your seat at the table</h3>
+      <p>Conclave builds GenAI chatbots, agentic workflows, and RAG knowledge apps for the energy industry. Here's the version of the pitch that matters to you.</p>
+    </div>
+    <div class="persona-grid" data-reveal="stagger">
       <div class="card">
-        <h3>What "governed" means here</h3>
-        <p style="font-size:13.5px;">Nothing is autonomous end-to-end. Every stage — plan, design, architecture, code, test, review, deploy — ends at a gate that waits for a human yes. You can stop, redirect, or send work back at any of them, and every decision is written down where you can read it later.</p>
+        <span class="persona-role">The product owner</span>
+        <p class="persona-pain">"I've seen AI demos that dazzled in the meeting and died in the proof of concept."</p>
+        <p class="persona-win">Describe what you want in plain language. You approve the backlog, the clickable design mockup, and the launch — nothing exists that you didn't sign off first.</p>
       </div>
       <div class="card">
-        <h3>The value proposition</h3>
-        <p style="font-size:13.5px;">Every project gets the same disciplined pipeline — Plan, Architecture, Code, Test, Review, Deploy — with the right specialist SMEs convened for its actual risk profile, and a human who never loses the ability to stop, redirect, or override at any gate.</p>
+        <span class="persona-role">The operations leader</span>
+        <p class="persona-pain">"Generic software assumptions don't survive contact with a control room or a field crew."</p>
+        <p class="persona-win">An industry advisor sits on the build, pressure-testing every plan against how energy operations actually run — before code, not after complaints.</p>
+      </div>
+      <div class="card">
+        <span class="persona-role">The compliance &amp; security leader</span>
+        <p class="persona-pain">"When audit asks where a decision came from, 'the AI did it' is not an answer."</p>
+        <p class="persona-win">Every gate decision, approval, override, and test failure is appended to one written record as it happened. The audit trail isn't reconstructed — it's the build log itself.</p>
+      </div>
+      <div class="card">
+        <span class="persona-role">The IT leader</span>
+        <p class="persona-pain">"I don't want to inherit a black box my team can't run, patch, or explain."</p>
+        <p class="persona-win">A standard, portable stack plus the full decision record and test evidence — your team can own it from day one, no priesthood required.</p>
       </div>
     </div>
   </section>
 
   <section id="build" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">A build, gate by gate</span>
+      <span class="eyebrow"><i class="n">02</i>A build, gate by gate</span>
       <h2>Here's what it's actually like to build something.</h2>
       <p>Nine gates, in order — a gate only opens once you've approved the one before it. Walked through as if you're the one asking Conclave to build it: say, a customer-facing outage-status chatbot for your utility.</p>
     </div>
@@ -434,7 +562,7 @@
 
   <section id="team" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">The team</span>
+      <span class="eyebrow"><i class="n">03</i>The team</span>
       <h2>Think of it like a newsroom, not a machine.</h2>
       <p>One managing editor coordinates. A publisher signs off on every story before it runs. A staff is always on the desk, and outside experts get pulled in only when a story actually needs them — nobody talks sideways, everything goes through the editor and one shared assignment board.</p>
     </div>
@@ -515,7 +643,7 @@
 
   <section id="outcomes" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">What you get</span>
+      <span class="eyebrow"><i class="n">04</i>What you get</span>
       <h2>Every build leaves you holding real artifacts.</h2>
       <p>Not a demo and a promise — a working application plus the paper trail that lets you defend every decision behind it.</p>
     </div>
@@ -537,11 +665,27 @@
         <p style="font-size:13.5px;">For anything with a screen: the clickable previews you approved at the design gate, kept alongside a running log of how the design performs after launch.</p>
       </div>
     </div>
+
+    <div class="section-subhead" data-reveal>
+      <h3>On a stack your team already knows</h3>
+      <p>No proprietary runtime, no lock-in. LLM providers are switchable by configuration — no code changes.</p>
+    </div>
+    <div class="stack-strip" data-reveal="stagger">
+      <span>Next.js</span>
+      <span>TypeScript</span>
+      <span>FastAPI</span>
+      <span>Python</span>
+      <span>LangChain</span>
+      <span>LangGraph</span>
+      <span>Anthropic Claude</span>
+      <span>OpenAI</span>
+      <span>Chroma</span>
+    </div>
   </section>
 
   <section id="proof" data-reveal>
     <div class="section-head">
-      <span class="eyebrow">Proof</span>
+      <span class="eyebrow"><i class="n">05</i>Proof</span>
       <h2>Conclave is built by Conclave.</h2>
       <p>The strongest test of a governed pipeline is whether its makers trust it with their own product. Every capability of this platform — including the specialists you just met, and this very page — went through the same nine gates you'd use.</p>
     </div>
@@ -570,11 +714,19 @@
 
 <footer class="bookend">
   <div class="glow2" aria-hidden="true"></div>
-  <h3>Tell us what you want to build.</h3>
-  <p class="pitch">One email starts it. Describe the product in plain language — the first gate is just a conversation.</p>
+  <h3>Convene the Conclave.</h3>
+  <p class="pitch">Tell us what you want to build. One email starts it — describe the product in plain language; the first gate is just a conversation.</p>
   <a class="btn btn-primary" href="mailto:hello@conclave.example?subject=Building%20with%20Conclave&body=I%27d%20like%20to%20talk%20about%20building%3A%20%0A%0A(Describe%20it%20in%20plain%20language%20%E2%80%94%20that%27s%20genuinely%20all%20gate%201%20needs.)">Start the conversation</a>
   <p class="fallback">or write to hello@conclave.example</p>
-  <p class="meta">Conclave — generated by deliverables-agent, design by ui-ux-designer, 2026-07-13 · this file makes zero external network requests</p>
+  <div class="foot-links">
+    <a href="#why">Why Conclave</a>
+    <a href="#build">The build</a>
+    <a href="#team">The team</a>
+    <a href="#outcomes">What you get</a>
+    <a href="#proof">Proof</a>
+    <a href="#top">Back to top</a>
+  </div>
+  <p class="meta">Conclave — generated by deliverables-agent, design by ui-ux-designer, 2026-07-17 · this file makes zero external network requests</p>
 </footer>
 
 <script>
@@ -658,7 +810,7 @@
   /* ===== Scroll-spy for the floating pill nav ===== */
   var navLinks = document.querySelectorAll('#navLinks a');
   var currentLabel = document.getElementById('currentLabel');
-  var sections = ['build', 'team', 'outcomes', 'proof'].map(function (id) { return document.getElementById(id); });
+  var sections = ['why', 'build', 'team', 'outcomes', 'proof'].map(function (id) { return document.getElementById(id); });
   if ('IntersectionObserver' in window) {
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -691,18 +843,21 @@
     }
     requestAnimationFrame(step);
   }
-  if ('IntersectionObserver' in window && statStrip) {
+  var countGroups = [statStrip].concat(Array.prototype.slice.call(document.querySelectorAll('[data-countup]'))).filter(Boolean);
+  if ('IntersectionObserver' in window) {
     var statIO = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          statStrip.querySelectorAll('.num').forEach(countUp);
-          statIO.unobserve(statStrip);
+          entry.target.querySelectorAll('.num').forEach(countUp);
+          statIO.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.4 });
-    statIO.observe(statStrip);
-  } else if (statStrip) {
-    statStrip.querySelectorAll('.num').forEach(function (el) { el.textContent = el.dataset.count + (el.dataset.suffix || ''); });
+    }, { threshold: 0.35 });
+    countGroups.forEach(function (g) { statIO.observe(g); });
+  } else {
+    countGroups.forEach(function (g) {
+      g.querySelectorAll('.num').forEach(function (el) { el.textContent = el.dataset.count + (el.dataset.suffix || ''); });
+    });
   }
 
   /* ===== Cursor spotlight on cards ===== */
