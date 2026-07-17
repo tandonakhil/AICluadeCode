@@ -97,6 +97,18 @@ F13 (real contact address) remains deferred, human-owned, blocking any
 external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-17 — Human requested "an exact replica of THRED for Conclave" —
+  declined: reproducing a real commercial product's (Deloitte-branded)
+  visual identity crosses from design inspiration into copying another
+  company's actual work. Clarified with human via AskUserQuestion; human
+  confirmed "inspiration is what I want but for conclave" (density,
+  typography, interaction feel) plus a follow-up request for THRED-like
+  responsive behavior. Delivered a v6 design pass (dev/ commit cf64b3f):
+  denser editorial spacing, tighter letter-spacing/smaller type scale,
+  grow-underline link utility, faster tab transitions, and a new <480px
+  responsive density tier — original Conclave colors/copy throughout
+  (own warm paper-toned neutrals and copper accent, not Deloitte's actual
+  brand palette). 36/36 tests re-confirmed, live-verified. [orchestrator]
 - 2026-07-17 — Post-Deploy gap fix: human flagged that several THRED-
   reference component patterns identified during Intake/research were
   never actually built (F12's ranking judged most as low-value/skip,
