@@ -61,5 +61,24 @@ Feature intent already voiced by the human (candidate backlog for Plan gate):
 ## Test Results
 (none yet)
 
+## Intake Gate (complete, 2026-07-17)
+- Domain (functional-agent): B2B AI-platform marketing-site engineering →
+  `knowledge/DOMAIN_KB.md`. Headlines: the site's strongest honest proof is
+  "built by Conclave itself"; one primary CTA per page; WCAG 2.2 AA with
+  reduced-motion parity for all always-moving components; hard anti-fabrication
+  rules incl. a citations manifest checked at Test.
+- Industry (industry-expert): energy-sector AI-software buyers →
+  `knowledge/INDUSTRY_KB.md`. Headlines: utility buying is committee/RFP-driven —
+  the site must survive being forwarded to skeptics; auditability + human
+  oversight language is the differentiator ("decision support, not autonomous
+  control"); FTC Operation AI Comply puts AI marketing claims squarely in
+  scope; both Gartner stats on the seed verified real; several seed claims
+  need sync/hedging (test-suite counts, "0 lines" as design guarantee).
+- Usage estimate (usage-monitor): core-only ~270–440k tokens; full team
+  ~800–950k; recommends core-only + one targeted responsible-ai-architect
+  claims review (~40–50k). Biggest cost risk: design revisions — mitigated by
+  treating the v5 seed as approved direction (extend, don't reimagine).
+
 ## Current Status
-Scaffolded; Intake gate in progress (domain + industry research dispatched).
+Intake complete. Team Composition gate presented to human; awaiting roster
+approval.
