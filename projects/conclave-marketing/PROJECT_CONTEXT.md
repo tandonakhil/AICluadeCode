@@ -97,6 +97,26 @@ F13 (real contact address) remains deferred, human-owned, blocking any
 external sharing.
 
 Additional Decisions Log entries:
+- 2026-07-19 — Human, with a screenshot, asked for all menus consolidated
+  at the top ("this menu needs to be embedded in the top"), plus internet
+  research on how large menus work on product sites, plus a thorough
+  ui-ux-designer test with logged defects. Researched SaaS mega-menu +
+  combined-nav best practice (task-based grouping; the "layered
+  navigation" pattern — one persistent nav element, not independently-
+  appearing bars — is the standard fix for exactly this complaint).
+  Dispatched ui-ux-designer with that research; returned 11 defects (1
+  Critical: two genuinely separate nav bars, the in-page section nav only
+  entering the layout after scrolling past the hero) and a concrete
+  consolidation spec, saved at dev/test-evidence/ux-nav-audit-2026-07-19.md.
+  Implemented directly: single <nav class="topnav"> with two rows (global
+  links always visible; that page's in-page sections in row 2, present
+  on Home/Solutions, correctly absent on Contact) — both rows render
+  together from initial page load, no scroll-triggered appearance.
+  Fixed 5 of the 6 High/Critical defects as part of the same pass
+  (label mismatches across mega-panel/row2/jump-palette, a scroll-margin
+  single-source-of-truth bug, a mobile menu/row2 overlap risk, a
+  double-smooth-scroll animation conflict). dev/ commit c9bbe62. 36/36
+  tests re-confirmed, live-verified. [orchestrator]
 - 2026-07-17 — Human reported menu still confusing, disliked the center
   thread line, said pages didn't match the approved color mockup, and
   asked for wider responsiveness — with an explicit request for
