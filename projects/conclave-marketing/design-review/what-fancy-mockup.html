@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/what redesign — animated examples mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6022;
+    --gold:#8A5A17; --gold-soft:#8a5a1722; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF;
+    --rust:#A8432F; --c-research:#2456C4; --c-design:#8A3A7A; --c-arch:#5B4AA8;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b91f;
+    --gold:#E0A94E; --gold-soft:#e0a94e1f; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19;
+    --rust:#E07A5F; --c-research:#8AB0F8; --c-design:#E08AC8; --c-arch:#A79AE8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:system-ui,-apple-system,sans-serif; padding:40px 20px 70px; }
+  .bar { max-width:980px; margin:0 auto 30px; display:flex; justify-content:space-between; align-items:baseline; }
+  .bar h1 { font-family:Georgia,serif; font-weight:500; font-size:22px; }
+  .bar button { font:inherit; font-size:13px; padding:7px 14px; border-radius:999px; border:1px solid var(--hairline); background:transparent; color:var(--ink); cursor:pointer; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h2.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(26px,3.2vw,38px); margin-bottom:14px; }
+  p.answer { font-size:15px; line-height:1.65; color:var(--muted); max-width:70ch; margin-bottom:10px; }
+  p.answer.lead { color:var(--ink); font-size:16.5px; }
+
+  .type { margin-top:52px; border:1px solid var(--hairline); border-radius:16px; overflow:hidden; background:var(--surface); }
+  .type-head { padding:22px 28px 0; }
+  .type-head h3 { font-family:Georgia,serif; font-size:22px; font-weight:500; }
+  .type-head .kicker { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px; }
+  .type-head p { font-size:14px; color:var(--muted); line-height:1.6; margin-top:8px; max-width:60ch; }
+
+  .demo-frame { margin:22px 28px 0; border-radius:12px; border:1px solid var(--hairline); background:var(--cream); padding:18px 20px; min-height:220px; }
+  .demo-label { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; display:flex; justify-content:space-between; }
+  .replay-btn { font-size:11px; border:1px solid var(--hairline); background:transparent; color:var(--ink); border-radius:999px; padding:3px 10px; cursor:pointer; }
+
+  .foot-row { display:flex; padding:20px 28px 26px; gap:28px; flex-wrap:wrap; }
+  .foot-col h4 { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .foot-col p { font-size:13px; color:var(--ink); line-height:1.55; max-width:44ch; }
+  .not-box { margin:0 28px 26px; border-top:1px dashed var(--rust); padding-top:12px; font-size:12.5px; color:var(--muted); }
+  .not-box b { color:var(--rust); }
+
+  /* ---- Demo 1: chat bubbles ---- */
+  .chatlog { display:flex; flex-direction:column; gap:8px; }
+  .bubble { max-width:78%; padding:8px 12px; border-radius:12px; font-size:13px; line-height:1.5; opacity:0; animation: bIn .4s ease-out forwards; }
+  .bubble.user { align-self:flex-end; background:var(--teal); color:var(--cream); border-bottom-right-radius:3px; }
+  [data-theme="dark"] .bubble.user { color:#0e2a26; }
+  .bubble.bot { align-self:flex-start; background:var(--surface); border:1px solid var(--hairline); border-bottom-left-radius:3px; }
+  .bubble.bot .cite { display:block; margin-top:6px; font-size:10.5px; color:var(--gold); }
+  .typing { align-self:flex-start; display:flex; gap:3px; padding:8px 12px; opacity:0; animation:bIn .3s ease-out forwards; }
+  .typing i { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:bounce 1s infinite ease-in-out; }
+  .typing i:nth-child(2) { animation-delay:.15s; } .typing i:nth-child(3) { animation-delay:.3s; }
+  @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-4px); } }
+  @keyframes bIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  /* ---- Demo 2: workflow pipeline ---- */
+  .flow { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .fstep { position:relative; border:1.5px solid var(--hairline); border-radius:10px; padding:10px 14px; font-size:12px; background:var(--surface); min-width:110px; text-align:center; opacity:.35; transition:opacity .3s, border-color .3s, box-shadow .3s; }
+  .fstep .fn { font-weight:700; font-size:11.5px; }
+  .fstep .fs { font-size:10px; color:var(--muted); margin-top:2px; }
+  .fstep.active { opacity:1; border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); }
+  .fstep.done { opacity:1; border-color:var(--teal); }
+  .fstep.checkpoint.active { border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+  .fstep.checkpoint .fn { color:var(--gold); }
+  .farrow { color:var(--muted); font-size:14px; }
+  .flow-log { margin-top:14px; font-size:11.5px; color:var(--muted); min-height:18px; }
+  .flow-log b { color:var(--ink); }
+
+  /* ---- Demo 3: retrieval reveal ---- */
+  .retrieval { display:flex; flex-direction:column; gap:10px; }
+  .q-line { font-size:13px; padding:8px 12px; background:var(--surface); border:1px solid var(--hairline); border-radius:8px; }
+  .docs { display:flex; gap:8px; flex-wrap:wrap; }
+  .doc { font-size:11px; padding:6px 10px; border-radius:6px; border:1px dashed var(--hairline); color:var(--muted); opacity:.3; transition:opacity .3s, border-color .3s, color .3s; }
+  .doc.hit { opacity:1; border-color:var(--teal); border-style:solid; color:var(--teal); }
+  .ans { font-size:13px; line-height:1.6; padding:10px 12px; border-radius:8px; background:var(--cream); border:1px solid var(--hairline); min-height:20px; }
+  .ans .cite2 { display:block; margin-top:6px; font-size:10.5px; color:var(--gold); }
+  .cursor { display:inline-block; width:2px; height:13px; background:var(--ink); vertical-align:middle; margin-left:1px; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  .notes { max-width:980px; margin:50px auto 0; border-top:1px solid var(--hairline); padding-top:18px; font-size:13.5px; color:var(--muted); line-height:1.75; }
+  .notes b { color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>/what redesign — three live examples, for approval</h1>
+  <button id="t">◐ Toggle theme</button>
+</div>
+
+<div class="wrap">
+  <h2 class="q">What can it build?</h2>
+  <p class="answer lead">Three kinds of application — support chatbots, automated workflows, and knowledge assistants — each delivered through the same nine gates, from the same templates Conclave maintains for itself.</p>
+  <p class="answer">These are the shapes Conclave's template catalog actually supports today. Watch each one work, not just read about it.</p>
+
+  <!-- ============ TYPE 1: SUPPORT CHATBOT ============ -->
+  <div class="type">
+    <div class="type-head">
+      <div class="kicker" style="color:var(--teal)">Support chatbots</div>
+      <h3>Answers with a citation, and an honest "I don't know"</h3>
+    </div>
+    <div class="demo-frame">
+      <div class="demo-label"><span>Live example</span><button class="replay-btn" data-replay="chat">↻ Replay</button></div>
+      <div class="chatlog" id="chatlog"></div>
+    </div>
+    <div class="foot-row">
+      <div class="foot-col"><h4>What a build produces</h4><p>A curated answer corpus, a citation under every reply, an explicit refusal path, and a one-tap route to a person.</p></div>
+      <div class="foot-col"><h4>What you approve</h4><p>The question domain and honesty guardrail at intake; tone at design; retention rules at architecture; the launch itself.</p></div>
+    </div>
+    <div class="not-box"><b>What it is not:</b> an oracle. It won't answer outside its approved knowledge set or improvise policy — a send-back at test is the enforced consequence of trying.</div>
+  </div>
+
+  <!-- ============ TYPE 2: AUTOMATED WORKFLOW ============ -->
+  <div class="type">
+    <div class="type-head">
+      <div class="kicker" style="color:var(--c-arch)">Automated workflows</div>
+      <h3>Every step logged, every checkpoint stops for you</h3>
+    </div>
+    <div class="demo-frame">
+      <div class="demo-label"><span>Live example</span><button class="replay-btn" data-replay="flow">↻ Replay</button></div>
+      <div class="flow" id="flow">
+        <div class="fstep" data-i="0"><div class="fn">Intake</div><div class="fs">request received</div></div>
+        <span class="farrow">→</span>
+        <div class="fstep" data-i="1"><div class="fn">Gather</div><div class="fs">pull required data</div></div>
+        <span class="farrow">→</span>
+        <div class="fstep checkpoint" data-i="2"><div class="fn">✋ Checkpoint</div><div class="fs">waits for you</div></div>
+        <span class="farrow">→</span>
+        <div class="fstep" data-i="3"><div class="fn">Act</div><div class="fs">execute approved step</div></div>
+        <span class="farrow">→</span>
+        <div class="fstep" data-i="4"><div class="fn">Record</div><div class="fs">logged &amp; replayable</div></div>
+      </div>
+      <div class="flow-log" id="flowLog"></div>
+    </div>
+    <div class="foot-row">
+      <div class="foot-col"><h4>What a build produces</h4><p>Discrete, inspectable steps; defined checkpoints that pause for a human decision; a full replayable run record.</p></div>
+      <div class="foot-col"><h4>What you approve</h4><p>Which steps may run without you at planning; failure behavior at architecture; test evidence the checkpoints actually stop the run.</p></div>
+    </div>
+    <div class="not-box"><b>What it is not:</b> autonomous control. It prepares, drafts, and executes the routine — the calls that matter stop and wait for a person, written into the architecture record.</div>
+  </div>
+
+  <!-- ============ TYPE 3: KNOWLEDGE ASSISTANT ============ -->
+  <div class="type">
+    <div class="type-head">
+      <div class="kicker" style="color:var(--c-research)">Knowledge assistants</div>
+      <h3>Searches by meaning, cites what it found</h3>
+    </div>
+    <div class="demo-frame">
+      <div class="demo-label"><span>Live example</span><button class="replay-btn" data-replay="ret">↻ Replay</button></div>
+      <div class="retrieval">
+        <div class="q-line" id="retQ"></div>
+        <div class="docs" id="retDocs">
+          <span class="doc" data-i="0">onboarding-guide.pdf</span>
+          <span class="doc" data-i="1">benefits-2026.pdf</span>
+          <span class="doc" data-i="2">leave-policy.pdf</span>
+          <span class="doc" data-i="3">org-chart.pdf</span>
+        </div>
+        <div class="ans" id="retAns"></div>
+      </div>
+    </div>
+    <div class="foot-row">
+      <div class="foot-col"><h4>What a build produces</h4><p>A retrieval-backed assistant over a corpus you control — "not in the corpus" is a valid, visible result, not an invitation to invent one.</p></div>
+      <div class="foot-col"><h4>What you approve</h4><p>What enters the corpus at intake, revisited on every enhancement; the citation format at design; accuracy evidence at test.</p></div>
+    </div>
+    <div class="not-box"><b>What it is not:</b> a general search engine or a chatbot that happens to have read your files. When the corpus is silent, so is it — it points to a person instead of a guess.</div>
+  </div>
+</div>
+
+<div class="notes">
+  <b>How this differs from today's /what:</b> the "what a build produces" and "what you approve" prose is condensed into two short columns per type (still complete, half the reading), and each type now opens with a small looping-on-demand demo instead of only description — a chat exchange playing out with a citation and one honest refusal, a workflow pipeline lighting up step by step and visibly pausing at its human checkpoint, and a document search resolving into a cited answer with a "not in the corpus" case included. Every demo replays on click and is scripted/deterministic (no live model calls, no external requests) — it's illustrative, matching the same "canonical build, not a customer story" framing already used on /how. All three respect prefers-reduced-motion (typing indicators and cursors are skipped; states appear instantly). <b>Reload or click "↻ Replay" on any demo to see it run.</b>
+</div>
+
+<script>
+  document.getElementById('t').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+
+  // ---- Demo 1: chat ----
+  function runChat() {
+    var log = document.getElementById('chatlog');
+    log.innerHTML = '';
+    var seq = [
+      { d:0,    t:600,  fn:function(){ addBubble('user', 'How many vacation days do I have left?'); } },
+      { d:700,  t:900,  fn:function(){ addTyping(); } },
+      { d:1600, t:400,  fn:function(){ removeTyping(); addBubble('bot', 'You have 9 vacation days remaining this year.', 'Source: leave-policy.pdf, §3.2'); } },
+      { d:2400, t:600,  fn:function(){ addBubble('user', 'Can I carry them into next year?'); } },
+      { d:3100, t:900,  fn:function(){ addTyping(); } },
+      { d:4000, t:400,  fn:function(){ removeTyping(); addBubble('bot', "I don't know — carryover isn't covered in what I have access to. I'll connect you with HR.", null, true); } },
+    ];
+    seq.forEach(function (s) { setTimeout(s.fn, s.d); });
+    function addBubble(cls, text, cite, unsure) {
+      var b = document.createElement('div');
+      b.className = 'bubble ' + cls; b.textContent = text;
+      if (cite) { var c = document.createElement('span'); c.className='cite'; c.textContent = cite; b.appendChild(c); }
+      if (unsure) { var c2 = document.createElement('span'); c2.className='cite'; c2.style.color='var(--rust)'; c2.textContent='honest refusal, not a guess'; b.appendChild(c2); }
+      log.appendChild(b);
+    }
+    function addTyping() { var t = document.createElement('div'); t.className='typing'; t.id='typingNow'; t.innerHTML='<i></i><i></i><i></i>'; log.appendChild(t); }
+    function removeTyping() { var t = document.getElementById('typingNow'); if (t) t.remove(); }
+  }
+
+  // ---- Demo 2: workflow ----
+  function runFlow() {
+    var steps = document.querySelectorAll('#flow .fstep');
+    var logEl = document.getElementById('flowLog');
+    steps.forEach(function (s) { s.classList.remove('active','done'); });
+    logEl.textContent = '';
+    var labels = ['Request received.', 'Required data gathered.', '<b>Paused — waiting for your approval.</b>', 'Approved step executed.', 'Run recorded, replayable.'];
+    steps.forEach(function (s, i) {
+      var isCheckpoint = s.classList.contains('checkpoint');
+      var delay = i * 850;
+      setTimeout(function () {
+        if (i > 0) steps[i-1].classList.remove('active');
+        if (i > 0) steps[i-1].classList.add('done');
+        s.classList.add('active');
+        logEl.innerHTML = labels[i];
+      }, delay);
+      if (isCheckpoint) {
+        setTimeout(function () { logEl.innerHTML = labels[i]; }, delay + 300);
+      }
+    });
+    setTimeout(function () { steps[steps.length-1].classList.add('done'); }, steps.length * 850);
+  }
+
+  // ---- Demo 3: retrieval ----
+  function runRet() {
+    var qEl = document.getElementById('retQ'); var ans = document.getElementById('retAns');
+    var docs = document.querySelectorAll('#retDocs .doc');
+    qEl.innerHTML = ''; ans.textContent = ''; docs.forEach(function(d){ d.classList.remove('hit'); });
+    var q = 'What is the parental leave policy?';
+    typeInto(qEl, q, 0, function () {
+      setTimeout(function () {
+        [2].forEach(function (i) { docs[i].classList.add('hit'); });
+        setTimeout(function () {
+          ans.innerHTML = 'Employees are eligible for 12 weeks of paid parental leave after one year of employment.<span class="cite2">Source: leave-policy.pdf, §5.1</span>';
+        }, 500);
+      }, 400);
+    });
+    function typeInto(el, text, i, done) {
+      if (i === 0) el.appendChild(document.createElement('span'));
+      if (i < text.length) {
+        el.firstChild ? null : el.appendChild(document.createTextNode(''));
+        el.textContent = text.slice(0, i+1);
+        var cur = document.createElement('span'); cur.className='cursor'; el.appendChild(cur);
+        setTimeout(function () { typeInto(el, text, i+1, done); }, 28);
+      } else { done(); }
+    }
+  }
+
+  document.querySelectorAll('.replay-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.dataset.replay === 'chat') runChat();
+      if (b.dataset.replay === 'flow') runFlow();
+      if (b.dataset.replay === 'ret') runRet();
+    });
+  });
+  runChat(); runFlow(); runRet();
+</script>
+</body>
+</html>

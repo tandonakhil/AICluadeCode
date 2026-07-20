@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homepage additions: Vibe-coding comparison + FDE rollout</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6022;
+    --gold:#8A5A17; --gold-soft:#8a5a1722; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF;
+    --rust:#A8432F; --rust-soft:#a8432f18;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b91f;
+    --gold:#E0A94E; --gold-soft:#e0a94e1f; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19;
+    --rust:#E07A5F; --rust-soft:#e07a5f18;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:system-ui,-apple-system,sans-serif; padding:40px 20px 70px; }
+  .bar { max-width:920px; margin:0 auto 30px; display:flex; justify-content:space-between; align-items:baseline; }
+  .bar h1 { font-family:Georgia,serif; font-weight:500; font-size:22px; }
+  .bar button { font:inherit; font-size:13px; padding:7px 14px; border-radius:999px; border:1px solid var(--hairline); background:transparent; color:var(--ink); cursor:pointer; }
+  .wrap { max-width:920px; margin:0 auto 60px; background:var(--surface); border:1px solid var(--hairline); border-radius:14px; padding:36px 42px; }
+  .tag { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  h2.sec { font-family:Georgia,serif; font-weight:500; font-size:22px; margin-bottom:16px; }
+
+  /* ---- Comparison ---- */
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--hairline); border-radius:12px; overflow:hidden; }
+  .cside { padding:20px 22px; }
+  .cside.vibe { background:var(--rust-soft); border-right:1px solid var(--hairline); }
+  .cside.conclave { background:var(--teal-soft); }
+  .cside h3 { font-size:14px; letter-spacing:.04em; margin-bottom:12px; }
+  .cside.vibe h3 { color:var(--rust); }
+  .cside.conclave h3 { color:var(--teal); }
+  .cside ul { list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .cside li { font-size:13.5px; line-height:1.5; display:flex; gap:8px; }
+  .cside li .m { flex-shrink:0; font-weight:700; }
+  .cside li em { font-style:normal; color:var(--muted); font-size:11.5px; }
+  .cside.vibe li .m { color:var(--rust); }
+  .cside.conclave li .m { color:var(--teal); }
+  .onestep { margin-top:14px; padding-top:12px; border-top:1px dashed var(--hairline); font-size:12px; color:var(--muted); }
+  .ninestep { margin-top:14px; padding-top:12px; border-top:1px dashed var(--hairline); display:flex; gap:3px; }
+  .ninestep i { flex:1; height:5px; border-radius:3px; background:var(--teal); }
+
+  /* ---- FDE rollout ---- */
+  .fde-head { font-size:14px; color:var(--muted); margin-bottom:20px; line-height:1.55; }
+  .weeks { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .wk { border:1px solid var(--hairline); border-radius:10px; padding:16px 18px; background:var(--cream); }
+  .wk .wn { font-family:Georgia,serif; font-size:13px; color:var(--gold); font-weight:700; margin-bottom:6px; }
+  .wk h4 { font-size:14.5px; margin-bottom:8px; }
+  .wk p { font-size:12.5px; line-height:1.55; color:var(--muted); }
+  .wk .fde-tag { display:inline-block; margin-top:10px; font-size:10.5px; background:var(--gold-soft); color:var(--gold); padding:3px 9px; border-radius:999px; }
+
+  .caption-opts { max-width:920px; margin:0 auto 60px; font-size:13px; line-height:2; color:var(--muted); }
+  .caption-opts b { color:var(--ink); }
+  .caption-opts .lbl { color:var(--ink); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Final structure: comparison on homepage (cited), FDE rollout on its own page</h1>
+  <button id="t">◐ Toggle theme</button>
+</div>
+
+<!-- ================= COMPARISON ================= -->
+<div class="wrap">
+  <div class="tag">Homepage — below the Harness strip. Homepage now scrolls (headline stays the one-viewport opening; content continues below).</div>
+  <h2 class="sec">Speed to demo isn't speed to production</h2>
+  <div class="compare">
+    <div class="cside vibe">
+      <h3>VIBE CODING</h3>
+      <ul>
+        <li><span class="m">✕</span> One prompt, then you're on your own — no review, no gate, no second opinion.</li>
+        <li><span class="m">✕</span> No standard coding practices — 45% of AI-generated code fails basic security tests. <em>(Veracode, 2025)</em></li>
+        <li><span class="m">✕</span> Daisy-chained code — each new prompt patches onto the last, with duplication up 8× and refactoring down 70% in AI-era codebases. <em>(GitClear, 2025)</em></li>
+        <li><span class="m">✕</span> No centralized architecture view — and 95% of AI pilots never reach production impact. <em>(MIT NANDA, 2025)</em></li>
+      </ul>
+      <div class="onestep">1 step: prompt → whatever comes out</div>
+    </div>
+    <div class="cside conclave">
+      <h3>CONCLAVE</h3>
+      <ul>
+        <li><span class="m">✓</span> Nine gates, and a person reviews the actual work at every one — nothing advances on trust alone.</li>
+        <li><span class="m">✓</span> A named architect owns the design before a line of code is written, and a named reviewer checks it after.</li>
+        <li><span class="m">✓</span> Every change traces to a decision, on the record — not a patch bolted onto the last one.</li>
+        <li><span class="m">✓</span> One architecture record, kept current, that shows the whole system — not just the last prompt's slice of it.</li>
+      </ul>
+      <div class="ninestep"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FDE ROLLOUT ================= -->
+<div class="wrap">
+  <div class="tag">New page — linked from the homepage's forward-link area, not on the homepage itself</div>
+  <h2 class="sec">We bring the platform to you — in three weeks</h2>
+  <p class="fde-head">Forward-deployed engineers bring Conclave to you — not a login, a team. This is the standard rollout for a first application; it is our defined process, not a promise on a specific engagement.</p>
+  <div class="weeks">
+    <div class="wk">
+      <div class="wn">Week 1</div>
+      <h4>Stand up &amp; scope</h4>
+      <p>Your FDEs deploy Conclave inside your environment, connect it to your systems and standards, and run Intake and Team Composition on your first application with your stakeholders in the room.</p>
+      <span class="fde-tag">FDE on-site / embedded</span>
+    </div>
+    <div class="wk">
+      <div class="wn">Week 2</div>
+      <h4>Build, gate by gate</h4>
+      <p>Plan, Design, Architecture, and Code run through their gates. You approve each one; your FDE team runs the process and briefs you before every decision.</p>
+      <span class="fde-tag">Daily gate reviews</span>
+    </div>
+    <div class="wk">
+      <div class="wn">Week 3</div>
+      <h4>Test, review, ship</h4>
+      <p>Full test suites, Review, and Deploy — into your environment, on your infrastructure. You leave week three with a live application and its complete audit trail.</p>
+      <span class="fde-tag">Production + handoff</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DECISIONS LOCKED ================= -->
+<div class="caption-opts">
+  <p class="lbl">Decided, reflected above:</p>
+  Homepage now scrolls (headline still opens as one viewport, page continues below) · comparison heading "Speed to demo isn't speed to production" · comparison cites sources inline (Veracode / GitClear / MIT NANDA) · FDE rollout lives on its own page, heading "We bring the platform to you — in three weeks" · FDE framed as "the standard rollout" (a defined process, not a delivered track record).
+  <br><br>
+  <p class="lbl">One remaining call — where does the FDE page sit in the question chain?</p>
+  A. <b>/rollout</b> — a 6th page inserted after /what and before /why, reachable from a new forward-link on the homepage comparison ("See the rollout →") and from /what's own forward-link. Keeps /why as the pure evidence terminus.<br>
+  B. <b>New section on /why</b>, at the top, ahead of the existing evidence blocks — no new page, no chain renumbering.<br>
+  C. <b>Its own untitled route</b> (e.g. `/fde`) linked only from the homepage comparison callout, outside the five-question chain entirely — for a page that's really a sales artifact, not one of the five core answers.
+</div>
+
+<script>
+  document.getElementById('t').addEventListener('click', function () {
+    var r = document.documentElement;
+    r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

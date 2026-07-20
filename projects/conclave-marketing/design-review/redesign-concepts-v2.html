@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conclave Redesign — 5 Experience Concepts</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background:#1c1e22; color:#e8e8e8; }
+  .picker-bar { position:sticky; top:0; z-index:10; background:#101114; border-bottom:1px solid #33363c; padding:14px 24px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .picker-bar h1 { font-size:15px; font-weight:600; margin-right:12px; color:#fff; }
+  .picker-bar button { font:inherit; font-size:13px; padding:8px 14px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; }
+  .picker-bar button.active { background:#fff; color:#111; border-color:#fff; font-weight:600; }
+  .concept { display:none; }
+  .concept.show { display:block; }
+  .mock { min-height:88vh; padding:0; overflow:hidden; }
+  .notes { background:#101114; border-top:1px solid #33363c; padding:28px 32px 40px; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:22px; }
+  .notes h3 { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#8b8f98; margin-bottom:8px; }
+  .notes p, .notes li { font-size:13.5px; line-height:1.55; color:#c8cbd2; }
+  .notes ol { padding-left:18px; }
+  .notes ol li { margin-bottom:4px; }
+
+  /* ---------- C1: The Plain Answer ---------- */
+  .c1 { background:#F7F5F0; color:#1A1A1A; display:flex; flex-direction:column; }
+  .c1 .nav { display:flex; justify-content:space-between; align-items:baseline; padding:26px 48px; }
+  .c1 .wordmark { font-weight:700; letter-spacing:.02em; font-size:16px; }
+  .c1 .nav .qs { display:flex; gap:22px; font-size:13px; }
+  .c1 .nav .qs a { color:#1B4FD8; text-decoration:none; }
+  .c1 .center { flex:1; display:flex; flex-direction:column; justify-content:center; max-width:880px; margin:0 auto; padding:60px 48px 90px; }
+  .c1 h2 { font-family: Georgia, 'Times New Roman', serif; font-size:clamp(34px,4.6vw,58px); line-height:1.12; font-weight:500; letter-spacing:-.01em; }
+  .c1 h2 em { font-style:normal; color:#1E7A46; }
+  .c1 .sub { margin-top:26px; font-size:17px; line-height:1.65; color:#3d3d3a; max-width:62ch; }
+  .c1 .row { margin-top:38px; display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .c1 .cta { background:#1B4FD8; color:#fff; padding:13px 26px; border-radius:4px; font-size:15px; font-weight:600; text-decoration:none; }
+  .c1 .next { color:#1B4FD8; font-size:15px; text-decoration:none; border-bottom:1px solid #1B4FD8; padding-bottom:2px; }
+  .c1 .rule { border-top:1px solid #C9C4B8; margin:0 48px; padding:16px 0 26px; font-size:12.5px; color:#8a857a; }
+
+  /* ---------- C2: The Convening ---------- */
+  .c2 { background:#12100E; color:#EDE4D3; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .c2 .nav { width:100%; display:flex; justify-content:space-between; padding:26px 48px; font-size:13px; }
+  .c2 .wordmark { font-family:Georgia,serif; letter-spacing:.14em; font-size:15px; color:#D08A4E; }
+  .c2 .acts { display:flex; gap:20px; color:#9b8f7c; }
+  .c2 h2 { font-family:Georgia,'Times New Roman',serif; font-size:clamp(30px,4vw,52px); line-height:1.18; font-weight:500; max-width:20ch; margin:64px auto 8px; }
+  .c2 h2 .gold { color:#D08A4E; }
+  .c2 svg { margin:34px auto 6px; display:block; }
+  .c2 .seatlabels { font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#9b8f7c; }
+  .c2 .row { margin:30px 0 20px; display:flex; gap:24px; align-items:center; }
+  .c2 .cta { background:#D08A4E; color:#12100E; padding:13px 28px; border-radius:3px; font-weight:700; font-size:15px; text-decoration:none; }
+  .c2 .next { color:#D08A4E; font-size:15px; text-decoration:none; }
+  .c2 .below { border-top:1px solid #2e2a24; width:100%; margin-top:34px; padding:22px 48px 30px; display:flex; gap:38px; justify-content:center; font-size:13.5px; color:#b8ac96; flex-wrap:wrap; }
+
+  /* ---------- C3: The Control Room ---------- */
+  .c3 { background:#0C0F12; color:#EDF2F7; font-family:ui-monospace,'SF Mono',Menlo,monospace; position:relative; }
+  .c3::before { content:""; position:absolute; inset:0; background-image:linear-gradient(#161b21 1px,transparent 1px),linear-gradient(90deg,#161b21 1px,transparent 1px); background-size:44px 44px; opacity:.5; }
+  .c3 .inner { position:relative; padding:26px 48px 40px; }
+  .c3 .nav { display:flex; justify-content:space-between; font-size:12px; color:#98A2AE; letter-spacing:.08em; }
+  .c3 .wordmark { color:#4ADE80; font-weight:700; }
+  .c3 h2 { font-size:clamp(24px,3.2vw,40px); line-height:1.25; max-width:26ch; margin:56px auto 10px; text-align:center; font-weight:600; letter-spacing:-.01em; }
+  .c3 h2 .op { color:#F5B942; }
+  .c3 .board { max-width:960px; margin:40px auto 0; border:1px solid #232a33; background:rgba(12,15,18,.82); border-radius:6px; padding:28px 30px; }
+  .c3 .board-title { font-size:11px; color:#98A2AE; letter-spacing:.14em; margin-bottom:20px; }
+  .c3 .gates { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .c3 .gate { width:64px; height:46px; border:1px solid #2c3540; border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:9px; color:#98A2AE; }
+  .c3 .dot { width:8px; height:8px; border-radius:50%; background:#4ADE80; box-shadow:0 0 8px #4ade8088; }
+  .c3 .gate.hold .dot { background:#F5B942; box-shadow:0 0 8px #f5b94288; }
+  .c3 .gate.dark .dot { background:#2c3540; box-shadow:none; }
+  .c3 .link-line { flex:1 0 8px; height:1px; background:#2c3540; min-width:6px; }
+  .c3 .operator { margin-top:22px; display:flex; align-items:center; gap:14px; border-top:1px dashed #2c3540; padding-top:18px; font-size:12px; color:#F5B942; letter-spacing:.1em; }
+  .c3 .opbox { border:1px solid #F5B942; border-radius:4px; padding:8px 14px; }
+  .c3 .row { display:flex; justify-content:center; margin-top:36px; gap:24px; align-items:center; }
+  .c3 .cta { background:#4ADE80; color:#0C0F12; padding:12px 26px; border-radius:4px; font-weight:700; font-size:14px; text-decoration:none; }
+  .c3 .walk { color:#4ADE80; font-size:13px; text-decoration:none; letter-spacing:.06em; }
+
+  /* ---------- C4: The Dossier ---------- */
+  .c4 { background:#ECEAE4; color:#22262B; font-family:system-ui,sans-serif; padding:52px 24px 60px; }
+  .c4 .cover { max-width:720px; margin:0 auto; background:#FAFAF7; border:1px solid #D8D6CF; box-shadow:0 8px 30px rgba(0,0,0,.08); padding:52px 58px; }
+  .c4 .docmeta { display:flex; justify-content:space-between; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#84817a; border-bottom:1px solid #D8D6CF; padding-bottom:14px; }
+  .c4 h2 { font-family:Georgia,serif; font-size:clamp(24px,3vw,36px); line-height:1.28; font-weight:500; margin:34px 0 18px; }
+  .c4 .abstract { font-size:15px; line-height:1.65; color:#43474d; }
+  .c4 .prepared { margin-top:22px; font-size:12.5px; color:#84817a; }
+  .c4 .cta { display:inline-block; margin-top:28px; background:#2456C4; color:#fff; padding:12px 24px; border-radius:3px; font-size:14px; font-weight:600; text-decoration:none; }
+  .c4 .toc { max-width:720px; margin:34px auto 0; }
+  .c4 .toc-row { display:flex; gap:20px; align-items:baseline; background:#FAFAF7; border:1px solid #D8D6CF; border-bottom:none; padding:16px 24px; font-size:14px; }
+  .c4 .toc-row:last-child { border-bottom:1px solid #D8D6CF; }
+  .c4 .n { font-weight:800; color:#2456C4; font-size:16px; min-width:32px; }
+  .c4 .toc-row .t { font-weight:600; min-width:180px; }
+  .c4 .toc-row .d { color:#6b6f75; font-size:13px; flex:1; }
+  .c4 .toc-row .rt { color:#a09d95; font-size:12px; }
+
+  /* ---------- C5: Watch One Get Built ---------- */
+  .c5 { background:#F4F6F8; color:#23282E; padding:0 0 46px; }
+  .c5 .nav { display:flex; justify-content:space-between; align-items:center; padding:24px 48px; font-size:13.5px; }
+  .c5 .wordmark { font-weight:800; font-size:16px; color:#0E8074; }
+  .c5 .navlinks { display:flex; gap:22px; }
+  .c5 .navlinks a { color:#4a5058; text-decoration:none; }
+  .c5 h2 { font-size:clamp(26px,3.4vw,44px); line-height:1.2; font-weight:700; letter-spacing:-.015em; max-width:24ch; margin:34px auto 14px; text-align:center; }
+  .c5 h2 .gold { color:#B7791F; }
+  .c5 .premise { text-align:center; font-size:15.5px; color:#4a5058; max-width:52ch; margin:0 auto; line-height:1.6; }
+  .c5 .player { max-width:760px; margin:32px auto 0; background:#fff; border:1px solid #dde3e8; border-radius:14px; box-shadow:0 10px 34px rgba(20,40,50,.09); padding:26px 30px; }
+  .c5 .phead { display:flex; justify-content:space-between; font-size:12px; color:#8b929a; margin-bottom:16px; }
+  .c5 .chips { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .c5 .chip { background:#E6F2F0; color:#0E8074; font-size:12px; padding:5px 12px; border-radius:999px; font-weight:600; }
+  .c5 .artifact { background:#FBF3E4; border:1px solid #ecd9b4; border-radius:8px; padding:16px 18px; font-family:Georgia,serif; font-size:13.5px; line-height:1.55; color:#5a4a2e; }
+  .c5 .seal { margin-top:14px; display:flex; align-items:center; gap:10px; font-size:13px; color:#B7791F; font-weight:700; }
+  .c5 .seal .disc { width:26px; height:26px; border-radius:50%; border:2px solid #B7791F; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .c5 .pbar { margin-top:18px; height:6px; background:#e6eaee; border-radius:3px; overflow:hidden; }
+  .c5 .pbar i { display:block; height:100%; width:11%; background:#0E8074; }
+  .c5 .prow { display:flex; justify-content:center; gap:22px; margin-top:28px; align-items:center; }
+  .c5 .cta { background:#0E8074; color:#fff; padding:13px 26px; border-radius:8px; font-weight:700; font-size:15px; text-decoration:none; }
+  .c5 .play { color:#0E8074; font-weight:700; font-size:15px; text-decoration:none; }
+  .c5 .quietrow { display:flex; justify-content:center; gap:14px; margin-top:34px; flex-wrap:wrap; padding:0 24px; }
+  .c5 .qchip { background:#fff; border:1px solid #dde3e8; border-radius:999px; padding:8px 16px; font-size:12.5px; color:#4a5058; }
+</style>
+</head>
+<body>
+
+<div class="picker-bar">
+  <h1>Conclave redesign — pick a direction</h1>
+  <button class="active" data-c="c1">1 · The Plain Answer</button>
+  <button data-c="c2">2 · The Convening</button>
+  <button data-c="c3">3 · The Control Room</button>
+  <button data-c="c4">4 · The Dossier</button>
+  <button data-c="c5">5 · Watch One Get Built</button>
+</div>
+
+<!-- ================= CONCEPT 1 ================= -->
+<section class="concept show" id="c1">
+  <div class="mock c1">
+    <div class="nav">
+      <div class="wordmark">CONCLAVE</div>
+      <div class="qs"><a>What is it?</a><a>How does it work?</a><a>Who does the work?</a><a>What can it build?</a><a>Why trust it?</a></div>
+    </div>
+    <div class="center">
+      <h2>Conclave is a team of AI agents that builds AI applications — <em>and a human approves every step.</em></h2>
+      <p class="sub">It plans, designs, codes, tests, and deploys GenAI chatbots, agentic workflows, and knowledge applications. Specialist agents deliberate; one orchestrator runs the process; you hold final say at all nine gates.</p>
+      <div class="row">
+        <a class="cta">Ask us the sixth question</a>
+        <a class="next">Okay — how does it actually work? →</a>
+      </div>
+    </div>
+    <div class="rule">The homepage is deliberately one viewport tall. Five pages, each titled as the question it answers.</div>
+  </div>
+  <div class="notes">
+    <div><h3>Structure</h3><p>A five-question interview: each page is a question a skeptical evaluator would ask, answered in its first sentence, ending with the next question.</p></div>
+    <div><h3>Pages</h3><ol><li>What is Conclave?</li><li>How does it work?</li><li>Who does the work?</li><li>What can it build?</li><li>Why trust it?</li></ol></div>
+    <div><h3>Deep dive</h3><p>Expanders inside each answer ("show me the detail") reveal gate criteria, agent contracts, and artifacts — one level down, never forced.</p></div>
+    <div><h3>CTA &amp; why it's different</h3><p>"Ask us the sixth question" → contact. The only concept with zero metaphor — radical plainness as the brand.</p></div>
+  </div>
+</section>
+
+<!-- ================= CONCEPT 2 ================= -->
+<section class="concept" id="c2">
+  <div class="mock c2">
+    <div class="nav">
+      <div class="wordmark">CONCLAVE</div>
+      <div class="acts"><span>I · The Summons</span><span>II · The Council</span><span>III · The Deliberation</span><span>IV · The Record</span></div>
+    </div>
+    <h2>Bring your AI project before a council of specialist agents. <span class="gold">Nothing ships until you say yes.</span></h2>
+    <svg width="360" height="180" viewBox="0 0 360 180" aria-label="Six seats around a table">
+      <ellipse cx="180" cy="95" rx="120" ry="46" fill="none" stroke="#3a332a" stroke-width="1.5"/>
+      <circle cx="180" cy="30" r="11" fill="#D08A4E"/>
+      <circle cx="70" cy="70" r="9" fill="#8a6a44"/>
+      <circle cx="290" cy="70" r="9" fill="#8a6a44"/>
+      <circle cx="60" cy="125" r="9" fill="#8a6a44"/>
+      <circle cx="300" cy="125" r="9" fill="#8a6a44"/>
+      <circle cx="180" cy="160" r="9" fill="#8a6a44"/>
+      <text x="180" y="12" text-anchor="middle" fill="#D08A4E" font-size="9" letter-spacing="2">ORCHESTRATOR</text>
+    </svg>
+    <div class="seatlabels">architect · security · ux · industry expert · test</div>
+    <div class="row">
+      <a class="cta">Convene a session</a>
+      <a class="next">Enter the room →</a>
+    </div>
+    <div class="below">
+      <span>Builds chatbots · workflows · knowledge apps</span>
+      <span>For teams that can't afford ungoverned AI</span>
+      <span>A named human approves every gate</span>
+    </div>
+  </div>
+  <div class="notes">
+    <div><h3>Structure</h3><p>A four-act drama: The Summons → The Council → The Deliberation (all nine gates as a scripted exchange, including one honest "sent back" moment) → The Record.</p></div>
+    <div><h3>Pages</h3><ol><li>The Summons (home)</li><li>The Council — the seats, in character</li><li>The Deliberation — the nine gates</li><li>The Record — evidence + CTA</li></ol></div>
+    <div><h3>Deep dive</h3><p>Each gate row in Act III expands to show the real artifact type produced there — plan excerpt, threat-model summary, test evidence.</p></div>
+    <div><h3>CTA &amp; why it's different</h3><p>"Convene a session." The only narrative-drama concept — you walk a story, in character, driven by the brand name itself.</p></div>
+  </div>
+</section>
+
+<!-- ================= CONCEPT 3 ================= -->
+<section class="concept" id="c3">
+  <div class="mock c3">
+    <div class="inner">
+      <div class="nav">
+        <span class="wordmark">CONCLAVE // CONTROL</span>
+        <span>OVERVIEW · PIPELINE · AGENTS · APPLICATIONS · LOGBOOK</span>
+      </div>
+      <h2>A control room for building AI software — where <span class="op">you</span>, not the AI, throw the final switch.</h2>
+      <div class="board">
+        <div class="board-title">PIPELINE STATUS — SIMULATED PROJECT ADVANCING</div>
+        <div class="gates">
+          <div class="gate"><span class="dot"></span>INTAKE</div><span class="link-line"></span>
+          <div class="gate"><span class="dot"></span>TEAM</div><span class="link-line"></span>
+          <div class="gate"><span class="dot"></span>PLAN</div><span class="link-line"></span>
+          <div class="gate"><span class="dot"></span>DESIGN</div><span class="link-line"></span>
+          <div class="gate hold"><span class="dot"></span>ARCH</div><span class="link-line"></span>
+          <div class="gate dark"><span class="dot"></span>CODE</div><span class="link-line"></span>
+          <div class="gate dark"><span class="dot"></span>TEST</div><span class="link-line"></span>
+          <div class="gate dark"><span class="dot"></span>REVIEW</div><span class="link-line"></span>
+          <div class="gate dark"><span class="dot"></span>DEPLOY</div>
+        </div>
+        <div class="operator"><span class="opbox">OPERATOR — HOLD AT GATE 5</span><span>← authority line to every interlock. Amber = awaiting your approval.</span></div>
+      </div>
+      <div class="row">
+        <a class="cta">Request a walkthrough</a>
+        <a class="walk">WALK THE BOARD →</a>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div><h3>Structure</h3><p>The homepage schematic board is the navigation — every region deep-links to its page, and each page keeps a mini "you are here" board in its header.</p></div>
+    <div><h3>Pages</h3><ol><li>Overview board (home)</li><li>The interlocks (9 gates)</li><li>The subsystems (agents)</li><li>Output (the 3 app types)</li><li>The operator's logbook (evidence)</li></ol></div>
+    <div><h3>Deep dive</h3><p>Drill exactly where your concern is — a security lead clicks the security subsystem panel directly. Panels expand to artifact-level detail.</p></div>
+    <div><h3>CTA &amp; why it's different</h3><p>"Request a walkthrough." The only concept built on operational iconography — interlocks, hold-points, operator authority over automation.</p></div>
+  </div>
+</section>
+
+<!-- ================= CONCEPT 4 ================= -->
+<section class="concept" id="c4">
+  <div class="mock c4">
+    <div class="cover">
+      <div class="docmeta"><span>Evaluation dossier</span><span>CONCLAVE · 2026</span></div>
+      <h2>AI applications built by a governed team of AI agents — with the audit trail to prove it.</h2>
+      <p class="abstract">Conclave convenes specialist AI agents — architecture, security, experience, domain — under one orchestrator to plan, build, test, and deploy GenAI applications. A human decision-maker approves every one of nine gates. This document set is the evaluation package: method, roster, portfolio, and exhibits.</p>
+      <p class="prepared">Prepared for: technology and business leaders evaluating AI delivery · 5 documents · ~12 min total</p>
+      <a class="cta">Request the working session</a>
+    </div>
+    <div class="toc">
+      <div class="toc-row"><span class="n">01</span><span class="t">Executive summary</span><span class="d">The whole case in 200 words</span><span class="rt">1 min</span></div>
+      <div class="toc-row"><span class="n">02</span><span class="t">Method</span><span class="d">Nine gates, a human decision at each</span><span class="rt">3 min</span></div>
+      <div class="toc-row"><span class="n">03</span><span class="t">Roster &amp; responsibilities</span><span class="d">Who owns what — an accountability matrix</span><span class="rt">2 min</span></div>
+      <div class="toc-row"><span class="n">04</span><span class="t">Portfolio &amp; fit</span><span class="d">Three application types — and what Conclave is not</span><span class="rt">3 min</span></div>
+      <div class="toc-row"><span class="n">05</span><span class="t">Exhibits</span><span class="d">Decision logs, test evidence, claims-to-source table</span><span class="rt">3 min</span></div>
+    </div>
+  </div>
+  <div class="notes">
+    <div><h3>Structure</h3><p>A numbered document set built to be forwarded to a buying committee — the cover sheet is the homepage, the table of contents is the navigation.</p></div>
+    <div><h3>Pages</h3><ol><li>Cover sheet (home)</li><li>01 Executive summary</li><li>02 Method</li><li>03 Roster &amp; responsibilities</li><li>04 Portfolio &amp; fit</li><li>05 Exhibits</li></ol></div>
+    <div><h3>Deep dive</h3><p>Two reading speeds by design: read only the five "In brief" boxes for the whole story, or open the exhibits — including a claims-to-source table mapping every marketing claim to its evidence.</p></div>
+    <div><h3>CTA &amp; why it's different</h3><p>"Request the working session." The only concept optimized for the committee/RFP buying reality — institutional, evidence-led, forwardable.</p></div>
+  </div>
+</section>
+
+<!-- ================= CONCEPT 5 ================= -->
+<section class="concept" id="c5">
+  <div class="mock c5">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="navlinks"><a>The build</a><a>The cast</a><a>For you</a></div>
+    </div>
+    <h2>Watch a team of AI agents build a real application, step by step — <span class="gold">with a human approving every move.</span></h2>
+    <p class="premise">A company needs its customers to get accurate answers at 2 a.m. Here's how Conclave builds the chatbot — nine gates, real artifacts, one honest rejection along the way.</p>
+    <div class="player">
+      <div class="phead"><span>STEP 1 OF 9 — INTAKE</span><span>▶ paused</span></div>
+      <div class="chips"><span class="chip">functional-agent</span><span class="chip">industry-expert</span></div>
+      <div class="artifact">"The domain is customer support at scale. Peak load: incident events, 40× normal query volume. The chatbot must never speculate about answers it doesn't have…" — <em>Domain research, excerpt</em></div>
+      <div class="seal"><span class="disc">✓</span> Your decision goes here — approve, or send it back.</div>
+      <div class="pbar"><i></i></div>
+    </div>
+    <div class="prow">
+      <a class="cta">Build one with us</a>
+      <a class="play">▶ Press play</a>
+    </div>
+    <div class="quietrow">
+      <span class="qchip">9 gates · a human decision at each</span>
+      <span class="qchip">Specialist agents, one orchestrator</span>
+      <span class="qchip">Chatbots · workflows · knowledge apps</span>
+    </div>
+  </div>
+  <div class="notes">
+    <div><h3>Structure</h3><p>The whole site orbits one concrete build — a customer-support chatbot — replayed step by step. Abstraction (gates, agents) is introduced only when it appears in the build.</p></div>
+    <div><h3>Pages</h3><ol><li>The premise (home)</li><li>The build — stepper replay of all 9 gates</li><li>The cast — the agents you just watched</li><li>Your version — what we'd build for you + CTA</li></ol></div>
+    <div><h3>Deep dive</h3><p>Three clean depths: read the premise and leave informed; press play through the replay; expand any artifact card for the full excerpt.</p></div>
+    <div><h3>CTA &amp; why it's different</h3><p>"Build one with us." The only demonstration-first concept — show, don't describe; the most approachable and product-like of the five.</p></div>
+  </div>
+</section>
+
+<script>
+  var btns = document.querySelectorAll('.picker-bar button');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      document.querySelectorAll('.concept').forEach(function (c) { c.classList.remove('show'); });
+      document.getElementById(b.dataset.c).classList.add('show');
+      window.scrollTo(0, 0);
+    });
+  });
+</script>
+</body>
+</html>

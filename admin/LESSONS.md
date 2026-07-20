@@ -244,3 +244,15 @@ and edited; "Open" = observed, not yet reviewed.
   First applied at conclave-marketing's Plan & Backlog gate. Orchestrator
   practice at every Plan & Backlog gate and enhancement-scope approval;
   also queued for plan-agent's contract text at the next mas-architect pass.
+- **2026-07-17 — Applied (process).** Design/mockup approvals: the human
+  wants to **always review a rendered mockup/preview before approving**
+  any Experience Design (or similar visual) gate — never approve from
+  spec text alone. Already ui-ux-designer's own gate contract in principle
+  (conclave-marketing's spec explicitly flagged "final human sign-off
+  requires visual artifacts, not text alone"), but the human made it
+  explicit and general: standard practice going forward for every project,
+  not just when the designer happens to ask for it. Orchestrator practice:
+  build/present a rendered HTML preview (design-review/ or equivalent)
+  at every Experience Design gate before requesting approval; queued for
+  ui-ux-designer's contract text at the next mas-architect pass so the
+  requirement isn't just orchestrator-remembered.

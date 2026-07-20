@@ -224,3 +224,91 @@ Additional Decisions Log entries:
 - 2026-07-17 — Plan & Backlog gate approved via per-feature checkbox list
   (new standing approval format per human direction, recorded in
   admin/LESSONS.md): F1–F12 all in MVP 0.1.0; F13 deferred. [human]
+- 2026-07-19 — FROM-SCRATCH REDESIGN INITIATED [human]: current site rejected
+  ("very confusing for a visitor, does not tell me what it does in one line";
+  dislikes single-scroll layout — wants unique pages with continuation).
+  ui-ux-designer dispatched clean-slate (no reference to existing site);
+  delivered 5 distinct multi-page experience concepts (Plain Answer /
+  Convening / Control Room / Dossier / Watch One Get Built). Rendered
+  mockups: design-review/redesign-concepts-v2.html. Awaiting human pick.
+- 2026-07-19 — POSITIONING CHANGE [human]: website is now INDUSTRY-AGNOSTIC.
+  Human: "this has nothing to do with utilities" → chose "Industry-agnostic"
+  via AskUserQuestion. All energy/utility framing stripped from concepts;
+  examples are generic (customer-support chatbot, knowledge apps). NOTE:
+  CLAUDE.md and INDUSTRY_KB.md still describe the platform's portfolio as
+  energy-focused — the marketing site no longer reflects that; INDUSTRY_KB's
+  energy-buyer research is demoted to background for this project. Any
+  rebuilt copy must not reintroduce industry framing.
+- 2026-07-19 — EXPERIENCE DESIGN v2 APPROVED [human]: merged concept
+  "Show Your Work" (Q&A-chain spine + build-replay as /how), industry-
+  agnostic, "Paper & Seal" palette (Paper/Ink/Deep Teal/Human Gold/
+  Artifact Cream/Rework Rust), gold-seal signature motion. Approved from
+  rendered interactive mockup (design-review/show-your-work-mockup.html,
+  also published as private artifact) after a motion-layer revision.
+  Human additions at approval: (1) more content per page, (2) more
+  intuitive animation on /how, (3) /who must show the team as a connected
+  hierarchy visualization, not word-heavy cards. Full rebuild of the site
+  proceeds through Plan & Backlog → Code → Test → Review → Deploy.
+- 2026-07-20 — PLAN & BACKLOG v2 APPROVED [human]: all 11 rebuild features
+  (F2.1–F2.11) approved via per-feature checkbox list, none trimmed.
+  v2 ships as 0.2.0. Build order per PLAN.md. Code gate begins.
+- 2026-07-20 — CODE GATE v2 COMPLETE: code-agent implemented all 11 features
+  (F2.1–F2.11) in dev/ commit beda5d3. 90/90 tests passing (up from 36),
+  orchestrator independently re-ran suite and live-smoke-tested (5 routes
+  200, /solutions & /contact 308 redirects, zero external requests).
+  Deployed locally on :8100. Code-agent judgment calls logged for Review:
+  (1) /who diagrams 16 project-level agents, mas-* platform agents covered
+  in prose; (2) Test send-back is one step containing fail→rework→re-run;
+  (3) banned-terms list stricter than plan (adds substation, "certified");
+  (4) contact placeholder centralized as CONTACT_EMAIL constant. Deferred
+  to designer audit: no-below-fold rule, live motion/contrast behavior.
+- 2026-07-20 — POSITIONING COPY APPROVED [human]: homepage sub-copy replaced
+  with '"Defend" short form' variant, chosen from 3 research-backed previews
+  ("AI-built software you can defend…" anti-vibe-coding differentiator +
+  FDE delivery paragraph). Headline unchanged. dev/ commit 8a39fe3, 91/91
+  tests (new copy-drift test). Backed by industry-expert market research
+  (INDUSTRY_KB.md 2026-07-20 entry: competitive map, claims evidence tiers,
+  FDE hedge rules). No stats on home — STRONG-tier stats reserved for /why.
+  NEW STANDING RULE [human]: no website changes of any kind without prior
+  human approval of exact wording/design (recorded in personal memory).
+  Platform roadmap proposals STAGED, NOT APPROVED (human: "build website
+  first") — see admin/proposals/2026-07-20-roadmap-additions.md.
+- 2026-07-21 — POST-v2 CONTENT ADDITIONS APPROVED & BUILT [human]: from two
+  rounds of mockup review (design-review/who-hierarchy-v2-mockup.html,
+  design-review/comparison-and-fde-mockup.html). (1) Homepage "The Harness"
+  strip: 9-gate rail beneath the CTA row, caption Option A verbatim
+  ("industry best practices, wired into nine gates — end-to-end automation
+  with you in command"), gold/rust ticks, deep-links to /how's real gate
+  anchors. (2) /who hierarchy visual pass: rail-and-columns layout keeps
+  the graph structure the human liked; every node gets a team-color accent
+  + drawn icon (research/design/architecture/build/quality/ship/
+  cross-cutting), staged entrance animation, hover glow, color legend, and
+  one explicitly-approved looping exception — a slow gold shimmer on the
+  rail every ~6s (frozen under prefers-reduced-motion; the only loop on the
+  site). (3) Homepage comparison "Speed to demo isn't speed to production":
+  vibe-coding vs Conclave, citing Veracode 2025 (45% security-vuln rate),
+  GitClear 2025 (8x duplication, -70% refactoring), MIT NANDA 2025 (95%
+  pilot-stall) — sourced from industry-expert's 2026-07-20 market research,
+  added to content/CITATIONS.md. HUMAN RELAXED F2.3: homepage no longer
+  strictly one-viewport — headline still opens the page, but it now scrolls
+  to accommodate real content. (4) FDE 3-week rollout moved to /why (not a
+  new 6th chain page, not the homepage) as its new opening section, titled
+  "We bring the platform to you — in three weeks," framed explicitly as
+  "the standard rollout... our defined process, not a promise on a specific
+  engagement" (no named customers exist; hedge enforced per industry-expert
+  research). dev/ commits d90c6c1 (harness+hierarchy) and 54632ac
+  (comparison+FDE), 141/141 tests, orchestrator independently re-verified
+  and redeployed :8100 both times.
+- 2026-07-21 — /WHAT REWORK APPROVED & BUILT [human]: from reviewed mockup
+  (design-review/what-fancy-mockup.html, "build as shown", auto-run once on
+  load + replay button). Each of the three app types now opens with a
+  small, replayable, scripted demo instead of only description: support
+  chatbots (a Q&A exchange incl. one honest refusal), automated workflows
+  (5-step pipeline pausing visibly at its human checkpoint), knowledge
+  assistants (question types out, matching doc highlights, cited answer
+  resolves). Explicit, one-time, human-approved exception to the site's
+  general no-autoplay rule (demos auto-run once on page load; flagged in
+  code as page-scoped, not a new pattern). All existing "what it is not"
+  boundary copy preserved verbatim. dev/ commit 8ae09ec, 147/147 tests,
+  orchestrator independently re-verified (pytest, JS syntax, zero external
+  requests) and redeployed :8100.

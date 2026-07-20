@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/who Hierarchy v2 — Pipeline Rail Mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6022;
+    --gold:#8A5A17; --gold-soft:#8a5a1722; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF;
+    --c-research:#2456C4; --c-design:#8A3A7A; --c-arch:#5B4AA8; --c-build:#0B6B60; --c-quality:#B7791F; --c-ship:#1E7A46; --c-cross:#5C6670;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b91f;
+    --gold:#E0A94E; --gold-soft:#e0a94e1f; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19;
+    --c-research:#8AB0F8; --c-design:#E08AC8; --c-arch:#A79AE8; --c-build:#3FC9B9; --c-quality:#E8B45A; --c-ship:#6FCF8F; --c-cross:#9AA8B4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:system-ui,-apple-system,sans-serif; padding:40px 20px 60px; transition:background .3s; }
+  .bar { max-width:1180px; margin:0 auto 26px; display:flex; justify-content:space-between; align-items:baseline; }
+  .bar h1 { font-family:Georgia,serif; font-weight:500; font-size:24px; }
+  .bar button { font:inherit; font-size:13px; padding:7px 14px; border-radius:999px; border:1px solid var(--hairline); background:transparent; color:var(--ink); cursor:pointer; }
+  .org { max-width:1180px; margin:0 auto; }
+  .lvl-label { text-align:center; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+  /* ---------- Proposal 1: homepage harness strip ---------- */
+  .homeprev { max-width:880px; margin:0 auto; border:1px solid var(--hairline); border-radius:14px; padding:38px 44px; background:var(--surface); }
+  .hp-h1 { font-family:Georgia,serif; font-weight:500; font-size:clamp(24px,3vw,38px); line-height:1.16; }
+  .hp-gold { border-bottom:4px solid var(--gold); }
+  .hp-p { margin-top:14px; font-size:14.5px; line-height:1.6; color:var(--muted); max-width:64ch; }
+  .hp-row { margin-top:20px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  .hp-cta { background:var(--teal); color:var(--cream); padding:11px 22px; border-radius:5px; font-size:14px; font-weight:600; }
+  [data-theme="dark"] .hp-cta { color:#0e2a26; }
+  .hp-fwd { color:var(--teal); font-size:14px; border-bottom:1px solid var(--teal); padding-bottom:2px; }
+  .harness { margin-top:30px; border-top:1px solid var(--hairline); padding-top:18px; }
+  .harness-head { display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; margin-bottom:12px; }
+  .harness-title { font-family:Georgia,serif; font-size:15px; letter-spacing:.04em; color:var(--gold); font-weight:700; }
+  .harness-sub { font-size:12px; color:var(--muted); }
+  .hrail { display:grid; grid-template-columns:repeat(9,1fr); border:1px solid var(--hairline); border-radius:10px; overflow:hidden; background:linear-gradient(90deg, var(--teal-soft), var(--gold-soft)); }
+  .hgate { text-align:center; padding:9px 2px 7px; font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); border-left:1px solid var(--hairline); cursor:pointer; transition:background .2s; }
+  .hgate:first-child { border-left:none; }
+  .hgate:hover { background:var(--teal-soft); }
+  .hgate b { display:block; color:var(--teal); font-size:10px; letter-spacing:.12em; }
+  .hgate .tick { display:block; font-style:normal; color:var(--gold); font-size:12px; line-height:1; margin-bottom:3px; }
+  .hgate.rework .tick { color:#A8432F; }
+  [data-theme="dark"] .hgate.rework .tick { color:#E07A5F; }
+  .harness-note { margin-top:10px; font-size:11.5px; color:var(--muted); }
+  .caption-opts { max-width:880px; margin:14px auto 0; font-size:13px; line-height:1.8; color:var(--muted); }
+  .caption-opts b { color:var(--ink); }
+
+  /* ---------- Proposal 2: jazzed hierarchy ---------- */
+  .node { position:relative; border-radius:12px; background:var(--surface); border:1.5px solid var(--ac, var(--teal)); padding:9px 10px 9px 40px; text-align:left; cursor:pointer; transition:transform .22s, box-shadow .22s; opacity:0; animation:popIn .55s cubic-bezier(.34,1.45,.5,1) forwards; }
+  .node:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 10px 26px color-mix(in srgb, var(--ac, var(--teal)) 35%, transparent); }
+  .node .ic { position:absolute; left:8px; top:50%; transform:translateY(-50%); width:24px; height:24px; border-radius:50%; background:color-mix(in srgb, var(--ac, var(--teal)) 16%, var(--surface)); display:flex; align-items:center; justify-content:center; transition:transform .35s; }
+  .node:hover .ic { transform:translateY(-50%) rotate(-12deg) scale(1.15); }
+  .node .ic svg { width:14px; height:14px; stroke:var(--ac, var(--teal)); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .node .nm { font-weight:700; font-size:12.5px; color:var(--ac, var(--teal)); }
+  .node .sub { font-size:10px; color:var(--muted); margin-top:1px; }
+  @keyframes popIn { from { opacity:0; transform:translateY(14px) scale(.7); } 70% { opacity:1; transform:translateY(-2px) scale(1.04); } to { opacity:1; transform:none; } }
+
+  .you-wrap, .orc-wrap { display:flex; flex-direction:column; align-items:center; }
+  .node.you, .node.orc { text-align:center; padding:12px 34px; animation-delay:.1s; }
+  .node.you { --ac:var(--gold); background:linear-gradient(var(--gold-soft), transparent), var(--surface); }
+  .node.you .nm { font-family:Georgia,serif; font-size:19px; }
+  .node.orc { --ac:var(--teal); animation-delay:.35s; }
+  .node.orc .nm { font-size:14.5px; }
+  .drop { width:2px; height:34px; background:linear-gradient(var(--gold), var(--teal)); transform-origin:top; animation:grow .4s ease-out .25s both; }
+  .drop.teal { background:var(--teal); opacity:.75; animation-delay:.55s; }
+  @keyframes grow { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+
+  .rail { position:relative; height:36px; border-radius:18px; background:linear-gradient(90deg, var(--teal-soft), var(--gold-soft)); border:1px solid var(--hairline); display:grid; grid-template-columns:repeat(9,1fr); align-items:center; overflow:hidden; transform-origin:left; animation:railDraw .7s cubic-bezier(.22,.9,.3,1) .7s both; }
+  @keyframes railDraw { from { transform:scaleX(0); opacity:0; } to { transform:scaleX(1); opacity:1; } }
+  .rail::after { content:""; position:absolute; top:0; bottom:0; width:60px; background:linear-gradient(90deg, transparent, color-mix(in srgb, var(--gold) 30%, transparent), transparent); animation:shimmer 6s ease-in-out 1.6s infinite; }
+  @keyframes shimmer { 0% { left:-70px; } 55% { left:100%; } 100% { left:100%; } }
+  .rail .gate { text-align:center; font-size:9.5px; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; border-left:1px solid var(--hairline); line-height:1.2; padding:2px 2px; }
+  .rail .gate:first-child { border-left:none; }
+  .rail .gate b { display:block; color:var(--teal); font-size:10px; letter-spacing:.14em; }
+
+  .hang { display:grid; grid-template-columns:repeat(9,1fr); gap:0 10px; }
+  .col { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .stub { width:2px; height:20px; background:var(--ac, var(--teal)); opacity:.55; transform-origin:top; animation:grow .35s ease-out both; }
+  .col .node { width:100%; }
+  .col .note { font-size:10px; color:var(--muted); text-align:center; padding-top:24px; line-height:1.5; max-width:92px; opacity:0; animation:fadeIn .6s ease-out 1.9s forwards; }
+  @keyframes fadeIn { to { opacity:1; } }
+
+  .band { margin-top:44px; border-top:1.5px dashed var(--hairline); padding-top:14px; }
+  .band .lvl-label { margin-bottom:14px; }
+  .band-row { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .band .node { --ac:var(--c-cross); border-style:dashed; min-width:170px; }
+
+  .panel { max-width:720px; margin:36px auto 0; background:var(--cream); border:1px solid var(--hairline); border-radius:10px; padding:18px 22px; font-size:14px; line-height:1.6; }
+  .panel b { font-family:Georgia,serif; font-size:16px; }
+  .panel .gold { color:var(--gold); font-weight:700; }
+  .legend { display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:26px; font-size:11px; color:var(--muted); }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .legend i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .notes { max-width:1180px; margin:44px auto 0; border-top:1px solid var(--hairline); padding-top:18px; font-size:13.5px; color:var(--muted); line-height:1.7; }
+  .notes b { color:var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration:.01ms !important; animation-delay:0ms !important; }
+    .node, .col .note { opacity:1; }
+    .rail::after { display:none; }
+  }
+  @media (max-width: 860px) {
+    .rail { display:none; }
+    .hang { grid-template-columns:repeat(3,1fr); gap:12px; }
+    .stub { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="21" y2="21"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="3,17 9,11 13,14 21,6"/><polyline points="15,6 21,6 21,12"/></symbol>
+    <symbol id="i-plan" viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><polyline points="4,6 5,7 7,4"/><polyline points="4,12 5,13 7,10"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20 L6 14 L16 4 L20 8 L10 18 Z"/><line x1="14" y1="6" x2="18" y2="10"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polygon points="12,7 15,15 12,13 9,15"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z"/><polyline points="9,12 11,14 15,9"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><polyline points="9,6 4,12 9,18"/><polyline points="15,6 20,12 15,18"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 3 V9 L4 19 C3.5 20 4 21 5 21 H19 C20 21 20.5 20 20 19 L14 9 V3"/><line x1="8" y1="3" x2="16" y2="3"/><line x1="7" y1="15" x2="17" y2="15"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12 C5 6 19 6 22 12 C19 18 5 18 2 12 Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 3 C15 5 16 9 15 13 L9 13 C8 9 9 5 12 3 Z"/><path d="M9 13 L6 17 M15 13 L18 17"/><line x1="12" y1="13" x2="12" y2="19"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M4 4 H12 L20 12 L12 20 L4 12 Z"/><circle cx="9" cy="9" r="1.5"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 18 A9 9 0 1 1 20 18"/><line x1="12" y1="15" x2="16" y2="9"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6 V18 C5 19.7 8 21 12 21 C16 21 19 19.7 19 18 V6"/><path d="M5 12 C5 13.7 8 15 12 15 C16 15 19 13.7 19 12"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M4 18 L4 9 L9 13 L12 6 L15 13 L20 9 L20 18 Z"/></symbol>
+    <symbol id="i-hub" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="4" r="1.6"/><circle cx="20" cy="12" r="1.6"/><circle cx="12" cy="20" r="1.6"/><circle cx="4" cy="12" r="1.6"/><line x1="12" y1="7" x2="12" y2="9"/><line x1="15" y1="12" x2="18" y2="12"/><line x1="12" y1="15" x2="12" y2="18"/><line x1="6" y1="12" x2="9" y2="12"/></symbol>
+  </defs>
+</svg>
+
+<div class="bar">
+  <h1>Revised: Harness wording options &amp; jazzed hierarchy</h1>
+  <button id="t">◐ Toggle theme</button>
+</div>
+
+<!-- ============ PROPOSAL 1 ============ -->
+<div class="org" style="margin-bottom:18px;">
+  <div class="lvl-label">Proposal 1 — homepage harness strip (layout approved · pick a caption below)</div>
+  <div class="homeprev">
+    <h2 class="hp-h1">Conclave is a team of AI agents that builds AI applications — and a <span class="hp-gold">human</span> approves every step.</h2>
+    <p class="hp-p">AI-built software you can defend. Vibe-coding tools race to a demo; Conclave delivers to production through nine human-approved gates, with every decision on the record.</p>
+    <p class="hp-p">And we bring the platform to you: forward-deployed engineers run the pipeline inside your environment, end to end — the audit trail ships with the application.</p>
+    <div class="hp-row"><span class="hp-cta">Build one with us</span><span class="hp-fwd">How does it actually work? Watch one get built →</span></div>
+    <div class="harness">
+      <div class="harness-head">
+        <span class="harness-title">The Harness</span>
+        <span class="harness-sub" id="capline">industry best practices, wired into nine gates — end-to-end automation with you in command</span>
+      </div>
+      <div class="hrail">
+        <span class="hgate"><i class="tick">✓</i><b>01</b>Intake</span>
+        <span class="hgate"><i class="tick">✓</i><b>02</b>Team</span>
+        <span class="hgate"><i class="tick">✓</i><b>03</b>Plan</span>
+        <span class="hgate"><i class="tick">✓</i><b>04</b>Design</span>
+        <span class="hgate"><i class="tick">✓</i><b>05</b>Arch</span>
+        <span class="hgate"><i class="tick">✓</i><b>06</b>Code</span>
+        <span class="hgate rework"><i class="tick">↩</i><b>07</b>Test</span>
+        <span class="hgate"><i class="tick">✓</i><b>08</b>Review</span>
+        <span class="hgate"><i class="tick">✓</i><b>09</b>Deploy</span>
+      </div>
+      <div class="harness-note">Each tick is a human decision — gold approved, rust sent back. Every gate links to its replay step.</div>
+    </div>
+  </div>
+  <div class="caption-opts">
+    <b>Caption options (click to preview in place):</b><br>
+    <label><input type="radio" name="cap" value="industry best practices, wired into nine gates — end-to-end automation with you in command" checked> <b>A.</b> "industry best practices, wired into nine gates — end-to-end automation with you in command"</label><br>
+    <label><input type="radio" name="cap" value="our industry best practices automate the process end to end — nine gates, every one yours to approve"> <b>B.</b> "our industry best practices automate the process end to end — nine gates, every one yours to approve"</label><br>
+    <label><input type="radio" name="cap" value="nine gates, industry best practices built in — it automates everything between your decisions"> <b>C.</b> "nine gates, industry best practices built in — it automates everything between your decisions"</label>
+  </div>
+</div>
+
+<!-- ============ PROPOSAL 2 (JAZZED) ============ -->
+<div class="org" style="margin-top:56px;">
+  <div class="lvl-label" style="margin-bottom:18px;">Proposal 2 — /who hierarchy, jazzed: per-team colors, drawn icons, staged entrance</div>
+
+  <div class="you-wrap">
+    <div class="lvl-label">The final say</div>
+    <div class="node you" style="--ac:var(--gold)"><span class="ic"><svg><use href="#i-crown"/></svg></span><div class="nm">You</div><div class="sub">approve · send back · stop</div></div>
+    <div class="drop"></div>
+  </div>
+  <div class="orc-wrap">
+    <div class="node orc"><span class="ic"><svg><use href="#i-hub"/></svg></span><div class="nm">orchestrator</div><div class="sub">runs the process · convenes the roster</div></div>
+    <div class="drop teal"></div>
+  </div>
+
+  <div class="rail">
+    <div class="gate"><b>01</b>Intake</div><div class="gate"><b>02</b>Team</div><div class="gate"><b>03</b>Plan</div>
+    <div class="gate"><b>04</b>Design</div><div class="gate"><b>05</b>Arch</div><div class="gate"><b>06</b>Code</div>
+    <div class="gate"><b>07</b>Test</div><div class="gate"><b>08</b>Review</div><div class="gate"><b>09</b>Deploy</div>
+  </div>
+  <div class="hang">
+    <div class="col" style="--ac:var(--c-research)">
+      <span class="stub" style="animation-delay:1.3s"></span>
+      <div class="node" style="animation-delay:1.35s"><span class="ic"><svg><use href="#i-search"/></svg></span><div class="nm">functional-agent</div><div class="sub">domain research</div></div>
+      <div class="node" style="--ac:var(--c-research); animation-delay:1.45s"><span class="ic"><svg><use href="#i-trend"/></svg></span><div class="nm">industry-expert</div><div class="sub">market research</div></div>
+    </div>
+    <div class="col"><div class="note">you and the orchestrator pick the roster here</div></div>
+    <div class="col" style="--ac:var(--c-build)">
+      <span class="stub" style="animation-delay:1.4s"></span>
+      <div class="node" style="animation-delay:1.5s"><span class="ic"><svg><use href="#i-plan"/></svg></span><div class="nm">plan-agent</div><div class="sub">backlog &amp; MVP</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-design)">
+      <span class="stub" style="animation-delay:1.45s"></span>
+      <div class="node" style="animation-delay:1.55s"><span class="ic"><svg><use href="#i-pen"/></svg></span><div class="nm">ui-ux-designer</div><div class="sub">experience</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-arch)">
+      <span class="stub" style="animation-delay:1.5s"></span>
+      <div class="node" style="animation-delay:1.6s"><span class="ic"><svg><use href="#i-compass"/></svg></span><div class="nm">solution-architect</div><div class="sub">technical design</div></div>
+      <div class="node" style="--ac:var(--c-arch); animation-delay:1.7s"><span class="ic"><svg><use href="#i-shield"/></svg></span><div class="nm">security-architect</div><div class="sub">auth &amp; secrets</div></div>
+      <div class="node" style="--ac:var(--c-arch); animation-delay:1.8s"><span class="ic"><svg><use href="#i-spark"/></svg></span><div class="nm">responsible-ai-architect</div><div class="sub">AI guardrails</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-build)">
+      <span class="stub" style="animation-delay:1.55s"></span>
+      <div class="node" style="animation-delay:1.65s"><span class="ic"><svg><use href="#i-code"/></svg></span><div class="nm">code-agent</div><div class="sub">implementation</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-quality)">
+      <span class="stub" style="animation-delay:1.6s"></span>
+      <div class="node" style="animation-delay:1.7s"><span class="ic"><svg><use href="#i-flask"/></svg></span><div class="nm">test-agent</div><div class="sub">every suite</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-quality)">
+      <span class="stub" style="animation-delay:1.65s"></span>
+      <div class="node" style="animation-delay:1.75s"><span class="ic"><svg><use href="#i-eye"/></svg></span><div class="nm">review-agent</div><div class="sub">intent &amp; hygiene</div></div>
+    </div>
+    <div class="col" style="--ac:var(--c-ship)">
+      <span class="stub" style="animation-delay:1.7s"></span>
+      <div class="node" style="animation-delay:1.8s"><span class="ic"><svg><use href="#i-rocket"/></svg></span><div class="nm">deploy-agent</div><div class="sub">release &amp; smoke</div></div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="lvl-label">Cross-cutting · convened when needed</div>
+    <div class="band-row">
+      <div class="node" style="animation-delay:2.0s"><span class="ic"><svg><use href="#i-plus"/></svg></span><div class="nm">enhance-agent</div><div class="sub">enhancements</div></div>
+      <div class="node" style="animation-delay:2.08s"><span class="ic"><svg><use href="#i-tag"/></svg></span><div class="nm">release-manager</div><div class="sub">releases</div></div>
+      <div class="node" style="animation-delay:2.16s"><span class="ic"><svg><use href="#i-gauge"/></svg></span><div class="nm">usage-monitor</div><div class="sub">cost &amp; budgets</div></div>
+      <div class="node" style="animation-delay:2.24s"><span class="ic"><svg><use href="#i-doc"/></svg></span><div class="nm">deliverables-agent</div><div class="sub">documents</div></div>
+      <div class="node" style="animation-delay:2.32s"><span class="ic"><svg><use href="#i-db"/></svg></span><div class="nm">synthetic-data-agent</div><div class="sub">test data</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--c-research)"></i> research</span>
+    <span><i style="background:var(--c-build)"></i> plan &amp; build</span>
+    <span><i style="background:var(--c-design)"></i> design</span>
+    <span><i style="background:var(--c-arch)"></i> architecture</span>
+    <span><i style="background:var(--c-quality)"></i> quality</span>
+    <span><i style="background:var(--c-ship)"></i> ship</span>
+    <span><i style="background:var(--c-cross)"></i> cross-cutting</span>
+  </div>
+
+  <div class="panel">
+    <b>solution-architect</b> — owns gate <span class="gold">05 · Architecture</span>. Designs the technical shape of the application: components, data flow, trade-offs. Produces the architecture record you approve before any code is written. <span class="gold">See its moment in the replay →</span>
+    <div style="font-size:11.5px; color:var(--muted); margin-top:8px;">(Detail panel — fills when any node is selected; keyboard included, as today.)</div>
+  </div>
+</div>
+
+<div class="notes">
+  <b>What's new in this revision:</b> every agent now has a drawn line-art icon in a tinted disc and belongs to a color family (legend above) — research cobalt, design plum, architecture violet, quality amber, ship green — so the teams read at a glance instead of a wall of same-teal pills. Entrance is fully staged: You pops in, the line grows down to the orchestrator, the rail draws left-to-right, then each column's stub grows and its agents pop in with a slight bounce, cascading left to right; cross-cutting agents arrive last. Hover any node: it lifts with a colored glow and its icon tilts. One deliberate exception to the "nothing loops" rule, for your sign-off: a slow gold shimmer sweeps the rail every 6 seconds to keep the diagram feeling alive — say the word and it's removed. All motion is static under reduced-motion. <b>Reload the page to replay the entrance.</b>
+</div>
+
+<script>
+  document.getElementById('t').addEventListener('click', function () {
+    var r = document.documentElement;
+    r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+  document.querySelectorAll('input[name="cap"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      document.getElementById('capline').textContent = radio.value;
+    });
+  });
+</script>
+</body>
+</html>

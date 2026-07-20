@@ -68,3 +68,50 @@ Sources:
 - [Baker Botts: EU AI Act for energy executives](https://www.bakerbotts.com/thought-leadership/publications/2026/march/the-eu-ai-act), [AI x Energy: governance architecture](https://www.aixenergy.io/utilities-need-an-ai-governance-architecture-not-another-framework/)
 - [FTC Operation AI Comply announcement](https://www.ftc.gov/news-events/news/press-releases/2024/09/ftc-announces-crackdown-deceptive-ai-claims-schemes), [Benesch: one year of Operation AI Comply](https://www.beneschlaw.com/insight/one-year-in-ftcs-operation-ai-comply-continues-under-new-administration-signaling-enduring-enforcement-focus/)
 - [RFP.wiki energy/utilities software](https://www.rfp.wiki/specialty-industries/energy-utilities-software), [Energy Central utility RFP checklist](https://www.energycentral.com/intelligent-utility/post/your-utility-program-software-vendor-rfp-checklist-snmmn2l2rBTGbCJ), [TechTarget software RFP guide](https://www.techtarget.com/searchcio/tip/How-to-write-an-RFP-for-a-software-purchase-with-template)
+
+---
+
+## 2026-07-20 — Market positioning research (industry-agnostic repositioning + FDE model)
+
+Supersedes the energy-sector buyer research above for positioning purposes.
+Full deliverable returned to orchestrator; decision-ready summary:
+
+**White space:** no player occupies (multi-agent build system) × (human-gated
+governance with audit evidence) × (FDE delivery in customer environment).
+- Cluster A vibe-coding (Lovable ~$200M ARR, Bolt, Replit Agent, v0, Cursor):
+  win on speed-to-demo; fail enterprise security review; documented incidents.
+- Cluster B agentic delivery (Cognition/Devin, Factory, GitHub Agent HQ):
+  task autonomy inside existing eng orgs; governance bolt-on via SIs
+  (Cognizant/Infosys partnerships prove the platform alone doesn't close).
+- Cluster C FDE-led (Palantir +85% YoY, OpenAI Deployment Company $4B+,
+  Distyl $1.8B, SIs): outcome ownership, but no governed build pipeline as
+  the shipped artifact; FDE job postings +729% YoY.
+
+**Recommended primary positioning:** "Conclave is governed AI software
+delivery: forward-deployed engineers run a multi-agent build pipeline inside
+your environment, a human approves every gate, and the audit trail ships
+with the application." Short form: "AI-built software you can defend."
+Pillars: (1) human-in-command by design; (2) the audit trail is a
+deliverable; (3) forward-deployed, outcome-owned delivery.
+
+**Claims evidence tiers (for CITATIONS.md if used on site):**
+- STRONG (website-grade): Veracode 2025/2026 (45% of AI-generated code has
+  OWASP Top-10 vulns); GitClear 2025/2026 (8x duplication, −70% refactoring,
+  +47% error-masking); Replit prod-DB deletion incident (Jul 2025, since
+  safeguarded); CVE-2025-48757 (Lovable RLS, ~170 apps exposed); MIT NANDA
+  2025 (95% of GenAI pilots no P&L impact; external partners ~2x internal);
+  EU AI Act Art. 12–14 logging/oversight, penalties from Aug 2026.
+- MEDIUM (attribute explicitly, not headlines): CodeRabbit 1.7x issues;
+  Escape.tech scan; Gartner 40%-of-apps-agents-by-2026.
+- WEAK (never use): Creatr rebuild-cost stat; unverified CVE-count and
+  adoption/trust aggregator numbers; MindStudio "640% returns".
+
+**Hedge rules for FDE copy:** no named-customer implication; always pair
+"FDE" with the governed pipeline (never bare "we provide FDEs"); no scale
+claims (boutique/high-touch); competitor-failure claims must cite dated
+incidents/CVEs or be omitted; preempt "nine gates = slow" with
+time-to-trusted-production framing; keep WEAK-tier stats out entirely.
+
+**GTM signal:** fixed-price gated pilot (one application through all 9
+gates, audit trail as deliverable) → portfolio retainer; bootcamp-style
+wedge motion validated by Palantir AIP Bootcamps (1,300+).

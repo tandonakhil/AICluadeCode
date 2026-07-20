@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show Your Work — Merged Concept Mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --gold:#8A5A17;
+    --cream:#FBF3E4; --rust:#A8432F; --hairline:#D8D4CA; --muted:#5C5A54;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --gold:#E0A94E;
+    --cream:#242019; --rust:#E07A5F; --hairline:#3A3733; --muted:#A5A099;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#26282c; font-family: system-ui, -apple-system, sans-serif; }
+
+  .chrome { position:sticky; top:0; z-index:20; background:#101114; border-bottom:1px solid #33363c; padding:12px 22px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; margin-right:10px; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; }
+  .chrome button.active { background:#fff; color:#111; border-color:#fff; font-weight:600; }
+  .chrome .theme { margin-left:auto; }
+
+  .site { background:var(--paper); color:var(--ink); min-height:92vh; display:flex; flex-direction:column; }
+  .page { display:none; flex:1; flex-direction:column; }
+  .page.show { display:flex; }
+
+  .nav { display:flex; justify-content:space-between; align-items:baseline; padding:24px 48px; }
+  .wordmark { font-weight:700; font-size:16px; letter-spacing:.02em; }
+  .nav .qs { display:flex; gap:20px; font-size:13px; flex-wrap:wrap; }
+  .nav .qs a { color:var(--teal); text-decoration:none; cursor:pointer; }
+  .nav .qs a.here { color:var(--ink); font-weight:600; border-bottom:2px solid var(--gold); }
+
+  .col { width:100%; max-width:820px; margin:0 auto; padding:0 32px; }
+  h1.q { font-family: Georgia, 'Iowan Old Style', serif; font-weight:500; letter-spacing:-.01em; line-height:1.14; }
+  .answer { font-size:17px; line-height:1.65; color:var(--muted); }
+
+  .cta { display:inline-block; background:var(--teal); color:#FBF3E4; padding:13px 26px; border-radius:5px; font-size:15px; font-weight:600; text-decoration:none; cursor:pointer; }
+  [data-theme="dark"] .cta { color:#0e2a26; }
+  .fwd { color:var(--teal); font-size:15px; text-decoration:none; border-bottom:1px solid var(--teal); padding-bottom:2px; cursor:pointer; }
+
+  .foot { border-top:1px solid var(--hairline); margin-top:auto; padding:16px 48px; display:flex; gap:20px; font-size:12.5px; color:var(--muted); flex-wrap:wrap; }
+  .foot a { color:var(--teal); text-decoration:none; cursor:pointer; }
+
+  /* Home */
+  .home-center { flex:1; display:flex; flex-direction:column; justify-content:center; max-width:880px; margin:0 auto; padding:40px 48px 70px; }
+  .home-center h1 { font-size:clamp(32px,4.4vw,56px); font-family:Georgia,serif; font-weight:500; line-height:1.14; }
+  .goldline { border-bottom:4px solid var(--gold); }
+  .home-center .answer { margin-top:24px; max-width:62ch; }
+  .home-row { margin-top:36px; display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
+
+  /* Inner pages */
+  .inner { padding:36px 0 60px; }
+  .inner h1.q { font-size:clamp(26px,3.2vw,40px); margin-bottom:18px; }
+  .inner .answer.lead { font-size:18px; color:var(--ink); margin-bottom:10px; }
+  .inner .answer { margin-bottom:26px; }
+  .rule { border-top:1px solid var(--hairline); margin:30px 0; }
+  .next-row { margin-top:34px; }
+
+  /* Replay player */
+  .player { border:1px solid var(--hairline); border-radius:12px; background:color-mix(in srgb, var(--paper) 60%, var(--cream) 40%); padding:24px 28px; }
+  .rail { display:flex; gap:6px; margin-bottom:18px; }
+  .rail i { flex:1; height:6px; border-radius:3px; background:var(--hairline); }
+  .rail i.done { background:var(--teal); }
+  .rail i.rework { background:var(--rust); }
+  .phead { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); letter-spacing:.08em; margin-bottom:14px; }
+  .chips { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .chip { border:1px solid var(--teal); color:var(--teal); font-size:12px; padding:4px 12px; border-radius:999px; font-weight:600; cursor:pointer; }
+  .artifact { background:var(--cream); border:1px solid var(--hairline); border-radius:8px; padding:16px 18px; font-family:Georgia,serif; font-size:14px; line-height:1.6; }
+  .artifact em { color:var(--muted); }
+  details.exp { margin-top:10px; }
+  details.exp summary { font-size:13px; color:var(--teal); cursor:pointer; }
+  details.exp p { margin-top:8px; font-size:13px; line-height:1.6; color:var(--muted); }
+  .sealrow { margin-top:16px; display:flex; align-items:center; gap:12px; }
+  .seal { width:56px; height:56px; border-radius:50%; border:2.5px solid var(--gold); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; transform:rotate(-8deg); }
+  .seal.rust { border-color:var(--rust); color:var(--rust); }
+  .sealrow span { font-size:13.5px; color:var(--muted); }
+  .pctl { display:flex; gap:10px; margin-top:20px; }
+  .pctl button { font:inherit; font-size:13.5px; padding:8px 18px; border-radius:6px; border:1px solid var(--teal); background:transparent; color:var(--teal); cursor:pointer; font-weight:600; }
+  .pctl button.primary { background:var(--teal); color:#FBF3E4; }
+  [data-theme="dark"] .pctl button.primary { color:#0e2a26; }
+
+  /* Roster cards */
+  .cards { display:flex; flex-direction:column; gap:0; }
+  .card { border-top:1px solid var(--hairline); padding:18px 0; }
+  .card:last-child { border-bottom:1px solid var(--hairline); }
+  .card .role { font-family:Georgia,serif; font-size:19px; margin-bottom:5px; }
+  .card p { font-size:14px; line-height:1.6; color:var(--muted); }
+  .card .see { font-size:13px; color:var(--teal); cursor:pointer; }
+
+  /* Evidence */
+  .ev-seal { display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--gold); font-weight:700; margin-top:8px; }
+  .mini-seal { width:22px; height:22px; border-radius:50%; border:2px solid var(--gold); display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
+
+  .notes { background:#101114; border-top:1px solid #33363c; padding:26px 32px 38px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; }
+  .notes h3 { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#8b8f98; margin-bottom:8px; }
+  .notes p { font-size:13.5px; line-height:1.55; color:#c8cbd2; }
+
+  /* ================= MOTION LAYER ================= */
+  /* Page entrance */
+  .page.show { animation: pageIn .5s cubic-bezier(.22,.9,.3,1) both; }
+  @keyframes pageIn { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform:none; } }
+
+  /* Headline word-by-word settle (home) */
+  .home-center h1 .w { display:inline-block; opacity:0; transform: translateY(.5em); animation: wordIn .55s cubic-bezier(.22,.9,.3,1) forwards; }
+  @keyframes wordIn { to { opacity:1; transform:none; } }
+  /* Gold underline draws in after the words */
+  .goldline { border-bottom:none; background-image: linear-gradient(var(--gold), var(--gold)); background-repeat:no-repeat; background-position:0 96%; background-size:0% 4px; animation: lineDraw .6s ease-out 1.6s forwards; }
+  @keyframes lineDraw { to { background-size:100% 4px; } }
+  .home-center h1 .w.goldline { animation: wordIn .55s cubic-bezier(.22,.9,.3,1) forwards, lineDraw .7s ease-out forwards; }
+  .home-center .answer, .home-center .home-row { opacity:0; animation: riseIn .6s ease-out forwards; }
+  .home-center .answer { animation-delay: 1.1s; }
+  .home-center .home-row { animation-delay: 1.45s; }
+  @keyframes riseIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform:none; } }
+
+  /* Grow-underline on nav + forward links */
+  .nav .qs a, .fwd, .foot a, .card .see { background-image: linear-gradient(currentColor, currentColor); background-repeat:no-repeat; background-position:0 100%; background-size:0% 1.5px; transition: background-size .28s ease; }
+  .fwd { border-bottom:none; padding-bottom:2px; }
+  .nav .qs a:hover, .fwd:hover, .foot a:hover, .card .see:hover { background-size:100% 1.5px; }
+  .nav .qs a.here { background:none; }
+
+  /* CTA lift */
+  .cta { transition: transform .22s ease, box-shadow .22s ease; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(11,107,96,.28); }
+
+  /* Replay staging: chips pop, artifact slides, seal stamps */
+  .player.staging .chip { opacity:0; transform: scale(.85); animation: chipIn .35s cubic-bezier(.22,.9,.3,1) forwards; }
+  .player.staging .chip:nth-child(2) { animation-delay:.12s; }
+  .player.staging .chip:nth-child(3) { animation-delay:.24s; }
+  @keyframes chipIn { to { opacity:1; transform:none; } }
+  .player.staging .artifact { opacity:0; transform: translateX(26px); animation: artIn .5s cubic-bezier(.22,.9,.3,1) .18s forwards; }
+  @keyframes artIn { to { opacity:1; transform:none; } }
+  .player.staging .seal { opacity:0; animation: stamp .5s cubic-bezier(.34,1.4,.5,1) .75s forwards; }
+  @keyframes stamp {
+    0%   { opacity:0; transform: rotate(-8deg) scale(1.9); }
+    60%  { opacity:1; transform: rotate(-8deg) scale(.94); }
+    100% { opacity:1; transform: rotate(-8deg) scale(1); }
+  }
+  .player.staging .sealrow span { opacity:0; animation: riseIn .4s ease-out 1.05s forwards; }
+  .rail i { transition: background-color .45s ease .2s; }
+
+  /* Card cascade on inner pages */
+  .page.show .card { opacity:0; animation: riseIn .5s ease-out forwards; }
+  .page.show .card:nth-child(1) { animation-delay:.15s; }
+  .page.show .card:nth-child(2) { animation-delay:.27s; }
+  .page.show .card:nth-child(3) { animation-delay:.39s; }
+  .page.show .card:nth-child(4) { animation-delay:.51s; }
+  .page.show .card:nth-child(5) { animation-delay:.63s; }
+
+  /* Evidence seal tick draw on /why */
+  .page.show .mini-seal { opacity:0; animation: stamp .45s cubic-bezier(.34,1.4,.5,1) .8s forwards; transform-origin:center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; animation-delay:0ms !important; transition-duration:.01ms !important; }
+    .home-center h1 .w, .home-center .answer, .home-center .home-row,
+    .player.staging .chip, .player.staging .artifact, .player.staging .seal,
+    .player.staging .sealrow span, .page.show .card, .page.show .mini-seal { opacity:1; transform:none; }
+    .goldline { background-size:100% 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <span class="t">"Show Your Work" — merged concept (1 + 5)</span>
+  <button class="active" data-p="p-home">/ What is it</button>
+  <button data-p="p-how">/how — the replay</button>
+  <button data-p="p-who">/who</button>
+  <button data-p="p-what">/what</button>
+  <button data-p="p-why">/why</button>
+  <button class="theme" id="themeBtn">◐ Dark</button>
+</div>
+
+<div class="site">
+
+  <!-- ============ HOME ============ -->
+  <div class="page show" id="p-home">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="qs">
+        <a class="here">What is it</a><a data-go="p-how">How it works</a><a data-go="p-who">Who does it</a><a data-go="p-what">What it builds</a><a data-go="p-why">Why trust it</a>
+      </div>
+    </div>
+    <div class="home-center">
+      <h1>Conclave is a team of AI agents that builds AI applications — and a <span class="goldline">human</span> approves every step.</h1>
+      <p class="answer">Specialist agents — an architect, a security reviewer, a designer, a tester — work under one orchestrator, moving each project through nine gates from idea to release. At every gate, a person reviews the work and decides whether it goes forward. Support chatbots, automated workflows, knowledge assistants: built in the open, on the record.</p>
+      <div class="home-row">
+        <a class="cta">Build one with us</a>
+        <a class="fwd" data-go="p-how">How does it actually work? Watch one get built →</a>
+      </div>
+    </div>
+    <div class="foot">
+      <a>What is it</a><a data-go="p-how">How it works</a><a data-go="p-who">Who does it</a><a data-go="p-what">What it builds</a><a data-go="p-why">Why trust it</a><a>Contact</a>
+      <span style="margin-left:auto">The homepage is one viewport tall. There is no below-the-fold.</span>
+    </div>
+  </div>
+
+  <!-- ============ /HOW — THE REPLAY ============ -->
+  <div class="page" id="p-how">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="qs"><a data-go="p-home">What is it</a><a class="here">How it works</a><a data-go="p-who">Who does it</a><a data-go="p-what">What it builds</a><a data-go="p-why">Why trust it</a></div>
+    </div>
+    <div class="col inner">
+      <h1 class="q">How does it work?</h1>
+      <p class="answer lead">Like this. A company needs its customers to get accurate answers at 2 a.m. — here is Conclave building that support chatbot, gate by gate, exactly as it happened.</p>
+      <p class="answer">Nine gates. Real artifacts. One honest rejection along the way. Use Next and Back — nothing autoplays.</p>
+
+      <div class="player" id="player">
+        <div class="rail" id="rail"></div>
+        <div class="phead"><span id="stepLabel">STEP 1 OF 9 — INTAKE</span><span id="stepAgentLabel"></span></div>
+        <div class="chips" id="stepChips"></div>
+        <div class="artifact" id="stepArtifact"></div>
+        <details class="exp"><summary>Read the full artifact</summary><p id="stepDetail"></p></details>
+        <div class="sealrow"><div class="seal" id="stepSeal">Approved</div><span id="stepSealText"></span></div>
+        <div class="pctl">
+          <button id="backBtn">← Back</button>
+          <button class="primary" id="nextBtn">Next →</button>
+        </div>
+      </div>
+
+      <div class="next-row"><a class="fwd" data-go="p-who">Who was that doing the work? →</a></div>
+    </div>
+    <div class="foot"><a class="cta" style="padding:9px 18px; font-size:13px;">Build one with us</a><span>The final replay step ends at this same door.</span></div>
+  </div>
+
+  <!-- ============ /WHO ============ -->
+  <div class="page" id="p-who">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="qs"><a data-go="p-home">What is it</a><a data-go="p-how">How it works</a><a class="here">Who does it</a><a data-go="p-what">What it builds</a><a data-go="p-why">Why trust it</a></div>
+    </div>
+    <div class="col inner">
+      <h1 class="q">Who does the work?</h1>
+      <p class="answer lead">A roster of specialist agents, each with one job and one gate — convened per project under a single orchestrator, with you above them all.</p>
+      <div class="cards">
+        <div class="card"><div class="role">The architect</div><p>Designs the technical shape of the application — components, data flow, trade-offs — and owns the architecture gate.</p><a class="see" data-go="p-how">See this agent's moment in the build →</a></div>
+        <div class="card"><div class="role">The security reviewer</div><p>Decides how the application authenticates, what it may never leak, and owns the security tests.</p><a class="see" data-go="p-how">See this agent's moment in the build →</a></div>
+        <div class="card"><div class="role">The designer</div><p>Owns the experience gate: how the application looks, flows, and treats the person using it.</p><a class="see" data-go="p-how">See this agent's moment in the build →</a></div>
+        <div class="card"><div class="role">The tester</div><p>Runs every suite at the test gate and refuses to summarize a failure as a pass.</p><a class="see" data-go="p-how">See this agent's moment in the build →</a></div>
+        <div class="card"><div class="role">The orchestrator</div><p>Runs the process, convenes the roster, and brings every decision to the only voice that outranks it: yours.</p><a class="see" data-go="p-how">See the whole build →</a></div>
+      </div>
+      <div class="next-row"><a class="fwd" data-go="p-what">What could it build for you? →</a></div>
+    </div>
+    <div class="foot"><a>Build one with us</a></div>
+  </div>
+
+  <!-- ============ /WHAT ============ -->
+  <div class="page" id="p-what">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="qs"><a data-go="p-home">What is it</a><a data-go="p-how">How it works</a><a data-go="p-who">Who does it</a><a class="here">What it builds</a><a data-go="p-why">Why trust it</a></div>
+    </div>
+    <div class="col inner">
+      <h1 class="q">What can it build?</h1>
+      <p class="answer lead">Three kinds of application, each delivered through the same nine gates.</p>
+      <div class="cards">
+        <div class="card"><div class="role">Support chatbots</div><p>Your customers ask in plain language; the chatbot answers only what it actually knows. You approve its tone, its limits, and its launch.</p></div>
+        <div class="card"><div class="role">Automated workflows</div><p>Multi-step processes run by agents — with the judgment calls routed to a person, by design, not as an afterthought.</p></div>
+        <div class="card"><div class="role">Knowledge assistants</div><p>Your documents, searchable by meaning, every answer citing its source. You approve what goes in and what stays out.</p></div>
+      </div>
+      <div class="next-row"><a class="fwd" data-go="p-why">Why should you trust it? →</a></div>
+    </div>
+    <div class="foot"><a>Build one with us</a></div>
+  </div>
+
+  <!-- ============ /WHY ============ -->
+  <div class="page" id="p-why">
+    <div class="nav">
+      <div class="wordmark">Conclave</div>
+      <div class="qs"><a data-go="p-home">What is it</a><a data-go="p-how">How it works</a><a data-go="p-who">Who does it</a><a data-go="p-what">What it builds</a><a class="here">Why trust it</a></div>
+    </div>
+    <div class="col inner">
+      <h1 class="q">Why trust it?</h1>
+      <p class="answer lead">Because every claim on this site has a record behind it — including the failures.</p>
+      <div class="artifact">"Gate 7 — Test: 2 defects found. Content-enforcement test missing; one unhedged statistic. Sent back." <em>— decision log, this website's own build</em></div>
+      <div class="ev-seal"><span class="mini-seal">✓</span> This site was built by Conclave itself, through the same nine gates.</div>
+      <div class="rule"></div>
+      <p class="answer">30% of generative-AI projects are abandoned after proof of concept (Gartner, 2024). Over 40% of agentic-AI projects are projected to be canceled by 2027 (Gartner, 2025). The gates exist because of numbers like these.</p>
+      <details class="exp"><summary>Show the claims-to-source table</summary><p>Every statistic and claim on this site, mapped to its verifiable source — rendered here in full on the real page.</p></details>
+      <div class="rule"></div>
+      <div class="home-row"><a class="cta">Build one with us</a><span class="answer" style="margin:0">hello@conclave.example · we reply within two business days</span></div>
+    </div>
+    <div class="foot"><span>Terminal page — the chain ends at the door.</span></div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <div><h3>The merge</h3><p>Concept 1's question chain is the spine — five pages, each answering its title in the first sentence. Concept 5's replay is the entire body of "/how": the pipeline is never described abstractly, only shown building a customer-support chatbot.</p></div>
+  <div><h3>Three depths</h3><p>Depth 0: read five sentences, understand everything. Depth 1: the replay stepper. Depth 2: closed-by-default expanders (full artifacts, roster detail, claims-to-source). The simple surface never shows them until asked.</p></div>
+  <div><h3>Palette — "Paper &amp; Seal"</h3><p>Paper #F7F5F0 · Ink #1D1C1A · Deep Teal #0B6B60 (links, action) · Human Gold #8A5A17 (every human decision) · Artifact Cream #FBF3E4 · Rework Rust #A8432F (the one rejection). Dark theme included — try the toggle above.</p></div>
+  <div><h3>Signature motion</h3><p>The gold seal: a stamp that scales-and-settles onto the artifact at every human decision — replay steps, verified claims, the headline's gold underline. Reduced-motion renders all seals static.</p></div>
+</div>
+
+<script>
+  // Headline word-by-word entrance
+  (function () {
+    var h1 = document.querySelector('.home-center h1');
+    var nodes = Array.prototype.slice.call(h1.childNodes);
+    h1.innerHTML = '';
+    var delay = 0.15;
+    function addWord(text, cls) {
+      var s = document.createElement('span');
+      s.className = 'w' + (cls ? ' ' + cls : '');
+      s.textContent = text;
+      s.style.animationDelay = delay.toFixed(2) + 's';
+      delay += 0.07;
+      h1.appendChild(s);
+      h1.appendChild(document.createTextNode(' '));
+    }
+    nodes.forEach(function (n) {
+      if (n.nodeType === 3) {
+        n.textContent.trim().split(/\s+/).forEach(function (w) { if (w) addWord(w); });
+      } else if (n.nodeType === 1) {
+        addWord(n.textContent, 'goldline');
+      }
+    });
+  })();
+
+  // Page switching (chrome buttons + in-mock links)
+  var btns = document.querySelectorAll('.chrome button[data-p]');
+  function goPage(id) {
+    document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('show'); });
+    document.getElementById(id).classList.add('show');
+    btns.forEach(function (b) { b.classList.toggle('active', b.dataset.p === id); });
+    window.scrollTo(0, 0);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { goPage(b.dataset.p); }); });
+  document.querySelectorAll('[data-go]').forEach(function (a) {
+    a.addEventListener('click', function () { goPage(a.dataset.go); });
+  });
+
+  // Theme toggle
+  var themeBtn = document.getElementById('themeBtn');
+  themeBtn.addEventListener('click', function () {
+    var root = document.documentElement;
+    var dark = root.dataset.theme === 'dark';
+    root.dataset.theme = dark ? 'light' : 'dark';
+    themeBtn.textContent = dark ? '◐ Dark' : '◑ Light';
+  });
+
+  // Replay stepper — sample steps (full 9 in real build)
+  var STEPS = [
+    { n:1, gate:'INTAKE', agents:['functional-agent','domain-expert'], seal:'Approved', sealClass:'',
+      art:'"The domain is customer support at scale. Peak load: incident events, 40× normal query volume. The chatbot must never speculate about answers it doesn’t have…" — <em>Domain research, excerpt</em>',
+      note:'You approved the domain framing and the honesty constraint.',
+      detail:'Full research memo: audience profile, question taxonomy, escalation rules, the "no speculation" guardrail and its rationale.' },
+    { n:3, gate:'PLAN & BACKLOG', agents:['plan-agent'], seal:'Approved', sealClass:'',
+      art:'"MVP: answer the top 40 known questions with citations; hand off to a person for everything else. Deferred: multilingual, voice." — <em>PLAN.md, excerpt</em>',
+      note:'You approved the MVP as a per-feature checklist — and cut two features.',
+      detail:'The full plan: feature list F1–F9, each with acceptance criteria and its owning gate.' },
+    { n:5, gate:'ARCHITECTURE', agents:['solution-architect','security-architect'], seal:'Approved', sealClass:'',
+      art:'"Retrieval before generation; the model may only answer from retrieved passages. Secrets never reach the prompt." — <em>Architecture record, excerpt</em>',
+      note:'You approved the design after one question about data retention.',
+      detail:'Component diagram, data flow, threat notes, and the retention answer, on the record.' },
+    { n:7, gate:'TEST', agents:['test-agent'], seal:'Sent back', sealClass:'rust',
+      art:'"2 defects: citation missing on fallback answers; one response exceeded the honesty guardrail. FAIL." — <em>Test evidence, verbatim</em>',
+      note:'You sent it back. The rework took one day — and it’s on the record.',
+      detail:'The full test report, the two failing cases, and the rework diff that fixed them.' },
+    { n:9, gate:'DEPLOY', agents:['deploy-agent','test-agent'], seal:'Approved', sealClass:'',
+      art:'"Smoke test: live round-trip passed. Every answer cites its source. Handed to the operator." — <em>Deploy record, excerpt</em>',
+      note:'You approved the release. Nine gates, nine decisions — all yours.',
+      detail:'Deployment record, smoke-test transcript, and the release tag.' }
+  ];
+  var cur = 0;
+  var rail = document.getElementById('rail');
+  var player = document.getElementById('player');
+  function renderStep() {
+    var s = STEPS[cur];
+    player.classList.remove('staging');
+    void player.offsetWidth; // reflow so the staging animations re-fire
+    player.classList.add('staging');
+    rail.innerHTML = '';
+    for (var g = 1; g <= 9; g++) {
+      var i = document.createElement('i');
+      if (g < s.n) i.className = 'done';
+      if (g === s.n) i.className = (s.sealClass === 'rust') ? 'rework' : 'done';
+      rail.appendChild(i);
+    }
+    document.getElementById('stepLabel').textContent = 'STEP ' + s.n + ' OF 9 — ' + s.gate;
+    document.getElementById('stepAgentLabel').textContent = '(sample — ' + (cur + 1) + '/' + STEPS.length + ' shown in mockup)';
+    var chips = document.getElementById('stepChips'); chips.innerHTML = '';
+    s.agents.forEach(function (a) { var c = document.createElement('span'); c.className = 'chip'; c.textContent = a; chips.appendChild(c); });
+    document.getElementById('stepArtifact').innerHTML = s.art;
+    document.getElementById('stepDetail').textContent = s.detail;
+    var seal = document.getElementById('stepSeal');
+    seal.textContent = s.seal; seal.className = 'seal ' + s.sealClass;
+    document.getElementById('stepSealText').textContent = s.note;
+    document.getElementById('backBtn').disabled = (cur === 0);
+    document.getElementById('nextBtn').textContent = (cur === STEPS.length - 1) ? 'Build one with us' : 'Next →';
+  }
+  document.getElementById('nextBtn').addEventListener('click', function () { if (cur < STEPS.length - 1) { cur++; renderStep(); } });
+  document.getElementById('backBtn').addEventListener('click', function () { if (cur > 0) { cur--; renderStep(); } });
+  renderStep();
+</script>
+</body>
+</html>

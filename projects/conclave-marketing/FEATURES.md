@@ -44,3 +44,23 @@ checked; F13 kept deferred). First release target: 0.1.0.
 ## Deferred
 - F13 — Real contact address swap + external-sharing checklist (S) — human-owned;
   blocks any external distribution. `hello@conclave.example` stays visibly flagged.
+
+## Rebuild v2 — Show Your Work (approved 2026-07-20, target 0.2.0)
+- F2.1 Paper & Seal foundation — status: built (beda5d3)
+- F2.2 Signature motion system — status: built (beda5d3)
+- F2.3 Homepage "What is Conclave?" — status: built (beda5d3)
+- F2.4 /how replay engine, 9 gates — status: built (beda5d3)
+- F2.5 /how intuitive pipeline motion — status: built (beda5d3)
+- F2.6 /who hierarchy visualization — status: built (beda5d3)
+- F2.7 /what "What can it build?" — status: built (beda5d3)
+- F2.8 /why "Why trust it?" — status: built (beda5d3)
+- F2.9 Citations manifest v2 + industry-agnostic sweep — status: built (beda5d3)
+- F2.10 Test-suite extension — status: built (beda5d3)
+- F2.11 Legacy route retirement — status: built (beda5d3)
+
+## Post-v2 additions (approved 2026-07-20/21, dev/ commits d90c6c1, 54632ac)
+- Homepage "The Harness" strip (9-gate rail, deep-links to /how) — status: built (d90c6c1)
+- /who hierarchy visual pass: team colors, icons, staged entrance, shimmer — status: built (d90c6c1)
+- Homepage "Speed to demo isn't speed to production" comparison (cited) — status: built (54632ac)
+- /why "We bring the platform to you — in three weeks" FDE rollout section — status: built (54632ac)
+- F2.12 /what rework: three replayable examples (chat/workflow/retrieval) — status: built (8ae09ec)

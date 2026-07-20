@@ -186,3 +186,237 @@ claims manifest):
   routing to Contact.
 - Placeholder address flagged in README and page source; app runs via uvicorn
   on the Architecture-chosen port with documented start command.
+
+---
+
+## Rebuild v2 — Show Your Work (2026-07-19)
+
+**Author**: plan-agent | **Status**: awaiting human approval (per-feature checklist)
+**Supersedes**: the v1 site above (F1–F12, deployed 2026-07-17). Kept for history;
+v2 replaces its pages, palette, motion, and information architecture wholesale.
+
+### Context
+
+The human rejected the v1 site ("very confusing for a visitor, does not tell me
+what it does in one line") and approved a full redesign from the rendered
+mockup `design-review/show-your-work-mockup.html`: **"Show Your Work"** — five
+pages forming a question chain, each page answering its title question in its
+first sentence and ending with the next question as a forward link. Formal
+human decisions bound into this plan:
+
+- **Industry-agnostic** — zero energy/utility framing anywhere; generic
+  examples (customer-support chatbot, automated workflows, knowledge
+  assistants). Any energy-anchored stat or copy from v1 is retired, not ported.
+- **Palette "Paper & Seal"** — light: Paper `#F7F5F0`, Ink `#1D1C1A`, Deep Teal
+  `#0B6B60`, Human Gold `#8A5A17`, Artifact Cream `#FBF3E4`, Rework Rust
+  `#A8432F`; dark: `#161513` / `#EDEAE2` / `#3FC9B9` / `#E0A94E` / `#242019` /
+  `#E07A5F`. Typography: Georgia-stack serif for question headlines + artifact
+  cards; system sans for body/UI.
+- **Signature motion**: gold seal stamp (scale-and-settle) at every human
+  decision; grow-underline links; page-entrance rises; card cascades. Nothing
+  loops or autoplays; everything static under `prefers-reduced-motion`.
+- **Human additions at approval** (explicit features below, not afterthoughts):
+  (a) substantive content depth per page — F2.4/F2.7/F2.8; (b) more intuitive
+  pipeline animation on `/how` — F2.5; (c) `/who` as a connected hierarchy
+  visualization, not word-heavy cards — F2.6.
+
+**The question chain** (routes replace v1's `/`, `/solutions`, `/contact`):
+
+1. `/` — "What is Conclave?" (one viewport, no below-fold)
+2. `/how` — "How does it work?" (the nine-gate build replay)
+3. `/who` — "Who does the work?" (the roster hierarchy)
+4. `/what` — "What can it build?" (three app types)
+5. `/why` — "Why trust it?" (evidence + contact)
+
+**Carry-forward constraints (non-negotiable, from v1 hard rules)**: zero
+external network requests; WCAG AA contrast in both themes; 100% original
+content; every stat mapped in `content/CITATIONS.md` and enforced by
+`tests/test_content.py`; honest claims only (no invented customers); FastAPI +
+Jinja2 + vanilla CSS/JS; extend the existing test-suite pattern; real contact
+address remains deferred and human-owned (F13).
+
+### Target structure (delta from §3)
+
+```
+dev/app/
+  main.py                 # routes /, /how, /who, /what, /why; 404; legacy redirects
+  templates/
+    base.html             # rewritten shell: question-chain nav, theme toggle, footer
+    index.html  how.html  who.html  what.html  why.html  404.html
+  static/
+    css/site.css          # Paper & Seal tokens (light+dark), serif/sans scale
+    css/motion.css        # seal stamp, rises, cascades, underlines, reduced-motion
+    js/replay.js          # /how stepper engine
+    js/roster.js          # /who hierarchy interaction
+    js/site.js            # theme toggle, entrance observers, shared utilities
+    img/                  # inline-able SVG assets (seal, rail, hierarchy)
+content/
+  CITATIONS.md            # rewritten for v2 copy (industry-agnostic)
+  replay/                 # optional: per-gate artifact excerpts as data (see F2.4)
+tests/
+  test_routes.py  test_content.py   # extended for 5 routes + chain invariants
+```
+
+### Feature backlog v2
+
+Sizes: S ≈ under half a session, M ≈ half–one, L ≈ 1+.
+
+- **F2.1 — Paper & Seal foundation** (M): new `base.html` shell, five routes +
+  404 in `main.py`, full light/dark token system, serif/sans typography scale,
+  question-chain top nav, theme toggle, footer.
+  *Accepts when*: all 5 routes serve with correct title/meta/canonical; both
+  themes render from CSS custom properties only; every token pair used for
+  text meets 4.5:1 (body) / 3:1 (large) in both themes; nav marks the active
+  question; zero external requests.
+- **F2.2 — Signature motion system** (M): shared motion layer — gold-seal
+  stamp (scale-and-settle), grow-underline links, page-entrance rise,
+  card cascade, word-by-word headline utility; one reusable CSS/JS vocabulary,
+  not per-page one-offs.
+  *Accepts when*: each primitive exists once and is consumed by pages, not
+  duplicated; nothing loops or autoplays; under `prefers-reduced-motion` every
+  primitive renders its final static state (element present, no transform/
+  opacity animation); links keep visible focus states.
+- **F2.3 — `/` "What is Conclave?"** (S): single-viewport page, no below-fold
+  content at common desktop sizes. Headline exactly: "Conclave is a team of AI
+  agents that builds AI applications — and a human approves every step." with
+  word-by-word entrance and gold underline drawing under "human"; CTA "Build
+  one with us" (→ `/why` contact block); forward link "How does it actually
+  work? Watch one get built →" (→ `/how`).
+  *Accepts when*: headline text matches verbatim and is the page's first
+  sentence; page fits one viewport (no vertical scroll at ≥ 1280×800 and a
+  sane mobile treatment); both links resolve; reduced-motion shows the full
+  headline + underline statically.
+- **F2.4 — `/how` replay engine + nine gates fully written** (L): the
+  centerpiece. Stepper through all NINE gates (Intake, Team Composition,
+  Plan & Backlog, Experience Design, Architecture, Code, Test, Review, Deploy)
+  of a canonical customer-support-chatbot build. Per step: agent chips,
+  artifact card (rendered excerpt in serif on Artifact Cream — a real-shaped
+  artifact: intake brief, backlog checklist, design spec, code diff, test run,
+  review notes, deploy record), human decision as gold seal; **step 7 (Test)
+  is an honest "Sent back" in Rework Rust**, followed by the fix and re-pass.
+  Next/Back buttons, fully keyboard-operable, no autoplay; gate-progress rail
+  shows position. Content is substantive per the human's addition: every gate
+  gets a genuinely distinct, fully written artifact excerpt — no placeholder
+  or near-duplicate steps. All excerpts are original, honest, industry-
+  agnostic ("a canonical build," not a fake customer).
+  *Accepts when*: 9 steps, each with distinct agent chips + distinct written
+  artifact + a decision; step 7 renders the rust "Sent back" path; stepper
+  operable by keyboard alone (buttons focusable, Enter/Space, arrow keys);
+  no timer-driven advancement; the page's first sentence answers "How does it
+  work?"; forward link to `/who` present.
+- **F2.5 — `/how` intuitive pipeline motion** (M): the human's "more intuitive
+  animation" addition, layered on F2.4. Concrete proposal: (1) *hand-off
+  flow* — on step entry, a teal pulse travels a drawn connector from the
+  active agent chip(s) into the artifact card, then the card rises in, then
+  the gold seal stamps: agent → artifact → decision reads as one continuous
+  motion; (2) *advancing rail* — on approval, the rail's current node fills
+  gold and a line visibly draws forward to the next node before the step
+  transitions; (3) *send-back reversal* — at step 7, the rail line draws
+  BACKWARD in rust from Test to Code, then re-advances on the fix; (4)
+  *directional transitions* — Next slides content forward (exit left / enter
+  right), Back reverses, so direction always matches pipeline motion. All
+  sequences are triggered only by user action, never looped, and collapse to
+  static final states under reduced motion.
+  *Accepts when*: the four behaviors above are present and per-interaction
+  (not ambient); total per-step sequence stays under ~1.2s so repeat stepping
+  never feels slow; reduced-motion shows completed rail/connector states with
+  no animation; keyboard-triggered steps get the identical sequence.
+- **F2.6 — `/who` connected hierarchy visualization** (L): replaces card
+  lists entirely. SVG-based diagram: human at top → orchestrator → specialist
+  agents, with gate-ownership connections; connections draw in on entrance
+  (once, no loop). Interactive nodes: hover/focus/click reveals that node's
+  detail (role, gate owned, what it produces) in an adjacent panel — detail
+  lives in the panel, keeping the diagram itself sparse. Every node keyboard-
+  focusable in a logical order with visible focus rings; detail panel is a
+  live region or linked via `aria-expanded`/`aria-controls`. Roster and gate
+  ownership synced from `admin/MAS_REGISTRY.md` at build time (counted, not
+  guessed — v1's "eight vs six" lesson). Responsive: reflows or pans sensibly
+  on mobile rather than shrinking to illegibility.
+  *Accepts when*: hierarchy renders human → orchestrator → agents with
+  visible gate connections; every node operable by mouse AND keyboard with
+  the same revealed detail; no word-heavy card grid anywhere on the page;
+  roster contents match the registry; reduced-motion shows fully drawn
+  connections statically; first sentence answers "Who does the work?";
+  forward link to `/what`.
+- **F2.7 — `/what` "What can it build?"** (M): three app types — support
+  chatbots, automated workflows, knowledge assistants — each with a full
+  treatment (what it is, what a build produces, what the human approves along
+  the way, an honest "what it is not"), not a three-tile teaser. Industry-
+  agnostic examples only. Card-cascade entrance from F2.2.
+  *Accepts when*: three genuinely distinct treatments (no shared boilerplate
+  sentences between types); no capability claim beyond what the templates
+  catalog actually supports; no industry framing; first sentence answers the
+  title; forward link to `/why`.
+- **F2.8 — `/why` "Why trust it?" evidence page** (L): the chain's terminus.
+  Contents: (1) decision-log excerpts rendered as artifact cards (real-shaped,
+  original); (2) test evidence including the failure — the honest "sent back"
+  record; (3) the two Gartner citations with inline source + year (30% GenAI
+  PoC abandonment, 2024; 40%+ agentic canceled by 2027, 2025); (4) the FULL
+  claims-to-source table rendered on-page from the same facts as
+  `content/CITATIONS.md`; (5) "this site was built by Conclave itself" proof
+  block; (6) contact block with the CTA — one mailto action, placeholder
+  address still flagged (F13 unchanged, blocks external sharing).
+  *Accepts when*: all six blocks present; every on-page claim row matches a
+  CITATIONS.md row; the failure evidence is real-shaped and rust-styled; the
+  contact block is the site's conversion endpoint (the `/` CTA lands here);
+  first sentence answers "Why trust it?"; the chain terminates (closing link
+  loops to `/`, "Start again — What is Conclave? →" or equivalent).
+- **F2.9 — Citations manifest v2 + industry-agnostic content sweep** (S):
+  rewrite `content/CITATIONS.md` for v2 copy — keep only the two Gartner rows
+  and Conclave-self-referential rows; retire all energy-anchored rows
+  (Deloitte outlook, EPRI, Itron, NERC) with a "retired 2026-07-19,
+  industry-agnostic pivot" note rather than silent deletion; keep the "claims
+  deliberately NOT made" section. Add an industry-framing banned-term list
+  (utility/utilities, energy, grid, outage, NERC, meter, etc.) to the content
+  rules.
+  *Accepts when*: every stat rendered anywhere in v2 has a manifest row;
+  no retired stat appears in any template; hedged 0/100% phrasing preserved
+  wherever those design guarantees are stated.
+- **F2.10 — Test-suite extension** (M): extend `test_routes.py` +
+  `test_content.py` for v2, same pattern: 5 routes + 404 + legacy redirects;
+  per-page title/meta/canonical; zero external URLs; stat↔CITATIONS sync;
+  banned phrases now including the industry-term list and customer-shaped
+  language; **question-chain invariants** (each page's `<h1>` is its
+  question; each page contains its forward link to the next route; `/` links
+  to `/how`, chain ends at `/why`); structural a11y checks (one `<h1>`,
+  landmarks present, no heading-order skips, stepper/nodes have real button
+  semantics). ui-ux-designer owns the interactive/contrast/reduced-motion
+  audit at the Test gate as before.
+  *Accepts when*: suite passes green on the finished v2 build; deliberately
+  breaking a chain link or reintroducing a banned term fails a test.
+- **F2.11 — Legacy route retirement** (S): `/solutions` → 308 redirect to
+  `/what`, `/contact` → 308 to `/why`; old templates/CSS/JS removed from
+  `app/` (v1 remains in git history and the frozen design seed stays in
+  `design-reference/`); README rewritten for v2 (run command, port 8100,
+  route map, F13 flag).
+  *Accepts when*: both legacy paths redirect (tested); no dead v1 template,
+  style block, or script ships in the served app; README current.
+
+### Suggested build order
+
+1. **F2.1** foundation → 2. **F2.2** motion system (everything else consumes
+these two) → 3. **F2.3** `/` (smallest page; proves foundation + motion end to
+end and gives the human an early visual checkpoint) → 4. **F2.4** replay
+engine + content → 5. **F2.5** pipeline motion (layers on a working replay) →
+6. **F2.6** `/who` hierarchy → 7. **F2.7** `/what` → 8. **F2.8** `/why` →
+9. **F2.9** citations sweep (needs final copy from all pages) → 10. **F2.10**
+test extension → 11. **F2.11** legacy retirement + README. Semver: v2 ships as
+**0.2.0** on completion of F2.1–F2.11; F13 unchanged, still blocking external
+sharing.
+
+### Risks (v2-specific)
+
+1. **/how content thinness** — nine distinct, well-written artifact excerpts
+   is the largest writing task in the plan; padding would gut the concept.
+   *Mitigation*: F2.4 acceptance requires distinct artifacts per gate; model
+   them on this project's own real gate outputs (reshaped, original).
+2. **Hierarchy visualization accessibility** — interactive SVG is the easiest
+   place to strand keyboard/screen-reader users. *Mitigation*: keyboard parity
+   and panel semantics are F2.6 acceptance criteria, not a later sweep.
+3. **Motion-layer creep on /how** — "more intuitive" must not become "always
+   moving" (would violate the no-loop rule and v1's own lesson). *Mitigation*:
+   F2.5 caps sequences at ~1.2s, everything user-triggered.
+4. **Industry framing leaking back in** via reused v1 copy. *Mitigation*:
+   v2 copy written fresh; F2.9 banned-term list enforced by F2.10 tests.
+5. **One-viewport home regressing** as copy is added later. *Mitigation*:
+   F2.3's no-below-fold rule is a standing test-gate check, not a one-time one.
