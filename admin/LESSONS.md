@@ -72,6 +72,16 @@ doesn't get lost before that review happens.
   "run this specific test command" tool) so the owning agent can execute
   its own suite rather than only ever producing a static-review report
   that a human or the orchestrator has to separately verify.
+  - **Status 2026-07-26 — Open, approved, scheduled for Phase 2.** This is
+    "B2" in `mas-architect`'s consolidated review. Reviewed and approved in
+    principle (use the proven `synthetic-data-agent` pattern: `code-agent`
+    authors `dev/tests/suites/<suite>/run.sh`, and each SME's `Bash` is
+    scoped to invoking its own entry point plus read-only result
+    inspection), but deliberately **not** landed in the Phase 1 contract
+    sweep — Phase 1 was scoped to the KB-destruction fix and contract
+    hygiene. Until it ships, `security-architect` and
+    `responsible-ai-architect` still cannot execute the suites they own;
+    the registry's Scope constraint column now says so explicitly.
 
 - **2026-07-11 — An agent with `Write` (not `Edit`) access to a large,
   append-only KB file is one misused tool call away from destroying it.**
@@ -107,6 +117,21 @@ doesn't get lost before that review happens.
     with `Write` (not `Edit`) on a `knowledge/*_KB.md` file all carry this
     exact risk today, not just the one agent that happened to trigger it
     twice.
+  - **RESOLVED 2026-07-26 — the tool-grant half is applied.** Phase 1 of
+    `mas-architect`'s consolidated review shipped `Edit` to all 11
+    append-target agents, each carrying the explicit rule that `Write` is
+    only permitted when the target file does not exist. `deliverables-agent`
+    is the one deliberate exclusion (it regenerates its outputs wholesale).
+    **The git-backstop half is not yet applied**: the orchestrator does not
+    yet commit `projects/<name>/` root artifacts at every gate close, and
+    `mas-architect` flagged that doing so requires a real
+    `git check-ignore -v` pass first (`dev/.venv/` has hundreds of files on
+    disk). Also still open and recorded as a genuine policy conflict:
+    `DOMAIN_KB.md` records an orchestrator-proxy KB-write policy that
+    contradicts the registry's KB ownership — the recommendation is
+    agent-writes-with-`Edit` and retire the proxy, but that needs to be an
+    explicit recorded decision, because two contradictory policies are
+    running today.
 
 - **2026-07-11 — Never run `next build` while the same project's `next dev`
   server is running.** Both write to the same `.next/` directory; the build
@@ -164,6 +189,33 @@ doesn't get lost before that review happens.
 Queue, most recent first. "Applied" = already reviewed via `mas-architect`
 and edited; "Open" = observed, not yet reviewed.
 
+- **2026-07-26 — Applied (Phase 1 contract sweep).** `mas-architect`'s
+  consolidated review (`admin/proposals/2026-07-26-mas-architect-review.md`)
+  was approved by the human and implemented by `mas-registrar` in one pass.
+  Three long-queued items from this section landed:
+  - **B1 `Write`→`Edit` — APPLIED.** The item queued 2026-07-11 and escalated
+    2026-07-12 after it recurred is now actually fixed: 11 agents gained
+    `Edit`, each with the rule "`Write` is permitted only when the target file
+    does not exist — `Read` first; if the `Read` succeeds, `Write` is off the
+    table for that path" in its Guardrails. `deliverables-agent` deliberately
+    excluded (regenerates wholesale). *This is the entry that proves the
+    queue's own failure mode: a correct fix sat here for one day and a KB was
+    destroyed again before it landed. Queued is not applied.*
+  - **B3 completeness-check — APPLIED**, and wider than queued: `plan-agent`,
+    `code-agent`, `solution-architect`, `security-architect`,
+    `responsible-ai-architect`, `test-agent`, `review-agent`, `deploy-agent`,
+    `enhance-agent`. The wording requires the agent to **state explicitly
+    which binding decisions it checked and how the output satisfies each** —
+    without that, the guardrail is aspirational.
+  - **B5 checkbox backlog + rendered mockup — APPLIED to contract text.** Both
+    were orchestrator practice only; they are now in `plan-agent`'s and
+    `ui-ux-designer`'s own contracts, so they survive a session that doesn't
+    happen to remember them.
+
+  Still **Open — approved, scheduled for Phase 2/3** (not landed in this
+  pass): **B2** scoped `Bash` for the suite-owning SMEs, and **B4**
+  `review-agent`'s cross-KB sweep. Both remain listed below.
+
 - **2026-07-10 — Applied to orchestrator + ui-ux-designer; queued for
   broader rollout.** `ui-ux-designer`'s second revision pass (colors +
   wireframes) ran *after* the "responsive web app" platform decision was
@@ -183,6 +235,9 @@ and edited; "Open" = observed, not yet reviewed.
   `responsible-ai-architect`, `code-agent`) — applying it to all six at
   once is a real contract-shape change and deserves the standard review,
   not a unilateral edit under time pressure mid-pipeline.
+  **Applied 2026-07-26** via the Phase 1 contract sweep, and wider than
+  queued here — also added to `test-agent`, `review-agent`, `deploy-agent`,
+  and `enhance-agent`, since each equally reads only its current brief.
 - **2026-07-10 — Applied directly (human feedback, real-time).** At the
   Experience Design gate, the orchestrator asked for design approval from a
   text summary. Human feedback: there must be a process to review the
@@ -230,12 +285,22 @@ and edited; "Open" = observed, not yet reviewed.
   lane-discipline note distinguishing its domain-correctness devil's-advocate
   pass from `responsible-ai-architect`'s AI-behavior-risk pass, so the two
   don't duplicate each other's work at a shared gate.
-- **Open — not yet applied.** `review-agent`'s scope is narrow by design,
-  but its guardrail text doesn't yet say what to do when a cross-cutting
-  consistency issue spans two SME KBs written in different sessions (e.g.
-  `ARCHITECTURE_KB.md` and `SECURITY_KB.md` disagreeing on a detail neither
-  Architecture-gate participant caught). Flagged for a future
-  `mas-architect` pass.
+- **Open — approved, scheduled for Phase 3.** `review-agent`'s scope is
+  narrow by design, but its guardrail text doesn't yet say what to do when a
+  cross-cutting consistency issue spans two SME KBs written in different
+  sessions (e.g. `ARCHITECTURE_KB.md` and `SECURITY_KB.md` disagreeing on a
+  detail neither Architecture-gate participant caught). This is "B4" in
+  `mas-architect`'s 2026-07-26 consolidated review, which reviewed and
+  approved a concrete design: add a **third verdict, `escalate`** (a
+  contradiction between two SME KBs is not `code-agent`'s to fix), naming
+  both KBs and their owners and quoting the conflict; lane discipline holds —
+  `review-agent` reports *that* they disagree, never adjudicates which is
+  right; scope is changed KBs by default with a full sweep at
+  `/cut-release`. **Not landed in the Phase 1 contract sweep** — scheduled
+  for Phase 3 alongside rendered-UI verification. A live instance already
+  exists in the wild: `DOMAIN_KB.md` still lists native mobile under HARD
+  OUT while the site's boundary lines were removed on 2026-07-25, so KB and
+  site currently describe different worlds.
 - **2026-07-17 — Applied (process).** Backlog approvals: the human directed
   that every backlog/MVP approval be presented as a **per-feature checkbox
   list** (AskUserQuestion with multiSelect, one checkbox per feature incl.
@@ -244,6 +309,10 @@ and edited; "Open" = observed, not yet reviewed.
   First applied at conclave-marketing's Plan & Backlog gate. Orchestrator
   practice at every Plan & Backlog gate and enhancement-scope approval;
   also queued for plan-agent's contract text at the next mas-architect pass.
+  **Applied to `plan-agent`'s contract text 2026-07-26** (Phase 1 sweep):
+  its proposed split is recorded as a default pre-selection and never the
+  decision, with deferred and recommend-reject items always shown rather
+  than filtered out before the human sees them.
 - **2026-07-17 — Applied (process).** Design/mockup approvals: the human
   wants to **always review a rendered mockup/preview before approving**
   any Experience Design (or similar visual) gate — never approve from
@@ -256,3 +325,7 @@ and edited; "Open" = observed, not yet reviewed.
   at every Experience Design gate before requesting approval; queued for
   ui-ux-designer's contract text at the next mas-architect pass so the
   requirement isn't just orchestrator-remembered.
+  **Applied to `ui-ux-designer`'s contract text 2026-07-26** (Phase 1
+  sweep): a rendered mockup/preview is now a hard precondition of requesting
+  approval at any visual gate, and an unrenderable design must be reported
+  as not ready rather than approved from text.

@@ -6,6 +6,113 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **Phase 1 contract sweep (2026-07-26)** — one `mas-registrar` pass
+  implementing `mas-architect`'s consolidated review
+  (`admin/proposals/2026-07-26-mas-architect-review.md`), approved by the
+  human on 2026-07-26. **Closes the 2026-07-20 proposal's P1 item 1 in full.**
+  All 19 agent contracts touched; every one bumped to **v1.1.0**.
+
+  - **B1 — the KB-destruction fix (shipped first, before anything else).**
+    A `Write` on an append-target knowledge base destroyed
+    `ARCHITECTURE_KB.md` (787 lines, 2026-07-11) and `UX_KB.md` (458 lines,
+    2026-07-12), one day apart; both recoveries depended on session
+    transcripts still existing, which is not a fix. Eleven agents' tool grants
+    now include `Edit` — `ui-ux-designer`, `solution-architect`,
+    `security-architect`, `responsible-ai-architect`, `functional-agent`,
+    `industry-expert`, `synthetic-data-agent`, `plan-agent`, `enhance-agent`,
+    `release-manager`, `usage-monitor` — each with the rule added verbatim to
+    its Guardrails: **`Write` is permitted only when the target file does not
+    exist; `Read` first, and if the `Read` succeeds, `Write` is off the table
+    for that path.** `deliverables-agent` was **deliberately excluded** — its
+    outputs are regenerated wholesale, so `Write` is semantically correct
+    there; the exclusion is recorded in its own change history so it doesn't
+    read as an oversight later.
+  - **A1 — two drift corrections.** `code-agent`: the **registry** was wrong,
+    not the agent — its broad `Bash` is correct (the Code gate needs
+    npm/pip/pytest/tsc/build/linters, and `Bash(git)` would have broken it
+    immediately), so the registry row was corrected to disk and shell
+    discipline was added as contract prose instead (confined to `dev/`, never
+    `prod/`, no destructive recursive deletes outside `dev/`, no `git push`,
+    no `git reset --hard`, no unapproved dependency installs, no long-lived
+    servers started in-turn). `review-agent`: **both sides were wrong** —
+    disk had `Read, Bash`, the registry had `Read, Bash(git diff)`; both are
+    now `Read, Grep, Glob, Bash` with hard read-only discipline. It needs
+    `git log`/`show`/`status`, not just `diff`, and it had no `Grep`/`Glob`
+    at all — likely why `Bash` got widened in the first place. The rejected
+    alternative (drop `Bash`; orchestrator hands it a pre-computed diff) is
+    recorded in its contract so it isn't re-litigated.
+  - **A2 — registry column split.** `admin/MAS_REGISTRY.md`'s single `Tools`
+    column mixed enforceable frontmatter grants with prose-only scoping
+    annotations, which is how the two drifts hid in plain sight — 8 further
+    rows had the same defect. Split into **`Tool grant`** (verbatim
+    frontmatter, byte-comparable, the only column the audit compares) and
+    **`Scope constraint`** (advisory prose from the contract body, never
+    compared mechanically). Every one of the 19 `Tool grant` cells now
+    reflects what is actually on disk.
+  - **A3 — prevention machinery.** `mas-architect` gains a standing
+    contract-drift audit duty (Glob agent files, extract `name`/`tools`,
+    compare against the registry's `Tool grant` and `status`, emit one row per
+    agent verdicted MATCH / DRIFT / MISSING ON DISK / ORPHAN / UNRESOLVABLE;
+    report-only, never edits) run as pre-flight on every `propose-agent` and
+    **mandatory + blocking before any platform version cut** — mirrored as a
+    guardrail in `mas-release-manager`. `mas-registrar` gains a `verify`
+    action running the same comparison (fixes require explicit per-item human
+    approval; silent reconciliation is prohibited, since it destroys the
+    evidence that something went wrong) and a **mandatory post-write
+    self-check**: re-`Read` every agent file written, echo its frontmatter
+    verbatim, confirm it equals the approved contract. Real contract
+    versioning added throughout: `version:`/`updated:` frontmatter, a trailing
+    `## Change history` table per agent, and a `Version` column in the
+    registry, with semver defined for contracts (MAJOR = gate/core-optional/
+    KB/test-suite ownership change; MINOR = tool grant or new required
+    behaviour; PATCH = clarification). All 19 agents backfilled to `1.0.0`
+    against their real build dates from `admin/ROADMAP.md`'s Shipped section,
+    then bumped to `1.1.0` for this pass.
+  - **A4 — 7th standard contract question.** `mas-architect` must now answer
+    **interruption behaviour** for every agent it evaluates: what the agent
+    does if cut off mid-task and how a resumed invocation recovers. The
+    corresponding uniform clause was rolled into every write-capable agent —
+    declare the intended write set up front; never leave a reference to a file
+    that does not exist yet; checkpoint per coherent unit; on resume re-read
+    actual on-disk state rather than assuming the prior turn's intended state.
+    `code-agent`'s **phased commits** (a real commit per coherent unit on any
+    multi-part build) landed as the Code-gate instance of the same rule, now
+    an explicit obligation rather than a style preference.
+  - **B3 — completeness-check rollout**, wider than originally queued: added
+    to `plan-agent`, `code-agent`, `solution-architect`, `security-architect`,
+    `responsible-ai-architect`, `test-agent`, `review-agent`, `deploy-agent`,
+    `enhance-agent` (`ui-ux-designer` already carried it from 2026-07-10). The
+    load-bearing part is that the agent must **state explicitly which binding
+    decisions it checked against and how its output satisfies each** —
+    otherwise the guardrail is aspirational.
+  - **B5 — two standing human rules moved from orchestrator practice into
+    contract text.** `plan-agent`: the per-feature checkbox backlog split is a
+    **default pre-selection, never the decision** — the human approves every
+    feature individually, and deferred/recommend-reject items are always
+    shown, never filtered out before the human sees them. `ui-ux-designer`: a
+    rendered mockup/preview is **required** before requesting approval at any
+    Experience Design or similar visual gate; approval is never requested from
+    spec text alone.
+  - **Smaller selected items.** `deploy-agent` now records the served URL and
+    a real health-check result (endpoint, status, timestamp) in
+    `PROJECT_CONTEXT.md`, not just assigned ports. `test-agent` now reports the
+    per-suite **test-count delta** (added / removed / changed) each run —
+    a plausible-looking total can hide silently replaced coverage.
+  - **Two findings resolved, one still open.** `DesignSync` was flagged as a
+    possible phantom tool; it is **confirmed present** in the runtime and is
+    recorded normally (the `admin/LESSONS.md` "DesignSync unavailable" note
+    refers to one invocation context, not to the tool's absence). Still
+    unverified: whether `Bash(git)` parenthesised scoping is honoured in
+    subagent frontmatter — it affects `enhance-agent` and `release-manager`,
+    is recorded exactly as it appears on disk, and must be treated as plain
+    `Bash` plus prose discipline until tested empirically.
+  - **Not in this pass, by design**: B2 (scoped `Bash` so suite-owning SMEs
+    can execute their own suites) and B4 (review-agent cross-KB sweep with an
+    `escalate` verdict) remain approved and scheduled for Phase 2/3; the
+    PRD/plan-agent expansion, mobile, and cloud `target_env` are later phases.
+    `admin/ROADMAP.md` was deliberately left untouched — that is
+    `mas-release-manager`'s lane.
+
 - **`synthetic-data-agent` scaffolded (2026-07-12)**: new optional
   cross-cutting agent, added via `/admin-panel add-agent` after
   `mas-architect`'s 2026-07-11 advisory review and human approval via
