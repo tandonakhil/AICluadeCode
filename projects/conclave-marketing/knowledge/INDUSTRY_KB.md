@@ -115,3 +115,122 @@ time-to-trusted-production framing; keep WEAK-tier stats out entirely.
 **GTM signal:** fixed-price gated pilot (one application through all 9
 gates, audit trail as deliverable) → portfolio retainer; bootcamp-style
 wedge motion validated by Palantir AIP Bootcamps (1,300+).
+
+---
+
+## 2026-07-23 — /what redesign research (Conclave builds a wide range of software)
+
+Current /what wrongly caps Conclave at 3 template types. Market reality:
+custom-software market ~22% CAGR ($53.95B 2025 → $65.85B 2026 → $141B 2030,
+The Business Research Company 2026). Demand spans a dozen+ categories, not 3.
+
+**9 concrete illustrative example applications (domain-neutral, no invented
+customers — "Conclave CAN build," never "we built X for Y"):**
+1. Contract & Document Intelligence Platform — extract terms/obligations/
+   renewals, route exceptions to a human. (doc-AI payback ~10-14mo, SQ Mag 2026)
+2. Customer/Partner Self-Service Portal — external access under account rules.
+   (portals = most common web commission; 82% found over-broad agent access,
+   Gravitee 2026)
+3. Internal Operations Console — replace spreadsheets/admin panels.
+   (JPMorgan 450+ internal-ops AI use cases, Acuvate 2026)
+4. Compliance & Audit-Trail System — regulator-ready tamper-evident records.
+   (EU AI Act Aug 2026, ISO 42001)
+5. Decision-Support / Analytics App — surface drivers, recommend with reasoning.
+6. Agentic Process Automation Workflow — multi-step, escalates to human.
+   (~171% ROI on successful deploys; 88% of pilots die pre-prod on governance)
+7. System Integration / Middleware Layer — custom APIs across systems.
+8. Knowledge & Retrieval Assistant — reframed as ONE option (was a template).
+9. Customer-Facing Support Assistant — reframed as ONE option (was a template).
+Presentation: lead with #1-#7 (new breadth); demote the original chatbot/
+knowledge/workflow trio to "three of many accelerators, not the menu."
+
+**Recommended breadth framing (honest, survives claims manifest):**
+"From an idea to a production-grade platform — across the software your
+business actually runs on." Sub: the 16 agents / 9 gates aren't tied to one
+app type; the 3 templates are accelerators, not limits; examples below are
+illustrative. Capability-spine claim: every app shares the same backbone
+(human-in-command gates, tamper-evident audit trail, security+design review,
+FDE delivery). One-line: "Not three app types — a general-purpose way to build
+software, shown through concrete examples of what it can produce."
+
+**Governance-matters-across-all-software evidence (citable):** 88% of agent
+pilots never reach prod, blocker = governance/controls not model quality
+(Northflank/AnAr 2026); >40% agentic canceled by 2027 on inadequate risk
+controls (Gartner); only 13% of enterprises believe they have adequate AI
+governance despite 76% having a CAIO (getagentid 2026) — the vacuum Conclave's
+gates fill.
+
+**OVERCLAIM FLAGS (must avoid):** (1) "build literally anything" — use "wide
+range" + anchors; (2) any named customer/logo/delivery — illustrative only;
+(3) market ROI figures (171%/2.4x/5.1x) as CONCLAVE's results — attribute to
+sources as "why governed delivery matters," never own track record; (4) no
+implied shipped client portfolio; (5) no compliance-guarantee language ("makes
+you EU AI Act compliant") — "produces the audit trail these frameworks require";
+(6) no banned industries — domain-neutral. Full source list in the research
+deliverable (transcript 2026-07-23).
+
+---
+
+## 2026-07-25 — /what example ORDER research (serial-position effect)
+
+Research-backed sequence for the 8 example cards (flat, curated — NOT grouped;
+grouping would bury the governance differentiator and surface the technical
+integration card under a header). Serial-position effect: first + last remembered,
+middle skimmed (F-pattern). Lead with broadest/most-relatable; anchor value last.
+
+RECOMMENDED ORDER:
+1. Contract & document intelligence — OPENER (broadest hook: every org has
+   contracts; embodies "governed clarity" — extract value, route exceptions to a
+   human — without opening on the pessimistic compliance note).
+2. Internal operations console — most universally-felt pain ("kill the spreadsheet").
+3. Customer & partner portals — customer-facing, revenue-adjacent, easy to picture.
+4. Decision-support & analytics — more abstract → skimmed middle.
+5. Integration & middleware — most technical/least relatable → deepest buried slot.
+6. Agentic process automation — aspirational 2026 peak, rising to recency zone.
+7. Compliance & audit — RECENCY trust anchor; the last CONCRETE example, answers
+   #6's autonomy with a guardrail; governance = closing reassurance, not a brake.
+8. "…software you haven't scoped yet" — LAST, open-ended closer that converts a
+   finite list into an unbounded promise; the implicit CTA.
+Arc: concrete value → more value → intelligence → autonomy → all governed → whatever's next.
+Do NOT lead with compliance/audit (over-indexes on the "brake" story). Sources:
+Laws of UX / CXL / abtasty / LogRocket (serial position), Unbounce (F-pattern),
+Forbes Tech Council Jan 2026 (governance demand). Full list in transcript 2026-07-25.
+
+---
+
+## 2026-07-25 — Visual-engagement research (text-heavy fix + "imagery")
+
+Human wants imagery + less text ("very text heavy"). Research on how LEADING
+comparable products engage users. BOTTOM LINE: for serious/trust-led technical
+products (our peer set: Anthropic, Palantir, Glean, Writer, Sierra), the leading
+move is NOT "add images" — it's rationed restraint + product/system clarity +
+editorial text-breaking. Anthropic built its brand on "warmth, restraint, trust,"
+skips symbolism, one rationed accent. Consumer AI builders (v0/Replit/Lovable)
+lead with generated-output eye-candy, but that's the WRONG register for us.
+
+WHAT WORKS on text-heavy B2B (cited): real product/UI over illustration (abstract
+hero art declining); interactive demos (+63% lead-gen conv); scrollytelling for
+complex stories (+85% engagement, +40% product-page conv); scroll-triggered
+stat/charts; split layouts (text|visual); pull-quotes + callouts (10-20 words).
+WHAT HURTS: generic stock / AI imagery = banner blindness + credibility red flag
+(worst possible for a trust brand); animation without a job (NN/g: 100-300ms,
+purposeful, give agency). Honesty note: can't show fake product screenshots —
+our labeled "sample UI" cards are the honest substitute; lean on diagram/system
+visuals.
+
+RECOMMENDATION (impact→risk):
+- P1 editorial text-breaking kit (stat callouts, pull-quotes, split cards) —
+  highest ROI, zero risk, directly fixes text-heaviness. Apply to Home, /why, /what.
+- P2 scroll-reveal the visuals we ALREADY own (Council Mark, replay, hierarchy,
+  sample-UI) — activate, don't add; fast/purposeful, respect reduced-motion.
+- P3 the honest answer to "imagery": a restrained ON-BRAND, LOCALLY-GENERATED
+  abstract "council network" texture (richer ambient canvas) as sparse section
+  backing/dividers — monochrome-paper + one rationed teal/gold accent. Generative-
+  from-code guarantees zero external requests. NO stock, NO people, NO fake screens.
+- P4 thin custom line-icon/seal-motif spot-graphics for section heads.
+AVOID: stock/AI photography, human imagery, fake screenshots-as-real, heavy 3D/
+scroll-jacking. Per page: /why (top priority) = heavy P1 + P2; Home = stat
+callouts + pull-quotes + scroll-reveal Council Mark + ambient hero backing;
+/what = more split cards; /how,/who already visual (add scroll choreography +
+section icons). Sources: Mantlr, Figma trends 2026, Nebutra, Studio Siraj,
+SaaSFrame, Maglr, NN/g, Webbiquity, Rewarx (full list in transcript 2026-07-25).

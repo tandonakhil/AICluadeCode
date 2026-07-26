@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/what redesign — Conclave builds a wide range of software</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6018;
+    --gold:#8A5A17; --gold-soft:#8a5a1718; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF; --rust:#A8432F;
+    --c-research:#2456C4; --c-design:#8A3A7A; --c-arch:#5B4AA8; --c-quality:#7A5014; --c-ship:#1E7A46;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b915;
+    --gold:#E0A94E; --gold-soft:#e0a94e15; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19; --rust:#E07A5F;
+    --c-research:#8AB0F8; --c-design:#E08AC8; --c-arch:#A79AE8; --c-quality:#E8B45A; --c-ship:#6FCF8F;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#141518; font-family:system-ui,-apple-system,sans-serif; color:#e8e8e8; }
+  .chrome { position:sticky; top:0; z-index:30; background:#0d0e11; border-bottom:1px solid #2a2d33; padding:12px 22px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; margin-left:auto; }
+  .stage { background:var(--paper); color:var(--ink); }
+  .col { max-width:940px; margin:0 auto; padding:48px 40px 30px; }
+  h1.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(30px,3.6vw,44px); line-height:1.13; margin-bottom:16px; }
+  .lead { font-size:18px; line-height:1.6; color:var(--ink); margin-bottom:14px; }
+  .lead .em { color:var(--teal); font-weight:600; }
+  .answer { font-size:15.5px; line-height:1.65; color:var(--muted); margin-bottom:14px; }
+  .boundary { font-size:12.5px; line-height:1.55; color:var(--muted); border-left:2px solid var(--hairline); padding-left:12px; margin:6px 0 4px; }
+
+  .section-label { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:38px 0 14px; display:flex; align-items:center; gap:12px; }
+  .section-label::after { content:""; flex:1; height:1px; background:var(--hairline); }
+
+  /* templates row (accelerators) */
+  .tpl-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .tpl { border:1px dashed var(--hairline); border-radius:10px; padding:14px 16px; background:var(--surface); }
+  .tpl .tag { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
+  .tpl h3 { font-size:15px; font-family:Georgia,serif; font-weight:500; margin:4px 0 5px; }
+  .tpl p { font-size:12.5px; color:var(--muted); line-height:1.5; }
+
+  /* examples grid (the breadth) */
+  .ex-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .ex { border:1px solid var(--hairline); border-radius:12px; padding:18px 20px; background:var(--surface); position:relative; overflow:hidden; }
+  .ex::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--ac,var(--teal)); }
+  .ex h3 { font-size:16px; font-family:Georgia,serif; font-weight:500; margin-bottom:5px; color:var(--ink); }
+  .ex .desc { font-size:13.5px; line-height:1.55; color:var(--ink); margin-bottom:9px; }
+  .ex .why { font-size:12px; line-height:1.5; color:var(--muted); padding-top:9px; border-top:1px dashed var(--hairline); }
+  .ex .why b { color:var(--ac,var(--teal)); font-weight:600; }
+  .ex .preview { height:98px; border:1px solid var(--hairline); border-radius:8px; background:var(--paper); margin-bottom:12px; overflow:hidden; }
+  .ex .preview svg { display:block; width:100%; height:100%; }
+  .ex .plabel { font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+
+  /* capability spine */
+  .spine { margin-top:34px; border:1px solid var(--hairline); border-radius:12px; background:linear-gradient(180deg, var(--teal-soft), transparent); padding:22px 24px; }
+  .spine h3 { font-family:Georgia,serif; font-weight:500; font-size:19px; margin-bottom:12px; }
+  .spine .rows { display:flex; gap:22px; flex-wrap:wrap; }
+  .spine .item { display:flex; align-items:baseline; gap:8px; font-size:13.5px; color:var(--ink); }
+  .spine .item .d { color:var(--gold); font-weight:700; }
+
+  .notb { font-size:12.5px; color:var(--muted); margin-top:16px; }
+  .notb b { color:var(--rust); }
+  .fwd { color:var(--teal); font-size:15px; text-decoration:none; border-bottom:1px solid var(--teal); padding-bottom:2px; display:inline-block; margin-top:26px; }
+  .notes-panel { background:#0d0e11; border-top:1px solid #2a2d33; padding:22px 32px 34px; font-size:13px; line-height:1.6; color:#c8cbd2; }
+  .notes-panel b { color:#fff; } .notes-panel .g { color:#e0b060; }
+  @media (max-width:720px){ .tpl-row,.ex-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="chrome">
+  <span class="t">/what redesign — "a general-purpose way to build software" — for approval</span>
+  <button id="theme">◐ Theme</button>
+</div>
+
+<div class="stage"><div class="col">
+  <h1 class="q">What can it build?</h1>
+  <p class="lead">Not three templates — <span class="em">a general-purpose way to build the software your business runs on.</span> Conclave's 16 specialist agents and 9 governance gates aren't tied to one kind of app.</p>
+  <p class="answer">The three starter templates just get the most common projects moving fast. The same governed build process — plan, design, secure, code, test, ship — produces a wide range of applications, each built and delivered into your own environment with a human in command at every gate.</p>
+  <p class="boundary">Conclave builds web, API, data, and agentic software, delivered into your environment. Native mobile, embedded, and managed cloud hosting aren't part of the toolchain today — cloud delivery is on the roadmap.</p>
+
+  <div class="section-label">Start fast — three templates</div>
+  <div class="tpl-row">
+    <div class="tpl"><span class="tag">Template</span><h3>Support assistant</h3><p>Answers from an approved knowledge set, cites its source, hands off to a person when it's out of depth.</p></div>
+    <div class="tpl"><span class="tag">Template</span><h3>Automated workflow</h3><p>Multi-step process run by agents, with the judgment calls routed to a human by design.</p></div>
+    <div class="tpl"><span class="tag">Template</span><h3>Knowledge assistant</h3><p>Grounded answers over your own documents, every reply citing the passages it came from.</p></div>
+  </div>
+
+  <div class="section-label">Or build something custom — a sense of the range</div>
+  <div class="ex-grid">
+    <div class="ex" style="--ac:var(--c-research)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="16" y="14" width="72" height="68" rx="4" fill="var(--surface)" stroke="var(--hairline)"/>
+        <line x1="26" y1="26" x2="74" y2="26" stroke="var(--muted)" stroke-width="2" opacity=".45"/>
+        <rect x="26" y="33" width="48" height="9" rx="2" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/>
+        <line x1="26" y1="52" x2="78" y2="52" stroke="var(--muted)" stroke-width="2" opacity=".45"/>
+        <rect x="26" y="59" width="32" height="9" rx="2" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/>
+        <path d="M96 40 L124 40" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="3 3"/><path d="M120 36 L126 40 L120 44" fill="none" stroke="var(--muted)" stroke-width="1.2"/>
+        <rect x="134" y="20" width="70" height="19" rx="9.5" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width=".8"/>
+        <text x="169" y="32.5" font-size="9" fill="var(--gold)" text-anchor="middle" font-family="system-ui">renewal flagged</text>
+        <circle cx="150" cy="66" r="6.5" fill="none" stroke="var(--gold)" stroke-width="1.3"/><circle cx="150" cy="63.5" r="2" fill="var(--gold)"/><path d="M145.5 71 q4.5 -4 9 0" fill="none" stroke="var(--gold)" stroke-width="1.3"/>
+        <text x="163" y="69" font-size="8.5" fill="var(--muted)" font-family="system-ui">to a person</text>
+      </svg></div>
+      <h3>Contract &amp; document intelligence</h3><p class="desc">Ingests contracts, invoices, and policies; extracts terms, flags obligations and renewal dates, routes exceptions to a person.</p><p class="why"><b>Why governed matters:</b> contract decisions carry legal liability — every extraction and routing is traceable in the audit trail.</p></div>
+
+    <div class="ex" style="--ac:var(--c-arch)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="30" y="12" width="160" height="72" rx="5" fill="var(--surface)" stroke="var(--hairline)"/>
+        <path d="M30 27 H190" stroke="var(--hairline)"/>
+        <circle cx="39" cy="19.5" r="2" fill="var(--muted)"/><circle cx="46" cy="19.5" r="2" fill="var(--muted)"/><circle cx="53" cy="19.5" r="2" fill="var(--muted)"/>
+        <rect x="150" y="15" width="34" height="9" rx="4.5" fill="var(--teal-soft)" stroke="var(--ac)" stroke-width=".7"/>
+        <rect x="40" y="37" width="42" height="40" rx="4" fill="var(--paper)" stroke="var(--hairline)"/>
+        <rect x="89" y="37" width="42" height="40" rx="4" fill="var(--paper)" stroke="var(--hairline)"/>
+        <rect x="138" y="37" width="42" height="40" rx="4" fill="var(--paper)" stroke="var(--hairline)"/>
+        <rect x="46" y="44" width="24" height="4" rx="2" fill="var(--ac)"/><line x1="46" y1="55" x2="76" y2="55" stroke="var(--muted)" stroke-width="1.6" opacity=".45"/><line x1="46" y1="63" x2="70" y2="63" stroke="var(--muted)" stroke-width="1.6" opacity=".45"/>
+        <rect x="95" y="44" width="24" height="4" rx="2" fill="var(--ac)"/><rect x="144" y="44" width="24" height="4" rx="2" fill="var(--ac)"/>
+      </svg></div>
+      <h3>Customer &amp; partner portals</h3><p class="desc">A branded external portal where customers or partners check status, place orders, and pull their own data under account-specific rules.</p><p class="why"><b>Why governed matters:</b> portals expose internal data to outsiders — the security gate scopes access before anything ships.</p></div>
+
+    <div class="ex" style="--ac:var(--c-ship)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="20" y="12" width="180" height="72" rx="5" fill="var(--surface)" stroke="var(--hairline)"/>
+        <path d="M20 28 H200 M20 12 v0" stroke="var(--hairline)"/><rect x="20" y="12" width="180" height="16" rx="5" fill="var(--teal-soft)"/>
+        <line x1="30" y1="38" x2="92" y2="38" stroke="var(--muted)" stroke-width="2" opacity=".5"/><rect x="150" y="33" width="40" height="10" rx="5" fill="none" stroke="var(--c-ship)" stroke-width=".9"/><path d="M156 38 l3 3 l6 -7" fill="none" stroke="var(--c-ship)" stroke-width="1.2"/>
+        <line x1="30" y1="57" x2="92" y2="57" stroke="var(--muted)" stroke-width="2" opacity=".5"/><rect x="150" y="52" width="40" height="10" rx="5" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width=".9"/>
+        <line x1="30" y1="76" x2="92" y2="76" stroke="var(--muted)" stroke-width="2" opacity=".5"/><rect x="150" y="71" width="40" height="10" rx="5" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".9"/>
+        <line x1="20" y1="47" x2="200" y2="47" stroke="var(--hairline)" opacity=".5"/><line x1="20" y1="66" x2="200" y2="66" stroke="var(--hairline)" opacity=".5"/>
+      </svg></div>
+      <h3>Internal operations console</h3><p class="desc">A unified dashboard that replaces spreadsheets and scattered admin panels for approvals, data edits, and reporting.</p><p class="why"><b>Why governed matters:</b> these tools write to production data — human approval on any read-to-write step is a gate, not an afterthought.</p></div>
+
+    <div class="ex" style="--ac:var(--c-quality)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="34" y="10" width="152" height="76" rx="5" fill="var(--surface)" stroke="var(--hairline)"/>
+        <circle cx="50" cy="27" r="6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/><path d="M47 27 l2.4 2.4 l3.8 -4.6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/>
+        <line x1="64" y1="25" x2="150" y2="25" stroke="var(--muted)" stroke-width="2" opacity=".5"/><line x1="64" y1="31" x2="118" y2="31" stroke="var(--muted)" stroke-width="1.4" opacity=".3"/>
+        <circle cx="50" cy="48" r="6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/><path d="M47 48 l2.4 2.4 l3.8 -4.6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/>
+        <line x1="64" y1="46" x2="150" y2="46" stroke="var(--muted)" stroke-width="2" opacity=".5"/><line x1="64" y1="52" x2="130" y2="52" stroke="var(--muted)" stroke-width="1.4" opacity=".3"/>
+        <circle cx="50" cy="69" r="6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/><path d="M47 69 l2.4 2.4 l3.8 -4.6" fill="none" stroke="var(--c-quality)" stroke-width="1.3"/>
+        <line x1="64" y1="67" x2="150" y2="67" stroke="var(--muted)" stroke-width="2" opacity=".5"/><line x1="64" y1="73" x2="112" y2="73" stroke="var(--muted)" stroke-width="1.4" opacity=".3"/>
+      </svg></div>
+      <h3>Compliance &amp; audit system</h3><p class="desc">Logs actions, enforces policy, and produces tamper-evident, regulator-ready audit records on demand.</p><p class="why"><b>Why governed matters:</b> the auditable trail these frameworks expect is a native output of how Conclave builds.</p></div>
+
+    <div class="ex" style="--ac:var(--c-research)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="22" y="12" width="122" height="72" rx="5" fill="var(--surface)" stroke="var(--hairline)"/>
+        <path d="M32,70 52,60 72,64 92,46 112,52 132,32 132,76 32,76 Z" fill="var(--teal-soft)"/>
+        <polyline points="32,70 52,60 72,64 92,46 112,52 132,32" fill="none" stroke="var(--ac)" stroke-width="2"/>
+        <circle cx="132" cy="32" r="3.2" fill="var(--ac)"/>
+        <rect x="154" y="34" width="48" height="30" rx="6" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width=".8"/>
+        <path d="M162 50 l4 4 l7 -8" fill="none" stroke="var(--gold)" stroke-width="1.4"/><text x="178" y="60" font-size="7.5" fill="var(--gold)" text-anchor="middle" font-family="system-ui">recommend</text>
+      </svg></div>
+      <h3>Decision-support &amp; analytics app</h3><p class="desc">Pulls data across systems, surfaces cost and risk drivers, and recommends next actions with the reasoning shown.</p><p class="why"><b>Why governed matters:</b> recommendations that drive spend must be explainable — the trail captures why each one surfaced.</p></div>
+
+    <div class="ex" style="--ac:var(--c-design)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <line x1="34" y1="46" x2="190" y2="46" stroke="var(--hairline)"/>
+        <circle cx="36" cy="46" r="8.5" fill="var(--surface)" stroke="var(--teal)" stroke-width="1.4"/>
+        <circle cx="87" cy="46" r="8.5" fill="var(--surface)" stroke="var(--teal)" stroke-width="1.4"/>
+        <circle cx="138" cy="46" r="11" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="1.6"/><path d="M133 46 l3.4 3.4 l6 -7" fill="none" stroke="var(--gold)" stroke-width="1.6"/>
+        <circle cx="189" cy="46" r="8.5" fill="var(--surface)" stroke="var(--teal)" stroke-width="1.4"/>
+        <text x="138" y="72" font-size="8" fill="var(--gold)" text-anchor="middle" font-family="system-ui">human checkpoint</text>
+      </svg></div>
+      <h3>Agentic process automation</h3><p class="desc">Autonomous multi-step handling of a back-office process — onboarding, claims, procurement — that escalates judgment calls to a human.</p><p class="why"><b>Why governed matters:</b> most agent pilots die before production on governance, not model quality — the nine gates are built for the survivors.</p></div>
+
+    <div class="ex" style="--ac:var(--c-arch)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <g stroke="var(--ac)" stroke-width="1.3"><line x1="54" y1="26" x2="100" y2="44"/><line x1="166" y1="26" x2="120" y2="44"/><line x1="54" y1="70" x2="100" y2="52"/><line x1="166" y1="70" x2="120" y2="52"/></g>
+        <circle cx="110" cy="48" r="13" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.5"/><text x="110" y="51" font-size="7.5" fill="var(--teal)" text-anchor="middle" font-family="system-ui">API</text>
+        <g stroke="var(--hairline)" fill="var(--surface)"><rect x="20" y="16" width="34" height="20" rx="3"/><rect x="166" y="16" width="34" height="20" rx="3"/><rect x="20" y="60" width="34" height="20" rx="3"/><rect x="166" y="60" width="34" height="20" rx="3"/></g>
+      </svg></div>
+      <h3>Integration &amp; middleware layer</h3><p class="desc">Custom APIs and connectors that make finance, ops, and legacy systems talk to each other.</p><p class="why"><b>Why governed matters:</b> integrations are where data quietly leaks — reviewed data-governance at each gate is what makes them durable.</p></div>
+
+    <div class="ex" style="--ac:var(--c-ship)">
+      <div class="plabel">Illustrative preview</div>
+      <div class="preview"><svg viewBox="0 0 220 96" aria-hidden="true">
+        <rect x="58" y="14" width="104" height="66" rx="6" fill="none" stroke="var(--hairline)" stroke-dasharray="5 4"/>
+        <line x1="110" y1="28" x2="110" y2="49" stroke="var(--gold)" stroke-width="2.2"/><circle cx="110" cy="25" r="4" fill="var(--gold)"/><circle cx="110" cy="53" r="5.5" fill="var(--muted)"/>
+        <text x="110" y="72" font-size="8.5" fill="var(--muted)" text-anchor="middle" font-family="system-ui">your idea → a plan</text>
+      </svg></div>
+      <h3>&hellip;and the software you haven't scoped yet</h3><p class="desc">The pipeline starts from an idea, not a template. If it's a web, API, data, or agentic application, the same nine gates apply.</p><p class="why"><b>Why governed matters:</b> a custom build carries more unknowns — which is exactly what a named architect, a security review, and a human at every gate are for.</p></div>
+  </div>
+
+  <div class="spine">
+    <h3>Whatever it is, it shares one backbone</h3>
+    <div class="rows">
+      <span class="item"><span class="d">·</span> A human approves every gate</span>
+      <span class="item"><span class="d">·</span> A tamper-evident audit trail</span>
+      <span class="item"><span class="d">·</span> Security &amp; design review, built in</span>
+      <span class="item"><span class="d">·</span> Delivered into your environment</span>
+    </div>
+  </div>
+
+  <a class="fwd">Why should you trust it? →</a>
+</div></div>
+
+<div class="notes-panel">
+  <b>What changed &amp; the honesty guardrails:</b> the page no longer caps Conclave at "three kinds of application from the same templates." It now leads <span class="g">broadest-defensible</span> — "a general-purpose way to build the software your business runs on" — with the 3 templates demoted to <span class="g">fast-starts</span> and seven concrete example categories carrying the breadth. Each example now has an <span class="g">illustrative UI preview</span> — a small schematic sketch of what that app could look like (labeled "Illustrative preview"), so a visitor sees the art of the possible. These are deliberately <span class="g">generic wireframes, not screenshots of real products</span> — no invented customer, no fabricated UI passed off as delivered work; that keeps them inside the claims manifest. The boundary stays <span class="g">present but understated</span>: one quiet line (web/API/data/agentic · your environment · cloud roadmapped · not mobile/embedded). Every example is illustrative ("Conclave can build…"), no market-ROI stat is presented as Conclave's own, no compliance-guarantee language. Claims-manifest rows needed before build: delivery=your-environment (cloud roadmapped); web-not-native-mobile; templates=accelerators; previews-are-illustrative-schematics. Animation on build: cards + previews draw/rise in on scroll (site's draw-once vocabulary).
+</div>
+
+<script>
+  document.getElementById('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

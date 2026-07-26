@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imagery — "Pressed in paper" treatment mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --gold:#8A5A17; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF;
+    --tone-shadow:#1D1C1A; --tone-hi:#FBF3E4;   /* light: ink -> cream sepia */
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --gold:#E0A94E; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19;
+    --tone-shadow:#0E2A26; --tone-hi:#161513;    /* dark: teal-ink -> dark paper */
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#141518; font-family:system-ui,-apple-system,sans-serif; color:#e8e8e8; }
+  .chrome { position:sticky; top:0; z-index:30; background:#0d0e11; border-bottom:1px solid #2a2d33; padding:12px 22px; display:flex; gap:10px; align-items:center; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; margin-left:auto; }
+  .stage { background:var(--paper); color:var(--ink); }
+  .col { max-width:860px; margin:0 auto; padding:36px 40px; }
+  h2.q { font-family:Georgia,serif; font-weight:500; font-size:26px; margin-bottom:8px; }
+  .answer { font-size:15.5px; line-height:1.65; color:var(--muted); margin-bottom:14px; }
+  .tag { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:26px 0 8px; }
+
+  /* ---- "Pressed in paper" duotone plate ---- */
+  .plate { position:relative; overflow:hidden; background:var(--tone-shadow); border-radius:4px;
+    -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent),linear-gradient(#000,#000);
+    -webkit-mask-composite:source-in; mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); }
+  .plate .master { position:absolute; inset:0; width:100%; height:100%; mix-blend-mode:lighten; filter:grayscale(1) contrast(1.05); }
+  .plate::after { content:""; position:absolute; inset:0; background:var(--tone-hi); mix-blend-mode:darken; pointer-events:none; }
+  .plate.band { aspect-ratio:4.4/1; }
+  .plate.fig { aspect-ratio:3/2; max-width:420px; }
+  .ph-note { font-size:11px; color:var(--muted); margin-top:6px; font-style:italic; }
+
+  /* page-context helpers */
+  .home-close { text-align:center; padding-top:20px; }
+  .fde-row { display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:center; }
+  .fde-row h3 { font-family:Georgia,serif; font-weight:500; font-size:20px; margin-bottom:8px; }
+  .divider { border:0; border-top:1px solid var(--hairline); margin:30px 0; }
+  .notes-panel { background:#0d0e11; border-top:1px solid #2a2d33; padding:22px 32px 34px; font-size:13px; line-height:1.65; color:#c8cbd2; }
+  .notes-panel b { color:#fff; } .notes-panel .g { color:#e0b060; }
+  .notes-panel code { background:#1c1f26; padding:1px 5px; border-radius:4px; font-size:12px; }
+  @media (max-width:640px){ .fde-row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="chrome">
+  <span class="t">Imagery — "Pressed in paper" duotone, in 3 placements (placeholders) — for approval</span>
+  <button id="theme">◐ Theme</button>
+</div>
+
+<!-- The reusable grayscale "master" placeholder: SVG grain + tonal study.
+     A real generated photo (grayscale) drops in here as an <img>; the CSS
+     duotone + feather is identical. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer></filter>
+  <radialGradient id="lit" cx="34%" cy="30%" r="80%"><stop offset="0" stop-color="#e9e4da"/><stop offset="55%" stop-color="#8f8a80"/><stop offset="100%" stop-color="#2b2822"/></radialGradient>
+</defs></svg>
+
+<div class="stage"><div class="col">
+
+  <div class="tag">Home &mdash; closing signature band (above the footer)</div>
+  <div class="home-close">
+    <p class="answer">…every gate on the record, every decision yours. That's the whole idea.</p>
+    <div class="plate band">
+      <svg class="master" viewBox="0 0 440 100" preserveAspectRatio="xMidYMid slice">
+        <rect width="440" height="100" fill="url(#lit)"/>
+        <g opacity=".5" stroke="#efe" stroke-width="1" fill="none"><path d="M120 20 L210 55"/><path d="M300 18 L214 55"/><path d="M80 55 L206 55"/><path d="M130 88 L210 60"/></g>
+        <rect x="150" y="34" width="140" height="40" rx="3" fill="#d9d3c6" opacity=".25"/>
+        <rect width="440" height="100" filter="url(#grain)" opacity=".5"/>
+      </svg>
+    </div>
+    <p class="ph-note">Placeholder showing the treatment. Real asset = IMG-1 (drafting table, paper &amp; network sketch), grayscale, duotoned in CSS.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="tag">/how &mdash; opening band, under the intro, before the replay</div>
+  <h2 class="q">How does it work?</h2>
+  <p class="answer">Like this. Here is Conclave building a real application, gate by gate &mdash; nine of them, real artifacts, one honest rejection along the way.</p>
+  <div class="plate band" style="aspect-ratio:4.8/1">
+    <svg class="master" viewBox="0 0 480 100" preserveAspectRatio="xMidYMid slice">
+      <rect width="480" height="100" fill="url(#lit)"/>
+      <circle cx="250" cy="52" r="34" fill="#efe9df" opacity=".7"/><circle cx="250" cy="52" r="34" fill="none" stroke="#221f1a" stroke-width="3" opacity=".5"/>
+      <ellipse cx="250" cy="86" rx="120" ry="12" fill="#2b2822" opacity=".35"/>
+      <rect width="480" height="100" filter="url(#grain)" opacity=".5"/>
+    </svg>
+  </div>
+  <p class="ph-note">Real asset = IMG-2 (a blank wax seal pressing into handmade paper &mdash; a decision committed to the record).</p>
+
+  <hr class="divider">
+
+  <div class="tag">/why &mdash; inside the "We build it with you" (FDE) section</div>
+  <div class="fde-row">
+    <div>
+      <h3>We build it with you &mdash; and in three weeks, it's yours</h3>
+      <p class="answer">Forward-deployed engineers bring Conclave to you &mdash; not a login, a team that builds alongside yours.</p>
+    </div>
+    <div>
+      <div class="plate fig">
+        <svg class="master" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="200" fill="url(#lit)"/>
+          <rect x="40" y="70" width="120" height="90" rx="4" fill="#e6e0d5" opacity=".55" transform="rotate(-6 100 115)"/>
+          <rect x="150" y="55" width="120" height="90" rx="4" fill="#d7d1c5" opacity=".5" transform="rotate(5 210 100)"/>
+          <circle cx="70" cy="40" r="14" fill="#cfc8ba" opacity=".5"/><circle cx="238" cy="168" r="16" fill="#cfc8ba" opacity=".45"/>
+          <rect width="300" height="200" filter="url(#grain)" opacity=".5"/>
+        </svg>
+      </div>
+      <p class="ph-note">Real asset = IMG-3 (a shared worktable, papers between two positions).</p>
+    </div>
+  </div>
+
+</div></div>
+
+<div class="notes-panel">
+  <b>The designer's recommendation (and my agreement):</b> a firm <span class="g">no to photographic AI stock art</span> — no faces, teams, offices, robots, or glowing-brain clich&eacute;s. On a site whose /why literally says "we won't invent a customer," fabricating people would be the most self-undermining thing we could add. Instead: <span class="g">3 images, one treatment</span> &mdash; "Pressed in paper" duotone macro <b>material studies</b> (drafting table, a wax seal, a shared worktable). Warmth comes from <span class="g">craft, paper grain, and warm light</span>, not from depicting humans who don't exist.
+  <br><br>
+  <b>How the treatment works:</b> each image is generated <span class="g">grayscale</span>; the Paper &amp; Seal duotone is applied in <span class="g">CSS</span> (shadows &rarr; ink/teal-ink, highlights &rarr; cream/paper), so <span class="g">one asset renders correctly in both themes</span> &mdash; toggle the theme above to see it. Edges feather into the paper. Gold is never used (reserved for human-decision). Served as <span class="g">local WebP</span> (&lt;120KB each, ~360KB total) &mdash; never hotlinked, so the zero-external-requests guarantee holds. All decorative (<code>alt=""</code>), static (reduced-motion safe), no text over image.
+  <br><br>
+  <b>Your two decisions:</b> (1) approve this direction (materials + duotone, 3 placements)? (2) the one judgment call: IMG-1 and IMG-3 can be <span class="g">materials-only</span> (max caution) or include <span class="g">one anonymous cropped hand</span> mid-gesture (warmer, still no face/identity) &mdash; the designer supplied both prompt variants. <b>I can't generate the images from here (no OpenAI access);</b> on approval I hand you the exact prompts, you generate the 3 grayscale masters, and I integrate them locally + wire the duotone.
+</div>
+
+<script>
+  document.getElementById('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

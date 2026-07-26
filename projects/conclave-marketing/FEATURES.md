@@ -64,3 +64,7 @@ checked; F13 kept deferred). First release target: 0.1.0.
 - Homepage "Speed to demo isn't speed to production" comparison (cited) — status: built (54632ac)
 - /why "We bring the platform to you — in three weeks" FDE rollout section — status: built (54632ac)
 - F2.12 /what rework: three replayable examples (chat/workflow/retrieval) — status: built (8ae09ec)
+- F2.13 Ambient network background, site-wide (recolored, one gold orchestrator node) — status: built (0e20e0d)
+- F2.14 Council Mark cross-page component (3 tiers) + new "new way to build software" hero — status: built (df69caa/0d1b8cf/d2f149f/4ac845a)
+- F2.15 /what redesign: breadth story + 8 real illustrative UI previews — status: built (3031cf8)
+- F2.16 Visual-engagement layer (editorial kit + generative texture + scroll-reveal + section icons) — status: built (c67d0c6..66fcbae)

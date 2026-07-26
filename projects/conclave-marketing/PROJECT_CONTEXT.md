@@ -284,8 +284,13 @@ Additional Decisions Log entries:
   + drawn icon (research/design/architecture/build/quality/ship/
   cross-cutting), staged entrance animation, hover glow, color legend, and
   one explicitly-approved looping exception — a slow gold shimmer on the
-  rail every ~6s (frozen under prefers-reduced-motion; the only loop on the
-  site). (3) Homepage comparison "Speed to demo isn't speed to production":
+  rail every ~6s (frozen under prefers-reduced-motion). [CORRECTED
+  2026-07-22 per coherence audit C2: this entry originally called the
+  shimmer "the only loop on the site" — that was false. Other continuous
+  loops exist: the site-wide ambient network canvas (added later same day)
+  and /what's dotBounce/cursorBlink demo micro-animations. The shimmer is
+  one of several motion exceptions, not the only one.] (3) Homepage
+  comparison "Speed to demo isn't speed to production":
   vibe-coding vs Conclave, citing Veracode 2025 (45% security-vuln rate),
   GitClear 2025 (8x duplication, -70% refactoring), MIT NANDA 2025 (95%
   pilot-stall) — sourced from industry-expert's 2026-07-20 market research,
@@ -312,3 +317,232 @@ Additional Decisions Log entries:
   boundary copy preserved verbatim. dev/ commit 8ae09ec, 147/147 tests,
   orchestrator independently re-verified (pytest, JS syntax, zero external
   requests) and redeployed :8100.
+- 2026-07-21 — AMBIENT BACKGROUND RESTORED [human]: from reviewed mockup
+  (drifting-nodes canvas, ported from the pre-v2 design but recolored to
+  the "Paper & Seal" palette — teal nodes/lines, one gold node standing in
+  for the orchestrator). Human chose site-wide (all 5 pages) over
+  homepage-only, and kept the differentiated gold node over uniform teal.
+  Quieter than the original (opacity .22 vs .28-.5, 26 vs 38-60 nodes),
+  fixed behind all content (z-index 0), freezes to a static frame under
+  prefers-reduced-motion, zero external requests (pure canvas API). dev/
+  commit 0e20e0d, 154/154 tests, orchestrator independently re-verified
+  (pytest, JS syntax, canvas present on all 5 routes, zero external URLs)
+  and redeployed :8100.
+- 2026-07-21 — AMBIENT BACKGROUND FIX (real defect, found by dispatched
+  UI/UX audit) [human]: after two blind visibility tweaks failed ("i dont
+  see it on the side", then "still no animation"), human directed a proper
+  audit ("test it properly before release to me, engage UI UX designer")
+  instead of further guessing. Root cause found: #conclaveNet's CSS
+  opacity (.38) and each shape's own rgba(...) alpha in site.js MULTIPLY,
+  not add — true effective on-screen strength was only ~18% for dots and
+  ~3-5% for connecting lines regardless of how high either number was
+  pushed independently; secondary issue, canvas wasn't scaled for
+  devicePixelRatio (blurred on Retina). Human approved the exact fix
+  parameters via a live side-by-side comparison artifact (real code, both
+  panels animating) rather than a static mockup — "go for right". Fix:
+  CSS opacity removed entirely; target alpha baked directly into JS (dot
+  .48->.55, core .7->.85, line coefficients .14/.22->.16/.24, radii
+  1.8/3->2.2/3.6); DPR scaling added via ctx.setTransform, correctly
+  reapplied on resize. Independently re-verified by the SAME
+  ui-ux-designer instance that found the bug (not a fresh rubber-stamp) —
+  recomputed effective contrast ~36%/49%/8-12%, confirmed DPR transform
+  ordering correct, confirmed no new throw/stacking regressions. Verdict:
+  PASS. dev/ commit b00f1bf, 154/154 tests, redeployed :8100.
+- 2026-07-22 — FULL-SITE COHERENCE AUDIT + fixes [human flagged "make sure
+  entire design is coherent"]. Dispatched ui-ux-designer for a real
+  cross-page audit (not per-page): verdict NOT coherent as shipped but
+  close/fixable, drift concentrated at the seams between separately-approved
+  rounds. 2 Critical (C1 home missing its forward link; C2 code+this-log
+  falsely claimed "/who shimmer is the only loop" while ambient canvas +
+  /what micro-animations also loop), 1 High fixed (H1 Harness was a styled
+  <span>, now a real <h2>). Fixed directly (dev/ commit 4789723, 159/159
+  tests) + this log's false claim corrected above. STILL OPEN (need human
+  decisions, NOT yet actioned): H2 (home comparison + /why both argue "why
+  gates matter" with different stats — dedupe or make overlap deliberate);
+  H3 (--c-quality ~= --gold, two meanings, near-identical hue); M1 (gold
+  used decoratively on /why FDE week labels); M2 (rust drifted to generic
+  negative — vibe column, /what not-boxes); M3/M4/L1/L2 (motion-weight
+  inconsistency, Harness eyebrow style, latent class drift).
+- 2026-07-22 — COUNCIL AS CORE CROSS-PAGE COMPONENT [human: "core component
+  moving across pages, starting with main page, design philosophy should
+  coexist"]. ui-ux-designer produced a design concept (pre-mockup): "The
+  Council Mark" at 3 tiers sharing one draw-once-then-hold choreography —
+  Tier 1 full labeled diagram stays EXCLUSIVELY on /who (resolves audit C2,
+  no second full diagram); Tier 2 unlabeled teal-threads-into-neutral-core
+  glyph with one gold pull-line travels (hero-scale woven into home hero via
+  the existing ambient-canvas layer, icon-scale on /why); Tier 3 gold
+  pull-line signature marks existing human-decision beats (Harness ticks,
+  /how gate seals, /what workflow pause). NOT a 4th homepage section — woven
+  into hero + Harness, zero new sections. Motion rule: draws in once per load
+  (scroll-triggered below fold), then holds, never loops; supersedes the
+  inaccurate "nothing loops" line for this component family. Palette: gold
+  reserved strictly for pull-line/terminus, teal threads, neutral core never
+  gold; no other gold element may share a viewport with the Mark (fixes H3
+  within its footprint). Concept APPROVED-IN-PRINCIPLE by human; rendered
+  mockup is the next step before any build.
+- 2026-07-23 — POSITIONING + COUNCIL MARK APPROVED FOR BUILD [human]. After
+  extended positioning work: the site's lead shifts from a governance/"brake"
+  story to the AHA — "Conclave is a new way to build software — 16 expert AI
+  agents that take an idea all the way to a production-grade platform." The
+  differentiator (vibe coding = one prompt, one model, a demo; Conclave = 16
+  agents running the full SDLC → production-grade) leads, with governance as
+  the trust mechanism beneath. Approved hero copy (verbatim, from mockup
+  design-review/council-mark-mockup.html): headline as above (gold underline
+  on "production-grade platform"); lede "Imagine handing an idea to a full
+  engineering team — planners, architects, security, testers, reviewers — and
+  getting back software that's ready for the real world. That's Conclave: 16
+  specialist AI agents running every stage of the software lifecycle, with you
+  in command, so what you launch is production-grade from day one."; stat
+  strip 16 (specialist agents, not one model) · 9 (SDLC gates, every one
+  covered) · 0 (lines shipped unreviewed). New hero LAYOUT: full-width
+  headline band, then a two-column body (copy left, council diagram right).
+  THE COUNCIL MARK (cross-page component, 3 tiers, one draw-once-then-hold
+  motion, never loops): Tier 1 = full labeled diagram, /who only (glyph draws
+  in then unfolds into the existing team-colored pipeline-rail); Tier 2 =
+  hero council glyph (6 SDLC-discipline nodes → neutral Conclave core → "→ a
+  production-grade platform", gold "You / YOUR CALL · EVERY GATE" pull-line);
+  Tier 3 = gold pull-line signature marking human-decision beats on /how gate
+  seals and /what's workflow checkpoint. Palette: gold ONLY on pull-line/
+  terminus, teal threads, neutral core never gold. Numbers grounded in real
+  registry (16 project agents, 9 gates); "0 lines" = design guarantee, not an
+  audited metric. FLAGGED as separate follow-up (NOT in this build, needs its
+  own copy approval): propagating the new voice to /why and the comparison
+  section, which still read in the old governance-first tone.
+- 2026-07-23 — COUNCIL MARK + NEW HERO BUILT: code-agent implemented all 4
+  phases. P1 shared component + draw-once motion (df69caa); P2 new homepage
+  hero — full-width headline "a new way to build software", lede, 16/9/0 stat
+  strip, Tier-2 council diagram, IntersectionObserver draw-once trigger
+  (0d1b8cf); P3 /who Tier-1 glyph draws in then rail entrance follows via 700ms
+  one-shot delay (d2f149f); P4 Tier-3 gold pull-line signatures on /how's 9
+  seals (rust on Test send-back) + /what checkpoint (4ac845a). 161/161 tests;
+  4 CITATIONS rows added (16 agents = real registry count; 9 gates; "0 lines"
+  = design guarantee not metric; production-grade = capability claim, no
+  customer implied). WCAG AA verified both themes. Orchestrator independently
+  re-verified + redeployed :8100. KNOWN LOOSE END: page <title> and <meta
+  description> still carry the OLD headline copy — flagged to human for a copy
+  decision (needs new wording matching the "new way to build software"
+  positioning). Old on-page headline fully removed.
+- 2026-07-23 — EXPERIENCE REVIEW + fixes [human asked ui-ux-designer for a
+  detailed review of experience loose ends]. Verdict: no Critical, new hero
+  strongest yet, title/meta fix confirmed. Fixes applied (dev/ commit acadb37,
+  161/161): H1 /who TRUE unfold — rail-entrance delay 700ms→1900ms so the
+  glyph leads, glyph de-emphasized (max-width 520→340px, role labels removed
+  so the labeled roster lives only in the rail, no more double "You"/roster);
+  M3 hero lede/stat-strip/CTA staged entrance restored (orphaned selectors
+  repointed to .home-body); M2 Tier-3 .sig3 signatures given their own short
+  timeline (draw by ~0.8s, no more ~1s blank); M1 hero gold underline now
+  wraps under both lines on mobile via box-decoration-break:clone + period
+  folded into the goldline unit. H2 bridging edit [human-approved wording]:
+  homepage comparison heading "Speed to demo isn't speed to production" →
+  "Anyone can be fast to a demo. Conclave gets you to production." (dev/
+  commit 34bdb8a) — puts Conclave on the winning side of the speed argument,
+  resolving the same-page collision with the "production-grade from day one"
+  hero. STILL DEFERRED (own copy-approval round): full /why + comparison-body
+  voice rewrite into the new "new way to build software" register.
+- 2026-07-23 — /why + COMPARISON VOICE REWRITE [human: "rewrite and fix that
+  too"]. ui-ux-designer drafted the full rewrite into the new "new way to
+  build software" partner voice; human approved via mockup (design-review/
+  why-comparison-rewrite-mockup.html) incl. Conclave-first column order.
+  Applied directly by orchestrator (build agent kept dropping on connection
+  errors): (1) comparison — Conclave column now LEADS (left), divider moved
+  to it, reframed as two paths from the same idea, subcaptions "9 gates →
+  production" / "1 step: prompt → a demo"; all 3 cited stats (Veracode 45% /
+  GitClear 8x&70% / MIT NANDA 95%) kept verbatim on the vibe side. (2) /why —
+  partner-voice reframe of leads, FDE section ("We build it with you — and in
+  three weeks, it's yours"), gates intro (design-bet-first), decision-log +
+  claims-table intros, contact ("You're in command from the first line"),
+  with EVERY substantiated claim kept verbatim: both Gartner stats, the two
+  decision-log quotes, the unsanitized test-gate send-back, both seal lines,
+  the 7-row claims table, the FDE hedge, the F13 placeholder note. No citation
+  dropped/reworded — CITATIONS.md unchanged. dev/ commit 8db58c6, 161/161
+  tests, redeployed :8100. Tests updated: comparison bullet substrings +
+  column-order assertion, FDE-heading references (2 tests).
+- 2026-07-23 — /what REDO INITIATED [human: "'what it builds' is wrong — we
+  can use Conclave to build ANY software, need strong examples, conduct
+  detailed research, all right agents involved"]. Current /what wrongly caps
+  Conclave at 3 template types; truth is it's a general-purpose governed SDLC
+  system, templates are accelerators not the ceiling. Dispatched industry-
+  expert (deep research: software categories enterprises build/buy in 2026 +
+  6-10 concrete illustrative example applications + honest breadth framing)
+  and functional-agent (functional-breadth taxonomy + devil's-advocate on
+  where "any software" overclaims + the honest scope/hedge — noting cloud
+  target_env still local-only, mobile/embedded out of scope, etc.). Next:
+  synthesize → ui-ux-designer /what redesign concept → mockup → human approval
+  → build. Honesty constraint: illustrative capabilities only, no invented
+  customers, must survive the claims manifest.
+- 2026-07-24 — /what REDESIGN APPROVED FOR BUILD [human]. Research synthesized
+  (industry-expert + functional-agent, recorded in INDUSTRY_KB/DOMAIN_KB).
+  Human chose: breadth = "broadest defensible" ("a general-purpose way to build
+  the software your business runs on"), boundary = present-but-understated (one
+  quiet line: web/API/data/agentic · your environment · cloud roadmapped · not
+  mobile/embedded). Page structure/copy approved from mockup (design-review/
+  what-builds-redesign-mockup.html): lead + boundary line, 3 templates demoted
+  to fast-starts, 7 concrete custom example categories + an 8th "unscoped" card,
+  capability-spine, forward link. Human ADDITIONALLY directed: "actual previews
+  to be built when the build begins, I am okay with UI design" — i.e. upgrade
+  each example's schematic sketch to a REAL designed UI preview (fuller
+  fidelity). HONESTY GUARDRAIL (kept): previews are generic ILLUSTRATIVE sample
+  UIs — real design quality, placeholder/sample content, NO invented company
+  name/logo, labeled as a sample — never a screenshot implying a delivered
+  product; needs a claims-manifest row. Claims rows also needed: delivery=your-
+  environment (cloud roadmapped), web-not-native-mobile, templates=accelerators.
+  All examples illustrative ("Conclave can build…"), no market-ROI stat as
+  Conclave's own, no compliance-guarantee language, domain-neutral.
+- 2026-07-24/25 — /what REDESIGN BUILT: new page leads on breadth ("a
+  general-purpose way to build the software your business runs on"), 3
+  templates demoted to fast-starts, 8 example categories each with a REAL
+  designed illustrative-sample UI preview (contract view / portal dashboard /
+  ops table with status pills / audit log / analytics chart+recommendation /
+  process flow with gold human-checkpoint / integration hub / idea canvas),
+  capability spine, understated honest boundary (your environment; cloud
+  roadmapped; not native-mobile/embedded). Previews are generic labeled
+  "Illustrative sample" (no invented customer/logo) — honesty guardrail
+  enforced. Cards rise-in once on scroll via new what.js (no loop; reduced-
+  motion static). Build spanned agent connection drops; orchestrator finished
+  the loose ends directly: created what.js, added .reveal motion CSS, added 6
+  honest-scope CITATIONS rows, fixed banned-term false positive (ex-grid ->
+  ex-cards class rename), removed orphaned what-demos.js + old animated-demo
+  tests, wrote new-structure tests. dev/ commit 3031cf8, 163/163 tests,
+  redeployed :8100, zero external requests.
+- 2026-07-25 — /what RE-LANGUAGED + REALISTIC PREVIEWS [human] built. After
+  the human rejected "not three templates" (insider framing) and the abstract
+  sketches: (1) designer redid language positive/idea-first — page now opens
+  "Have an idea for software? Conclave builds it." with the idea→built theme
+  threaded end to end; (2) industry-expert researched example ORDER (serial-
+  position effect) → Contract → Internal ops → Portals → Analytics →
+  Integration → Agentic → Compliance → open-ended closer; (3) copy tightened;
+  (4) boundary "One honest note on scope" line REMOVED (scope now implied by
+  examples + spine's "Delivered into your environment"; CITATIONS mobile/
+  embedded/cloud rows retired); (5) templates reframed "Three quick-start
+  templates" (compact fast-lane), custom section made the prominent main event
+  "Pure custom — your idea, built end to end" with 8 ENLARGED cards; (6) the 8
+  previews upgraded from line-art to REALISTIC app-window sample UIs (window
+  chrome, drop-shadows, filled buttons/pills, sample data, real chart + audit
+  log) — still generic + labeled "Sample" (no company/logo), honesty held.
+  dev/ commits c3cf47d + 3339280, 163/163 tests, redeployed :8100, zero
+  external requests. Code-agent judgment calls: added --surface token (AA-
+  verified), SVG filter regions as objectBoundingBox fractions (avoids stat-
+  gate false positive on "140%"), breadth-lead test repointed to new lead.
+- 2026-07-25 — VISUAL-ENGAGEMENT LAYER [human: "add imagery... very text heavy",
+  then "research leading way to engage users, if not human it's fine"]. Research
+  (industry-expert, INDUSTRY_KB 2026-07-25): for trust-led technical products the
+  leading engagement move is NOT stock/AI photos (banner-blindness + credibility
+  damage — worst move for a trust brand) but rationed restraint + editorial
+  text-breaking + activating existing visuals + a locally-generated abstract
+  texture. Human chose the research-backed plan, all pages one pass. Designer
+  produced a build-ready per-page placement spec (caught real class collisions:
+  .pull→.pullquote, .split→.split-card, .stat→.stat-callout). Built (dev/ commits
+  c67d0c6/eaac20d/e2eaef4/739f608/66fcbae, 190/190 tests): P1 editorial kit
+  (stat-callouts, pull-quotes, split-card) LIFTING existing copy only — no new
+  marketing copy; P2 promoted the .reveal scroll observer site-wide + tightened
+  to .24s; P3 the honest "imagery" = a locally-generated "council network"
+  canvas texture (texture.js, multi-instance, IO-gated, reduced-motion static,
+  theme-aware) as exactly 3 sparse section dividers (/why closing, /what custom-
+  head, /who bottom; NONE on home [ambient canvas] or /how [replay]); P4 six thin
+  gold seal/line section icons in base.html defs. /why got the heavy treatment
+  (2 pull-quotes, 2-up Gartner stat-callouts, test-evidence as a split-card, a
+  texture band), other pages light. Zero external requests (pure canvas), both
+  themes, AA, reduced-motion parity all preserved. Deliberately AVOIDED: stock/AI
+  photos, human imagery, fake screenshots, scroll-jacking. NOTE: I (orchestrator)
+  cannot call the OpenAI image API — the generative-from-code texture sidesteps
+  that entirely and keeps the site self-contained.

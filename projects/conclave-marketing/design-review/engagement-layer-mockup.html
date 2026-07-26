@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual-engagement layer — mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6018; --gold:#8A5A17; --gold-soft:#8a5a1718; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF; --rust:#A8432F;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b915; --gold:#E0A94E; --gold-soft:#e0a94e15; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19; --rust:#E07A5F;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#141518; font-family:system-ui,-apple-system,sans-serif; color:#e8e8e8; }
+  .chrome { position:sticky; top:0; z-index:30; background:#0d0e11; border-bottom:1px solid #2a2d33; padding:12px 22px; display:flex; gap:10px; align-items:center; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; margin-left:auto; }
+  .stage { background:var(--paper); color:var(--ink); }
+  .col { max-width:860px; margin:0 auto; padding:40px; }
+  h1.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(30px,3.6vw,42px); line-height:1.14; margin-bottom:14px; }
+  .lead { font-size:18px; line-height:1.6; color:var(--ink); margin-bottom:8px; }
+  .answer { font-size:15.5px; line-height:1.65; color:var(--muted); margin-bottom:14px; }
+  .tag { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:30px 0 10px; }
+
+  /* P1 — stat callouts */
+  .callouts { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:24px 0; }
+  .callout { border:1px solid var(--hairline); border-radius:12px; padding:18px 20px; background:var(--surface); }
+  .callout .n { font-family:Georgia,serif; font-size:44px; font-weight:600; color:var(--teal); line-height:1; }
+  .callout .l { font-size:12.5px; color:var(--muted); margin-top:8px; line-height:1.4; }
+  .callout.gold .n { color:var(--gold); }
+
+  /* P1 — pull quote */
+  .pull { font-family:Georgia,serif; font-size:clamp(20px,2.6vw,28px); line-height:1.3; color:var(--ink); border-left:3px solid var(--gold); padding:6px 0 6px 22px; margin:28px 0; max-width:24ch; }
+
+  /* P1 — split card */
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; border:1px solid var(--hairline); border-radius:14px; overflow:hidden; background:var(--surface); margin:22px 0; }
+  .split .txt { padding:22px 24px; }
+  .split .txt h3 { font-family:Georgia,serif; font-weight:500; font-size:19px; margin-bottom:8px; }
+  .split .txt p { font-size:13.5px; color:var(--muted); line-height:1.55; }
+  .split .vis { align-self:stretch; min-height:170px; position:relative; background:var(--paper); border-left:1px solid var(--hairline); }
+  .split .vis .art { position:absolute; inset:0; background:var(--cream); font-family:Georgia,serif; }
+  .artifact-mini { padding:16px 18px; font-family:Georgia,serif; font-size:12.5px; line-height:1.55; color:var(--muted); }
+  .artifact-mini .k { font-family:system-ui; font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:6px; }
+  .seal-mini { position:absolute; bottom:12px; right:14px; width:34px; height:34px; border:2px solid var(--gold); color:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:800; text-transform:uppercase; transform:rotate(-8deg); }
+
+  /* P3 — generative "council network" texture band */
+  .texband { position:relative; height:240px; margin:34px -40px; overflow:hidden; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline); }
+  .texband canvas { position:absolute; inset:0; width:100%; height:100%; }
+  .texband .over { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 30px; }
+  .texband .over p { font-family:Georgia,serif; font-size:clamp(20px,3vw,30px); color:var(--ink); max-width:20ch; line-height:1.25; }
+  .texband .over .em { color:var(--gold); }
+
+  .notes-panel { background:#0d0e11; border-top:1px solid #2a2d33; padding:22px 32px 36px; font-size:13px; line-height:1.65; color:#c8cbd2; }
+  .notes-panel b { color:#fff; } .notes-panel .g { color:#e0b060; } .notes-panel .p { color:#7fd4c6; font-weight:600; }
+  @media (max-width:640px){ .callouts,.split{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="chrome">
+  <span class="t">Visual-engagement layer (not stock imagery) — for approval</span>
+  <button id="theme">◐ Theme</button>
+</div>
+
+<div class="stage"><div class="col">
+
+  <div class="tag">P3 &mdash; generative "council network" texture (the honest "imagery")</div>
+  <div class="texband"><canvas id="tex"></canvas>
+    <div class="over"><p>Sixteen specialists. One <span class="em">human</span> holding the final say.</p></div>
+  </div>
+  <p class="answer" style="text-align:center; font-size:12.5px;">Rendered live from code (not a stock/AI photo) &mdash; monochrome paper with a single gold node for the human. Self-contained, zero external requests, both themes.</p>
+
+  <div class="tag">P1 &mdash; stat callouts (break the text, make the numbers land)</div>
+  <div class="callouts">
+    <div class="callout"><div class="n">16</div><div class="l">specialist agents, not one model</div></div>
+    <div class="callout"><div class="n">9</div><div class="l">SDLC gates, every one covered</div></div>
+    <div class="callout gold"><div class="n">0</div><div class="l">lines shipped unreviewed</div></div>
+  </div>
+
+  <div class="tag">P1 &mdash; pull-quote (the load-bearing line, lifted out of the prose)</div>
+  <p class="pull">"You stay in command &mdash; nothing advances without your call."</p>
+
+  <div class="tag">P1 &mdash; split card (chunk long evidence into text&#124;visual rows)</div>
+  <div class="split">
+    <div class="txt">
+      <h3>Sent back &mdash; and the record keeps it</h3>
+      <p>The first version of this site failed its own test gate: six defects, quoted here unedited. It was reworked and re-passed. That's the point &mdash; the failures survive in the record too.</p>
+    </div>
+    <div class="vis"><div class="artifact-mini"><span class="k">Test evidence &mdash; verbatim</span>"26/26 passing, but the content-enforcement suite was missing and one statistic was unhedged. Sent back. Reworked &rarr; 36/36 green."<div class="seal-mini">Sent<br>back</div></div></div>
+  </div>
+
+  <div class="tag">The problem this solves</div>
+  <p class="answer">Below is a slice of how /why reads <b>today</b> &mdash; a wall of prose. The devices above turn that same content into scannable, engaging units without adding a single word or a single stock image.</p>
+  <p class="answer" style="opacity:.7; font-size:13.5px;">You stay in command of everything Conclave builds. So you shouldn't have to take its work on faith &mdash; you should be able to check it. You can: every claim on this site has a record behind it, including the failures, which we quote below unedited in substance. We won't show you a customer logo, because we don't have one yet &mdash; and we won't invent one. What we can show you is stronger. The site you're reading was built by Conclave, through its own nine gates, and the record of that build survives. The gates exist so that a person decides, on the record, every time the work moves forward&hellip; (continues for several more paragraphs).</p>
+
+</div></div>
+
+<div class="notes-panel">
+  <b>What the research found (leading products in our category &mdash; Anthropic, Palantir, Linear, Stripe, Vercel):</b> the leading way to engage users on serious/trust-led technical sites is <span class="g">not "add images"</span> &mdash; it's rationed restraint + showing the product/system + breaking long text into visual units. <span class="g">Generic stock or AI photography actively hurts a trust brand</span> (banner blindness + credibility red flag) &mdash; the single worst move for a product that sells honesty. So this is the plan:
+  <br><br>
+  <span class="p">P1 &mdash; editorial text-breaking kit</span> (stat callouts, pull-quotes, split cards): highest impact, zero risk, directly fixes "too text-heavy." Applied to Home, /why, /what.<br>
+  <span class="p">P2 &mdash; scroll-reveal the visuals we already own</span> (Council Mark, /how replay, /who hierarchy, /what sample-UIs) so dense sections unfold on scroll instead of sitting as walls &mdash; fast (100&ndash;300ms), purposeful, reduced-motion-safe.<br>
+  <span class="p">P3 &mdash; the honest "imagery"</span>: an on-brand, <span class="g">locally-generated abstract "council network" texture</span> (shown up top) used sparingly as section backing/dividers &mdash; real imagery, generated from code, so it's self-contained AND can't read as fake stock. This is also why it needs <span class="g">no OpenAI API</span> &mdash; nothing to fetch or fabricate.<br>
+  <span class="p">P4 &mdash; a thin custom seal/line-icon spot-graphic set</span> for section heads.
+  <br><br>
+  <b>Deliberately avoided:</b> stock/AI photos, human imagery, fake product screenshots, heavy 3D/scroll-jacking. This gives you <span class="g">more visual engagement AND far less text density</span> &mdash; the two things you asked for &mdash; without a single move that would undercut the trust positioning.
+</div>
+
+<script>
+  document.getElementById('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+    draw();
+  });
+  // P3 generative "council network" texture — richer ambient field, one gold node
+  var canvas = document.getElementById('tex'), ctx = canvas.getContext('2d'), pts = [], W, H, raf;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function tone(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function size(){ var r=canvas.parentElement.getBoundingClientRect(); var d=devicePixelRatio||1; W=r.width; H=r.height; canvas.width=W*d; canvas.height=H*d; ctx.setTransform(d,0,0,d,0,0); }
+  function init(){ size(); pts=[]; var n=Math.round(W/26); for(var i=0;i<n;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,core:i===Math.floor(n/2)}); }
+  function hex2rgb(h){ h=h.replace('#',''); if(h.length===3)h=h.split('').map(function(c){return c+c;}).join(''); return parseInt(h.slice(0,2),16)+','+parseInt(h.slice(2,4),16)+','+parseInt(h.slice(4,6),16); }
+  function draw(mv){
+    var ink=hex2rgb(tone('--ink')), teal=hex2rgb(tone('--teal')), gold=hex2rgb(tone('--gold'));
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<pts.length;i++){var p=pts[i]; if(mv){p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;}
+      var c=p.core?gold:(i%5===0?teal:ink), a=p.core?.85:.34, r=p.core?3.4:1.5;
+      ctx.fillStyle='rgba('+c+','+a+')'; ctx.beginPath(); ctx.arc(p.x,p.y,r,0,7); ctx.fill(); }
+    for(var a2=0;a2<pts.length;a2++)for(var b=a2+1;b<pts.length;b++){var dx=pts[a2].x-pts[b].x,dy=pts[a2].y-pts[b].y,d=dx*dx+dy*dy;
+      if(d<150*150){var core=pts[a2].core||pts[b].core,c=core?gold:ink; ctx.strokeStyle='rgba('+c+','+((core?.3:.12)*(1-Math.sqrt(d)/150)).toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(pts[a2].x,pts[a2].y); ctx.lineTo(pts[b].x,pts[b].y); ctx.stroke();} }
+  }
+  function tick(){ raf=requestAnimationFrame(tick); if(document.hidden)return; draw(true); }
+  init(); if(reduce){draw(false);} else {tick();}
+  window.addEventListener('resize', function(){ init(); if(reduce)draw(false); });
+</script>
+</body>
+</html>

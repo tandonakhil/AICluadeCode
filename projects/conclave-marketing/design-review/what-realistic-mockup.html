@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/what — crisp copy + realistic sample UIs</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6018; --teal-2:#12907f;
+    --gold:#8A5A17; --gold-soft:#8a5a1718; --cream:#FBF3E4; --hairline:#D8D4CA; --line2:#ECE8DF; --muted:#5C5A54; --surface:#FFFFFF; --rust:#A8432F;
+    --c-research:#2456C4; --c-design:#8A3A7A; --c-arch:#5B4AA8; --c-quality:#7A5014; --c-ship:#1E7A46; --win:#FFFFFF; --winbar:#F2EFE9;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b915; --teal-2:#52d8c8;
+    --gold:#E0A94E; --gold-soft:#e0a94e15; --cream:#242019; --hairline:#3A3733; --line2:#2c2a25; --muted:#A5A099; --surface:#1E1C19; --rust:#E07A5F;
+    --c-research:#8AB0F8; --c-design:#E08AC8; --c-arch:#A79AE8; --c-quality:#E8B45A; --c-ship:#6FCF8F; --win:#211E1A; --winbar:#2a2721;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#141518; font-family:system-ui,-apple-system,sans-serif; color:#e8e8e8; }
+  .chrome { position:sticky; top:0; z-index:30; background:#0d0e11; border-bottom:1px solid #2a2d33; padding:12px 22px; display:flex; gap:10px; align-items:center; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; margin-left:auto; }
+  .stage { background:var(--paper); color:var(--ink); }
+  .col { max-width:960px; margin:0 auto; padding:48px 40px 40px; }
+  h1.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(30px,3.6vw,44px); line-height:1.13; margin-bottom:14px; }
+  .lead { font-size:19px; line-height:1.55; color:var(--ink); margin-bottom:22px; max-width:64ch; }
+  .lead .em { color:var(--teal); font-weight:600; }
+  .section-label { font-family:Georgia,serif; font-weight:500; font-size:22px; margin:40px 0 4px; }
+  .section-label.small-sec { font-size:18px; color:var(--muted); margin-top:36px; }
+  .section-label.big-sec { font-size:clamp(24px,3vw,34px); color:var(--ink); margin:0 0 6px; }
+  .custom-head { margin-top:52px; padding-top:26px; border-top:2px solid var(--hairline); }
+  .section-sub { font-size:14px; color:var(--muted); margin-bottom:16px; max-width:62ch; }
+
+  /* quick-start templates: deliberately compact (the fast lane) */
+  .tpl-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .tpl { border:1px solid var(--hairline); border-radius:10px; padding:13px 15px; background:var(--surface); }
+  .tpl .tag { font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); font-weight:600; }
+  .tpl h3 { font-size:14px; font-family:Georgia,serif; font-weight:500; margin:4px 0 4px; }
+  .tpl p { font-size:12px; color:var(--muted); line-height:1.45; }
+
+  /* custom builds: the large, prominent main event */
+  .ex-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-top:22px; }
+  .ex { border:1px solid var(--hairline); border-radius:16px; padding:0 0 20px; background:var(--surface); overflow:hidden; position:relative; box-shadow:0 6px 22px rgba(0,0,0,.06); transition:transform .2s, box-shadow .2s; }
+  .ex:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,.10); }
+  .ex::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--ac,var(--teal)); z-index:2; }
+  .preview { position:relative; background:var(--paper); border-bottom:1px solid var(--hairline); }
+  .preview svg { display:block; width:100%; height:auto; }
+  .plabel { position:absolute; top:10px; right:10px; z-index:2; font-size:9px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); background:color-mix(in srgb, var(--surface) 82%, transparent); border:1px solid var(--hairline); border-radius:5px; padding:2px 7px; }
+  .ex .body { padding:18px 24px 0; }
+  .ex h3 { font-size:20px; font-family:Georgia,serif; font-weight:500; margin-bottom:8px; }
+  .ex .desc { font-size:14.5px; line-height:1.55; color:var(--ink); margin-bottom:12px; }
+  .ex .why { font-size:12.5px; line-height:1.55; color:var(--muted); padding-top:12px; border-top:1px dashed var(--hairline); }
+  .ex .why b { color:var(--ac,var(--teal)); font-weight:600; }
+
+  .spine { margin-top:34px; border:1px solid var(--hairline); border-radius:12px; background:linear-gradient(180deg, var(--teal-soft), transparent); padding:20px 24px; }
+  .spine h3 { font-family:Georgia,serif; font-weight:500; font-size:19px; margin-bottom:12px; }
+  .spine .rows { display:flex; gap:22px; flex-wrap:wrap; }
+  .spine .item { display:flex; align-items:baseline; gap:8px; font-size:13.5px; color:var(--ink); }
+  .spine .item .d { color:var(--gold); font-weight:700; }
+  .fwd { color:var(--teal); font-size:15px; text-decoration:none; border-bottom:1px solid var(--teal); padding-bottom:2px; display:inline-block; margin-top:26px; }
+  .notes-panel { background:#0d0e11; border-top:1px solid #2a2d33; padding:22px 32px 34px; font-size:13px; line-height:1.6; color:#c8cbd2; }
+  .notes-panel b { color:#fff; } .notes-panel .g { color:#e0b060; }
+  @media (max-width:720px){ .tpl-row,.ex-cards{grid-template-columns:1fr;} }
+
+  /* realistic-preview SVG primitives */
+  .win { fill:var(--win); }
+  .winbar { fill:var(--winbar); }
+  .u-muted { fill:var(--muted); } .u-ink{ fill:var(--ink);} .u-teal{ fill:var(--teal);} .u-gold{ fill:var(--gold);}
+  .u-card { fill:var(--surface); stroke:var(--hairline); stroke-width:1; }
+  .u-line { stroke:var(--line2); stroke-width:1; }
+  .fs6{font-size:6px;} .fs7{font-size:7px;} .fs8{font-size:8px;} .fs9{font-size:9px;} .fs11{font-size:11px;} .fs16{font-size:16px;}
+  .sans{font-family:system-ui,sans-serif;} .serif{font-family:Georgia,serif;}
+  .wbtn{ fill:var(--teal); } .wbtn-t{ fill:var(--cream); }
+  [data-theme="dark"] .wbtn-t{ fill:#0e2a26; }
+</style>
+</head>
+<body>
+<div class="chrome">
+  <span class="t">/what — crisper copy, no scope note, realistic sample UIs — for approval</span>
+  <button id="theme">◐ Theme</button>
+</div>
+
+<div class="stage"><div class="col">
+  <h1 class="q">What can it build?</h1>
+  <p class="lead">Have an idea for software? Conclave builds it. Portals,
+  internal tools, document and contract systems, analytics, agentic workflows
+  &mdash; or something entirely your own. It&rsquo;s <span class="em">a
+  general-purpose way to build the software your business runs on</span>,
+  taking your idea from first sketch to production with a human in command at
+  every gate.</p>
+
+  <div class="section-label small-sec">Three quick-start templates</div>
+  <p class="section-sub">The most-requested builds, ready to start from &mdash; a head start, without skipping a gate.</p>
+  <div class="tpl-row">
+    <div class="tpl"><span class="tag">Quick start</span><h3>Support assistant</h3><p>Answers from an approved knowledge set, cites its source, hands off to a person when it&rsquo;s out of depth.</p></div>
+    <div class="tpl"><span class="tag">Quick start</span><h3>Automated workflow</h3><p>Multi-step process run by agents, with the judgment calls routed to a human by design.</p></div>
+    <div class="tpl"><span class="tag">Quick start</span><h3>Knowledge assistant</h3><p>Grounded answers over your own documents, every reply citing the passages it came from.</p></div>
+  </div>
+
+  <div class="custom-head">
+    <div class="section-label big-sec">Pure custom &mdash; your idea, built end to end</div>
+    <p class="section-sub">The templates are just the fast lane. Describe the software you actually need and the same governed pipeline builds it, idea to production. A few of the shapes it takes:</p>
+  </div>
+  <div class="ex-cards">
+
+    <!-- 1 · Contract & document intelligence -->
+    <div class="ex" style="--ac:var(--c-research)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: a contract with extracted fields and a renewal flag routed to a person">
+          <defs><filter id="s1" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s1)"/>
+          <path class="winbar" d="M14 12 h272 a9 9 0 0 1 9 9 v9 h-290 v-9 a9 9 0 0 1 9 -9 z" transform="translate(0,0)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">DocIntel &mdash; Master Services Agreement.pdf</text>
+          <rect class="u-card" x="26" y="44" width="150" height="102" rx="6"/>
+          <line class="u-line" x1="36" y1="58" x2="164" y2="58"/><line class="u-line" x1="36" y1="66" x2="150" y2="66"/>
+          <rect x="35" y="74" width="88" height="15" rx="4" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/><text class="sans fs7 u-teal" x="41" y="84">Term &mdash; 24 months</text>
+          <line class="u-line" x1="36" y1="98" x2="164" y2="98"/>
+          <rect x="35" y="106" width="94" height="15" rx="4" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/><text class="sans fs7 u-teal" x="41" y="116">Auto-renews &mdash; Yes</text>
+          <line class="u-line" x1="36" y1="130" x2="150" y2="130"/><line class="u-line" x1="36" y1="138" x2="120" y2="138"/>
+          <text class="sans fs7 u-muted" x="188" y="52" letter-spacing=".5">EXTRACTED</text>
+          <rect x="188" y="58" width="86" height="22" rx="6" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="1"/>
+          <circle cx="199" cy="69" r="6" fill="var(--gold)"/><path d="M196 69 l2 2 l3.4 -4" fill="none" stroke="var(--win)" stroke-width="1.3"/>
+          <text class="sans fs8 u-gold" x="209" y="72" font-weight="600">Renewal flagged</text>
+          <text class="sans fs7 u-muted" x="188" y="98">Exception &rarr; needs a decision</text>
+          <rect x="188" y="104" width="86" height="26" rx="7" class="wbtn"/><text class="sans fs8 wbtn-t" x="231" y="120" text-anchor="middle" font-weight="600">Route to a person</text>
+          <text class="sans fs6 u-muted" x="188" y="142">Every field &amp; routing logged</text>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Contract &amp; document intelligence</h3>
+        <p class="desc">Extracts terms, flags obligations and renewal dates, and routes the exceptions to a person.</p>
+        <p class="why"><b>Why governed matters:</b> contract calls carry legal weight &mdash; every extraction and routing is on the record.</p>
+      </div>
+    </div>
+
+    <!-- 2 · Internal operations console -->
+    <div class="ex" style="--ac:var(--c-ship)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: an operations console table with owners, status pills, and an approve action">
+          <defs><filter id="s2" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s2)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">Operations console</text>
+          <text class="sans fs7 u-muted" x="28" y="50" letter-spacing=".5">REQUEST</text><text class="sans fs7 u-muted" x="150" y="50" letter-spacing=".5">OWNER</text><text class="sans fs7 u-muted" x="228" y="50" letter-spacing=".5">STATUS</text>
+          <line class="u-line" x1="24" y1="56" x2="276" y2="56"/>
+          <g class="sans">
+            <text class="fs9 u-ink" x="28" y="73">Onboarding #4021</text>
+            <circle cx="154" cy="69" r="6" fill="var(--c-arch)" opacity=".22"/><text class="fs7 u-muted" x="164" y="72">A. Rivera</text>
+            <rect x="222" y="62" width="50" height="15" rx="7.5" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/><text class="fs7 u-teal" x="247" y="72" text-anchor="middle">Approved</text>
+            <line class="u-line" x1="24" y1="82" x2="276" y2="82"/>
+            <text class="fs9 u-ink" x="28" y="99">Refund #8830</text>
+            <circle cx="154" cy="95" r="6" fill="var(--c-design)" opacity=".22"/><text class="fs7 u-muted" x="164" y="98">M. Chen</text>
+            <rect x="222" y="88" width="50" height="15" rx="7.5" class="wbtn"/><path d="M229 95.5 l2.4 2.4 l4 -4.8" fill="none" stroke="var(--cream)" stroke-width="1.2"/><text class="fs7 wbtn-t" x="250" y="98" text-anchor="middle" font-weight="600">Approve</text>
+            <line class="u-line" x1="24" y1="108" x2="276" y2="108"/>
+            <text class="fs9 u-ink" x="28" y="125">Access req #219</text>
+            <circle cx="154" cy="121" r="6" fill="var(--c-ship)" opacity=".22"/><text class="fs7 u-muted" x="164" y="124">J. Okafor</text>
+            <rect x="222" y="114" width="50" height="15" rx="7.5" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width=".9"/><text class="fs7 u-gold" x="247" y="124" text-anchor="middle">Pending</text>
+            <line class="u-line" x1="24" y1="134" x2="276" y2="134"/>
+            <text class="fs9 u-ink" x="28" y="151">Vendor #77</text><circle cx="154" cy="147" r="6" fill="var(--c-research)" opacity=".22"/><text class="fs7 u-muted" x="164" y="150">S. Patel</text>
+            <rect x="222" y="140" width="50" height="15" rx="7.5" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/><text class="fs7 u-teal" x="247" y="150" text-anchor="middle">Active</text>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Internal operations console</h3>
+        <p class="desc">One dashboard for approvals, edits, and reporting &mdash; instead of scattered spreadsheets and admin panels.</p>
+        <p class="why"><b>Why governed matters:</b> these tools write to live data &mdash; approval on any write step is a gate, not an afterthought.</p>
+      </div>
+    </div>
+
+    <!-- 3 · Customer & partner portals -->
+    <div class="ex" style="--ac:var(--c-arch)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: a partner portal with an account badge and metric tiles">
+          <defs><filter id="s3" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s3)"/>
+          <rect x="14" y="12" width="272" height="30" rx="9" fill="var(--teal)"/><rect x="14" y="24" width="272" height="18" fill="var(--teal)"/>
+          <text class="serif fs11" x="28" y="32" fill="#fff">Partner Portal</text>
+          <text class="sans fs7" x="238" y="31" text-anchor="end" fill="#dff5f0">Northwind Co.</text>
+          <circle cx="258" cy="27" r="9" fill="#fff" opacity=".9"/><text class="sans fs8" x="258" y="30" text-anchor="middle" fill="var(--teal)" font-weight="700">N</text>
+          <g class="sans">
+            <rect class="u-card" x="26" y="52" width="78" height="48" rx="7"/><text class="fs6 u-muted" x="36" y="68" letter-spacing=".4">OPEN ORDERS</text><text class="serif" font-size="22" fill="var(--ac)" x="36" y="92">18</text>
+            <rect class="u-card" x="111" y="52" width="78" height="48" rx="7"/><text class="fs6 u-muted" x="121" y="68" letter-spacing=".4">INVOICES DUE</text><text class="serif" font-size="22" fill="var(--ac)" x="121" y="92">6</text>
+            <rect class="u-card" x="196" y="52" width="78" height="48" rx="7"/><text class="fs6 u-muted" x="206" y="68" letter-spacing=".4">MESSAGES</text><text class="serif" font-size="22" fill="var(--ac)" x="206" y="92">3</text>
+            <rect class="u-card" x="26" y="108" width="248" height="40" rx="7"/>
+            <text class="fs6 u-muted" x="36" y="122" letter-spacing=".4">RECENT ACTIVITY</text>
+            <line class="u-line" x1="36" y1="130" x2="180" y2="130"/><line class="u-line" x1="36" y1="139" x2="150" y2="139"/>
+            <rect x="222" y="122" width="44" height="16" rx="8" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width=".8"/><text class="fs7 u-teal" x="244" y="133" text-anchor="middle">View all</text>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Customer &amp; partner portals</h3>
+        <p class="desc">A branded portal where customers or partners check status, place orders, and pull their own data.</p>
+        <p class="why"><b>Why governed matters:</b> portals expose internal data outward &mdash; the security gate scopes access before launch.</p>
+      </div>
+    </div>
+
+    <!-- 4 · Decision-support & analytics -->
+    <div class="ex" style="--ac:var(--c-research)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: an analytics dashboard with a trend chart and a recommended-action card">
+          <defs><filter id="s4" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter>
+            <linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--teal)" stop-opacity=".3"/><stop offset="1" stop-color="var(--teal)" stop-opacity="0"/></linearGradient></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s4)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">Cost &amp; risk drivers</text>
+          <rect class="u-card" x="26" y="44" width="148" height="102" rx="7"/>
+          <line class="u-line" x1="36" y1="70" x2="164" y2="70"/><line class="u-line" x1="36" y1="94" x2="164" y2="94"/><line class="u-line" x1="36" y1="118" x2="164" y2="118"/>
+          <path d="M40 128 66 112 92 118 118 90 144 98 164 64 164 138 40 138 Z" fill="url(#ar)"/>
+          <polyline points="40,128 66,112 92,118 118,90 144,98 164,64" fill="none" stroke="var(--ac)" stroke-width="2.2"/>
+          <circle cx="164" cy="64" r="7" fill="var(--ac)" opacity=".25"/><circle cx="164" cy="64" r="3.4" fill="var(--ac)"/>
+          <text class="sans fs6 u-muted" x="40" y="151">Q1</text><text class="sans fs6 u-muted" x="90" y="151">Q2</text><text class="sans fs6 u-muted" x="140" y="151">Q3</text>
+          <rect x="182" y="44" width="92" height="102" rx="7" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="1"/>
+          <circle cx="196" cy="60" r="7" fill="var(--gold)"/><path d="M192.5 60 l2.5 2.5 l4 -5" fill="none" stroke="var(--win)" stroke-width="1.3"/>
+          <text class="sans fs8 u-gold" x="207" y="63" font-weight="700">Recommended</text>
+          <text class="sans fs7 u-ink" x="192" y="80">Shift spend to</text><text class="sans fs7 u-ink" x="192" y="90">tier-2 vendors</text>
+          <line class="u-line" x1="192" y1="100" x2="264" y2="100"/>
+          <text class="sans fs6 u-muted" x="192" y="114">Why: 14% lower risk,</text><text class="sans fs6 u-muted" x="192" y="123">reasoning shown</text>
+          <rect x="192" y="128" width="72" height="12" rx="6" fill="var(--gold)" opacity=".16"/><text class="sans fs6 u-gold" x="228" y="137" text-anchor="middle">Open analysis</text>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Decision-support &amp; analytics</h3>
+        <p class="desc">Surfaces cost and risk drivers and recommends the next move &mdash; with the reasoning shown.</p>
+        <p class="why"><b>Why governed matters:</b> a recommendation that drives spend must be explainable &mdash; the trail captures why.</p>
+      </div>
+    </div>
+
+    <!-- 5 · Integration & middleware -->
+    <div class="ex" style="--ac:var(--c-arch)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: business systems wired into a central API hub">
+          <defs><filter id="s5" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s5)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">Integration hub &mdash; 4 connectors live</text>
+          <g stroke="var(--ac)" stroke-width="1.6" opacity=".8"><line x1="78" y1="62" x2="134" y2="92"/><line x1="222" y1="62" x2="166" y2="92"/><line x1="78" y1="130" x2="134" y2="100"/><line x1="222" y1="130" x2="166" y2="100"/></g>
+          <circle cx="150" cy="96" r="24" fill="var(--teal)" opacity=".12"/><circle cx="150" cy="96" r="24" fill="none" stroke="var(--teal)" stroke-width="2"/>
+          <text class="serif fs11 u-teal" x="150" y="93" text-anchor="middle" font-weight="700">API</text><text class="sans fs6 u-muted" x="150" y="105" text-anchor="middle">gateway</text>
+          <g class="sans fs8" text-anchor="middle">
+            <rect class="u-card" x="46" y="48" width="64" height="26" rx="6"/><text class="u-ink" x="78" y="65">CRM</text>
+            <rect class="u-card" x="190" y="48" width="64" height="26" rx="6"/><text class="u-ink" x="222" y="65">ERP</text>
+            <rect class="u-card" x="46" y="118" width="64" height="26" rx="6"/><text class="u-ink" x="78" y="135">Billing</text>
+            <rect class="u-card" x="190" y="118" width="64" height="26" rx="6"/><text class="u-ink" x="222" y="135">Legacy DB</text>
+          </g>
+          <circle cx="106" cy="77" r="2.6" fill="var(--c-ship)"/><circle cx="194" cy="77" r="2.6" fill="var(--c-ship)"/><circle cx="106" cy="115" r="2.6" fill="var(--c-ship)"/><circle cx="194" cy="115" r="2.6" fill="var(--c-ship)"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Integration &amp; middleware</h3>
+        <p class="desc">Custom APIs and connectors that make finance, ops, and legacy systems talk to each other.</p>
+        <p class="why"><b>Why governed matters:</b> integrations are where data quietly leaks &mdash; reviewed at each gate, they hold.</p>
+      </div>
+    </div>
+
+    <!-- 6 · Agentic process automation -->
+    <div class="ex" style="--ac:var(--c-design)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: an automated process flow paused at a gold human checkpoint">
+          <defs><filter id="s6" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s6)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">Process run &mdash; claims intake</text>
+          <line x1="48" y1="86" x2="252" y2="86" stroke="var(--line2)" stroke-width="2"/>
+          <line x1="48" y1="86" x2="150" y2="86" stroke="var(--ac)" stroke-width="2"/>
+          <g class="sans fs7" text-anchor="middle">
+            <circle cx="48" cy="86" r="13" fill="var(--surface)" stroke="var(--ac)" stroke-width="1.8"/><path d="M42 86 l3.4 3.4 l6.4 -7.6" fill="none" stroke="var(--ac)" stroke-width="1.6"/><text class="u-muted" x="48" y="112">Intake</text>
+            <circle cx="99" cy="86" r="13" fill="var(--surface)" stroke="var(--ac)" stroke-width="1.8"/><path d="M93 86 l3.4 3.4 l6.4 -7.6" fill="none" stroke="var(--ac)" stroke-width="1.6"/><text class="u-muted" x="99" y="112">Validate</text>
+            <circle cx="150" cy="86" r="18" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="2.4"/>
+            <rect x="145.4" y="79" width="3.4" height="14" rx="1.4" fill="var(--gold)"/><rect x="151.2" y="79" width="3.4" height="14" rx="1.4" fill="var(--gold)"/>
+            <text class="u-gold" x="150" y="118" font-weight="700">Human checkpoint</text><text class="u-muted fs6" x="150" y="128">paused for approval</text>
+            <circle cx="201" cy="86" r="13" fill="var(--surface)" stroke="var(--line2)" stroke-width="1.8"/><text class="u-muted" x="201" y="112" opacity=".55">Pay out</text>
+            <circle cx="252" cy="86" r="13" fill="var(--surface)" stroke="var(--line2)" stroke-width="1.8"/><text class="u-muted" x="252" y="112" opacity=".55">Notify</text>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Agentic process automation</h3>
+        <p class="desc">Runs a multi-step back-office process on its own &mdash; and escalates the judgment calls to a human.</p>
+        <p class="why"><b>Why governed matters:</b> most agent pilots die before production on governance &mdash; the gates are built for the survivors.</p>
+      </div>
+    </div>
+
+    <!-- 7 · Compliance & audit -->
+    <div class="ex" style="--ac:var(--c-quality)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample interface: an audit log of verified events with a generate-report action">
+          <defs><filter id="s7" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s7)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="56" y="26">Audit log &mdash; tamper-evident</text>
+          <rect x="196" y="16" width="78" height="15" rx="7.5" class="wbtn"/><text class="sans fs7 wbtn-t" x="235" y="26" text-anchor="middle" font-weight="600">Generate report</text>
+          <g class="sans">
+            <circle cx="34" cy="54" r="7" fill="var(--c-ship)" opacity=".16"/><path d="M30.6 54 l2.4 2.4 l4.4 -5.2" fill="none" stroke="var(--c-ship)" stroke-width="1.5"/>
+            <text class="fs8 u-ink" x="48" y="52">Policy check passed</text><text class="fs6 u-muted" x="48" y="62">2026&#8209;07&#8209;24 09:14 &middot; verified &middot; hash 3f9a</text>
+            <line class="u-line" x1="26" y1="74" x2="274" y2="74"/>
+            <circle cx="34" cy="90" r="7" fill="var(--c-ship)" opacity=".16"/><path d="M30.6 90 l2.4 2.4 l4.4 -5.2" fill="none" stroke="var(--c-ship)" stroke-width="1.5"/>
+            <text class="fs8 u-ink" x="48" y="88">Access change recorded</text><text class="fs6 u-muted" x="48" y="98">2026&#8209;07&#8209;24 10:02 &middot; verified &middot; hash a71c</text>
+            <line class="u-line" x1="26" y1="110" x2="274" y2="110"/>
+            <circle cx="34" cy="126" r="7" fill="var(--c-ship)" opacity=".16"/><path d="M30.6 126 l2.4 2.4 l4.4 -5.2" fill="none" stroke="var(--c-ship)" stroke-width="1.5"/>
+            <text class="fs8 u-ink" x="48" y="124">Approval signed off</text><text class="fs6 u-muted" x="48" y="134">2026&#8209;07&#8209;24 11:37 &middot; verified &middot; hash c204</text>
+            <line class="u-line" x1="26" y1="146" x2="274" y2="146"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Compliance &amp; audit</h3>
+        <p class="desc">Logs every action, enforces policy, and produces tamper-evident, regulator-ready records on demand.</p>
+        <p class="why"><b>Why governed matters:</b> the auditable trail these frameworks expect is a native output of how it builds.</p>
+      </div>
+    </div>
+
+    <!-- 8 · The software you haven't scoped yet -->
+    <div class="ex" style="--ac:var(--c-ship)">
+      <div class="preview"><span class="plabel">Sample</span>
+        <svg viewBox="0 0 300 168" role="img" aria-label="Sample: an idea becoming a plan, with a gold pull-line into a neutral core">
+          <defs><filter id="s8" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.14"/></filter></defs>
+          <rect class="win" x="14" y="12" width="272" height="144" rx="9" filter="url(#s8)"/>
+          <rect class="winbar" x="14" y="12" width="272" height="22" rx="9"/><rect class="winbar" x="14" y="24" width="272" height="10"/>
+          <circle cx="26" cy="23" r="2.4" fill="#e0736a"/><circle cx="34" cy="23" r="2.4" fill="#e6b657"/><circle cx="42" cy="23" r="2.4" fill="#78c48a"/>
+          <text class="sans fs8 u-muted" x="150" y="26" text-anchor="middle">New build</text>
+          <rect x="48" y="46" width="204" height="94" rx="10" fill="none" stroke="var(--hairline)" stroke-width="1.5" stroke-dasharray="7 5"/>
+          <text class="sans fs7 u-muted" x="150" y="66" text-anchor="middle" letter-spacing=".5">START FROM AN IDEA</text>
+          <line x1="150" y1="78" x2="150" y2="104" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="150" cy="74" r="5.5" fill="var(--gold)"/>
+          <circle cx="150" cy="110" r="8" fill="var(--neutral-core,#8C8A82)"/>
+          <text class="serif fs11 u-ink" x="150" y="132" text-anchor="middle">your idea &rarr; a plan &rarr; shipped</text>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>&hellip;and whatever you haven&rsquo;t scoped yet</h3>
+        <p class="desc">The pipeline starts from an idea. If it&rsquo;s web, API, data, or agentic software, the same nine gates apply.</p>
+        <p class="why"><b>Why governed matters:</b> a custom build carries more unknowns &mdash; which is exactly what the gates are for.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="spine">
+    <h3>Whatever it is, it shares one backbone</h3>
+    <div class="rows">
+      <span class="item"><span class="d">&middot;</span> A human approves every gate</span>
+      <span class="item"><span class="d">&middot;</span> A tamper-evident audit trail</span>
+      <span class="item"><span class="d">&middot;</span> Security &amp; design review, built in</span>
+      <span class="item"><span class="d">&middot;</span> Delivered into your environment</span>
+    </div>
+  </div>
+
+  <a class="fwd">Why should you trust it? &rarr;</a>
+</div></div>
+
+<div class="notes-panel">
+  <b>Addresses your three notes:</b> (1) the "One honest note on scope" boundary line is <span class="g">removed</span> — scope is now implied by the examples (all web/API/data/agentic) and the spine's "Delivered into your environment," so the page no longer positively claims mobile/embedded/cloud-at-scale (not an overclaim, just less defensive). (2) Copy is <span class="g">tightened</span> — the lead is one sentence, the wordy second paragraph and long section intros are cut, per-card descriptions trimmed. (3) Previews are <span class="g">realistic app-window UIs</span> now — window chrome, soft shadows, filled buttons/pills, real sample data, a proper chart and audit log — still generic and labeled "Sample" (no company/logo), so honesty holds. Examples are in the researched serial-position order (Contract → ops → portals → analytics → integration → agentic → compliance → open-ended). Removing the explicit boundary means the CITATIONS boundary rows should be pared back at build (the "delivered to your environment" claim still lives in the spine).
+</div>
+
+<script>
+  document.getElementById('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

@@ -61,3 +61,43 @@ Buyer trust in vendor AI claims has *fallen* (TrustRadius: trust in vendor AI et
 ---
 
 Sources: [Genesys Growth — B2B SaaS homepages 2026](https://genesysgrowth.com/blog/designing-b2b-saas-homepages), [Genesys Growth — landing pages 2026](https://genesysgrowth.com/blog/designing-b2b-saas-landing-pages), [SaaS Hero — value prop messaging](https://www.saashero.net/strategy/b2b-saas-value-prop-messaging/), [SaaS Hero — high-converting landing pages](https://www.saashero.net/design/high-converting-landing-page-examples/), [TrustRadius — bridging the trust gap](https://solutions.trustradius.com/vendor-blog/bridging-the-trust-gap-b2b-tech-buying-in-the-age-of-ai/), [INFUSE — Voice of the Buyer AI Reality Check](https://infuse.com/insight/voice-of-the-buyer-ai-research-reality-check-from-hype-to-proof/), [Insider Growth HQ — what enterprise buyers expect from AI](https://www.insidergrowthhq.com/p/what-enterprise-buyers-really-expect), [Kai Waehner — enterprise agentic AI trust](https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/), [Siteimprove — Core Web Vitals and WCAG](https://www.siteimprove.com/blog/core-web-vitals-wcag/), [Juicebox — WCAG 2.2 accessibility guide](https://juiceboxinteractive.com/blog/accessibility-guide/), [Level Access — WCAG compliance 2026](https://www.levelaccess.com/compliance-overview/wcag-web-content-accessibility-guidelines/), [Kritano — web accessibility 2026](https://kritano.com/blog/web-accessibility-the-complete-guide-for-2026).
+
+---
+
+## 2026-07-23 — /what breadth: functional scope + honest boundary (functional-agent)
+
+Pipeline IS genuinely general-purpose (16 agents, 9 gates; code-agent has
+Read/Write/Edit/Bash — writes arbitrary code, not just template fills;
+plan-agent already handles the "none-of-the-3-templates" branch). Templates
+are accelerators, not the ceiling — human is right that "3 templates"
+undersells it.
+
+**Honest functional breadth (legitimate pipeline outputs):** web apps
+(SPA/SSR), internal tools/dashboards/admin, HTTP APIs/microservices, agentic/
+LLM automations, RAG/knowledge/document-processing, GenAI chatbots, data
+pipelines/ETL/batch, integrations/connectors/webhooks, CLI/dev tooling,
+customer portals. Proven stack: Python/FastAPI, Next.js/JS web, LangChain/
+LangGraph, Chroma.
+
+**HARD OUT (dishonest to claim — no toolchain):** native mobile (iOS/Android),
+embedded/firmware/IoT, games/GPU/model-TRAINING at scale, desktop-native,
+blockchain/smart contracts, formally-certified/regulated SW (medical/avionics
+— governance = human-gates+test-evidence, NOT formal certification).
+
+**MUST HEDGE (can design/build, not operate-as-implied):** cloud/production
+hosting — deploy-agent target_env is LOCAL-ONLY (cloud is roadmapped, not
+shipped); "deploy" today = local prod/ repo + uvicorn + smoke test. Also: no
+"at scale"/multi-tenant-SaaS delivered claims, no hard-real-time/low-latency
+(no perf harness), non-templated stacks carry more risk than "wide range"
+implies.
+
+**Honest center of gravity:** "a wide range of AI-centric and web/API/data
+software" delivered to YOUR environment — NOT "any software." The FDE
+"in your own environment" framing naturally covers the local/self-hosted
+reality as a positive, not a limitation.
+
+**Words to BAN on the page:** "any software", "anything", "production-ready in
+the cloud", "at scale" (as delivered-today claims). **Claims-manifest rows
+needed:** (a) delivery=local/self-hosted, cloud roadmapped; (b) web not
+native-mobile; (c) no embedded/real-time/certified claims; (d) templates =
+accelerators (backed by plan-agent ambiguous-branch handling).

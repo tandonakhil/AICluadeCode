@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/why + comparison rewrite — new voice mockup</title>
+<style>
+  :root {
+    --paper:#F7F5F0; --ink:#1D1C1A; --teal:#0B6B60; --teal-soft:#0b6b6022;
+    --gold:#8A5A17; --gold-soft:#8a5a1722; --cream:#FBF3E4; --hairline:#D8D4CA; --muted:#5C5A54; --surface:#FFFFFF; --rust:#A8432F; --rust-soft:#a8432f14;
+  }
+  [data-theme="dark"] {
+    --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --teal-soft:#3fc9b91f;
+    --gold:#E0A94E; --gold-soft:#e0a94e1f; --cream:#242019; --hairline:#3A3733; --muted:#A5A099; --surface:#1E1C19; --rust:#E07A5F; --rust-soft:#e07a5f14;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#141518; font-family:system-ui,-apple-system,sans-serif; color:#e8e8e8; }
+  .chrome { position:sticky; top:0; z-index:30; background:#0d0e11; border-bottom:1px solid #2a2d33; padding:12px 22px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .chrome .t { color:#fff; font-size:14px; font-weight:600; margin-right:10px; }
+  .chrome button { font:inherit; font-size:12.5px; padding:7px 13px; border-radius:999px; border:1px solid #45484f; background:transparent; color:#c8cbd2; cursor:pointer; }
+  .chrome button.active { background:#fff; color:#111; border-color:#fff; font-weight:600; }
+  .chrome .theme { margin-left:auto; }
+  .view { display:none; } .view.show { display:block; }
+  .stage { background:var(--paper); color:var(--ink); }
+  .col { max-width:820px; margin:0 auto; padding:44px 40px 20px; }
+  h1.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(28px,3.4vw,42px); line-height:1.14; margin-bottom:16px; }
+  h2.q { font-family:Georgia,serif; font-weight:500; font-size:clamp(20px,2.2vw,26px); margin:36px 0 12px; }
+  .answer { font-size:16.5px; line-height:1.65; color:var(--muted); margin-bottom:16px; }
+  .answer.lead { color:var(--ink); font-size:18px; }
+  .new { background:var(--gold-soft); box-shadow:-3px 0 0 var(--gold); padding-left:10px; }
+
+  /* comparison */
+  .compare { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--hairline); border-radius:12px; overflow:hidden; margin-top:8px; }
+  .cside { padding:20px 22px; }
+  .cside.conclave { background:var(--teal-soft); border-right:1px solid var(--hairline); }
+  .cside.vibe { background:var(--rust-soft); }
+  .cside h3 { font-size:14px; letter-spacing:.04em; margin-bottom:3px; }
+  .cside.conclave h3 { color:var(--teal); } .cside.vibe h3 { color:var(--rust); }
+  .cside .subcap { font-size:11px; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:.06em; }
+  .cside ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .cside li { font-size:13.5px; line-height:1.5; display:flex; gap:8px; }
+  .cside li .m { flex-shrink:0; font-weight:700; }
+  .cside.conclave li .m { color:var(--teal); } .cside.vibe li .m { color:var(--rust); }
+  .cside li em { font-style:normal; color:var(--muted); font-size:11.5px; }
+
+  /* artifacts */
+  .artifact { background:var(--cream); border:1px solid var(--hairline); border-radius:8px; padding:15px 18px; font-family:Georgia,serif; font-size:14px; line-height:1.6; margin-bottom:12px; }
+  .artifact.rust-edge { box-shadow:-3px 0 0 var(--rust); }
+  .art-kind { display:block; font-family:system-ui; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .weeks { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:6px; }
+  .wk { border:1px solid var(--hairline); border-radius:10px; padding:14px 16px; background:var(--surface); }
+  .wk .wn { font-family:Georgia,serif; font-size:12.5px; color:var(--gold); font-weight:700; margin-bottom:5px; }
+  .wk h4 { font-size:13.5px; margin-bottom:7px; }
+  .wk p { font-size:12px; line-height:1.55; color:var(--muted); }
+  .wk .tag { display:inline-block; margin-top:8px; font-size:10px; background:var(--gold-soft); color:var(--gold); padding:3px 8px; border-radius:999px; }
+  .seal-line { font-size:13.5px; color:var(--gold); font-weight:600; margin:10px 0 6px; display:flex; gap:8px; align-items:center; }
+  .contact { border-top:1px solid var(--hairline); margin-top:18px; padding-top:16px; }
+  .cta { display:inline-block; background:var(--teal); color:var(--cream); padding:12px 24px; border-radius:5px; font-weight:600; font-size:14.5px; text-decoration:none; margin-top:8px; }
+  [data-theme="dark"] .cta { color:#0e2a26; }
+  .f13 { font-size:11.5px; color:var(--muted); margin-top:10px; font-style:italic; }
+  .notes-panel { background:#0d0e11; border-top:1px solid #2a2d33; padding:22px 32px 34px; font-size:13px; line-height:1.6; color:#c8cbd2; }
+  .notes-panel b { color:#fff; } .notes-panel .g { color:#e0b060; }
+  .legendbar { max-width:820px; margin:0 auto; padding:6px 40px 0; font-size:11.5px; color:#8b8f98; }
+</style>
+</head>
+<body>
+<div class="chrome">
+  <span class="t">Rewrite in the new voice — for approval</span>
+  <button class="active" data-v="v-comp">Homepage comparison</button>
+  <button data-v="v-why">/why (full page)</button>
+  <button class="theme" id="theme">◐ Theme</button>
+</div>
+
+<!-- ============ COMPARISON ============ -->
+<section class="view show" id="v-comp">
+  <div class="legendbar">Gold-edged blocks = changed copy. Heading unchanged (already approved). Columns reversed: Conclave leads.</div>
+  <div class="stage"><div class="col">
+    <h2 class="q">Anyone can be fast to a demo. Conclave gets you to production.</h2>
+    <div class="compare">
+      <div class="cside conclave new">
+        <h3>CONCLAVE</h3>
+        <div class="subcap">9 gates → production</div>
+        <ul>
+          <li><span class="m">✓</span> Nine gates, and a person reviews the actual work at every one — you approve each step, so what ships is what you decided to ship.</li>
+          <li><span class="m">✓</span> A named architect owns the design before a line of code is written, and a named reviewer checks it after. You always know who's accountable for each call.</li>
+          <li><span class="m">✓</span> Every change traces back to a decision on the record — the system grows as one coherent whole, not a patch bolted onto the last one.</li>
+          <li><span class="m">✓</span> One living architecture record shows the entire system, kept current, so what you own stays supportable long after launch.</li>
+        </ul>
+      </div>
+      <div class="cside vibe new">
+        <h3>VIBE CODING</h3>
+        <div class="subcap">1 step: prompt → a demo</div>
+        <ul>
+          <li><span class="m">✕</span> Fast to a first demo — one prompt and something appears. That's where the speed ends.</li>
+          <li><span class="m">✕</span> No review step, so security gaps ship with the code: 45% of AI-generated code fails basic security tests. <em>(Veracode, 2025)</em></li>
+          <li><span class="m">✕</span> Each new prompt patches onto the last, so the codebase drifts — duplication up 8× and refactoring down 70% in AI-era codebases. <em>(GitClear, 2025)</em></li>
+          <li><span class="m">✕</span> No one holds the whole system, which is why 95% of AI pilots never reach production impact. <em>(MIT NANDA, 2025)</em></li>
+        </ul>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes-panel">
+    <b>What changed:</b> Conclave column now <span class="g">leads</span> (left), reframed from "our virtues vs their failures" to <span class="g">two paths from the same idea</span> — positive-first. All three cited stats (<span class="g">Veracode / GitClear / MIT NANDA</span>) stay on the page, verbatim, on the vibe-coding side as the evidence for why the fast path stops at a demo. Only non-cited change: the caption "whatever comes out" → "a demo." No citation dropped; CITATIONS needs no wording sync.
+  </div>
+</section>
+
+<!-- ============ /WHY ============ -->
+<section class="view" id="v-why">
+  <div class="legendbar">Gold-edged blocks = changed copy (voice reframe). Plain blocks = quoted claims/evidence kept VERBATIM (the substantiation).</div>
+  <div class="stage"><div class="col">
+    <h1 class="q">Why trust it?</h1>
+    <p class="answer lead new">You stay in command of everything Conclave builds. So you shouldn't have to take its work on faith — you should be able to check it. You can: every claim on this site has a record behind it, including the failures, which we quote below unedited in substance.</p>
+    <p class="answer new">We won't show you a customer logo, because we don't have one yet — and we won't invent one. What we can show you is stronger. The site you're reading was built by Conclave, through its own nine gates, and the record of that build survives. Here are pieces of it.</p>
+
+    <h2 class="q new">We build it with you — and in three weeks, it's yours</h2>
+    <p class="answer new">Forward-deployed engineers bring Conclave to you — not a login, a team that builds alongside yours. This is the standard rollout for a first application; it is our defined process, not a promise on a specific engagement.</p>
+    <div class="weeks">
+      <div class="wk new"><div class="wn">Week 1 — Stand up &amp; scope</div><p>Your FDE team deploys Conclave inside your environment, connects it to your systems and standards, and runs Intake and Team Composition on your first application — with you and your stakeholders in the room.</p><span class="tag">FDE on-site / embedded</span></div>
+      <div class="wk new"><div class="wn">Week 2 — Build, gate by gate</div><p>Plan, Design, Architecture, and Code each run through their gate. You approve every one; your FDE team runs the process and briefs you before every decision, so nothing moves without your call.</p><span class="tag">Daily gate reviews</span></div>
+      <div class="wk new"><div class="wn">Week 3 — Test, review, ship</div><p>Full test suites, Review, and Deploy — into your environment, on your infrastructure. You leave week three with a live application you own, and its complete audit trail.</p><span class="tag">Production + handoff</span></div>
+    </div>
+
+    <h2 class="q">Why the gates exist at all</h2>
+    <p class="answer new">The gates exist so that a person decides, on the record, every time the work moves forward. That one choice is a deliberate answer to a well-documented pattern: 30% of generative-AI projects are abandoned after proof of concept (Gartner, 2024), and over 40% of agentic-AI projects are projected to be canceled by the end of 2027 (Gartner, 2025). Behind both numbers is the same failure — systems that advance without anyone deciding they should. Conclave makes the opposite bet: by design, nothing advances without an explicit human decision.</p>
+
+    <h2 class="q">The decision log</h2>
+    <p class="answer new">You don't have to take our word for how a build goes. Here's the actual record from this site's own — the good calls and the corrections, in the words they were written.</p>
+    <div class="artifact"><span class="art-kind">Decision log — this website's own build</span>"2026-07-19 — Redesign initiated by the human: first version rejected — 'very confusing for a visitor, does not tell me what it does in one line.'…" <em>(kept verbatim)</em></div>
+    <div class="artifact"><span class="art-kind">Decision log — Review gate</span>"Review found one defect the tests missed: hidden screen-reader text said 'eight specialist agents' while the diagram rendered six." <em>(kept verbatim)</em></div>
+
+    <h2 class="q">The test evidence — including the send-back</h2>
+    <div class="artifact rust-edge"><span class="art-kind">Test evidence — verbatim</span>"26/26 passing, but the content-enforcement suite was missing and one statistic was unhedged; four design-audit defects. Sent back. Reworked → 36/36 green." <em>(kept verbatim, unedited)</em></div>
+    <div class="seal-line"><span>●</span> This site was sent back at its own test gate — and the record keeps it.</div>
+    <div class="seal-line"><span>●</span> Built by Conclave itself — the maker is its own first customer of the process, and publishes the record.</div>
+
+    <h2 class="q">Every claim, sourced</h2>
+    <p class="answer new">Here's every one, in one place — the same table lives in the repository and this site's own test suite fails if a claim drifts from its source.</p>
+    <div class="artifact"><span class="art-kind">Claims-to-source table (7 rows) — kept verbatim</span>Every stat and claim → its source, year, verified date. Unchanged.</div>
+
+    <div class="contact">
+      <h2 class="q">The door</h2>
+      <p class="answer new">One action, no form, no tracking: send an email, and the first gate of your build — Intake — starts from whatever you write in it. You're in command from the first line.</p>
+      <a class="cta">Build one with us</a>
+      <p class="f13">Dev placeholder: hello@conclave.example is not a monitored inbox — replace before external sharing. (kept verbatim)</p>
+    </div>
+  </div></div>
+  <div class="notes-panel">
+    <b>What changed vs. kept:</b> voice reframed to partner/"you're in command" in every <span class="g">gold-edged</span> block (leads, FDE heading, gates intro, log intro, contact). <b>Every substantiated claim kept verbatim</b> (plain blocks): both Gartner stats, the two decision-log quotes, the honest test-gate send-back (NOT sanitized), the "built by Conclave" proof, the 7-row claims table, and the F13 dev-placeholder honesty note. No citation dropped or reworded → CITATIONS.md needs no sync.
+  </div>
+</section>
+
+<script>
+  var btns = document.querySelectorAll('.chrome button[data-v]');
+  btns.forEach(function (b) { b.addEventListener('click', function () {
+    btns.forEach(function (x){x.classList.remove('active');}); b.classList.add('active');
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('show');});
+    document.getElementById(b.dataset.v).classList.add('show'); window.scrollTo(0,0);
+  }); });
+  document.getElementById('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>
