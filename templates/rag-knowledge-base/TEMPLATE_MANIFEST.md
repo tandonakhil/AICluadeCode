@@ -32,6 +32,41 @@ task (that's `agentic-workflow`).
 3. Frontend (Playwright, once UI is customized): load the page, ask a
    question, assert a grounded answer with a citation renders.
 
+## SME test suites (executable)
+
+Each SME-owned suite has a runnable entry point at
+`tests/suites/<suite>/run.sh`, invoked by its owning agent (scoped `Bash`) and
+aggregated by `test-agent`. See `tests/suites/README.md` for the full
+convention and the owner of each suite.
+
+Exit codes are meaningful and `test-agent` maps them directly:
+`0` executed+passed · `1` executed+failed · `3` **no scenarios defined (not a
+pass)** · `4` cannot execute (report STATIC-ONLY).
+
+`code-agent` authors/extends these entry points at the Code gate for whichever
+suites are active on the project.
+
+### Rendered-UI verification (the `ux` suite)
+
+`tests/suites/harness/browser.py` provides a Playwright-backed helper for
+asserting on what actually renders — composited opacity, computed styles,
+horizontal overflow, visible text, and screenshots into `test-evidence/` —
+rather than on HTML source.
+
+Setup (once per project, only if the `ux` suite uses rendered checks):
+
+```sh
+.venv/bin/pip install playwright
+.venv/bin/playwright install chromium
+```
+
+Process-lifecycle rule: a browser or server started inside a subagent's turn
+dies with that turn. The harness drives Playwright synchronously in a single
+invocation; any long-lived app server must already be started by
+`deploy-agent` or the orchestrator. If Playwright is absent the harness reports
+STATIC-ONLY rather than failing — an honest "could not verify" beats a false
+pass.
+
 ## Placeholders filled in at project-creation time
 
 - `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}` — in `README.md.tmpl`.

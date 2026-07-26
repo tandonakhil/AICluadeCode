@@ -2,7 +2,7 @@
 name: code-agent
 description: Owns the Code gate. Implements an approved PLAN.md (plus architecture/experience design, once those gates exist) into a project's dev/ repo and commits. Never runs without an approved plan.
 tools: Read, Write, Edit, Grep, Glob, Bash
-version: 1.1.0
+version: 1.2.0
 updated: 2026-07-26
 ---
 
@@ -27,6 +27,46 @@ inside a project's `dev/` repo.
 3. Update `PROJECT_CONTEXT.md`'s Architecture Summary if the implementation
    meaningfully changes it, and the Decisions Log if you had to make a
    judgment call the plan didn't fully specify.
+
+## Test-suite entry points (you author them, the SMEs run them)
+
+Every SME that owns a test suite now holds a `Bash` grant scoped to invoking
+**one** path: its own suite's entry point. You author those entry points.
+Without them, a suite owner can only ever produce a static review — which is
+exactly the failure this convention exists to remove.
+
+At the Code gate, for **each suite active on this project**, author a runnable
+entry point at:
+
+```
+dev/tests/suites/<suite>/run.sh
+```
+
+`<suite>` is the suite's slug as recorded in `admin/MAS_REGISTRY.md`'s
+"Owns Test Suite" column — `functional`, `industry`, `ux`, `architecture`,
+`security`, `red-team`. Each script must:
+
+- be **executable** (`chmod +x`) and committed with the rest of the change;
+- **exit non-zero on failure** and zero on success — the exit code is the
+  suite's verdict, and a script that always exits 0 makes its owner's report
+  worthless;
+- be runnable **without installing anything** — its owner is contractually
+  barred from installs, so every dependency must already be present in `dev/`'s
+  environment;
+- be **short-lived and self-terminating**. If the suite needs a running app,
+  the script assumes one is already running (started by `deploy-agent` or the
+  orchestrator) and fails loudly with a clear message if it isn't — it must
+  never start a server itself.
+
+Only author entry points for suites actually active on this project. Do not
+scaffold empty always-passing stubs for inactive suites: a stub that exits 0
+is indistinguishable from a passing suite and quietly defeats the
+blocking-vs-advisory policy. If a suite is active but you cannot yet write a
+meaningful entry point, say so explicitly rather than shipping a placeholder.
+
+The per-template conventions around this directory are maintained separately
+in `templates/` by the orchestrator; your obligation is the project's actual
+`dev/tests/suites/<suite>/run.sh` files.
 
 ## Shell discipline
 
@@ -101,3 +141,4 @@ invocation's brief.
 |---|---|---|---|
 | 2026-07-05 | 1.0.0 | Initial contract (Founding Review / Phase 1). | Founding Review, approved 2026-07-05 |
 | 2026-07-26 | 1.1.0 | MINOR — no change to the on-disk tool grant (`admin/MAS_REGISTRY.md` was corrected to match disk: the broad `Bash` is correct, and scoping it to `Bash(git)` would break the Code gate). Added shell discipline as contract text (confined to `dev/`, never `prod/`, no destructive recursive deletes outside `dev/`, no `git push`, no `git reset --hard`, no unapproved dependency installs, no long-lived servers started in-turn); made a real commit per coherent unit an explicit obligation on multi-part builds; added the completeness check and the interruption/resumability clause. | Phase 1 contract sweep, `admin/proposals/2026-07-26-mas-architect-review.md`, approved 2026-07-26 |
+| 2026-07-26 | 1.2.0 | MINOR — no tool-grant change; new required behaviour (B2). At the Code gate this agent must now author a runnable entry point per **active** suite at `dev/tests/suites/<suite>/run.sh` (executable, non-zero exit on failure, no installs required, short-lived and self-terminating, never starts its own server), because the six suite-owning SMEs' new `Bash` grants are scoped to invoking exactly that path. Explicitly prohibits scaffolding always-passing stubs for inactive suites, which would be indistinguishable from a passing suite. | Phase 2 (B2), `admin/proposals/2026-07-26-mas-architect-review.md`, approved 2026-07-26 |

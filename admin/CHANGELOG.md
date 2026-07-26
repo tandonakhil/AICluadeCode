@@ -6,6 +6,122 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **Phases 2 and 3 — suite execution + rendered-UI verification (2026-07-26)**
+  — one `mas-registrar` pass implementing the Phase 2 and Phase 3 items of
+  `mas-architect`'s consolidated review
+  (`admin/proposals/2026-07-26-mas-architect-review.md`), approved by the human
+  on 2026-07-26. Nine agent contracts touched, each bumped to **v1.2.0**;
+  `admin/MAS_REGISTRY.md` updated for all nine. `admin/ROADMAP.md`,
+  `templates/`, and `projects/` deliberately untouched (the template and test
+  infrastructure is the orchestrator's parallel workstream).
+
+  - **B2 — the six suite-owning SMEs can finally run their own suites.**
+    `functional-agent`, `industry-expert`, `ui-ux-designer`,
+    `solution-architect`, `security-architect`, and
+    `responsible-ai-architect` each gain `Bash`. None had a shell tool, so
+    every one of them could only ever produce a static report that someone
+    else had to verify — `responsible-ai-architect` returned
+    `STATIC ONLY — NOT EXECUTED` on 6 of 7 red-team scenarios, and when the
+    orchestrator ran that suite for real it found **three defects a thorough
+    static review had missed**. That closes the LESSONS pitfall queued
+    2026-07-11.
+    - The grant is scoped **by convention in contract prose**, not by
+      parenthesised syntax — whose enforceability in subagent frontmatter is
+      still unverified — following the proven `synthetic-data-agent`
+      precedent. Each agent may invoke exactly one path,
+      `dev/tests/suites/<suite>/run.sh` for the suite it owns per the
+      registry (`functional`, `industry`, `ux`, `architecture`, `security`,
+      `red-team`), plus read-only inspection of that run's results.
+    - Hard prohibitions on all six: **no dependency installs**; **never start
+      a long-lived server or process** (it dies with the turn —
+      `deploy-agent`/the orchestrator own process lifecycle); **never touch
+      `prod/`**; **no git mutation**; and **never edit the code under test**,
+      extending `test-agent`'s existing "do not fix failing tests yourself"
+      rule to every suite owner. Fixing what your own suite finds destroys
+      the evidence that it failed.
+    - Where an entry point doesn't exist yet, its owner reports
+      **static-review-only** and labels each unrun scenario
+      `STATIC ONLY — NOT EXECUTED` rather than presenting an unexecuted suite
+      as a passing one. And a suite once reported "could not execute"
+      **must actually be re-run** once the entry point exists — never waved
+      through because the earlier static pass looked thorough.
+  - **B2 — `code-agent` authors the entry points.** At the Code gate it must
+    now write a runnable `dev/tests/suites/<suite>/run.sh` per **active**
+    suite: executable, non-zero exit on failure, runnable without installs
+    (its owner is barred from them), short-lived and self-terminating, and
+    never starting its own server. Explicitly prohibited from scaffolding
+    always-passing stubs for inactive suites — a stub that exits 0 is
+    indistinguishable from a passing suite.
+  - **B2 — `test-agent` must distinguish EXECUTED from STATIC-ONLY.** Its
+    per-suite report now marks every suite `EXECUTED` /
+    `STATIC ONLY — NOT EXECUTED` / `PARTIAL`. Previously an unexecuted suite
+    and a passing suite were indistinguishable in the report, which silently
+    undermined the whole blocking-vs-advisory policy: a blocking suite that
+    never ran cannot block anything but reads exactly like one that passed.
+    A `STATIC ONLY` blocking suite no longer satisfies its blocking
+    obligation, and the status carries into `test-evidence/` per scenario.
+  - **Phase 3a — rendered-UI verification (`test-agent`).** Added as **one
+    capability with two backends**, deliberately shaped so mobile reuses the
+    pattern rather than growing a parallel mechanism. **Web backend, built
+    now: Playwright** — drive a real browser and assert on computed styles,
+    the accessibility tree, and visible state, capturing screenshots into
+    `test-evidence/`. **Native backend, recorded but not built: Maestro +
+    simulator** (the 2026-07-26 toolchain spike found no simulator or
+    emulator available on this machine). Rationale recorded in-contract: this
+    is the class of defect that was previously invisible to every gate — a
+    compounding-opacity bug and layout defects that no non-rendering reviewer
+    could catch and that the human ended up reporting by hand. **Hard
+    constraint designed in from the start**: the browser/simulator/app server
+    is never started as a long-lived process inside a subagent's turn (it
+    dies with the turn, `admin/LESSONS.md` 2026-07-09) — Playwright is driven
+    synchronously within a single command invocation, and any long-lived
+    server is started by `deploy-agent` or the orchestrator first.
+  - **Phase 3b — copy manifest + `review-agent` copy-drift check.** Approved
+    copy (headlines, positioning lines, CTAs, titles, meta descriptions) is a
+    decision, not an implementation detail, and it drifts silently because it
+    lives in many places at once. The real failure this fixes: after an
+    approved homepage hero rewrite, the page `<title>` and
+    `<meta description>` still carried the **old** headline and no gate
+    caught it. A project may now maintain a **copy manifest**
+    (`COPY_MANIFEST.md`) pinning each approved string to every location it
+    must appear; `review-agent` checks rendered and source copy against it and
+    reports drift as a finding. Deliberately degradable: where no manifest
+    exists, it still checks that copy changed in the diff matches what the
+    Decisions Log / `PRD.md` records as approved, and flags both unapproved
+    copy and partially-applied approved rewrites. `review-agent` never writes
+    the manifest — it only checks against it.
+  - **B4 — `review-agent` cross-KB consistency sweep and the third verdict.**
+    Two SME KBs written in different sessions can end up asserting
+    contradictory things with nobody owning noticing. `review-agent` now reads
+    every active `knowledge/*_KB.md` plus the Decisions Log (and `PRD.md`
+    where it exists) and checks for **pairwise contradictions** — changed KBs
+    by default, a **FULL sweep at `/cut-release`**, where the record becomes a
+    public claim.
+    - **New third verdict: `escalate`.** The agent previously produced only
+      approve / request-changes, but a contradiction between two SME KBs is
+      **not `code-agent`'s to fix**, so `request-changes` routed it to the
+      wrong place entirely. An `escalate` must name both KBs, both owning
+      agents, and quote both conflicting statements verbatim — then stop. The
+      orchestrator re-opens Architecture or routes `/consult` to the owning
+      SMEs, and the human decides.
+    - **Lane discipline is stated explicitly in-contract**, without which
+      this becomes scope creep: `review-agent` checks the **consistency of
+      the record**, never **correctness within a lane**. It reports *that*
+      two KBs disagree; it never adjudicates which is right.
+    - Motivating in-the-wild instance recorded: `conclave-marketing`'s
+      `knowledge/DOMAIN_KB.md` still lists native mobile under **HARD OUT**
+      while the live site's boundary lines were removed on 2026-07-25 — the
+      KB and the site now describe different worlds, and no gate flagged it.
+  - **Follow-up — `test-agent` gains `Write, Edit` (v1.3.0, 2026-07-26).** The
+    registrar's own Phase 2/3 self-check surfaced the inconsistency: the
+    contract requires writing per-scenario `test-evidence/*.md` files and now
+    Playwright screenshot evidence, but the grant was `Read, Bash` only, so it
+    worked solely via shell redirection. The grant is now
+    `Read, Write, Edit, Bash`, carrying the same "`Write` only if the target
+    file does not exist" rule the other eleven append-target agents hold —
+    `test-evidence/` files accumulate per-scenario entries across runs, so an
+    overwrite would erase prior evidence. Approved by the human on 2026-07-26.
+
 - **Phase 1 contract sweep (2026-07-26)** — one `mas-registrar` pass
   implementing `mas-architect`'s consolidated review
   (`admin/proposals/2026-07-26-mas-architect-review.md`), approved by the

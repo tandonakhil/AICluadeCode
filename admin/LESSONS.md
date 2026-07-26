@@ -72,16 +72,26 @@ doesn't get lost before that review happens.
   "run this specific test command" tool) so the owning agent can execute
   its own suite rather than only ever producing a static-review report
   that a human or the orchestrator has to separately verify.
-  - **Status 2026-07-26 — Open, approved, scheduled for Phase 2.** This is
-    "B2" in `mas-architect`'s consolidated review. Reviewed and approved in
-    principle (use the proven `synthetic-data-agent` pattern: `code-agent`
-    authors `dev/tests/suites/<suite>/run.sh`, and each SME's `Bash` is
-    scoped to invoking its own entry point plus read-only result
-    inspection), but deliberately **not** landed in the Phase 1 contract
-    sweep — Phase 1 was scoped to the KB-destruction fix and contract
-    hygiene. Until it ships, `security-architect` and
-    `responsible-ai-architect` still cannot execute the suites they own;
-    the registry's Scope constraint column now says so explicitly.
+  - **APPLIED 2026-07-26 (Phase 2).** "B2" shipped. All six suite-owning
+    SMEs — `functional-agent`, `industry-expert`, `ui-ux-designer`,
+    `solution-architect`, `security-architect`, `responsible-ai-architect` —
+    now hold `Bash`, scoped **by convention in contract prose** (not by
+    parenthesised syntax, whose enforceability here is still unverified) to
+    invoking their own suite's entry point at
+    `dev/tests/suites/<suite>/run.sh` plus read-only result inspection,
+    following the proven `synthetic-data-agent` precedent. `code-agent` now
+    carries the obligation to author those entry points at the Code gate
+    (executable, non-zero exit on failure, no installs required, short-lived,
+    never starts its own server), and `test-agent` must mark every suite
+    `EXECUTED` / `STATIC ONLY — NOT EXECUTED` / `PARTIAL`, since an
+    unexecuted suite and a passing suite were previously indistinguishable.
+    Hard prohibitions on all six: no installs, no long-lived processes,
+    never `prod/`, no git mutation, and **never edit the code under test**.
+    Where an entry point doesn't exist yet the owner reports
+    static-review-only; a suite once reported "could not execute" **must
+    actually be re-run** once it exists, never waved through on the earlier
+    static pass. The agent that could only return `STATIC ONLY — NOT
+    EXECUTED` on 6 of 7 red-team scenarios can now run its own suite.
 
 - **2026-07-11 — An agent with `Write` (not `Edit`) access to a large,
   append-only KB file is one misused tool call away from destroying it.**
@@ -212,9 +222,11 @@ and edited; "Open" = observed, not yet reviewed.
     `ui-ux-designer`'s own contracts, so they survive a session that doesn't
     happen to remember them.
 
-  Still **Open — approved, scheduled for Phase 2/3** (not landed in this
-  pass): **B2** scoped `Bash` for the suite-owning SMEs, and **B4**
-  `review-agent`'s cross-KB sweep. Both remain listed below.
+  Not landed in *this* pass but **both APPLIED later the same day** in the
+  Phases 2 and 3 pass (see the `2026-07-26 — Applied (Phases 2 and 3)` entry
+  further down this queue): **B2**
+  scoped `Bash` for the suite-owning SMEs, and **B4** `review-agent`'s
+  cross-KB sweep + `escalate` verdict.
 
 - **2026-07-10 — Applied to orchestrator + ui-ux-designer; queued for
   broader rollout.** `ui-ux-designer`'s second revision pass (colors +
@@ -285,8 +297,35 @@ and edited; "Open" = observed, not yet reviewed.
   lane-discipline note distinguishing its domain-correctness devil's-advocate
   pass from `responsible-ai-architect`'s AI-behavior-risk pass, so the two
   don't duplicate each other's work at a shared gate.
-- **Open — approved, scheduled for Phase 3.** `review-agent`'s scope is
-  narrow by design, but its guardrail text doesn't yet say what to do when a
+- **2026-07-26 — Applied (Phases 2 and 3).** The two items left Open after the
+  Phase 1 sweep both landed in a second `mas-registrar` pass, against the same
+  approved proposal (`admin/proposals/2026-07-26-mas-architect-review.md`).
+  Nine contracts bumped to **v1.2.0**.
+  - **B2 scoped `Bash` for the suite-owning SMEs — APPLIED.** Detailed above,
+    against the 2026-07-11 pitfall it closes. *Note the same pattern the B1
+    entry called out: this item was queued 2026-07-11, re-confirmed by a
+    three-defect incident the same day, and only shipped on 2026-07-26. It
+    stayed queued through two full contract passes.*
+  - **B4 `review-agent` cross-KB sweep + `escalate` verdict — APPLIED.**
+    Detailed below.
+  - Also landed in the same pass (not previously in this queue): `test-agent`
+    gains **rendered-UI verification** — one capability, two backends, with
+    Playwright built now for web and Maestro + simulator recorded as the
+    future native backend; and `review-agent` gains a **copy-drift check**
+    against an optional `COPY_MANIFEST.md`, degrading to a Decisions-Log
+    comparison where none exists.
+  - **New pitfall recorded from the rendered-UI work**: a page can return
+    `200`, contain every expected string in its source, and still render as
+    something a user cannot use. A compounding-opacity bug and a set of
+    layout defects reached the human because no gate rendered anything —
+    HTTP responses and source greps are structurally blind to this class.
+    Playwright asserting on computed styles and the accessibility tree is the
+    only mechanism that sees it, which is why it is now contractual rather
+    than optional.
+
+- **Applied 2026-07-26 (Phase 3) — was Open, approved, scheduled for Phase 3.**
+  `review-agent`'s scope is
+  narrow by design, but its guardrail text didn't say what to do when a
   cross-cutting consistency issue spans two SME KBs written in different
   sessions (e.g. `ARCHITECTURE_KB.md` and `SECURITY_KB.md` disagreeing on a
   detail neither Architecture-gate participant caught). This is "B4" in
@@ -296,9 +335,14 @@ and edited; "Open" = observed, not yet reviewed.
   both KBs and their owners and quoting the conflict; lane discipline holds —
   `review-agent` reports *that* they disagree, never adjudicates which is
   right; scope is changed KBs by default with a full sweep at
-  `/cut-release`. **Not landed in the Phase 1 contract sweep** — scheduled
-  for Phase 3 alongside rendered-UI verification. A live instance already
-  exists in the wild: `DOMAIN_KB.md` still lists native mobile under HARD
+  `/cut-release`. **All of that is now in `review-agent`'s contract text
+  (v1.2.0, 2026-07-26)** — the sweep reads every active `knowledge/*_KB.md`
+  plus the Decisions Log and `PRD.md`, `escalate` must name both KBs, both
+  owning agents and quote both statements verbatim before stopping, and the
+  lane-discipline sentence is stated explicitly so the check doesn't grow
+  into adjudication. A live instance already
+  exists in the wild and is cited in the contract as the motivating example:
+  `DOMAIN_KB.md` still lists native mobile under HARD
   OUT while the site's boundary lines were removed on 2026-07-25, so KB and
   site currently describe different worlds.
 - **2026-07-17 — Applied (process).** Backlog approvals: the human directed
@@ -329,3 +373,31 @@ and edited; "Open" = observed, not yet reviewed.
   sweep): a rendered mockup/preview is now a hard precondition of requesting
   approval at any visual gate, and an unrenderable design must be reported
   as not ready rather than approved from text.
+
+- **2026-07-26 — Applied (human decision, security-flagged).** Phase 2 granted
+  unrestricted `Bash` to the six suite-owning SMEs (functional-agent,
+  industry-expert, ui-ux-designer, solution-architect, security-architect,
+  responsible-ai-architect) so they can execute the suites they own. The
+  platform's automated security review **flagged this as a permission
+  escalation**, correctly: the scope limit ("invoke only your own suite's
+  `run.sh`") is **contract prose, not technically enforced**, because the
+  parenthesised `Bash(...)` scoping syntax has unverified enforceability here
+  (see the Phase 1 open finding). **Root cause of the flag was an orchestrator
+  disclosure failure, not the registrar**: the human approved "Phase 2 — SME
+  suite execution" from a summary that never said "six agents gain
+  unrestricted shell access." The detail existed only in the proposal file.
+  **Resolution**: surfaced in full to the human with the diff, the enforcement
+  gap, and three options (keep / revert / orchestrator-proxy). The human
+  **knowingly accepted the prose-scoped grant** on 2026-07-26, on the
+  precedent that `synthetic-data-agent` and `deliverables-agent` already hold
+  unrestricted `Bash` under prose scoping, and against the measured cost of
+  the alternative — responsible-ai-architect's static-only pass missed three
+  defects that executing the suite found.
+  **Standing rule going forward**: any change that widens an agent's tool
+  grant must be stated to the human *in the approval prompt itself*, naming
+  the agents and the tool, not merely referenced in a proposal document. An
+  approval given against a paraphrase is not an approval of the permission.
+  **Still open**: `Bash(...)` enforceability remains unverified; until it is
+  tested, every "scoped" Bash grant on this platform is honour-system, and the
+  registry's `Scope constraint` column should be read as documentation, not
+  as a control.
