@@ -7,11 +7,30 @@
 - Reverses the 2026-07-10 "responsive web, not native" decision (recorded in
   PROJECT_CONTEXT.md 2026-07-26).
 - Backend: bearer-token transport alongside the existing cookie (SECURITY_KB §9).
-- App: Expo SDK 57, tabs Today/Ask/Journey/Settings, SecureStore token, MFA.
-- Verified: backend 284/284 (0 regressions, 9 new security tests), tsc clean,
-  expo export produces a real iOS bundle. NOT verified on a device — no
-  simulator/emulator on this machine.
-- Remaining per UX_KB §13: Capture tab, You tab, night theme, offline queue.
+- App: Expo SDK 57, tabs Today / Ask / [+] capture / Journey / You, SecureStore
+  token, MFA. (The fourth tab is registered as `"You"` in `App.tsx`, not
+  "Settings" — an earlier evidence note said Settings; the code is correct.)
+- Verified 2026-07-28, measured not estimated: **backend 294**, desktop web 80,
+  mobile 7 (+ clean `tsc`), and the six SME suites 12/16/38/20/20/12 —
+  **499 total, all green** via `dev/tests/run-all.sh all`.
+- **Verified on a real device.** Ran on an iPhone 17 Pro simulator (Xcode 26.6);
+  evidence in `dev/test-evidence/mobile-ios-2026-07-26.md` and
+  `dev/test-evidence/screenshots/`. This supersedes the earlier
+  "NOT verified — no simulator/emulator on this machine" note, which was
+  wrong: the check misread `xcode-select -p`, which reports the *active*
+  developer directory, not whether Xcode is installed. That single misreading
+  also caused the native rendering backend to be deferred, which is the root
+  cause of the six rendering defects the human later found by hand.
+- Remaining per UX_KB §13: **night theme, offline queue.** Capture
+  (`CaptureModal`, `CaptureContext`, the central `[+]`) and the You tab
+  (`SettingsScreen` + `SecurityCard`) both shipped in phases B and D.
+- Defects found by the human on the running app and since fixed: avatar never
+  rendered; Journey photos never rendered; lightbox/gallery never mounted;
+  chat history sheet never mounted; prompt chips stretched to ovals; dead band
+  above the composer; first prompt chip age-blind across all ten age buckets.
+  All were "built but never wired" or visual, and all were invisible to
+  typecheck, bundle and API tests. Guards added — see
+  `dev/tests/suites/ux/test_native_rendering.py`.
 
 
 ### Post-MVP roadmap, approved 2026-07-12 (human checkbox review — 4 increments, sequenced by file overlap to avoid concurrent-edit conflicts)
@@ -257,4 +276,19 @@ backend from JSON files to SQLite. See PLAN.md §6.
 
 ## Ready for Release
 
+_Empty by design, not by neglect._ These two sections track a feature's passage
+through a **release train**, and no release has been cut for this project yet:
+there is no `prod/` repo, no tag in `dev/`, and no `RELEASES.md`. F1–F17 are
+built, merged to `main` in `dev/`, and **deployed (dev, local)** — which is a
+different state from "released", and the platform deliberately distinguishes
+them. A feature moves here only when `release-manager` runs `/cut-release`.
+
+Recorded 2026-07-28 because the emptiness was ambiguous: `deliverables-agent`
+had to reconstruct delivery state from `PROJECT_CONTEXT.md`'s Decisions Log,
+since it was not readable from this file. Until the first release train, the
+Decisions Log remains the source of truth for what shipped when.
+
 ## Released
+
+_None yet — see above._ The first entries appear when `/cut-release` promotes
+to `prod/` and writes `RELEASES.md`.

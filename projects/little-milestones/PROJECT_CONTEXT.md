@@ -2797,3 +2797,79 @@ which is still pending (asked to review Increments 5/6/7 together).
   (adding a central Capture action and a "You" tab), a night theme, an
   offline queue, and prompt chips in the thumb zone. Built here: the 4-tab
   core. The remainder is specified in UX_KB §13 and not yet implemented.
+
+- 2026-07-27 — MOBILE, phases A–D + first live-device run. **The
+  "no simulator on this machine" finding of 2026-07-26 was wrong.** The check
+  misread `xcode-select -p`, which reports the *active developer directory*,
+  not whether Xcode is installed; Xcode 26.6 with a full simulator set was
+  present all along. The app was run on an iPhone 17 Pro simulator (evidence:
+  `dev/test-evidence/mobile-ios-2026-07-26.md` and
+  `dev/test-evidence/screenshots/`). Phases A–D closed the delta against the
+  approved design: the central `[+]` Capture action (`CaptureModal`,
+  `CaptureContext`) and the "You" tab (`SettingsScreen` + `SecurityCard`) both
+  shipped. **Night theme and offline queue remain** the genuine outstanding
+  items from UX_KB §13.
+
+  This misreading is the most expensive single error in the build. It did not
+  merely leave the app unverified — it caused the native rendering backend to
+  be deferred as "no simulator available", which left `test-agent`'s
+  rendered-UI contract live with no backend able to observe a React Native
+  tree. Every rendering defect below follows from that.
+
+- 2026-07-27/28 — DEFECTS FOUND BY THE HUMAN ON THE RUNNING APP, and fixed.
+  Seven in total, reported across several rounds of screenshots: the avatar
+  never rendered; Journey photos never rendered; the lightbox and gallery were
+  built, state-managed and never mounted; the chat-history sheet was imported,
+  state-managed and never mounted; prompt chips stretched into ovals; a dead
+  band sat above the composer; and the first suggested-prompt chip was
+  age-blind across all ten CDC age buckets (it took the domain from the
+  bucket's *first* milestone, and every bucket leads with `social`, so every
+  child at every age read "connection").
+
+  Four of the seven are one failure class — **built, imported, sometimes
+  state-managed, never rendered** — which is invisible to typecheck, to the
+  bundler, and to every API test by construction. Nine gates and six SME
+  suites passed while the app was broken. Two of the seven were caught by
+  automation, and only because the tests were written *after* the human
+  reported the symptom.
+
+- 2026-07-28 — SUGGESTED PROMPTS reworked (human request). Curated per-bucket
+  T1 copy (40 lines, 10 buckets x 4 domains); domain affinity derived from the
+  profile's own past questions, as keyword signal only and never echoed back,
+  with a `HEALTH_VETO` list so a 2am health worry cannot become a cheerful
+  suggestion chip; and a day-rotating default domain. Landed on desktop web
+  automatically — the web reads the same endpoint and hardcodes nothing.
+
+- 2026-07-28 — TESTING topology rebuilt across three surfaces.
+  `dev/tests/run-all.sh` is now a single entry point over backend, desktop web,
+  mobile and all six SME suites, with `EMPTY` and `STATIC-ONLY` counted as
+  not-green on purpose. Three real bugs were found in the test infrastructure
+  itself: (a) every SME suite entry point was shadowed by a duplicate tree and
+  reported `NO SCENARIOS DEFINED` for suites that had passing tests; (b) the
+  registry slug `red-team` did not match the on-disk `redteam`, so
+  `responsible-ai-architect` could not invoke its own suite; (c) a red-team
+  probe was failing ~1 run in 5 and had twice been reported as LLM flake — it
+  was a brittle regex requiring "36 months" with a space where the model wrote
+  "birth-through-36-months". The guardrail had held every time. All fixed.
+  RNTL added as the native rendering backend (`suites/harness/native.py`), with
+  a negative control proving it catches the original defect.
+
+  Current measured state: **499 tests, all green** — backend 294, desktop web
+  80, mobile 7, SME suites 12/16/38/20/20/12.
+
+- 2026-07-28 — PLATFORM change (see `admin/`), driven by this build's failures.
+  Pipeline goes 9 → 11 gates and the roster 19 → 21 agents: a **Functional
+  Design** gate (acceptance criteria with stable IDs) and a blocking
+  **Verification** gate (every criterion must map to a named, executed,
+  passing check, else `NOT VERIFIED`). `code-agent` must now write unit and
+  reachability tests in the same commit, rendering from the app's real entry
+  point; `review-agent` gains a wiring sweep; `solution-architect` becomes
+  **non-droppable for multi-surface projects** and owes a mandatory Impact
+  Analysis. Full reasoning and the rejected alternatives are in
+  `admin/proposals/2026-07-28-pipeline-verification-gap.md`.
+
+  Known open gap, recorded rather than quietly fixed: `ARCHITECTURE_KB.md`
+  contains no mobile content at all — the mobile architecture was recorded in
+  `SECURITY_KB.md §9` and `UX_KB.md §13` instead. That is precisely the
+  myopia the new Impact Analysis obligation exists to prevent, and it is the
+  first thing that obligation is being applied to.
