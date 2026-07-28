@@ -154,6 +154,59 @@ doesn't get lost before that review happens.
   frontend change with `tsc --noEmit` while dev is running, and only run
   the full `next build` with the dev server stopped.
 
+- **2026-07-28 — A contract can be live while the capability behind it is
+  empty, and nothing reports the difference.** `test-agent` v1.3.0 made
+  rendered-UI verification contractual on 2026-07-26. The F18 mobile build ran
+  *under* that contract and still shipped six rendering defects, because the
+  capability had exactly one built backend (Playwright) and Playwright cannot
+  load a React Native tree; the native backend had been deferred when a
+  toolchain spike found no simulator. The gate was satisfied, the suites were
+  green, and the class of defect was **structurally uncatchable**. Fix applied:
+  RNTL added as the native backend (no simulator needed, ~1s). **Prevention: when
+  a contract asserts a capability, check that a backend exists for the specific
+  surface in play — "the contract requires it" is not evidence the check can
+  actually run.** Found by `mas-architect`, missed entirely by the orchestrator's
+  own end-to-end analysis.
+- **2026-07-28 — A component-rendering test proves compilation, not
+  reachability.** `render(<Avatar />)` passes brilliantly while `Avatar` is
+  mounted nowhere — which is exactly the defect it was written to prevent. Four
+  separate defects in F18 were this shape (`Avatar`, `RemoteImage`/`Lightbox`,
+  `ChatHistorySheet` — the last imported *and* state-managed *and* never
+  mounted). **A reachability test must render from the screen's or app's real
+  entry point and assert the component appears in the resulting tree.** This
+  distinction is the difference between a guard that works and one that is
+  decorative.
+- **2026-07-28 — Always run a negative control before trusting a new guard.**
+  A test verified only against correct code proves nothing about whether it
+  detects the bug. Before committing the new reachability guards, the original
+  defect was deliberately reintroduced (Avatar imported, not rendered); the guard
+  failed with the correct message, and passed again on restore. Cheap, and the
+  only thing that distinguishes a real guard from a passing no-op.
+- **2026-07-28 — A shadow copy of the test tree silently reports every suite as
+  EMPTY.** `dev/tests/<suite>/run.sh` delegated to a runner that scanned
+  `dev/tests/<suite>/test_*.py`, while every real test lived under
+  `dev/tests/suites/`. Result: exit 3 (`NO SCENARIOS DEFINED`) for suites that
+  had passing tests. Nothing referenced the outer tree and all 24 contract and
+  registry references named the inner one, so the outer was removed. **Check
+  that the path an agent's tool grant is scoped to is the path the tests actually
+  live at.**
+- **2026-07-28 — A registry-vs-disk slug mismatch can make an agent unable to
+  run its own suite.** `responsible-ai-architect`'s `Bash` grant is scoped to
+  `dev/tests/suites/red-team/run.sh`; the directory on disk was `redteam`. The
+  agent that owns the red-team suite could not invoke it, and nothing surfaced
+  that as anything other than a missing suite. Contract, registry and
+  `code-agent` all agreed on `red-team` — the disk was the outlier and was
+  renamed.
+- **2026-07-28 — The orchestrator's own analysis is biased toward machinery.**
+  The pipeline gap analysis written by the orchestrator proposed three new agents
+  and two new gates; `mas-architect` folded all three into existing agents and
+  rejected the third outright for a circularity the orchestrator had not seen (an
+  agent that guards the orchestrator only runs if the orchestrator invokes it).
+  Its sharper point: **every gate-skip in F18 violated rules that already
+  existed.** Adding rules to a system that is not executing the rules it has does
+  not fix it. Prefer making non-compliance *visible to someone other than the
+  non-complier* over adding another rule.
+
 ## Successful Patterns
 
 - **Verify empirically, every time a claim is checkable.** Real `pytest`

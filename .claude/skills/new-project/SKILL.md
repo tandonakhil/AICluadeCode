@@ -1,6 +1,6 @@
 ---
 name: new-project
-description: Create a new project and run it through the full gated SDLC pipeline (Intake, Team Composition, Plan & Backlog, Experience Design, Architecture, Code, Test, Review, Deploy). All core and SME agents now exist per admin/MAS_REGISTRY.md.
+description: Create a new project and run it through the full gated SDLC pipeline (Intake, Team Composition, Plan & Backlog, Functional Design, Experience Design, Architecture, Code, Test, Verification, Review, Deploy). All core and SME agents now exist per admin/MAS_REGISTRY.md.
 ---
 
 # /new-project
@@ -42,10 +42,19 @@ agent roster or gate order changes, not left stale.
    governance rules).
 
 4. **Team Composition gate**: propose a roster — **core, non-droppable**:
-   `plan-agent`, `code-agent`, `test-agent`, `review-agent`, `deploy-agent`,
+   `plan-agent`, `functional-design-agent`, `code-agent`, `test-agent`,
+   `verification-agent`, `review-agent`, `deploy-agent`,
    plus `ui-ux-designer` if the template is UI-bearing (`genai-chatbot`,
-   `rag-knowledge-base`; not applicable for `agentic-workflow`). **Optional,
-   droppable**: `functional-agent`, `industry-expert`, `solution-architect`,
+   `rag-knowledge-base`; not applicable for `agentic-workflow`).
+   **Multi-surface rule (2026-07-28)**: if this project has **more than one
+   surface** — web + mobile, app + public API, app + a data/deliverables
+   pipeline — then `solution-architect` moves into the core, non-droppable
+   set and **cannot be trimmed**. A *surface* is any independently-shipped
+   face of the system; when in doubt, count the project as multi-surface and
+   say why. State plainly which surfaces you counted, so the human can correct
+   the count rather than only the roster. **Optional,
+   droppable**: `functional-agent`, `industry-expert`, `solution-architect`
+   (single-surface projects only, per the rule above),
    `security-architect`, `responsible-ai-architect`, `synthetic-data-agent`
    (default-on for UI-bearing templates, default-off for `agentic-workflow`
    — invoked just before the Test gate, not a gate of its own). Present the proposal
@@ -82,7 +91,20 @@ agent roster or gate order changes, not left stale.
    approved subset becomes this project's MVP scope, recorded in
    `FEATURES.md`.
 
-6. **Experience Design gate** (UI-bearing templates only, skip entirely for
+6. **Functional Design gate**: invoke `functional-design-agent` on the
+   approved backlog. It writes `knowledge/FUNCTIONAL_SPEC.md` — per-feature
+   acceptance criteria in Given/When/Then form, each carrying a **stable
+   unique ID** (`AC-F18-03`), covering edge cases and empty/error states, and
+   including **observable-UI criteria** (which component visible, on which
+   screen, in which state) for every UI-bearing feature. Present the criteria
+   grouped by feature, with the count per feature and an explicit list of any
+   UI-bearing feature lacking an observable-UI criterion. These IDs are what
+   the Verification gate audits against later, so a feature specified vaguely
+   here cannot be verified at all downstream. This gate runs **before**
+   Experience Design so the designer designs against known required behaviour.
+   Stop and wait for approval.
+
+7. **Experience Design gate** (UI-bearing templates only, skip entirely for
    `agentic-workflow`): invoke `ui-ux-designer` to propose flows, layout, and
    visual language for the approved backlog, pushing components via
    `DesignSync`. Writes `knowledge/UX_KB.md` **and a reviewable visual
@@ -92,7 +114,7 @@ agent roster or gate order changes, not left stale.
    URL before asking for approval. Never ask for design approval from a
    text summary alone. Stop and wait for approval before Architecture.
 
-7. **Architecture gate**: invoke `solution-architect` and `security-architect`
+8. **Architecture gate**: invoke `solution-architect` and `security-architect`
    jointly (if either is on the roster — if both were dropped, skip this
    gate's SME work but still note in `PROJECT_CONTEXT.md` that architecture
    was not formally reviewed, so that's visible later, not silently absent),
@@ -103,27 +125,48 @@ agent roster or gate order changes, not left stale.
    `knowledge/SECURITY_KB.md` / `knowledge/RESPONSIBLE_AI_KB.md`. Stop and
    wait for approval before Code.
 
-8. **Code gate**: invoke `code-agent` with the approved plan, experience
-   design, and architecture. Present a summary of what was
-   implemented/committed. Stop and wait for approval.
+9. **Code gate**: invoke `code-agent` with the approved plan, functional spec,
+   experience design, and architecture. Present a summary of what was
+   implemented/committed — including the **unit tests and UI reachability
+   tests** it authored in the same commits, which are now Code-gate
+   deliverables: the gate does not close on untested new code, and a
+   reachability test must render from the screen's or app's real entry point
+   rather than the component in isolation. Stop and wait for approval.
 
-9. **Test gate**: invoke `test-agent` for unit/integration, plus each active
-   SME's owned suite (functional, industry/compliance, UX/accessibility,
-   architecture, security, red-team/bias — only for agents actually on the
-   roster). Present the report broken out per suite, not merged into one
-   pass/fail number, and clearly marked per `PROJECT_CONTEXT.md`'s Test
-   Policy which suites are blocking vs. advisory (default: all blocking).
-   A blocking suite's failure stops the gate — the human either sends it
-   back or explicitly overrides with a recorded `[override]` reason in the
-   Decisions Log. An advisory suite's failure is still fully reported but
-   doesn't force a stop. Stop and wait for approval.
+10. **Test gate**: invoke `test-agent` for unit/integration, plus each active
+    SME's owned suite (functional, industry/compliance, UX/accessibility,
+    architecture, security, red-team/bias — only for agents actually on the
+    roster). Present the report broken out per suite, not merged into one
+    pass/fail number, and clearly marked per `PROJECT_CONTEXT.md`'s Test
+    Policy which suites are blocking vs. advisory (default: all blocking).
+    A blocking suite's failure stops the gate — the human either sends it
+    back or explicitly overrides with a recorded `[override]` reason in the
+    Decisions Log. An advisory suite's failure is still fully reported but
+    doesn't force a stop. Rendered-UI verification now has a native backend
+    (RNTL, no simulator required) alongside Playwright for web — a UI-bearing
+    surface with no rendered evidence is reported, not assumed passing. Stop
+    and wait for approval.
 
-10. **Review gate**: invoke `review-agent` (narrow scope — see its own
+11. **Verification gate** (**blocking**): invoke `verification-agent`. It
+    audits the evidence trail only — `FUNCTIONAL_SPEC.md`, `test-evidence/`,
+    and `test-agent`'s per-suite report — and never re-runs anything or
+    re-reasons about the code. Present its per-feature evidence matrix
+    (`AC-* ID -> named check -> result`). Any acceptance criterion with no
+    mapped, executed, passing check is **`NOT VERIFIED`**: it is never folded
+    into a pass, it does not satisfy a blocking obligation, and it **blocks
+    this gate and routes back to Code**. As at any blocking gate the human may
+    override with a recorded `[override]` reason naming the AC IDs. Stop and
+    wait for approval.
+
+12. **Review gate**: invoke `review-agent` (narrow scope — see its own
     definition; does not re-check what the Test gate's suites already
-    covered). Present its verdict. Stop and wait for approval; "request
-    changes" loops back to Code with human confirmation.
+    covered). Its cross-cutting lane now includes the **wiring sweep**: every
+    component defined under this feature must be rendered somewhere reachable,
+    traced from the app's entry point through the render tree. An unrendered
+    component is `request-changes`. Present its verdict. Stop and wait for
+    approval; "request changes" loops back to Code with human confirmation.
 
-11. **Deploy gate**: invoke `deploy-agent`, then `test-agent` for the
+13. **Deploy gate**: invoke `deploy-agent`, then `test-agent` for the
     post-deploy smoke test. Present both results. On approval, update
     `PROJECT_CONTEXT.md`'s Current Status to `deployed (dev, local)` and
     `memory/INDEX.md`.

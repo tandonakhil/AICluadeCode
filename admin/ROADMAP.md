@@ -54,6 +54,55 @@ approved together.
   flagged relevant (new data shape introduced), not unconditional. See
   `.claude/agents/synthetic-data-agent.md` and `admin/MAS_REGISTRY.md`.
 
+- **Deferred from the 2026-07-28 verification-gap round** (see
+  `admin/proposals/2026-07-28-pipeline-verification-gap.md`; the human's
+  decision table selected N1, N2, RNTL, C1, C5, and C2 for immediate build —
+  everything below was explicitly *not* selected this round, and none of it is
+  rejected):
+  - **C3 — rendered-output evidence required per surface named by C2's Impact
+    Analysis.** A surface with no rendered evidence would report `NOT VERIFIED`
+    and never be folded into a pass. Now genuinely buildable in a way it wasn't
+    before: `solution-architect` v2.0.0 produces the surface list, and
+    `test-agent` v1.4.0 finally has a native rendering backend to produce
+    mobile evidence with. Deferred only for sequencing.
+  - **C6 — promote the cross-surface parity suite into the templates**, so
+    multi-surface projects get it from day one rather than having it
+    hand-written per project (it was written during F18 and exists only there).
+    Naturally pairs with C3 and with the multi-surface question below.
+  - **`admin/PIPELINE.yaml` + `admin/PIPELINE_LOG.md`.** The human's feedback
+    #5 asked for a strictly-followed workflow with a visual graph.
+    `pipeline-marshal` (N3) was correctly rejected for **circularity** — the
+    only way it runs is if the orchestrator invokes it, and an orchestrator
+    that skips gates skips the marshal too. What survives that objection is the
+    *artifacts*, not the enforcing agent: a single `PIPELINE.yaml` declaring
+    gate order plus per-gate required inputs/outputs and exit criteria, with
+    the workflow diagram **rendered from that same file** so picture and rule
+    cannot drift; and `PIPELINE_LOG.md`, a per-project record of which gates
+    actually ran, when, and with what human approval or recorded exception.
+    `mas-architect`'s reasoning for why the log is the load-bearing half:
+    every gate-skip in F18 violated rules that **already existed**, so the
+    problem was never a missing rule — it was that non-compliance was visible
+    only to the non-complier. A log makes it visible to someone else. Note the
+    gate count is now **11**, not 9, so anything built here must be authored
+    against the current order in `admin/MAS_REGISTRY.md`.
+  - **Open structural question — "multi-surface project" as a first-class
+    concept.** Raised by `mas-architect` and deliberately left open rather than
+    silently resolved. This platform has no first-class notion of a project
+    having multiple surfaces (web + mobile, app + public API, app + a
+    data/deliverables pipeline). Defects 9 and 10 of the F18 ledger are both
+    symptoms: desktop web had **zero** SME-suite coverage, and the deliverables
+    sat fifteen days stale describing a web-only product. The 2026-07-28 round
+    patched the *consequence* — `solution-architect` is now non-droppable for
+    multi-surface projects and must produce a per-surface Impact Analysis — but
+    the underlying gap is structural: templates are single-surface by
+    construction, `PROJECT_CONTEXT.md` has no surface inventory, no gate
+    enumerates surfaces, and "which surfaces exist" currently lives only in an
+    architect's prose. Candidate directions (none chosen, none evaluated):
+    a declared surface inventory in `PROJECT_CONTEXT.md` that gates read;
+    multi-surface templates; per-surface test-suite instantiation. **Route
+    through `mas-architect` before building anything here** — this is a
+    platform-shape question, not a contract tweak.
+
 ## Shipped
 
 - **Phase 0 (2026-07-05)**: Admin Control Panel bootstrap — `mas-architect`,
@@ -241,3 +290,49 @@ approved together.
   no direct infra/DB access. See Backlog section above for the full design
   and `.claude/agents/synthetic-data-agent.md` for the built contract. Pure
   scaffolding — no project has adopted this agent yet.
+- **Verification-gap round (2026-07-28)**: shipped the six items the human's
+  decision table marked BUILD in
+  `admin/proposals/2026-07-28-pipeline-verification-gap.md`. **Roster 19 → 21
+  agents; pipeline 9 → 11 gates.** Evidence base: the little-milestones F18
+  mobile build shipped ten defects, eight caught by the human on the running
+  app and **zero** caught by the nine gates or six SME suites — the pipeline
+  verified that code was written, never that the feature worked.
+  - **`functional-design-agent` (new, v1.0.0)** — new **Functional Design**
+    gate between Plan & Backlog and Experience Design; core, all templates;
+    owns `knowledge/FUNCTIONAL_SPEC.md`; owns no test suite. Per-feature
+    Given/When/Then acceptance criteria with **stable unique IDs**
+    (`AC-F18-03`), mandatory edge/empty/error coverage, and mandatory
+    **observable-UI criteria** for UI-bearing features. Lane discipline against
+    `plan-agent` and `ui-ux-designer` defended in contract prose, per
+    `mas-architect`'s flagged overlap risk. Human overrode the recommended
+    fold.
+  - **`verification-agent` (new, v1.0.0)** — new **Verification** gate between
+    Test and Review; core, **blocking**, sole gate owner. Owns no KB and no
+    test suite; produces a per-feature evidence matrix in
+    `PROJECT_CONTEXT.md`. Unmapped acceptance criteria are `NOT VERIFIED`,
+    never folded into a pass, and block back to Code. Hard read-only
+    (`Read, Grep, Glob`) and contractually barred from re-reasoning about the
+    code, per `mas-architect`'s cost caveat. Human overrode the recommended
+    fold; blocking-not-advisory was the orchestrator determination.
+  - **RNTL native rendering backend (`test-agent` v1.4.0)** —
+    `mas-architect`'s strongest recommendation and absent from the original
+    proposal entirely. Rendered-UI verification had exactly one built backend
+    (Playwright, web-only), so F18's rendering defects were **structurally
+    uncatchable** even though it ran under the v1.3.0 rendered-UI contract.
+    RNTL renders in-process with **no simulator required**, so the 2026-07-26
+    toolchain spike's blocker doesn't apply. Maestro + simulator retained as
+    the deeper future native backend, not deleted.
+  - **`code-agent` v1.3.0 (C1)** — unit tests are a Code-gate deliverable in
+    the implementer's own commit; every new UI component gets a reachability
+    test **rendered from the real entry point**, never in isolation.
+  - **`review-agent` v1.3.0 (C5)** — wiring sweep tracing from the app entry
+    point through the render tree; an import is explicitly not sufficient
+    evidence of reachability.
+  - **`solution-architect` v2.0.0 (C2, MAJOR)** — non-droppable for any
+    multi-surface project, plus a mandatory per-enhancement Impact Analysis
+    whose unjustified surface omissions block the Architecture gate.
+  - **Not built by decision**: `pipeline-marshal` (circularity accepted) and
+    the `deliverables-agent` freshness check (an optional agent may not block a
+    core gate). C3, C6, the `PIPELINE.yaml`/`PIPELINE_LOG.md` artifacts, and the
+    open multi-surface structural question moved to Backlog above.
+    Pure platform scaffolding — no project has run the 11-gate pipeline yet.

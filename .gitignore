@@ -7,6 +7,10 @@ __pycache__/
 *.pyc
 .venv/
 .deliverables-venv/
+# Same thing under the name deliverables-agent actually creates it with — the
+# pattern above only matched the hyphenated spelling, so a real run left an
+# untracked venv sitting in the repo root.
+.venv-deliverables/
 .pytest_cache/
 
 # Node / Next.js

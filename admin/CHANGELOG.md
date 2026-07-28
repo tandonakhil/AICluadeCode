@@ -6,6 +6,176 @@ by `mas-release-manager`.
 
 ## Unreleased
 
+- **Closing the pipeline's verification gap — two new gates (2026-07-28)** —
+  one `mas-registrar` pass implementing the human decision table in
+  `admin/proposals/2026-07-28-pipeline-verification-gap.md`, approved
+  2026-07-28. **Registry roster 19 → 21; pipeline 9 gates → 11.** Two agents
+  created, four contracts bumped. `projects/` deliberately untouched — the
+  project-level fixes are the orchestrator's parallel workstream.
+
+  **Why**: the little-milestones F18 mobile build shipped ten defects. Eight
+  were caught by the human on the running app; **zero** were caught by the nine
+  gates or the six SME suites. The pipeline verified that *code was written*,
+  never that *the feature works* — nothing bound a feature's acceptance criteria
+  to executed evidence, so "done" was asserted by the agent that did the work
+  rather than demonstrated to an independent checker. Four of the ten defects
+  were literally the same failure: a component built, imported, sometimes even
+  state-managed, and never rendered.
+
+  - **New agent — `functional-design-agent` (v1.0.0), new Functional Design
+    gate** between Plan & Backlog and Experience Design. Core for all templates,
+    owns `knowledge/FUNCTIONAL_SPEC.md`, owns no test suite. Produces per-feature
+    acceptance criteria in Given/When/Then form, each carrying a **stable unique
+    ID** (`AC-F18-03`) — the IDs are the load-bearing part, since they are what
+    makes `verification-agent`'s audit mechanical rather than interpretive; they
+    are never reused and never renumbered. Edge cases and empty/error states are
+    mandatory. For UI-bearing features the criteria must include
+    **observable-UI criteria** (which component visible, on which screen, in
+    which state) — the built-but-never-wired defect class expressed as a single
+    testable line. Runs *before* Experience Design so the designer designs
+    against known required behaviour. **Lane discipline is defended in contract
+    prose**, per `mas-architect`'s flag that overlap is the main risk of building
+    this rather than folding it: behaviour and acceptance criteria only — not
+    scope/backlog (`plan-agent`) and not flow/layout/visual (`ui-ux-designer`).
+    Writes at project root, never inside `dev/`. **The human overrode
+    `mas-architect`'s recommended fold** and had it built as a real agent.
+  - **New agent — `verification-agent` (v1.0.0), new Verification gate** between
+    Test and Review. Core, **blocking**, and **sole owner of its gate** so
+    authority is unambiguous. Owns no KB and no test suite; writes a per-feature
+    evidence matrix (`AC-* ID -> named check -> result`) into
+    `PROJECT_CONTEXT.md`. Single question: does every acceptance-criterion ID in
+    `FUNCTIONAL_SPEC.md` map to a named, executed, passing check? An AC with no
+    mapped executed check is **`NOT VERIFIED`** — deliberately reusing
+    `test-agent`'s existing `STATIC ONLY — NOT EXECUTED` language pattern so the
+    semantics stay consistent across the pipeline — never folded into a pass,
+    never satisfying a blocking obligation. Unmapped criteria block the gate and
+    route back to Code. **Hard cost guardrail, contractual**: it holds only
+    `Read, Grep, Glob`, runs nothing, and is explicitly forbidden from
+    re-reasoning about the code — it audits the evidence trail
+    (`test-evidence/`, `test-agent`'s per-suite report, `FUNCTIONAL_SPEC.md`)
+    and nothing else. `mas-architect` warned this becomes the pipeline's most
+    expensive gate for the least new information the moment it re-derives
+    correctness. **The human overrode the recommended fold**; blocking-rather-
+    than-advisory was the orchestrator determination, on the grounds that an
+    advisory verification gate is ignorable and reproduces the original problem
+    exactly.
+  - **`code-agent` v1.2.0 → v1.3.0 (MINOR, C1)** — no tool-grant change. **Unit
+    tests are now a Code-gate deliverable authored by the implementer in the
+    same commit**, not by a later agent after the fact; every new module gets
+    unit tests, and **the gate does not close on untested new code**. Every new
+    UI component gets a **reachability test that renders from the screen's or
+    app's real entry point** and asserts the component appears in the resulting
+    tree. Rendering the component in isolation explicitly does not satisfy this
+    — `mas-architect`'s correction, and the reason C1 as originally proposed
+    would not have prevented the defect class it targeted: a test that renders
+    `<Avatar/>` standalone passes while `Avatar` is mounted nowhere, which is
+    exactly defects 1–4. Recorded honestly in-contract that this makes the agent
+    both author and beneficiary of the proof, offset by `test-agent`'s existing
+    test-count-delta reporting. (`mas-architect` also corrected the proposal's
+    MAJOR to MINOR.)
+  - **`review-agent` v1.2.0 → v1.3.0 (MINOR, C5)** — no new tool grant needed
+    (`Grep`/`Glob`/read-only `Bash` already held). Adds a **wiring sweep** inside
+    its existing cross-cutting-consistency lane: every component defined under
+    the feature under review must be rendered somewhere reachable, established
+    by **tracing from the app's entry point through the render tree**. Checking
+    that a symbol is imported or referenced is **not** sufficient — an import is
+    precisely what defects 1–4 had (`ChatHistorySheet` was imported *and*
+    state-managed and still mounted nowhere). An unrendered component is
+    `request-changes`, never `escalate`, since wiring is `code-agent`'s to fix
+    and there is no contradiction in the record to adjudicate. **The honest
+    limitation is recorded in-contract**: static reachability analysis in
+    React/RN yields false negatives under conditional rendering, feature flags,
+    and dynamic imports, so a negative reports as "no static render path found."
+    It is a cheap, strong net over a defect class that previously had no net at
+    all — not a proof — and it pairs with the RNTL backend rather than replacing
+    it.
+  - **`test-agent` v1.3.0 → v1.4.0 (MINOR)** — **React Native Testing Library
+    added as the native rendering backend**, alongside Playwright for web, under
+    the existing one-capability-multiple-backends shape. This closes
+    `mas-architect`'s headline finding and **the largest error in the original
+    proposal**: rendered-UI verification became contractual in v1.3.0 on
+    2026-07-26 and F18 ran *under* that contract and still shipped six rendering
+    defects, because the capability had exactly one built backend and it was
+    web-only. Defects 1–6 were **structurally uncatchable**. The decisive
+    property of RNTL is that it renders **in-process and requires no simulator
+    or emulator**, so the 2026-07-26 toolchain spike's "no simulator available"
+    finding — which correctly deferred Maestro — does not block it. Proven in
+    practice: an RNTL test caught the `ChatHistorySheet` never-mounted defect
+    that all six SME suites missed. **Maestro + simulator is retained, not
+    deleted** — superseded as the backend to use today, still recorded as the
+    deeper future native backend for device-level layout, gesture, native-module,
+    and visual-regression concerns RNTL cannot reach (the stretched-prompt-chip
+    and dead-band defects are that shape). Same hard process-lifecycle
+    constraint as Playwright: synchronous within one command invocation, never a
+    watcher or bundler left running past the turn.
+  - **`solution-architect` v1.2.0 → v2.0.0 (MAJOR, C2)** — a core-vs-optional
+    status change, hence MAJOR. **Non-droppable at Team Composition for any
+    project with more than one surface** (web + mobile, app + public API, app +
+    a data/deliverables pipeline); optional/droppable only for single-surface
+    projects. The human chose this higher-blast-radius option explicitly over
+    the lighter gate-level alternative and over the MINOR bump `mas-architect`
+    proposed. Also adds a mandatory **Impact Analysis** section in
+    `ARCHITECTURE_KB.md` for every enhancement: which surfaces the change
+    reaches, which are unaffected **and why** (the justification is the
+    load-bearing half — a reader must be able to falsify it), and what must be
+    re-tested per reached surface. **A surface omitted without justification
+    blocks the Architecture gate**; blocking here is ordinary gate-owner
+    authority, since this agent is a joint owner of Architecture rather than an
+    advisory SME speaking at someone else's gate — stated explicitly in both the
+    contract and the registry's governance rules so it doesn't read as an
+    exception. Motivated by defects 9 and 10: desktop web with zero SME-suite
+    coverage, and deliverables fifteen days stale describing a web-only product
+    — both symptoms of a second surface nobody was accountable for.
+  - **Skills updated**: `/new-project` gains the Functional Design step after
+    Plan & Backlog and the Verification step after Test (renumbered to 13
+    steps), plus the multi-surface non-droppability rule at Team Composition;
+    `/enhance-project` gains both gates in its mini pipeline, the mandatory
+    Impact Analysis, and a note that the two new agents are core and outside the
+    re-engagement question. `/modify-feature` needed no change — it delegates by
+    reference and never enumerated gates. `/consult`'s list of non-consultable
+    core agents gained `functional-design-agent` and `verification-agent`
+    (skills carry no semver of their own).
+  - **Two follow-on PATCH bumps, from a staleness sweep run after the main
+    pass** — both are documentation consistency only, with no gate placement,
+    core/optional, KB, suite-ownership, or tool-grant change to either agent.
+    - **`enhance-agent` v1.1.0 → v1.1.1.** Its mini-pipeline gate list was two
+      gates behind the skill files it owns, which meant the agent that *drives*
+      `/enhance-project` and `/modify-feature` contradicted the route those
+      skills describe. Functional Design added after Plan & Backlog (appending
+      new `AC-*` IDs on an enhancement rather than renumbering existing ones,
+      consistent with the never-reused/never-renumbered rule), blocking
+      Verification added between Test and Review, and both new agents noted as
+      core and therefore outside the SME re-engagement question.
+    - **`mas-architect` v1.1.0 → v1.1.1.** Its "Gate placement" contract
+      question still enumerated nine gates and its blast-radius caution still
+      referred to "the core 5 (plan/code/test/review/deploy)". This was the
+      most consequential staleness found, because `mas-architect` is the agent
+      that adjudicates *future* proposals: a stale list here would have placed
+      the next proposed agent against a pipeline that no longer exists, and the
+      highest-blast-radius warning would silently have failed to fire for
+      anything touching `functional-design-agent` or `verification-agent`.
+      Corrected to the 11 gates and the non-droppable core 7, with
+      `ui-ux-designer` and `solution-architect` noted as conditionally core.
+      Both places now explicitly defer to `admin/MAS_REGISTRY.md` as the source
+      of truth rather than standing as independent copies — a hand-copied list
+      going stale is precisely what caused this.
+  - **Deliberately not touched**: the two generated KB pages
+    (`admin/deliverables/knowledge-base.html`,
+    `admin/kb-server/templates/index.html`) are now stale at 9 gates and an
+    18-agent roster. They are `deliverables-agent`'s output, `ROADMAP.md`
+    already records that their regeneration was never wired into a trigger, and
+    hand-editing a generated artifact only drifts it further from its source.
+    Flagged for separate handling rather than patched.
+  - **Not built, by explicit decision**: **N3 `pipeline-marshal`** (circularity
+    accepted — the only way it runs is if the orchestrator invokes it, and an
+    orchestrator that skips gates skips the marshal); **C4
+    `deliverables-agent` freshness check** (as written it violated standing
+    governance, since an optional agent may not block a core gate that
+    `deploy-agent` owns — treated instead as orchestrator trigger discipline
+    plus `PIPELINE_LOG` visibility). **C3** (rendered evidence per
+    Impact-Analysis surface) and **C6** (cross-surface parity suite promoted
+    into the templates) were deferred to a later phase, not selected this round.
+
 - **Phases 2 and 3 — suite execution + rendered-UI verification (2026-07-26)**
   — one `mas-registrar` pass implementing the Phase 2 and Phase 3 items of
   `mas-architect`'s consolidated review

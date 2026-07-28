@@ -13,7 +13,8 @@ reach any of the standing SME agents on demand.
 Any of the project-pipeline SME agents: `functional-agent`, `industry-expert`,
 `ui-ux-designer`, `solution-architect`, `security-architect`,
 `responsible-ai-architect`. (Core pipeline agents — `plan-agent`,
-`code-agent`, `test-agent`, `review-agent`, `deploy-agent` — aren't
+`functional-design-agent`, `code-agent`, `test-agent`, `verification-agent`,
+`review-agent`, `deploy-agent` — aren't
 "consulted," they're invoked through the normal gated pipeline; if the
 request is really "run the Plan gate again," redirect to `/enhance-project`
 or `/modify-feature` instead of treating it as a consult.)

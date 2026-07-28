@@ -1,6 +1,6 @@
 ---
 name: enhance-project
-description: Propose and build a new feature on an already-deployed project. Owned by enhance-agent — creates a feature branch, runs a re-engagement decision for dropped SMEs, and drives a mini gated pipeline scoped to the one feature.
+description: Propose and build a new feature on an already-deployed project. Owned by enhance-agent — creates a feature branch, runs a re-engagement decision for dropped SMEs, and drives a mini gated pipeline (Plan & Backlog, Functional Design, Experience Design, Architecture, Code, Test, Verification, Review, Deploy) scoped to the one feature.
 ---
 
 # /enhance-project
@@ -15,11 +15,14 @@ full procedure — this skill is the thin entry point).
    - Asks for a feature name.
    - Runs the re-engagement decision (ask about dropped SMEs; always
      re-engage solution-architect/security-architect/responsible-ai-architect,
-     and ui-ux-designer for UI-bearing projects).
+     and ui-ux-designer for UI-bearing projects). `functional-design-agent`
+     and `verification-agent` are core and always engage — they are not part
+     of the re-engagement question.
    - Creates `feature/<YYYY-MM-DD>-<slug>`, registers it in `FEATURES.md`.
-   - Runs the mini gated pipeline (Plan & Backlog → Experience Design if
-     applicable → Architecture → Code → Test → Review → Deploy), pausing for
-     human approval at every boundary exactly like `/new-project`.
+   - Runs the mini gated pipeline (Plan & Backlog → **Functional Design** →
+     Experience Design if applicable → Architecture → Code → Test →
+     **Verification** → Review → Deploy), pausing for human approval at every
+     boundary exactly like `/new-project`.
 3. On completion, the feature is "Ready for Release" — not yet in `prod/`.
    Mention `/cut-release` as the next step if the human wants to ship it.
 
@@ -35,6 +38,16 @@ full procedure — this skill is the thin entry point).
 - Before the mini pipeline's Code stage, invoke `usage-monitor` for a
   pre-work estimate the same way `/new-project`'s Team Composition gate
   does, scaled to a single-feature scope rather than a whole project.
+- **Impact Analysis is mandatory at the mini pipeline's Architecture stage**
+  (2026-07-28): `solution-architect` must record, in `ARCHITECTURE_KB.md`,
+  which surfaces (web / mobile / API / data / deliverables) this enhancement
+  reaches, which are unaffected **and why**, and what must be re-tested. A
+  surface omitted without justification blocks Architecture. On any
+  multi-surface project `solution-architect` is non-droppable, so this is not
+  waivable by trimming the roster.
+- **Verification is blocking**: an acceptance criterion from
+  `FUNCTIONAL_SPEC.md` with no mapped, executed, passing check is
+  `NOT VERIFIED` and routes back to Code, exactly as in `/new-project`.
 - **Test Policy**: the mini pipeline's Test stage respects the project's
   existing blocking/advisory suite policy from `PROJECT_CONTEXT.md` (see
   `test-agent.md`) unless the human explicitly amends it as part of the

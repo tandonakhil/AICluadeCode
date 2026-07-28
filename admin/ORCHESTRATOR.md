@@ -36,6 +36,26 @@ is never invoked as a subagent and never will be.
   unless someone re-reads for it) — the orchestrator is the one party with
   continuity across every gate and is responsible for catching a gap a
   single-invocation subagent has no way to know it's missing.
+- **Fires `deliverables-agent`'s regeneration trigger.** Its contract already
+  says it regenerates "at the end of whichever gate just wrote/updated
+  `PLAN.md`, `UX_KB.md`, `test-evidence/*`, or `FEATURES.md`" — but *the agent
+  cannot fire its own trigger*. In the F18 mobile build the deliverables went 15
+  days stale (`architecture.pptx`, `functional-design.docx`,
+  `technical-design.docx`, `test-results.xlsx` all dated 2026-07-13 against work
+  that ran 07-26 → 07-28) and still described a web-only product, because
+  nothing invoked it. **This is an orchestrator obligation, not a missing
+  check.** Considered and rejected 2026-07-28: making the staleness check
+  blocking at Deploy, which would have let an optional agent block a core gate
+  and contradicted the standing rule that `deploy-agent` owns Deploy and SME
+  input is never independently blocking.
+- **Does not exempt itself from the pipeline.** Every gate skipped during the
+  F18 build violated a rule that already existed — `new-project/SKILL.md`'s
+  "never skip a gate", `ui-ux-designer`'s rendered-preview precondition,
+  `test-agent`'s `EXECUTED` marking. The failure mode of this platform is not
+  missing rules, it is the orchestrator not following the ones it has. Where a
+  gate genuinely must be skipped, that is a human exception, requested
+  explicitly and recorded in the Decisions Log with its reason — never a silent
+  omission.
 
 ## What the orchestrator does NOT do
 
