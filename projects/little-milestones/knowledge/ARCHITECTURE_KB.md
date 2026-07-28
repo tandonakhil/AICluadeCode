@@ -36,9 +36,48 @@ dev/backend/app/
   scheduler.py        — NEW: APScheduler setup + daily digest-send job (§5.3)
   routes/
     profiles.py, chat.py, memories.py, photos.py, digest.py, products.py, auth.py
-dev/frontend/        — Next.js, per UX_KB.md; no architecture changes beyond
-                        what ui-ux-designer's component/screen inventory implies
+dev/frontend/        — Next.js desktop/responsive web client, per UX_KB.md;
+                        no architecture changes beyond what ui-ux-designer's
+                        component/screen inventory implies
+dev/mobile/          — React Native + Expo (SDK 57) native client (F18,
+                        2026-07-26 → 07-28). Second client of the SAME
+                        backend, not a second backend. Full design: §13.
 ```
+
+**Correction, 2026-07-28 — this project has three surfaces, not two.** The
+block above was written at the 2026-07-10 Architecture gate, when the binding
+platform decision was "responsive web app… not a native iOS/Android app." The
+human reversed that decision on 2026-07-26 (PROJECT_CONTEXT.md Decisions Log)
+and F18 shipped a native mobile client. This file was not updated at the time —
+the mobile architecture was designed, but it was recorded in SECURITY_KB §9
+(auth/device posture) and UX_KB §13 (experience) rather than here, leaving the
+component map above claiming a two-component system for fifteen days. §13 below
+closes that gap; §14 is the retrospective Impact Analysis the enhancement
+should have carried.
+
+The real shape, stated once so no future pass has to infer it:
+
+```
+                       ┌──────────────────────────────┐
+                       │  dev/backend  (FastAPI)      │
+                       │  ONE backend, ONE SQLite DB, │
+                       │  ONE sessions table, ONE     │
+                       │  guardrails/grounding path   │
+                       └───────┬──────────────┬───────┘
+              cookie session   │              │   Authorization: Bearer
+              (HttpOnly, Lax)  │              │   + X-LM-Client: mobile
+                       ┌───────┴──────┐   ┌───┴──────────────────┐
+                       │ dev/frontend │   │ dev/mobile           │
+                       │ Next.js web  │   │ React Native / Expo  │
+                       └──────────────┘   └──────────────────────┘
+```
+
+Every behaviour that matters — family scoping, the cross-family 404, R1/R2
+guardrails, CDC-2022 grounding, photo encryption-at-rest, digest assembly — is
+server-side and therefore shared by construction. That is the design's central
+property and the reason a second client was affordable at all. Its corollary is
+the one this project learned the hard way (§14): **a change to shared backend
+code reaches both clients whether or not anyone tested both.**
 
 All stores implement a common `create`/`get`/`delete` shape so the SQLite
 decision (§3) is testable in isolation and swappable in principle, though
@@ -1938,3 +1977,147 @@ as designed with no parallel/duplicate storage or crypto mechanisms, no
 scope creep beyond the approved design, and idempotent migrations
 consistent with this project's established F12 precedent. Fit to proceed
 to the remainder of the Test gate.
+
+---
+
+## 13. F18 — the native mobile surface (recorded 2026-07-28)
+
+> **Authorship note, stated plainly.** §13 and §14 were written by the
+> **orchestrator**, not by `solution-architect`. The agent was invoked twice for
+> exactly this work and both invocations terminated on API connection errors
+> after completing only the §0 correction above. Rather than leave the gap open
+> for a third night, the orchestrator wrote them from the same sources the agent
+> was pointed at. They should be reviewed — and are welcome to be rewritten — by
+> `solution-architect` at the next Architecture gate. This is a lane deviation,
+> recorded rather than hidden.
+
+### 13.1 What was actually built
+
+`dev/mobile/` — React Native + Expo (SDK 57), TypeScript, React 19.2.3 / RN
+0.86. It is a **second client of the same backend**, not a second backend. No
+endpoint exists solely for mobile; no business logic is duplicated client-side.
+
+Tabs: Today / Ask / `[+]` capture / Journey / You.
+
+### 13.2 The dual-credential model
+
+This is the one genuinely new architectural decision in F18, and it is the
+part most likely to be got wrong by a later change.
+
+Source of design: `SECURITY_KB.md §9` (security-architect). Recorded here
+because it is a client/server boundary decision, not only a security one.
+
+- **Web** keeps the existing cookie session — `HttpOnly`, `SameSite=Lax`.
+  Unchanged; F18 added nothing to the web credential path.
+- **Mobile** cannot use cookies reliably, so the same opaque session token is
+  returned in an `X-LM-Session-Token` response header and sent back as
+  `Authorization: Bearer <token>`, with `X-LM-Client: mobile` identifying the
+  client.
+- **One sessions table, one token format, one expiry, one revocation path.**
+  The transport differs; the credential does not. This is the decision that
+  keeps the blast radius small — a change to session handling lands on both
+  surfaces at once, by construction, and cannot silently diverge.
+- **The cookie is read FIRST and wins on conflict.** A request presenting both
+  is treated as a web request. This ordering is deliberate and load-bearing: it
+  means a stolen bearer token cannot be used to override a live cookie session
+  in a browser context.
+
+On-device storage: `expo-secure-store` with
+`WHEN_UNLOCKED_THIS_DEVICE_ONLY` — Keychain-backed, never in plain files, and
+excluded from device backups.
+
+**A real bug this design caught before shipping**: `routes/auth.py::logout`
+still read the cookie directly, so logging out over bearer cleared the token
+locally and left a live 30-day session on the server. Found by a new
+mobile-auth test, not by review.
+
+### 13.3 Shared vs. duplicated between the two clients
+
+| Concern | Where it lives | Note |
+|---|---|---|
+| Age computation, corrected age | Backend (`app/ages.py`) | Never re-implemented client-side |
+| Milestone content, activities, products | Backend, curated non-LLM | Both clients render what they are given |
+| Suggested-prompt copy | Backend (`app/suggested_prompts.py`) | Both clients hardcode nothing — this is what let the 2026-07-28 copy rework reach desktop web with no web code change |
+| Guardrails, grounding, disclaimer text | Backend | One path, both surfaces |
+| Navigation, layout, theming | Per client | Genuinely different form factors; duplication here is correct |
+| Photo fetch + caching | Per client | Web uses browser cache; mobile has its own `photoCache` |
+
+The rule this expresses: **anything a parent reads is server-owned; anything
+about how it is arranged on screen is client-owned.** A client that starts
+holding its own copy of parent-facing text has forked the product, and
+`dev/tests/suites/architecture/test_cross_surface_parity.py` now enforces it.
+
+### 13.4 Rejected alternatives
+
+- **A separate mobile BFF / API gateway.** Rejected: one product, one data
+  model, one family of endpoints. A BFF would have doubled the surface where
+  guardrails and disclaimer rules must hold, for no benefit at this size.
+- **JWTs for mobile.** Rejected: the existing sessions table already provides
+  server-side revocation, which a stateless JWT gives up. Revocation matters
+  here — this is a child's data, and "log out everywhere" must actually work.
+- **Cookie-over-native via a WebView shell.** Rejected at the 2026-07-26
+  Experience Design gate: it would have made the app a wrapper rather than a
+  native client, losing the capture flow and native photo access that were the
+  reason for building it.
+- **Expo Go only, no simulator.** Not a design choice — this was forced by the
+  mistaken belief that no simulator existed. See §14.
+
+---
+
+## 14. Retrospective Impact Analysis — F18 (recorded 2026-07-28)
+
+**Retrospective, and that is the point.** This analysis should have been
+produced at F18's Architecture gate and was not. `solution-architect`'s
+contract went to **v2.0.0 on 2026-07-28** making an Impact Analysis mandatory
+per enhancement, citing this exact omission. This is the first application of
+that obligation, applied backwards to the change that motivated it.
+
+### 14.1 Surfaces reached
+
+| Surface | Reached? | What changed | Re-test required |
+|---|---|---|---|
+| **API / backend** | YES | Bearer transport alongside cookie; 4 issuance sites; `logout` fixed to read either credential | Full backend suite + 9 new mobile-auth security tests |
+| **Mobile** | YES | Entire surface is new | Everything |
+| **Desktop web** | **YES — and this was missed** | No web code changed, but shared backend behaviour did | Web suite — *which did not exist* |
+| **Data** | NO | No schema change. Same `sessions` table, same token format | Migration check only |
+| **Deliverables** | YES — and this was missed | Every document described a web-only product | Regeneration |
+
+### 14.2 The failure this analysis is meant to prevent, demonstrated
+
+Two rows above are marked "missed", and they are the whole argument.
+
+**Desktop web.** The suggested-prompts rework of 2026-07-28 changed
+`app/suggested_prompts.py` — shared backend code. It landed on desktop web
+automatically and correctly. But it landed with **zero web-side test
+coverage**, because every SME suite file in the project was named
+`test_mobile_*`. A shared change had been shipped to a surface no suite was
+looking at. Nobody decided that; it was simply never asked. That is myopia in
+the precise sense the human raised it: not a wrong answer, an unasked question.
+
+**Deliverables.** `architecture.pptx`, `functional-design.docx`,
+`technical-design.docx` and `test-results.xlsx` sat at 2026-07-13 for fifteen
+days while an entire surface was built, still describing a two-component
+system. Also never asked.
+
+### 14.3 What "unaffected and why" actually requires
+
+The table above is only useful because the NO row carries a reason. "Data:
+NO — no schema change, same sessions table, same token format" is a claim that
+can be checked and falsified. A blank cell, or an omitted row, is not.
+
+This is why the new contract requires unaffected surfaces to be named with
+justification rather than left out: **an omitted surface and an unaffected
+surface look identical in a document, and only one of them is safe.**
+
+### 14.4 Standing consequence
+
+`solution-architect` is now **non-droppable for any project with more than one
+surface** (registry, 2026-07-28). The human chose this over the lighter option
+of a gate-level artifact, accepting a slower Team Composition on multi-surface
+projects in exchange for the guarantee that this analysis happens at all.
+
+Open structural question, raised by `mas-architect` and not yet resolved: this
+platform has **no first-class notion of a multi-surface project** — no
+per-surface roster, no per-surface suite scope, no per-surface deliverables.
+Both misses in §14.2 are symptoms of that absence rather than of individual
+carelessness. Routed to `admin/ROADMAP.md` as its own proposal.

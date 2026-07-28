@@ -2684,9 +2684,74 @@ remain the live design for the shipped web product.
 
 ### 13.12 Observed post-deploy behaviour (mobile)
 
-_None yet — the mobile app does not exist. To be populated after release
-with: which tab parents land on and stay in; whether [+] capture actually
-displaces web logging; how often the offline queue is used in anger;
-night-theme adoption vs. Automatic; app-lock opt-in rate; and whether the
-deferred surfaces (invite creation, Google Photos import) generate real
-requests or were correctly cut._
+> **Authorship note.** This entry was written by the **orchestrator**, not by
+> `ui-ux-designer`. That agent was invoked twice for this section and both
+> invocations terminated on API connection errors before writing anything. It
+> is recorded here rather than left stale for a third night, and should be
+> reviewed or rewritten by `ui-ux-designer` at the next Experience Design gate.
+> A lane deviation, recorded rather than hidden.
+
+**The premise of this section was wrong from 2026-07-27 onward.** It read "the
+mobile app does not exist" while the app was running on an iPhone 17 Pro
+simulator and the human was using it daily. Evidence:
+`dev/test-evidence/mobile-ios-2026-07-26.md` and
+`dev/test-evidence/screenshots/`.
+
+#### First observed behaviour — 2026-07-27/28
+
+Seven defects were found **by the human, on the running app**. None was found
+by any gate, and this is the most important observation in this section: the
+first real user of the mobile surface was the person who commissioned it, and
+they found everything.
+
+**Four were the same class — built, imported, sometimes state-managed, never
+rendered:** the child's avatar; the Journey photos; the lightbox and gallery;
+the chat-history sheet. To a parent these did not read as bugs. They read as
+*missing features* — a photo app with no photos, a chat with no history. That
+distinction matters for design: an unwired component is indistinguishable from
+a descoped one, so nobody reports it as broken. They just conclude the product
+doesn't do that.
+
+**Three were mine, and I want them recorded as design failures rather than
+implementation ones:**
+
+1. **The prompt-chip strip was specified as a horizontal scroller.** At real
+   phone width it showed roughly 1.5 of 3 chips. That is the direct cause of
+   the human reporting *"I switched the kid on top but the prompts stayed
+   same"* — when in fact two of the three chips **had** changed, and sat off
+   the right edge where nobody could see them. A correctness-shaped complaint
+   that was purely a legibility failure. Now a wrapping row, all three visible.
+2. **The pill radius on those chips** only reads as a pill on a single-line
+   chip. These wrap to two lines, so the specified radius rendered them as
+   ellipses with clipped text.
+3. **The dead band above the composer** — a consequence of the same scroller,
+   which RN gives `flexGrow: 1` by default.
+
+The lesson I'd carry forward: I specified all three at a canvas width that no
+phone has. A horizontal scroller is a reasonable pattern for *many* items; for
+exactly three it hides two of them and buys nothing. **Below about five items,
+wrap; don't scroll.**
+
+#### What I would design differently
+
+- **Do not use horizontal scrollers for small, fixed-count sets.** Above.
+- **Anything that varies by child must be visible without scrolling.** The
+  whole value of per-child suggestions is that switching children visibly
+  changes something. If the varying part is off-screen, the feature is
+  invisible even when it works perfectly.
+- **Specify the empty and unwired states as first-class.** Three of the four
+  wiring defects would have been caught at design review if the spec had said
+  "this screen must show N photos here" rather than describing the component
+  in isolation. That is now enforced by `functional-design-agent`'s
+  observable-UI acceptance criteria.
+
+#### Still to observe, after a real release
+
+Unchanged and still valid: which tab parents land on and stay in; whether `[+]`
+capture actually displaces web logging; how often the offline queue is used in
+anger; night-theme adoption vs. Automatic; app-lock opt-in rate; and whether
+the deferred surfaces (invite creation, Google Photos import) generate real
+requests or were correctly cut.
+
+**Note**: night theme and the offline queue are **not yet built** — the last
+two outstanding items from §13. Adoption cannot be observed until they exist.
