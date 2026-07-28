@@ -40,6 +40,20 @@ never edits a project's state. It reports.
    block from `admin/PIPELINE.md` §3. Every project's graph must look the same;
    that consistency is what makes the portfolio view scannable.
 
+3a. **Publish it, always.** Mermaid does **not** render in the terminal — a
+   graph pasted into a CLI reply is unreadable source, which defeats the entire
+   purpose of a visual status command. So every invocation ends by publishing
+   the relevant markdown as an Artifact and giving the human the link:
+   - one project → publish `projects/<name>/PIPELINE_LOG.md`
+   - no argument → publish `admin/PORTFOLIO_STATUS.md`
+
+   Re-publish the **same file path** each time so the URL stays stable — the
+   human should be able to bookmark one link per project and re-open it after
+   every gate. Never mint a new URL for the same project.
+
+   Still give the written summary in the reply; the artifact is the picture,
+   the reply is the reading. Neither replaces the other.
+
 4. **Report, in this order:**
    - **Position** — which gate, and whether it is running, awaiting approval, or
      blocked.

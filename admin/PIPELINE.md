@@ -210,7 +210,11 @@ The report-out is always these five parts, in this order:
 1. **Position** — gate number and name, and whether it is running, awaiting
    approval, or blocked.
 2. **The graph** — left-to-right, current state, using §3's notation and
-   `classDef` block verbatim.
+   `classDef` block verbatim. **Publish it as an Artifact and give the link.**
+   Mermaid does not render in a terminal; a graph pasted as source into a CLI
+   reply is not a visual report-out, it is unreadable text pretending to be
+   one. Re-publish the same file path every time so each project keeps one
+   stable, bookmarkable URL across the whole run.
 3. **What this gate produced** — artifacts, by path.
 4. **What was skipped and why**, if anything — and `⊘ not applicable`,
    `⊘ gate did not exist`, and `⊘ skipped without exception` must be
