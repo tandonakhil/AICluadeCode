@@ -207,6 +207,21 @@ doesn't get lost before that review happens.
   not fix it. Prefer making non-compliance *visible to someone other than the
   non-complier* over adding another rule.
 
+- **2026-07-28 — Repeated subagent API drops: recover the work, and say who
+  actually wrote it.** Four consecutive invocations (`solution-architect` x2,
+  `ui-ux-designer` x2) terminated on "Connection closed mid-response". Resuming
+  a dropped agent via `SendMessage` worked once (`mas-registrar`) but failed
+  twice for an agent whose context had already grown large from wide reading —
+  the resumed transcript is the bloated one, so the same failure repeats.
+  **What worked**: check disk for partial work first (`solution-architect` had
+  in fact landed a good §0 edit before dying, which would have been lost to a
+  blind retry), then either spawn a FRESH agent with the facts inline so it
+  needs almost no reading, or finish it directly. **What matters either way**:
+  when the orchestrator completes another agent's KB, say so *in the file* and
+  in the commit, and flag it for the owner to review at the next gate. A lane
+  deviation that is recorded is a known state; one that is silent is a lie
+  about provenance, and KBs are exactly where provenance is load-bearing.
+
 ## Successful Patterns
 
 - **Verify empirically, every time a claim is checkable.** Real `pytest`
