@@ -66,11 +66,11 @@ kept; it simply stops being updated.
 **Graph rendered for the human at this gate:**
 
 ```mermaid
-flowchart TD
-  G1["✅ 1 Intake"] --> G2["▶ 2 Team Composition"] --> G3["⬜ 3 Plan &amp; Backlog"]
-  G3 --> G4["⬜ 4 Functional Design"] --> G5["⬜ 5 Experience Design"]
-  G5 --> G6["⬜ 6 Architecture"] --> G7["⬜ 7 Code"] --> G8["⬜ 8 Test"]
-  G8 --> G9["⬜ 9 Verification"] --> G10["⬜ 10 Review"] --> G11["⬜ 11 Deploy"]
+flowchart LR
+  G1["✅ 1<br/>Intake"] --> G2["▶ 2<br/>Team"] --> G3["⬜ 3<br/>Plan"]
+  G3 --> G4["⬜ 4<br/>Functional"] --> G5["⬜ 5<br/>Experience"]
+  G5 --> G6["⬜ 6<br/>Architecture"] --> G7["⬜ 7<br/>Code"] --> G8["⬜ 8<br/>Test"]
+  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
 
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
@@ -170,11 +170,11 @@ never generated** — the model may quote and explain a published estimate, and
 is forbidden from computing one.
 
 ```mermaid
-flowchart TD
-  G1["✅ 1 Intake"] --> G2["✅ 2 Team Composition"] --> G3["✅ 3 Plan &amp; Backlog"]
-  G3 --> G4["✅ 4 Functional Design"] --> G5["✅ 5 Experience Design"]
-  G5 --> G6["▶ 6 Architecture"] --> G7["⬜ 7 Code"] --> G8["⬜ 8 Test"]
-  G8 --> G9["⬜ 9 Verification"] --> G10["⬜ 10 Review"] --> G11["⬜ 11 Deploy"]
+flowchart LR
+  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"]
+  G3 --> G4["✅ 4<br/>Functional"] --> G5["✅ 5<br/>Experience"]
+  G5 --> G6["▶ 6<br/>Architecture"] --> G7["⬜ 7<br/>Code"] --> G8["⬜ 8<br/>Test"]
+  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
 
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
@@ -226,10 +226,10 @@ The failures:
 **Blocking suites failed → gate does not pass. Loop back to Code.**
 
 ```mermaid
-flowchart TD
-  G6["✅ 6 Architecture"] --> G7["↩ 7 Code"] --> G8["↩ 8 Test"]
+flowchart LR
+  G6["✅ 6<br/>Architecture"] --> G7["↩ 7<br/>Code"] --> G8["↩ 8<br/>Test"]
   G8 -.->|"2 blocking suites FAILED<br/>AC-F3-02 violated"| G7
-  G8 --> G9["⬜ 9 Verification"] --> G10["⬜ 10 Review"] --> G11["⬜ 11 Deploy"]
+  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
 
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
@@ -272,10 +272,10 @@ agent repeating an estimate to a customer is the entire safeguard.
 > would have caught four of the seven defects in the F18 mobile build.
 
 ```mermaid
-flowchart TD
-  G7["↩ 7 Code"] --> G8["✅ 8 Test"] --> G9["↩ 9 Verification"]
+flowchart LR
+  G7["↩ 7<br/>Code"] --> G8["✅ 8<br/>Test"] --> G9["↩ 9<br/>Verify"]
   G9 -.->|"AC-F3-03 NOT VERIFIED<br/>no rendered evidence"| G7
-  G9 --> G10["⬜ 10 Review"] --> G11["⬜ 11 Deploy"]
+  G9 --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
 
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
@@ -320,10 +320,10 @@ cannot fire its own trigger, and this is the obligation that was missed for
 fifteen days on little-milestones.
 
 ```mermaid
-flowchart TD
-  G1["✅ 1 Intake"] --> G2["✅ 2 Team Comp"] --> G3["✅ 3 Plan"] --> G4["✅ 4 Functional"]
-  G4 --> G5["✅ 5 Experience"] --> G6["✅ 6 Architecture"] --> G7["✅ 7 Code"]
-  G7 --> G8["✅ 8 Test"] --> G9["✅ 9 Verification"] --> G10["✅ 10 Review"] --> G11["✅ 11 Deploy"]
+flowchart LR
+  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"] --> G4["✅ 4<br/>Functional"]
+  G4 --> G5["✅ 5<br/>Experience"] --> G6["✅ 6<br/>Architecture"] --> G7["✅ 7<br/>Code"]
+  G7 --> G8["✅ 8<br/>Test"] --> G9["✅ 9<br/>Verify"] --> G10["✅ 10<br/>Review"] --> G11["✅ 11<br/>Deploy"]
   G11 --> DONE(["Deployed · dev local"])
 
   classDef done fill:#eef6ef,stroke:#2f6f43,color:#123021
@@ -351,12 +351,12 @@ Composition. Multilingual customer communications carry regulatory obligations
 in several jurisdictions. **Human re-engages it for this feature only.**
 
 ```mermaid
-flowchart TD
+flowchart LR
   S(["/enhance-project · F6 multilingual"]) --> R{{"re-engage industry-expert?"}}
-  R -->|"human: yes"| E3["▶ Plan &amp; Backlog"]
-  E3 --> E4["⬜ Functional Design"] --> E5["⬜ Experience Design"]
+  R -->|"human: yes"| E3["▶ Plan"]
+  E3 --> E4["⬜ Functional"] --> E5["⬜ Experience"]
   E5 --> E6["⬜ Architecture"] --> E7["⬜ Code"] --> E8["⬜ Test"]
-  E8 --> E9["⬜ Verification"] --> E10["⬜ Review"] --> E11["⬜ Deploy"]
+  E8 --> E9["⬜ Verify"] --> E10["⬜ Review"] --> E11["⬜ Deploy"]
 
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
@@ -376,10 +376,10 @@ retention question, new acceptance criteria. **The route changes, so the graph
 is redrawn**, and the orchestrator says plainly which gates re-open and why:
 
 ```mermaid
-flowchart TD
-  E3["✅ Plan &amp; Backlog"] --> E4["↩ Functional Design"]
-  E4 --> E5["✅ Experience Design"] --> E6["↩ Architecture"]
-  E6 --> E7["↩ Code"] --> E8["⬜ Test"] --> E9["⬜ Verification"]
+flowchart LR
+  E3["✅ Plan"] --> E4["↩ Functional"]
+  E4 --> E5["✅ Experience"] --> E6["↩ Architecture"]
+  E6 --> E7["↩ Code"] --> E8["⬜ Test"] --> E9["⬜ Verify"]
   E9 --> E10["⬜ Review"] --> E11["⬜ Deploy"]
 
   NEW(["scope added at Code:<br/>remember language preference"]) -.->|"new AC needed"| E4

@@ -18,11 +18,11 @@ Canonical definitions: `admin/PIPELINE.md`. Template:
 **State**: deployed (dev, local); night theme + offline queue outstanding
 
 ```mermaid
-flowchart TD
-  G1["✅ 1 Intake"] --> G2["✅ 2 Team Composition"] --> G3["✅ 3 Plan &amp; Backlog"]
-  G3 --> G4["⊘ 4 Functional Design"] --> G5["✅ 5 Experience Design"]
-  G5 --> G6["⚠ 6 Architecture"] --> G7["✅ 7 Code"] --> G8["⚠ 8 Test"]
-  G8 --> G9["⊘ 9 Verification"] --> G10["⊘ 10 Review"] --> G11["✅ 11 Deploy"]
+flowchart LR
+  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"]
+  G3 --> G4["⊘ 4<br/>Functional"] --> G5["✅ 5<br/>Experience"]
+  G5 --> G6["⚠ 6<br/>Architecture"] --> G7["✅ 7<br/>Code"] --> G8["⚠ 8<br/>Test"]
+  G8 --> G9["⊘ 9<br/>Verify"] --> G10["⊘ 10<br/>Review"] --> G11["✅ 11<br/>Deploy"]
   G11 --> FIX["↩ human-found defects → Code"]
   FIX -.-> G7
 

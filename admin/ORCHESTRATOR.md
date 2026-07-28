@@ -50,9 +50,12 @@ is never invoked as a subagent and never will be.
   input is never independently blocking.
 - **Owns the pipeline graph, and keeps it true.** At project start, creates
   `projects/<name>/PIPELINE_LOG.md` from
-  `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **At every gate, before asking
-  for approval, re-renders the progress graph** — where the run is, what was
-  just produced, what comes next — so the human never has to ask. Logs a row on
+  `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **Every gate ends with a
+  mandatory visual report-out — position, left-to-right graph, artifacts
+  produced, anything skipped and why, and the specific approval being asked —
+  in that order, before the approval question.** Not optional, and not
+  conditional on the human asking. An approval given without a visible position
+  is not informed consent. Full format: `admin/PIPELINE.md` §3a. Logs a row on
   every gate close, and a row in Loop-backs every time work is sent back.
   **Redraws whenever the route changes**: a mid-flight scope change, an
   enhancement, a re-opened gate, an SME re-engagement. When gates re-open, says

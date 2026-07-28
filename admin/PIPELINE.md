@@ -17,30 +17,35 @@ review and human approval first, exactly like an agent contract.
 Eleven gates. Every arrow marked ✋ is a **human approval that cannot be
 skipped**. A gate never advances on the orchestrator's own judgement.
 
-```mermaid
-flowchart TD
-  REQ([Human request]) -->|start| G1
+**Layout is left-to-right.** A pipeline reads as a journey, and a journey reads
+along the page, not down it. Every progress graph in this platform uses
+`flowchart LR` — the whole point is that the human sees distance travelled at a
+glance.
 
-  G1["**1 · Intake**<br/>domain + industry questions<br/>functional-agent · industry-expert"]
-  G2["**2 · Team Composition**<br/>roster + cost estimate<br/>orchestrator · usage-monitor"]
-  G3["**3 · Plan &amp; Backlog**<br/>PLAN.md + MVP scope<br/>plan-agent"]
-  G4["**4 · Functional Design**<br/>FUNCTIONAL_SPEC.md · AC-* IDs<br/>functional-design-agent"]
-  G5["**5 · Experience Design**<br/>flows + rendered mockup<br/>ui-ux-designer"]
-  G6["**6 · Architecture**<br/>+ mandatory Impact Analysis<br/>solution-architect · security-architect"]
-  G7["**7 · Code**<br/>+ unit &amp; reachability tests<br/>code-agent"]
-  G8["**8 · Test**<br/>unit/integration + 6 SME suites<br/>test-agent"]
-  G9["**9 · Verification**<br/>every AC → executed check<br/>verification-agent · BLOCKING"]
-  G10["**10 · Review**<br/>diff hygiene · wiring sweep<br/>review-agent"]
-  G11["**11 · Deploy**<br/>run local + smoke test<br/>deploy-agent"]
-  DONE([Deployed · dev local])
+```mermaid
+flowchart LR
+  REQ([Request]) --> G1
+
+  G1["1<br/>**Intake**"]
+  G2["2<br/>**Team**"]
+  G3["3<br/>**Plan**"]
+  G4["4<br/>**Functional**"]
+  G5["5<br/>**Experience**"]
+  G6["6<br/>**Architecture**"]
+  G7["7<br/>**Code**"]
+  G8["8<br/>**Test**"]
+  G9["9<br/>**Verify**"]
+  G10["10<br/>**Review**"]
+  G11["11<br/>**Deploy**"]
+  DONE([Deployed])
 
   G1 -->|✋| G2 -->|✋| G3 -->|✋| G4 -->|✋| G5 -->|✋| G6 -->|✋| G7
   G7 -->|✋| G8 -->|✋| G9 -->|✋| G10 -->|✋| G11 -->|✋| DONE
 
-  G8  -.->|suite FAILED| G7
+  G8  -.->|FAILED| G7
   G9  -.->|NOT VERIFIED| G7
   G10 -.->|request-changes| G7
-  G10 -.->|escalate · KBs disagree| G6
+  G10 -.->|escalate| G6
   G11 -.->|smoke failed| G7
 
   classDef gate fill:#eef4fb,stroke:#2b6cb0,stroke-width:1px,color:#0f2b46
@@ -50,6 +55,10 @@ flowchart TD
   class G9 block
   class REQ,DONE term
 ```
+
+Gate owners and artifacts are in the table below rather than in the node
+labels — at eleven nodes across, long labels make the graph unreadable, and the
+graph's job is position-at-a-glance, not reference.
 
 **Dotted arrows are the loops.** They are not exceptions — they are the normal
 operation of a pipeline that is actually checking anything. A run with no
@@ -112,6 +121,35 @@ classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
 
 ---
 
+## 3a. Mandatory gate report-out
+
+**Every gate ends with a visual report-out. This is not optional and it is not
+conditional on the human asking.** A gate that closes without one has not
+closed correctly.
+
+The report-out is always these five parts, in this order:
+
+1. **Position** — gate number and name, and whether it is running, awaiting
+   approval, or blocked.
+2. **The graph** — left-to-right, current state, using §3's notation and
+   `classDef` block verbatim.
+3. **What this gate produced** — artifacts, by path.
+4. **What was skipped and why**, if anything — and `⊘ not applicable`,
+   `⊘ gate did not exist`, and `⊘ skipped without exception` must be
+   distinguished. They look identical in a graph and are entirely different
+   facts.
+5. **What is being asked** — the specific approval decision, and what happens
+   on each answer.
+
+Then, and only then, the approval question.
+
+**Why mandatory.** The failure this prevents is not the human being uninformed
+— it is the human being *asked to approve something whose position they cannot
+see*. An approval given without knowing which gates were skipped to arrive
+there is not informed consent, and the F18 build produced exactly that: gates
+skipped, work approved, and the omission invisible until a human found seven
+defects by hand on the running app.
+
 ## 4. The orchestrator's obligations
 
 1. **Create** `projects/<name>/PIPELINE_LOG.md` at project start, from
@@ -146,4 +184,7 @@ not another rule, but a record that makes the existing rules checkable.
   failing Test loop, a `NOT VERIFIED` loop, a `request-changes` loop, and a
   mid-enhancement redraw
 - `admin/templates/PIPELINE_LOG_TEMPLATE.md` — the per-project tracker
+- `admin/PORTFOLIO_STATUS.md` — current-state graph for every project
+- `.claude/skills/project-status/SKILL.md` — `/ProjectStatus`, the on-demand
+  read-only view of either one project or the whole portfolio
 - `.claude/skills/new-project/SKILL.md` — the executable form of §1
