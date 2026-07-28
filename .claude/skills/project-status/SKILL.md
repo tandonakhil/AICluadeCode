@@ -1,12 +1,19 @@
 ---
-name: ProjectStatus
-description: Show where a project is in its journey — a left-to-right progress graph across the 11 gates, what was skipped and why, open loop-backs, and what's next. Args "<project-name>" for one project, or no argument for the whole portfolio.
+name: project-status
+description: Show where a project is in its journey — a wrapped left-to-right progress graph across the 11 gates with human-approval checkpoints, what was skipped and why, open loop-backs, and what's next. Args "<project-name>" for one project, or no argument for the whole portfolio.
 ---
 
-# /ProjectStatus
+# /project-status
 
-`/ProjectStatus <project-name>` — one project's position, in detail.
-`/ProjectStatus` — the whole portfolio, one graph per project.
+`/project-status <project-name>` — one project's position, in detail.
+`/project-status` — the whole portfolio, one graph per project.
+
+> **Naming.** The human asked for this as `/ProjectStatus`. It is registered as
+> `project-status` because skill resolution follows the **directory name**, and
+> every other skill in this platform is kebab-case (`new-project`,
+> `enhance-project`, `cut-release`). A mixed-case outlier would be the one
+> command that behaves differently from the other seven. If asked for by the
+> original name, answer to it — it is the same command.
 
 Read-only. This command **never** advances a gate, never approves anything, and
 never edits a project's state. It reports.
