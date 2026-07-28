@@ -14,10 +14,26 @@ Canonical gate definitions: `admin/PIPELINE.md`.
 
 ---
 
-## Active: F-P1 — project tracking dashboard
+## CLOSED: F-P1 — project tracking dashboard → became a project
 
-**Run**: platform feature · **Started**: 2026-07-28
-**Now at**: gate 1 · Intake — complete; architecture review in flight
+**Run**: platform feature · **Started**: 2026-07-28 · **Closed**: 2026-07-28
+**Outcome**: **route changed at gate 2.** `mas-architect` rejected the
+platform-feature framing; the human agreed. This work continues as
+`projects/conclave-dashboard/` under the ordinary `/new-project` pipeline.
+Tracking moves to `projects/conclave-dashboard/PIPELINE_LOG.md`.
+
+**Why it moved**: building under `admin/` would require widening
+`code-agent`'s shell scope — the platform's main containment boundary — and
+would set a precedent that a project-pipeline agent may write to governance
+state. Building as a project costs zero contract changes. Precedent:
+`conclave-marketing` is already a platform-facing artifact living under
+`projects/`.
+
+**What this log established, and keeps**: `/admin-panel` has no flow for
+building a platform feature, and never did — `admin/kb-server/` was built
+ungated, which is why it drifted to 18 days stale. The resolution is not a new
+sub-command but a boundary: **`admin/` holds governance state; executable
+tooling is a project.**
 
 ```mermaid
 flowchart TB
