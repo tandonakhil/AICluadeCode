@@ -1,438 +1,702 @@
-<!--
-  Design pass: ui-ux-designer, 2026-07-13 — "the storybook's back cover."
-  The product's own river/journey motif (UX_KB §1.6) becomes the spine of
-  the whole microsite; shipped work gets a gold celebration flourish
-  (UX_KB §1.6/§4.2 --lm-gold) instead of a progress bar; hero type uses a
-  serif stack reserved the same way the product reserves Fraunces for
-  journey-chapter headings (UX_KB §1.4). Re-consult ui-ux-designer if this
-  design materially changes before regenerating.
--->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>little-milestones — Project Microsite</title>
+<title>little-milestones &mdash; project microsite</title>
+<!--
+  little-milestones microsite
+  Generated 2026-07-28 by deliverables-agent, one-way from project markdown:
+    PLAN.md, FEATURES.md, PROJECT_CONTEXT.md (Decisions Log),
+    knowledge/INDUSTRY_KB.md, knowledge/ARCHITECTURE_KB.md,
+    knowledge/SECURITY_KB.md (S9), knowledge/UX_KB.md (S13),
+    admin/MAS_REGISTRY.md, dev/test-evidence/.
+
+  DESIGN PROVENANCE - read this before regenerating:
+  No fresh ui-ux-designer design pass was obtained for this regeneration.
+  This invocation had no agent-invocation tool available, so the contract's
+  "consult ui-ux-designer before building a microsite" step could not be
+  performed rather than being skipped silently.
+  The visual language here is therefore derived directly from the project's
+  own recorded design tokens (UX_KB S4.2 rev-2 palette and S13.5/S13.7 night
+  theme), used verbatim, with editorial layout choices made by this agent.
+  BEFORE THE NEXT MATERIAL REDESIGN: get a real ui-ux-designer pass scoped to
+  this microsite and record its date and one-line description here.
+
+  Self-contained: all CSS/JS inline, zero external requests, no web fonts,
+  no CDN, no analytics. Theme-aware via prefers-color-scheme.
+  Nothing in the platform reads from deliverables/ - this file is terminal output.
+-->
 <style>
   :root {
-    --bg: #FDF8F2;
-    --bg-card: #FFFFFF;
-    --ink: #3D3833;
-    --ink-soft: #6E6259;
-    --border: #E7DDCF;
-    --terracotta: #C1502A;
-    --terracotta-deep: #8F3A1D;
-    --sage: #2F7A4E;
-    --slate: #3D6188;
-    --slate-tint: #E7EEF5;
-    --gold: #E8A317;
-    --blush: #FADCC5;
-    --shadow: 0 1px 2px rgba(61,56,51,0.06), 0 6px 20px rgba(61,56,51,0.06);
-    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  }
-  :root[data-theme="dark"] {
-    --bg: #211D1A; --bg-card: #2A2521; --ink: #F2ECE3; --ink-soft: #B5AA9C;
-    --border: #3E362D; --terracotta: #E27249; --terracotta-deep: #F08F68;
-    --sage: #4FAF77; --slate: #6C93BE; --slate-tint: #26313d; --gold: #F0B940; --blush: #3A2E24;
-    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.4);
+    --cream:#FDF8F2; --ink:#3D3833; --soft:#6E6259;
+    --terra:#C1502A; --terra-deep:#8F3A1D; --sage:#2F7A4E;
+    --slate:#3D6188; --slate-tint:#EEF3F8; --gold:#E8A317;
+    --blush:#FADCC5; --coral:#FF7A50;
+    --bg:var(--cream); --fg:var(--ink); --muted:var(--soft);
+    --card:#FFFFFF; --line:#E7DCCE; --raise:0 1px 2px rgba(61,56,51,.05),0 8px 24px -12px rgba(61,56,51,.16);
+    --disp:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #211D1A; --bg-card: #2A2521; --ink: #F2ECE3; --ink-soft: #B5AA9C;
-      --border: #3E362D; --terracotta: #E27249; --terracotta-deep: #F08F68;
-      --sage: #4FAF77; --slate: #6C93BE; --slate-tint: #26313d; --gold: #F0B940; --blush: #3A2E24;
-      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.4);
+    :root {
+      --bg:#211D1A; --fg:#F2E9E0; --muted:#B4A79A; --card:#2C2724;
+      --line:#3E3733; --terra:#F0A07C; --terra-deep:#FFC7A8;
+      --slate:#9DB9DA; --slate-tint:#2A3038; --sage:#7DC79C; --blush:#4A3A31;
+      --raise:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
     }
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; font-size: 16px; }
-  .spine-wrap { position: relative; }
-  .spine {
-    position: absolute; left: 22px; top: 0; bottom: 0; width: 3px;
-    background: linear-gradient(var(--terracotta) 0 0);
-    opacity: .28; border-radius: 3px;
+  * { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--sans);
+         font-size:16px; line-height:1.62; }
+
+  .wrap { max-width:1080px; margin:0 auto; padding:0 22px; }
+
+  /* ---- hero: an editorial masthead with the journey spine motif ---- */
+  header.hero { position:relative; overflow:hidden; padding:58px 0 30px;
+    border-bottom:1px solid var(--line); }
+  header.hero::before { content:""; position:absolute; left:calc(50% - 540px + 22px); top:0; bottom:0;
+    width:3px; background:linear-gradient(180deg,transparent,var(--coral) 18%,var(--gold) 82%,transparent);
+    opacity:.5; }
+  @media (max-width:1100px) { header.hero::before { left:22px; } }
+  .eyebrow { font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--terra); font-weight:700; margin:0 0 10px; }
+  h1 { font-family:var(--disp); font-weight:600; font-size:clamp(40px,7vw,66px);
+    line-height:1.03; margin:0 0 16px; letter-spacing:-.02em; }
+  h1 em { font-style:italic; color:var(--terra); }
+  .lede { font-size:clamp(16px,2.1vw,19.5px); color:var(--muted); max-width:60ch; margin:0 0 22px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { font-size:12.5px; font-weight:600; padding:5px 12px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card); color:var(--muted); }
+  .chip.hot { border-color:var(--terra); color:var(--terra); background:transparent; }
+
+  /* ---- tabs ---- */
+  nav.tabs { position:sticky; top:0; z-index:20; background:var(--bg);
+    border-bottom:1px solid var(--line); }
+  nav.tabs .wrap { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+  nav.tabs .wrap::-webkit-scrollbar { display:none; }
+  .tab { appearance:none; border:0; background:none; cursor:pointer; white-space:nowrap;
+    font:inherit; font-size:14.5px; font-weight:600; color:var(--muted);
+    padding:15px 16px; border-bottom:2.5px solid transparent; margin-bottom:-1px; }
+  .tab:hover { color:var(--fg); }
+  .tab[aria-selected="true"] { color:var(--terra); border-bottom-color:var(--terra); }
+  .tab:focus-visible { outline:2px solid var(--slate); outline-offset:-3px; border-radius:4px; }
+
+  main { padding:34px 0 90px; }
+  .panel[hidden] { display:none; }
+  h2 { font-family:var(--disp); font-weight:600; font-size:clamp(25px,3.6vw,33px);
+    margin:38px 0 6px; letter-spacing:-.01em; }
+  h2:first-child { margin-top:0; }
+  h3 { font-size:15px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--terra); margin:30px 0 10px; }
+  p { max-width:74ch; }
+  a { color:var(--terra); }
+
+  .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 20px; box-shadow:var(--raise); }
+  .card h4 { margin:0 0 7px; font-size:15.5px; }
+  .card p { margin:0; font-size:14.2px; color:var(--muted); }
+  .card .num { font-family:var(--disp); font-size:33px; color:var(--terra);
+    line-height:1; display:block; margin-bottom:6px; }
+
+  .note { border-left:3px solid var(--gold); background:var(--card); border-radius:0 12px 12px 0;
+    padding:14px 18px; margin:20px 0; font-size:14.3px; }
+  .note strong { color:var(--terra-deep); }
+  .note.warn { border-left-color:var(--terra); }
+
+  ul.clean { list-style:none; padding:0; margin:12px 0; }
+  ul.clean li { padding:11px 0 11px 20px; border-bottom:1px solid var(--line); position:relative;
+    font-size:14.6px; }
+  ul.clean li::before { content:""; position:absolute; left:0; top:19px; width:7px; height:7px;
+    border-radius:50%; background:var(--coral); }
+  ul.clean li strong { display:block; }
+  ul.clean li span { color:var(--muted); font-size:13.6px; }
+
+  code { font-family:var(--mono); font-size:.88em; background:var(--slate-tint);
+    color:var(--terra-deep); padding:1.5px 5px; border-radius:5px; }
+  @media (prefers-color-scheme: dark) { code { color:var(--terra-deep); } }
+
+  figure { margin:18px 0; }
+  figure svg { width:100%; height:auto; display:block; }
+  figcaption { font-size:12.8px; color:var(--muted); margin-top:9px; }
+
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  th,td { text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+
+  /* ---- gantt ---- */
+  .gwrap { background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 18px 10px; box-shadow:var(--raise); overflow:hidden; }
+  .gaxis { position:relative; height:20px; margin:0 0 6px; border-bottom:1px dashed var(--line); }
+  .gaxis .tick { position:absolute; transform:translateX(-50%); font-size:11px; color:var(--muted);
+    white-space:nowrap; }
+  .glane h4 { margin:16px 0 8px; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); display:flex; align-items:center; gap:7px; }
+  .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .dot.s { background:var(--sage); } .dot.p { background:var(--gold); }
+  .dot.u { background:var(--muted); }
+  .grow { display:grid; grid-template-columns:minmax(0,290px) 1fr; gap:12px; align-items:center;
+    padding:3px 0; }
+  .glab { font-size:13.2px; color:var(--fg); }
+  .gtrack { position:relative; height:24px; background:linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:calc(100%/5.5) 100%; border-radius:6px; }
+  .gbar { position:absolute; top:3px; height:18px; border-radius:6px; display:flex;
+    align-items:center; padding:0 8px; }
+  .gbar span { font-size:10.5px; font-weight:700; white-space:nowrap; }
+  .gbar.s { background:var(--sage); }
+  .gbar.s span { color:#fff; }
+  .gbar.p { background:var(--gold); }
+  .gbar.p span { color:#3D3833; }
+  @media (max-width:720px) {
+    .grow { grid-template-columns:1fr; gap:3px; }
+    .glab { font-size:12.6px; }
   }
-  @media (max-width: 640px) { .spine { left: 10px; } }
 
-  header.hero { position: relative; padding: 64px 24px 36px 64px; }
-  @media (max-width: 640px) { header.hero { padding: 48px 18px 28px 42px; } }
-  header.hero h1 {
-    font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em;
-    font-size: clamp(32px, 5vw, 48px); margin: 0 0 10px; color: var(--ink);
-  }
-  header.hero p.tagline { color: var(--ink-soft); margin: 0 0 22px; font-size: 16px; max-width: 520px; }
-  .tab-pills { display: flex; gap: 10px; flex-wrap: wrap; }
-  .tab-pills button {
-    appearance: none; border: 1px solid var(--border); background: var(--bg-card);
-    color: var(--ink-soft); font-size: 13.5px; font-weight: 600; font-family: var(--sans);
-    padding: 8px 16px 8px 14px; border-radius: 999px; cursor: pointer;
-    display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow);
-    transition: background .15s, color .15s, border-color .15s;
-  }
-  .tab-pills button .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .tab-pills button[aria-selected="true"] { background: var(--terracotta); color: #fff; border-color: transparent; }
-  .tab-pills button[aria-selected="true"] .dot { background: #fff; }
-  .tab-pills button:hover { border-color: var(--terracotta); }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--muted);
+    margin:14px 0 0; }
+  .legend span { display:flex; align-items:center; gap:6px; }
 
-  main { position: relative; max-width: 940px; margin: 0 auto; padding: 8px 24px 90px 64px; }
-  @media (max-width: 640px) { main { padding: 8px 18px 70px 42px; } }
-  section.panel { display: none; animation: fade .28s ease; }
-  section.panel[data-active="true"] { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
-  h2.panel-title { font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 22px 0 6px; }
-  p.panel-sub { color: var(--ink-soft); margin: 0 0 26px; font-size: 13.5px; max-width: 620px; }
-
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
-  .card h3 { margin: 0 0 8px; font-size: 16px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
-
-  .value-prop { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0 8px; }
-  @media (max-width: 720px) { .value-prop { grid-template-columns: 1fr; } }
-  .value-prop .vp-card { border-radius: 14px; padding: 20px; background: var(--blush); border: 1px solid transparent; }
-  :root[data-theme="dark"] .value-prop .vp-card, @media (prefers-color-scheme: dark) { }
-  .vp-icon { width: 30px; height: 30px; margin-bottom: 12px; }
-  .vp-icon svg { width: 100%; height: 100%; stroke: var(--terracotta); fill: none; stroke-width: 1.6; }
-
-  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--slate-tint); color: var(--slate); margin: 2px 4px 2px 0; }
-  code.inline { background: var(--slate-tint); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
-  ul.compact { margin: 8px 0 0; padding-left: 20px; }
-  ul.compact li { margin-bottom: 6px; font-size: 14px; }
-
-  .diagram-wrap { overflow-x: auto; }
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
-
-  /* River-threaded Gantt */
-  .river-gantt { position: relative; padding-left: 34px; }
-  .river-gantt::before { content:""; position:absolute; left:14px; top:6px; bottom:6px; width:2.5px; background:var(--terracotta); opacity:.35; border-radius:2px; }
-  .rg-row { position: relative; padding: 12px 0; }
-  .rg-row::before { content:""; position:absolute; left:-24px; top:19px; width:9px; height:9px; border-radius:50%; background:var(--terracotta); }
-  .rg-label { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
-  .rg-label small { display:block; font-weight:400; color:var(--ink-soft); font-size:11.5px; margin-top:2px; }
-  .rg-bar-track { height: 26px; position: relative; }
-  .rg-bar { position: absolute; top:2px; height: 22px; border-radius: 7px; display:flex; align-items:center; padding:0 10px; font-size:11px; white-space:nowrap; }
-  .rg-bar.shipped { background: var(--sage); color:#fff; }
-  .rg-bar.upcoming { border: 1.5px dashed var(--slate); color: var(--slate); background: transparent; }
-  .rg-star { margin-left: 6px; color: var(--gold); }
-
-  /* MAS hierarchy / gate log threaded on spine */
-  .river-log { position: relative; padding-left: 34px; }
-  .river-log::before { content:""; position:absolute; left:14px; top:6px; bottom:6px; width:2.5px; background:var(--terracotta); opacity:.35; border-radius:2px; }
-  .rl-entry { position: relative; padding-bottom: 24px; }
-  .rl-entry::before { content:""; position:absolute; left:-24px; top:3px; width:11px; height:11px; border-radius:50%; background:var(--sage); border: 2px solid var(--bg); box-shadow:0 0 0 1px var(--sage); }
-  .rl-entry.human::before { background: var(--gold); box-shadow:0 0 0 1px var(--gold); }
-  .rl-entry.redo::before { background: var(--terracotta); box-shadow:0 0 0 1px var(--terracotta); }
-  .rl-date { font-size: 11px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-  .rl-title { font-weight: 700; margin: 3px 0 4px; font-size: 14.5px; }
-  .rl-desc { font-size: 13.5px; color: var(--ink-soft); }
-  .rl-flourish { color: var(--gold); margin-left: 4px; }
-
-  footer { text-align: center; padding: 26px; color: var(--ink-soft); font-size: 12px; border-top: 1px solid var(--border); }
-  .theme-toggle {
-    position: fixed; top: 14px; right: 14px; border: 1px solid var(--border); background: var(--bg-card);
-    border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--ink); box-shadow: var(--shadow); z-index: 20;
-  }
-  @media (prefers-reduced-motion: reduce) { .panel { animation: none !important; } }
+  footer { border-top:1px solid var(--line); padding:26px 0 50px; font-size:12.8px;
+    color:var(--muted); }
 </style>
 </head>
 <body>
 
-<button class="theme-toggle" id="themeToggle" type="button">🌓 Theme</button>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Conclave &middot; project microsite</p>
+    <h1>little&#8209;milestones<br><em>a calm record of a childhood</em></h1>
+    <p class="lede">An age-aware milestone companion for parents: chat that knows how old your
+      child actually is, activities for right now, and a life-journey timeline that never plots
+      a child against a line.</p>
+    <div class="chips">
+      <span class="chip hot">Multi-surface since 26 Jul 2026</span>
+      <span class="chip">FastAPI backend</span>
+      <span class="chip">Next.js desktop web</span>
+      <span class="chip">React Native / Expo mobile</span>
+      <span class="chip">499 tests green</span>
+    </div>
+  </div>
+</header>
 
-<div class="spine-wrap">
-  <div class="spine" aria-hidden="true"></div>
+<nav class="tabs">
+  <div class="wrap" role="tablist" aria-label="Project sections">
+    <button class="tab" role="tab" id="t-about" aria-controls="p-about" aria-selected="true">About</button>
+    <button class="tab" role="tab" id="t-arch" aria-controls="p-arch" aria-selected="false">Architecture</button>
+    <button class="tab" role="tab" id="t-road" aria-controls="p-road" aria-selected="false">Roadmap</button>
+    <button class="tab" role="tab" id="t-mas" aria-controls="p-mas" aria-selected="false">Built with MAS</button>
+  </div>
+</nav>
 
-  <header class="hero">
-    <h1>little-milestones</h1>
-    <p class="tagline">A calm, age-aware companion for your child's earliest years — every milestone, memory, and moment threaded onto one gentle timeline.</p>
-    <nav class="tab-pills" role="tablist" aria-label="Project sections">
-      <button role="tab" aria-selected="true" data-tab="about"><span class="dot" style="background:var(--terracotta)"></span>About</button>
-      <button role="tab" aria-selected="false" data-tab="architecture"><span class="dot" style="background:var(--slate)"></span>Architecture</button>
-      <button role="tab" aria-selected="false" data-tab="roadmap"><span class="dot" style="background:var(--sage)"></span>Roadmap</button>
-      <button role="tab" aria-selected="false" data-tab="mas"><span class="dot" style="background:var(--gold)"></span>Built with MAS</button>
-    </nav>
-  </header>
+<main class="wrap">
 
-  <main>
+<!-- =============================== ABOUT =============================== -->
+<section class="panel" id="p-about" role="tabpanel" aria-labelledby="t-about">
+  <h2>What it is</h2>
+  <p>little-milestones answers a single recurring question &mdash; <em>what is normal for my
+    child right now?</em> &mdash; without ever telling a parent their child is behind. Age is
+    computed server-side from date of birth at query time, including corrected age for children
+    born preterm, and every piece of content is conditioned on that number. The LLM never
+    computes an age and never originates a milestone claim.</p>
 
-    <!-- ============ TAB 1: ABOUT ============ -->
-    <section class="panel" data-panel="about" data-active="true">
-      <h2 class="panel-title">What little-milestones is</h2>
-      <p class="panel-sub">Source: PLAN.md §1–§2, knowledge/INDUSTRY_KB.md §1</p>
+  <div class="grid">
+    <div class="card"><h4>Age-aware milestone chat</h4><p>Conditioned on the selected child's
+      computed age, framed on the CDC-2022 75th-percentile standard: &ldquo;most children do X
+      by Y&rdquo;. Hard medical-question deflection; red-flag concerns are always routed to a
+      pediatrician and never minimised.</p></div>
+    <div class="card"><h4>Corrected age, done properly</h4><p>Preterm children get corrected age
+      through 24 months, with defined behaviour for newborns and for children over 36 months
+      instead of extrapolation. Corrected age is never used to explain away a regression.</p></div>
+    <div class="card"><h4>A life-journey timeline</h4><p>Parent-logged moments with photos,
+      rendered as a story. A hard visual rule: never an expected-vs-actual axis, never a typical-range
+      band. Checklist ages appear only as neutral chapter markers.</p></div>
+    <div class="card"><h4>Activities and what's coming next</h4><p>Stage-appropriate activities
+      with supervision context, filtered by hard safety rules, plus a short preview of the next
+      stage &mdash; the category's strongest re-open trigger.</p></div>
+    <div class="card"><h4>Multi-caregiver families</h4><p>Invite a second parent or a
+      grandparent. Caregivers view and log; only the owner can delete a child profile or photos.
+      Cross-family access returns 404, not 403.</p></div>
+    <div class="card"><h4>On the phone, at 2am</h4><p>The native app is designed around the
+      actual use case: one-handed, camera-in-hand, frequently interrupted. Every primary action
+      sits in the bottom third of the screen.</p></div>
+  </div>
 
-      <div class="card">
-        <h3>The pitch</h3>
-        <p>little-milestones is a consumer parenting web app that turns a child's birthdate
-        into an <strong>age- and corrected-age-aware milestone chat</strong>, a private
-        <strong>photo &amp; memory journal</strong>, and a <strong>multi-caregiver family
-        space</strong> — explicitly not a healthcare or clinical product, and private-by-default
-        with a child's photos and data.</p>
-        <span class="chip">Consumer parenting / family tech</span>
-        <span class="chip">Chat-first, genai-chatbot template</span>
-        <span class="chip">Non-clinical, non-medical</span>
-      </div>
+  <h2>Who it is for</h2>
+  <p>Parents and caregivers of children from birth to about three years &mdash; disproportionately
+    first-time parents, and parents of preterm children, for whom generic milestone content is
+    actively misleading. Multi-caregiver support means grandparents and second parents are
+    first-class users, not an afterthought.</p>
 
-      <div class="card">
-        <h3>Target audience</h3>
-        <p>Parents and caregivers of infants and toddlers (0–~3 years), in the same market
-        segment as BabyCenter, Huckleberry, Wonder Weeks, and Qeepsake — direct-to-consumer,
-        mobile/web-first, no clinical gatekeeping.</p>
-        <ul class="compact">
-          <li><strong>Primary user:</strong> a first-time or early-stage parent who wants
-          reassurance and structure without a pediatric-grade tracker's clinical tone.</li>
-          <li><strong>Household shape:</strong> multi-caregiver by design (F10) — the product
-          assumes two or more adults share access to one child's space, not a single-user account.</li>
-          <li><strong>Premature-birth families</strong> are explicitly designed for — corrected-age
-          computation (F2) exists specifically because an app keyed only to birthdate systematically
-          mis-ages preterm infants.</li>
-        </ul>
-      </div>
+  <h3>Market position</h3>
+  <p>The industry read places this in <strong>consumer parenting / family tech</strong> &mdash;
+    BabyCenter, Huckleberry, Wonder Weeks, Qeepsake territory. It is explicitly
+    <strong>not</strong> a healthcare or pediatrics product and makes no clinical claims.</p>
+  <ul class="clean">
+    <li><strong>AI has to earn its keep</strong><span>The 2026 field has moved past generic
+      chatbots toward AI that anticipates the child's stage. An age-aware chat only matches the
+      market if answers genuinely change as the child ages.</span></li>
+    <li><strong>Credibility next to a free government app</strong><span>The CDC Milestone Tracker
+      anchors parents' expectations. Commercial apps survive by clearly framing suggestions as
+      parenting ideas rather than developmental screening &mdash; and saying so.</span></li>
+    <li><strong>Memory-keeping is the retention engine</strong><span>Qeepsake and Lifecake built
+      businesses on low-friction journaling and timelines. Photos plus timeline is not a
+      nice-to-have in this category; it is the emotional core that keeps parents for years, where
+      sleep trackers get abandoned once sleep stabilises.</span></li>
+  </ul>
 
-      <h3 style="margin:26px 0 4px; font-family:var(--serif); font-weight:400; font-size:19px;">Value proposition</h3>
-      <div class="value-prop">
-        <div class="vp-card">
-          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-4 3-6 5-9z"/></svg></span>
-          <h3>Age-true, not generic</h3>
-          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">Milestone chat and activity
-          suggestions are conditioned on the child's real, corrected age — matching the market's
-          shift from chat-only to predictive/personalized AI.</p>
-        </div>
-        <div class="vp-card">
-          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M4 12c3-6 6-9 8-9s5 3 8 9c-3 6-6 9-8 9s-5-3-8-9z"/><circle cx="12" cy="12" r="2.3"/></svg></span>
-          <h3>The memory keeper</h3>
-          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">Photo upload + a life-journey
-          timeline is the emotional core proven to retain parents for years — long after
-          sleep-tracking apps get abandoned.</p>
-        </div>
-        <div class="vp-card">
-          <span class="vp-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.6 6.4 6.9.5-5.3 4.5 1.7 6.8L12 16.9l-5.9 3.3 1.7-6.8-5.3-4.5 6.9-.5z"/></svg></span>
-          <h3>Private by construction</h3>
-          <p style="font-size:13.5px;color:var(--ink-soft);margin:0">No face processing, no AI
-          training on child photos, encryption at rest, EXIF/location stripped on every upload —
-          including photos imported from Google Photos.</p>
-        </div>
-      </div>
-    </section>
+  <h3>The trust posture, which is the product</h3>
+  <div class="note"><strong>Data minimisation by design.</strong> No last name, no gender, no
+    demographics beyond date of birth and prematurity status. Photos are encrypted at rest,
+    EXIF-stripped, served only through authenticated family-scoped routes and never a static
+    mount. There is <em>no face detection of any kind</em>, and the photo pipeline has
+    structurally no code path into the LLM layer &mdash; child photos cannot be used for AI
+    training because there is nowhere for them to go. Delete actually purges the file bytes, and
+    there are deliberately no automatic backups, because a backup is a second copy of child data
+    that would contradict the deletion promise.</div>
+  <p>A plain-language non-medical disclaimer is carried in every chat and activities response
+    payload, not just painted in the UI &mdash; so the test suite can assert it on every response
+    rather than trusting that it is there.</p>
+</section>
 
-    <!-- ============ TAB 2: ARCHITECTURE ============ -->
-    <section class="panel" data-panel="architecture">
-      <h2 class="panel-title">Underlying technical architecture</h2>
-      <p class="panel-sub">Source: knowledge/ARCHITECTURE_KB.md §0–§12</p>
+<!-- ============================ ARCHITECTURE ============================ -->
+<section class="panel" id="p-arch" role="tabpanel" aria-labelledby="t-arch" hidden>
+  <h2>One backend, three surfaces</h2>
+  <p>Since 26 July 2026 the product ships on three surfaces sharing a single FastAPI backend.
+    The mobile client was added without forking the credential model: the same opaque session
+    token is simply accepted from a second transport.</p>
 
-      <div class="card diagram-wrap">
-        <svg viewBox="0 0 900 460" width="100%" height="460" role="img" aria-label="little-milestones architecture diagram">
-          <rect x="30" y="20" width="840" height="70" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-          <text x="44" y="14" font-size="11" fill="var(--ink-soft)">CLIENT</text>
-          <rect x="60" y="35" width="220" height="40" rx="8" fill="var(--slate)" opacity="0.85"/>
-          <text x="170" y="59" font-size="13" text-anchor="middle" fill="#fff" font-weight="700">Next.js frontend</text>
-          <rect x="620" y="35" width="220" height="40" rx="8" fill="var(--slate)" opacity="0.5"/>
-          <text x="730" y="59" font-size="11.5" text-anchor="middle" fill="var(--ink)" font-weight="600">Browser: Google OAuth + Picker</text>
+  <figure>
+    <svg viewBox="0 0 980 610" role="img" aria-label="Component and data-flow diagram: Next.js web and React Native mobile clients over cookie and bearer transports into a FastAPI backend, then domain modules, then SQLite, encrypted photo files, curated JSON, the LLM provider and external services.">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--slate)"/></marker>
+        <marker id="art" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--terra)"/></marker>
+        <marker id="ars" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--sage)"/></marker>
+      </defs>
+      <g font-family="var(--sans)">
+        <!-- lanes -->
+        <rect x="8" y="8" width="964" height="118" rx="12" fill="var(--slate-tint)" opacity=".55"/>
+        <rect x="8" y="150" width="964" height="118" rx="12" fill="var(--slate-tint)" opacity=".35"/>
+        <rect x="8" y="292" width="964" height="104" rx="12" fill="var(--slate-tint)" opacity=".55"/>
+        <rect x="8" y="420" width="964" height="104" rx="12" fill="var(--slate-tint)" opacity=".35"/>
+        <text x="20" y="26" font-size="10.5" font-weight="700" fill="var(--muted)" letter-spacing="1.2">CLIENTS</text>
+        <text x="20" y="168" font-size="10.5" font-weight="700" fill="var(--muted)" letter-spacing="1.2">API &middot; FASTAPI :8000</text>
+        <text x="20" y="310" font-size="10.5" font-weight="700" fill="var(--muted)" letter-spacing="1.2">DOMAIN MODULES</text>
+        <text x="20" y="438" font-size="10.5" font-weight="700" fill="var(--muted)" letter-spacing="1.2">DATA AT REST &middot; EXTERNAL SERVICES</text>
 
-          <rect x="30" y="130" width="840" height="150" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-          <text x="44" y="124" font-size="11" fill="var(--ink-soft)">API (FastAPI backend)</text>
-          <rect x="60" y="150" width="200" height="42" rx="8" fill="var(--terracotta)"/>
-          <text x="160" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">auth.py / sessions.py</text>
-          <rect x="280" y="150" width="200" height="42" rx="8" fill="var(--terracotta)"/>
-          <text x="380" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">chat.py + guardrails.py</text>
-          <rect x="500" y="150" width="180" height="42" rx="8" fill="var(--terracotta)"/>
-          <text x="590" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">photos.py</text>
-          <rect x="700" y="150" width="160" height="42" rx="8" fill="var(--terracotta)"/>
-          <text x="780" y="176" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">google_photos.py</text>
-          <rect x="60" y="210" width="200" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
-          <text x="160" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">scheduler.py</text>
-          <rect x="280" y="210" width="200" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
-          <text x="380" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">totp.py / crypto.py</text>
-          <rect x="500" y="210" width="180" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
-          <text x="590" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">memories.py</text>
-          <rect x="700" y="210" width="160" height="42" rx="8" fill="var(--terracotta)" opacity="0.75"/>
-          <text x="780" y="236" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">profiles.py</text>
+        <!-- clients -->
+        <rect x="60" y="42" width="240" height="66" rx="12" fill="var(--card)" stroke="var(--slate)" stroke-width="1.6"/>
+        <text x="180" y="70" font-size="14" font-weight="700" text-anchor="middle" fill="var(--fg)">Next.js desktop web</text>
+        <text x="180" y="90" font-size="11" text-anchor="middle" fill="var(--muted)">:3000 &middot; cookie session</text>
 
-          <rect x="30" y="330" width="840" height="110" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
-          <text x="44" y="324" font-size="11" fill="var(--ink-soft)">DATA &amp; EXTERNAL SERVICES</text>
-          <rect x="60" y="350" width="170" height="42" rx="8" fill="var(--sage)"/>
-          <text x="145" y="376" font-size="12.5" text-anchor="middle" fill="#fff" font-weight="700">SQLite DB</text>
-          <rect x="250" y="350" width="190" height="42" rx="8" fill="var(--sage)"/>
-          <text x="345" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Encrypted photo store</text>
-          <rect x="460" y="350" width="150" height="42" rx="8" fill="var(--ink-soft)"/>
-          <text x="535" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Anthropic / OpenAI</text>
-          <rect x="630" y="350" width="110" height="42" rx="8" fill="var(--ink-soft)"/>
-          <text x="685" y="376" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Resend</text>
-          <rect x="760" y="350" width="100" height="42" rx="8" fill="var(--ink-soft)"/>
-          <text x="810" y="376" font-size="11.5" text-anchor="middle" fill="#fff" font-weight="700">Google Photos</text>
+        <rect x="380" y="42" width="250" height="66" rx="12" fill="var(--card)" stroke="var(--terra)" stroke-width="1.8"/>
+        <text x="505" y="66" font-size="14" font-weight="700" text-anchor="middle" fill="var(--fg)">React Native / Expo</text>
+        <text x="505" y="84" font-size="11" text-anchor="middle" fill="var(--muted)">SDK 57 &middot; iOS + Android</text>
+        <text x="505" y="99" font-size="10" text-anchor="middle" fill="var(--muted)">Today &middot; Ask &middot; [+] &middot; Journey &middot; You</text>
 
-          <line x1="170" y1="75" x2="170" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="178" y="115" font-size="10.5" fill="var(--ink-soft)">HTTPS / JSON</text>
-          <line x1="730" y1="75" x2="780" y2="150" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="700" y="115" font-size="10.5" fill="var(--ink-soft)">OAuth2 + Picker</text>
-          <line x1="160" y1="252" x2="145" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="10" y="310" font-size="10.5" fill="var(--ink-soft)">SQL</text>
-          <line x1="590" y1="192" x2="345" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="420" y="270" font-size="10.5" fill="var(--ink-soft)">EXIF-strip + encrypt</text>
-          <line x1="380" y1="192" x2="535" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="470" y="200" font-size="10.5" fill="var(--ink-soft)">LLM completion</text>
-          <line x1="160" y1="252" x2="685" y2="350" stroke="var(--ink-soft)" stroke-width="1.2" marker-end="url(#arrow)" opacity="0.6"/>
-          <text x="640" y="315" font-size="10.5" fill="var(--ink-soft)">Reset / digest email</text>
-          <line x1="780" y1="192" x2="810" y2="350" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
-          <text x="770" y="270" font-size="10.5" fill="var(--ink-soft)">Media fetch</text>
+        <rect x="700" y="42" width="230" height="66" rx="12" fill="var(--blush)" stroke="var(--terra-deep)" stroke-width="1.6"/>
+        <text x="815" y="66" font-size="13" font-weight="700" text-anchor="middle" fill="var(--fg)">expo-secure-store</text>
+        <text x="815" y="84" font-size="10" text-anchor="middle" fill="var(--muted)">Keychain / Keystore</text>
+        <text x="815" y="98" font-size="9.5" text-anchor="middle" fill="var(--muted)">WHEN_UNLOCKED_THIS_DEVICE_ONLY</text>
 
-          <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
-            </marker>
-          </defs>
-        </svg>
-        <div class="legend">
-          <span><i style="background:var(--slate)"></i> Client</span>
-          <span><i style="background:var(--terracotta)"></i> API (FastAPI)</span>
-          <span><i style="background:var(--sage)"></i> First-party data</span>
-          <span><i style="background:var(--ink-soft)"></i> External services</span>
-        </div>
-      </div>
+        <!-- api -->
+        <rect x="60" y="182" width="270" height="70" rx="12" fill="var(--card)" stroke="var(--sage)" stroke-width="1.8"/>
+        <text x="195" y="206" font-size="13" font-weight="700" text-anchor="middle" fill="var(--fg)">auth.py &middot; _extract_raw_token</text>
+        <text x="195" y="224" font-size="10.5" text-anchor="middle" fill="var(--muted)">cookie read FIRST, wins on conflict;</text>
+        <text x="195" y="238" font-size="10.5" text-anchor="middle" fill="var(--muted)">otherwise Authorization: Bearer</text>
 
-      <div class="grid-2">
-        <div class="card"><h3>Frontend</h3><p style="font-size:13.5px;">Next.js (App Router) + TypeScript, fluid/adaptive CSS rebuilt from fixed breakpoints in Increment 5 after human review of a live mockup.</p></div>
-        <div class="card"><h3>Backend</h3><p style="font-size:13.5px;">FastAPI + SQLite, a <code class="inline">Store[T]</code> interface convention, idempotent schema migrations on every startup.</p></div>
-        <div class="card"><h3>Auth &amp; security</h3><p style="font-size:13.5px;">Session-cookie auth, opt-in TOTP MFA, Fernet-encrypted secrets, argon2id recovery codes, rate-limited sensitive routes.</p></div>
-        <div class="card"><h3>Photos</h3><p style="font-size:13.5px;">Every photo — direct upload or Google-imported — goes through one pipeline: sniff → EXIF-strip → encrypt → write. No parallel path.</p></div>
-      </div>
-    </section>
+        <rect x="390" y="182" width="240" height="70" rx="12" fill="var(--card)" stroke="var(--slate)" stroke-width="1.6"/>
+        <text x="510" y="206" font-size="13" font-weight="700" text-anchor="middle" fill="var(--fg)">routes/</text>
+        <text x="510" y="224" font-size="10.5" text-anchor="middle" fill="var(--muted)">auth &middot; profiles &middot; chat &middot; memories</text>
+        <text x="510" y="238" font-size="10.5" text-anchor="middle" fill="var(--muted)">photos &middot; digest &middot; products</text>
 
-    <!-- ============ TAB 3: ROADMAP ============ -->
-    <section class="panel" data-panel="roadmap">
-      <h2 class="panel-title">Product roadmap — built vs. upcoming</h2>
-      <p class="panel-sub">Source: FEATURES.md, PROJECT_CONTEXT.md Decisions Log. Gold ✦ marks a shipped moment, the same way the product celebrates a memory — never a percentage bar.</p>
+        <rect x="700" y="182" width="230" height="70" rx="12" fill="var(--card)" stroke="var(--slate)" stroke-width="1.6"/>
+        <text x="815" y="206" font-size="13" font-weight="700" text-anchor="middle" fill="var(--fg)">sessions table</text>
+        <text x="815" y="224" font-size="10.5" text-anchor="middle" fill="var(--muted)">one token type, both surfaces</text>
+        <text x="815" y="238" font-size="10.5" text-anchor="middle" fill="var(--muted)">sessions.client = web | mobile</text>
 
-      <div class="card">
-        <div class="river-gantt">
-          <div class="rg-row">
-            <div class="rg-label">MVP — F1–F10<small>Profiles, milestone chat, photos, digest, auth</small></div>
-            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:0%;width:26%;">Shipped Jul 10 <span class="rg-star">✦</span></div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">Increment 4 — F14/F15/F16<small>Avatars, lightbox, gallery</small></div>
-            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:34%;width:18%;">Shipped Jul 12 <span class="rg-star">✦</span></div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">Increment 5 — F13<small>Chat history + "Ask" redesign</small></div>
-            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:38%;width:20%;">Shipped Jul 12 <span class="rg-star">✦</span></div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">Increment 6 — F12<small>Hardened auth: MFA, reset, sessions</small></div>
-            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:46%;width:26%;">Shipped Jul 12/13 <span class="rg-star">✦</span></div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">Increment 7 — F17<small>Google Photos import</small></div>
-            <div class="rg-bar-track"><div class="rg-bar shipped" style="left:58%;width:30%;">Shipped Jul 13 <span class="rg-star">✦</span></div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">F11 — conditional RAG mode<small>No trigger yet</small></div>
-            <div class="rg-bar-track"><div class="rg-bar upcoming" style="left:88%;width:12%;">Not yet on the river</div></div>
-          </div>
-          <div class="rg-row">
-            <div class="rg-label">Google OAuth production verification<small>Go-live checklist item</small></div>
-            <div class="rg-bar-track"><div class="rg-bar upcoming" style="left:88%;width:12%;">Not yet on the river</div></div>
-          </div>
-        </div>
-      </div>
+        <!-- domain -->
+        <g font-size="12" font-weight="700" text-anchor="middle" fill="var(--fg)">
+          <rect x="40" y="322" width="165" height="52" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.4"/>
+          <text x="122" y="345">ages.py</text>
+          <text x="122" y="362" font-size="10" font-weight="400" fill="var(--muted)">chronological + corrected</text>
+          <rect x="222" y="322" width="165" height="52" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.4"/>
+          <text x="304" y="345">prompts.py</text>
+          <text x="304" y="362" font-size="10" font-weight="400" fill="var(--muted)">grounding block</text>
+          <rect x="404" y="322" width="165" height="52" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.4"/>
+          <text x="486" y="345">guardrails.py</text>
+          <text x="486" y="362" font-size="10" font-weight="400" fill="var(--muted)">output-side enforcement</text>
+          <rect x="586" y="322" width="165" height="52" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.4"/>
+          <text x="668" y="345">crypto.py</text>
+          <text x="668" y="362" font-size="10" font-weight="400" fill="var(--muted)">decrypt-on-serve</text>
+          <rect x="768" y="322" width="165" height="52" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.4"/>
+          <text x="850" y="345">scheduler.py</text>
+          <text x="850" y="362" font-size="10" font-weight="400" fill="var(--muted)">APScheduler digest</text>
+        </g>
 
-      <div class="card" style="margin-top:14px;">
-        <h3>What's built</h3>
-        <p style="font-size:13.5px;">F1–F10 (core MVP), F14–F16 (avatars, lightbox, gallery), F13 (chat history + "Ask"), F12 (hardened auth suite), F17 (Google Photos import). Every increment closed its own full Test/Review/Deploy gate cycle.</p>
-        <h3 style="margin-top:16px;">What's next</h3>
-        <p style="font-size:13.5px;">F11 (conditional RAG mode) stays in the backlog with no trigger yet. Google OAuth's production app-verification is a tracked go-live item, not a blocker to the current dev/local deployment.</p>
-      </div>
-    </section>
+        <!-- data -->
+        <g font-size="12" font-weight="700" text-anchor="middle" fill="var(--fg)">
+          <rect x="40" y="450" width="165" height="52" rx="10" fill="var(--slate-tint)" stroke="var(--slate)" stroke-width="1.4"/>
+          <text x="122" y="473">SQLite</text>
+          <text x="122" y="490" font-size="9.5" font-weight="400" fill="var(--muted)">little_milestones.db</text>
+          <rect x="222" y="450" width="165" height="52" rx="10" fill="var(--slate-tint)" stroke="var(--slate)" stroke-width="1.4"/>
+          <text x="304" y="473">Encrypted photos</text>
+          <text x="304" y="490" font-size="9.5" font-weight="400" fill="var(--muted)">data/photos/{id}</text>
+          <rect x="404" y="450" width="165" height="52" rx="10" fill="var(--slate-tint)" stroke="var(--slate)" stroke-width="1.4"/>
+          <text x="486" y="470">Curated JSON</text>
+          <text x="486" y="486" font-size="9.5" font-weight="400" fill="var(--muted)">CDC-2022 &middot; activities</text>
+          <text x="486" y="497" font-size="9.5" font-weight="400" fill="var(--muted)">products &middot; CPSC denylist</text>
+          <rect x="586" y="450" width="165" height="52" rx="10" fill="var(--blush)" stroke="var(--terra)" stroke-width="1.4"/>
+          <text x="668" y="473">LLM provider</text>
+          <text x="668" y="490" font-size="9.5" font-weight="400" fill="var(--muted)">chat only, never photos</text>
+          <rect x="768" y="450" width="165" height="52" rx="10" fill="var(--blush)" stroke="var(--terra)" stroke-width="1.4"/>
+          <text x="850" y="470">Resend &middot; Google Photos</text>
+          <text x="850" y="487" font-size="9.5" font-weight="400" fill="var(--muted)">email &middot; F17 OAuth</text>
+        </g>
 
-    <!-- ============ TAB 4: BUILT WITH MAS ============ -->
-    <section class="panel" data-panel="mas">
-      <h2 class="panel-title">How this was built with the MAS</h2>
-      <p class="panel-sub">Source: PROJECT_CONTEXT.md Decisions Log, admin/MAS_REGISTRY.md. Gold marks a moment the human personally approved or redirected.</p>
+        <!-- flows -->
+        <g stroke-width="1.7" fill="none">
+          <path d="M180,108 L180,182" stroke="var(--slate)" marker-end="url(#ar)"/>
+          <path d="M470,108 L240,178" stroke="var(--terra)" marker-end="url(#art)"/>
+          <path d="M630,75 L700,75" stroke="var(--terra)" marker-end="url(#art)"/>
+          <path d="M330,217 L390,217" stroke="var(--sage)" marker-end="url(#ars)"/>
+          <path d="M630,217 L700,217" stroke="var(--sage)" marker-end="url(#ars)"/>
+          <path d="M470,252 L200,318" stroke="var(--slate)" marker-end="url(#ar)"/>
+          <path d="M500,252 L486,322" stroke="var(--slate)" marker-end="url(#ar)"/>
+          <path d="M545,252 L660,318" stroke="var(--slate)" marker-end="url(#ar)"/>
+          <path d="M122,374 L122,450" stroke="var(--muted)" marker-end="url(#ar)"/>
+          <path d="M304,374 L470,446" stroke="var(--muted)" marker-end="url(#ar)"/>
+          <path d="M486,374 L640,446" stroke="var(--terra)" marker-end="url(#art)"/>
+          <path d="M668,374 L330,448" stroke="var(--muted)" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+          <path d="M850,374 L850,450" stroke="var(--terra)" marker-end="url(#art)"/>
+        </g>
+        <g font-size="9.5" font-weight="700">
+          <text x="188" y="146" fill="var(--slate)">HTTPS/JSON + Cookie (HttpOnly, SameSite=Lax)</text>
+          <text x="340" y="163" fill="var(--terra)">Bearer + X-LM-Client: mobile</text>
+          <text x="632" y="66" fill="var(--terra)">token at rest</text>
+          <text x="336" y="211" fill="var(--sage)">resolve</text>
+          <text x="636" y="211" fill="var(--sage)">SHA-256 hash</text>
+          <text x="120" y="418" fill="var(--muted)">SQL</text>
+          <text x="360" y="418" fill="var(--muted)">curated rows</text>
+          <text x="560" y="418" fill="var(--terra)">prompt / completion</text>
+          <text x="790" y="418" fill="var(--terra)">HTTPS API</text>
+          <text x="600" y="404" fill="var(--muted)">AES at rest</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>Components from ARCHITECTURE_KB &sect;0/&sect;3; the mobile client, bearer
+      transport and device-side token storage from SECURITY_KB &sect;9.</figcaption>
+  </figure>
 
-      <div class="card">
-        <h3>This project's actual gate history (selected real moments)</h3>
-        <div class="river-log">
-          <div class="rl-entry human">
-            <div class="rl-date">2026-07-10</div>
-            <div class="rl-title">Human approves F1–F10 MVP scope <span class="rl-flourish">✦</span></div>
-            <div class="rl-desc">Itemized checkbox review of plan-agent's proposed backlog — a much larger scope than the first-slice F1–F5 proposal.</div>
-          </div>
-          <div class="rl-entry redo">
-            <div class="rl-date">2026-07-11</div>
-            <div class="rl-title">Increment 2 Test gate: 2 blocking failures sent back</div>
-            <div class="rl-desc">Architecture and UX/accessibility suites both failed; 13 findings sent to code-agent for a fix pass rather than proceeding to Review.</div>
-          </div>
-          <div class="rl-entry human">
-            <div class="rl-date">2026-07-12</div>
-            <div class="rl-title">Human overrides shipped desktop layout mid-stream <span class="rl-flourish">✦</span></div>
-            <div class="rl-desc">"we need desktop view to be adaptive... not grow too wide but look built for desktop" — required reviewing a live mockup before rebuilding.</div>
-          </div>
-          <div class="rl-entry">
-            <div class="rl-date">2026-07-12</div>
-            <div class="rl-title">Live-testing feedback: 4 real bugs, all fixed same day</div>
-            <div class="rl-desc">Shrunk banner photos, missing nav icons, wrong chat-continuity default, desktop space usage — all traced to root cause and fixed.</div>
-          </div>
-          <div class="rl-entry redo">
-            <div class="rl-date">2026-07-12</div>
-            <div class="rl-title">Increment 6 (F12) Test gate: zero committed tests found</div>
-            <div class="rl-desc">Working auth/MFA code existed with no regression coverage. Human chose "send back for tests" over an override — 35 new tests added.</div>
-          </div>
-          <div class="rl-entry">
-            <div class="rl-date">2026-07-13</div>
-            <div class="rl-title">Increment 7: 4-SME Architecture pass, run in parallel</div>
-            <div class="rl-desc">solution-architect, security-architect, responsible-ai-architect, and industry-expert each produced an independent design pass for the Google Photos OAuth integration.</div>
-          </div>
-          <div class="rl-entry redo">
-            <div class="rl-date">2026-07-13</div>
-            <div class="rl-title">Increment 7 Test gate: UX suite finds 2 real defects</div>
-            <div class="rl-desc">A disconnect dialog rendered in destructive red and two status chips lost their semantic color coding — found, fixed, re-verified.</div>
-          </div>
-          <div class="rl-entry human">
-            <div class="rl-date">2026-07-13</div>
-            <div class="rl-title">All three increments (5, 6, 7) shipped together <span class="rl-flourish">✦</span></div>
-            <div class="rl-desc">Per the human's explicit instruction to build all three without intermediate approval and review them as one batch at the end.</div>
-          </div>
-        </div>
-      </div>
+  <div class="note warn"><strong>Source gap, stated rather than smoothed over.</strong>
+    <code>ARCHITECTURE_KB.md</code> was last updated on 13 July 2026 and contains no occurrence
+    of &ldquo;mobile&rdquo;, &ldquo;Expo&rdquo;, &ldquo;React Native&rdquo;, &ldquo;bearer&rdquo;
+    or <code>X-LM-Session-Token</code>. Its component map still describes a backend plus a Next.js
+    frontend only. The mobile architecture <em>is</em> fully designed &mdash; it just lives in
+    <code>SECURITY_KB.md &sect;9</code> and <code>UX_KB.md &sect;13</code> instead. This diagram
+    draws on all three and labels which is which.</div>
 
-      <div class="card">
-        <h3>The hierarchy behind every gate</h3>
-        <p style="font-size:13.5px;">Human (product owner) → orchestrator (this conversation, the human's single point of contact) → gate-owning agents (plan-agent, ui-ux-designer, solution-architect, security-architect, responsible-ai-architect, industry-expert, code-agent, test-agent, review-agent, deploy-agent). Every stage transition paused for explicit human approval — the orchestrator never auto-advances a gate, and a genuinely blocking Test-gate finding stops for a human decision rather than silently passing.</p>
-      </div>
-    </section>
+  <h2>Component by component</h2>
+  <table>
+    <tr><th>Component</th><th>What it is</th></tr>
+    <tr><td><strong>Next.js desktop web</strong></td><td>The original and still primary surface, on
+      <code>:3000</code>. Authenticates with an HttpOnly, <code>SameSite=Lax</code> session cookie.
+      Its behaviour is byte-for-byte unchanged by the mobile work &mdash; a hard constraint on that
+      design, not an aspiration.</td></tr>
+    <tr><td><strong>React Native / Expo mobile</strong></td><td>Expo SDK 57 on react-native 0.86.
+      Bottom tabs with each tab owning its own native stack, plus a central [+] capture action that
+      is deliberately not a tab. Child switching is a header chip, so it never costs a tab slot and
+      never costs a parent their place in the app.</td></tr>
+    <tr><td><strong>expo-secure-store</strong></td><td>iOS Keychain / Android Keystore, with
+      <code>WHEN_UNLOCKED_THIS_DEVICE_ONLY</code>. <code>AsyncStorage</code> is prohibited for the
+      session token: it is unencrypted in the app sandbox and included in default device backups,
+      which would leave a 30-day children's-data credential in cleartext in a desktop backup
+      folder.</td></tr>
+    <tr><td><strong><code>auth.py</code> &middot; <code>_extract_raw_token</code></strong></td>
+      <td>The single new read path. Returns the session cookie if present; <em>otherwise</em> parses
+      <code>Authorization: Bearer</code>. The cookie is checked first and wins on conflict &mdash;
+      that ordering is what structurally guarantees no browser request's resolution behaviour can
+      change.</td></tr>
+    <tr><td><strong><code>sessions</code> table</strong></td><td>One token type for both surfaces:
+      same SHA-256-at-rest hashing, same 30-day sliding / 90-day absolute expiry, same
+      <code>mfa_pending</code> semantics, same revocation surface. A
+      <code>sessions.client</code> column records <code>web</code> or <code>mobile</code> so the
+      &ldquo;log out everywhere&rdquo; screen can name the device being revoked.</td></tr>
+    <tr><td><strong><code>ages.py</code></strong></td><td>Pure age math: completed months, CDC
+      checklist bucketing, corrected age for preterm children through 24 months, and defined
+      behaviour outside that range. Server-side only &mdash; the LLM never computes an age.</td></tr>
+    <tr><td><strong><code>prompts.py</code> + curated JSON</strong></td><td>A hand-curated CDC-2022
+      milestone table is injected into the system prompt as a grounding block. Model weights mix
+      pre-2022 50th-percentile and post-2022 75th-percentile framings indiscriminately, and no
+      amount of prompting reliably fixes that, because the model does not know its source is
+      stale.</td></tr>
+    <tr><td><strong><code>guardrails.py</code></strong></td><td>Output-side enforcement, backstopping
+      the system prompt rather than trusting it. Instructions are not a control.</td></tr>
+    <tr><td><strong><code>crypto.py</code> + photo store</strong></td><td>Photo bytes live encrypted
+      on the filesystem, not in SQLite; metadata rows carry the IV, never the key. Delete unlinks
+      the file, so deletion is literal.</td></tr>
+    <tr><td><strong>SQLite</strong></td><td>A single file with <code>PRAGMA foreign_keys = ON</code>
+      and <code>ON DELETE CASCADE</code>, which turns hand-rolled cascade logic into
+      database-enforced invariants that cannot drift between store implementations.</td></tr>
+  </table>
 
-  </main>
+  <h3>Why bearer, and what was rejected</h3>
+  <ul class="clean">
+    <li><strong>Let React Native carry cookies &mdash; rejected</strong><span>It almost works, which
+      is precisely why it is dangerous. The platform cookie jar is undocumented-by-contract, differs
+      between Expo Go and release builds, and is unencrypted and inside the default backup set.
+      <code>HttpOnly</code> also buys nothing on a client with no DOM.</span></li>
+    <li><strong>A separate mobile token type &mdash; rejected as gold-plating</strong><span>It would
+      fork the credential model in two: two lifetimes, two revocation paths, two places for
+      <code>mfa_pending</code> to be wrong.</span></li>
+    <li><strong>Full OAuth2 / PKCE &mdash; rejected</strong><span>A first-party app talking to its own
+      first-party backend has no third party to delegate to. It would mean standing up an
+      authorization server to issue tokens to ourselves.</span></li>
+  </ul>
+  <p>Mobile clients are deliberately sent <em>no</em> <code>Set-Cookie</code> &mdash; a cookie would
+    recreate the rejected design by accident &mdash; and receive the token in an
+    <code>X-LM-Session-Token</code> response header, which must never be added to CORS
+    <code>expose_headers</code>.</p>
+</section>
+
+<!-- ============================== ROADMAP ============================== -->
+<section class="panel" id="p-road" role="tabpanel" aria-labelledby="t-road" hidden>
+  <h2>What has been built, and when</h2>
+  <p>Dates are gate-close dates from <code>PROJECT_CONTEXT.md</code>'s Decisions Log, cross-referenced
+    with <code>FEATURES.md</code>. Note the shape: F1&ndash;F17 landed in a dense burst between 10
+    and 13 July, then a two-week gap, then the mobile surface.</p>
+
+  <div class="gwrap">
+    <div class="gaxis"><span class="tick" style="left:0.0%">Jul 10</span>
+<span class="tick" style="left:18.182%">Jul 14</span>
+<span class="tick" style="left:36.364%">Jul 18</span>
+<span class="tick" style="left:54.545%">Jul 22</span>
+<span class="tick" style="left:72.727%">Jul 26</span>
+<span class="tick" style="left:90.909%">Jul 30</span></div>
+    <div class="glane"><h4><span class="dot s"></span>Shipped</h4>
+<div class="grow" data-k="s"><div class="glab">Intake + Plan &amp; Backlog gate &mdash; F1&ndash;F10 approved</div><div class="gtrack"><div class="gbar s" style="left:0.0%;width:1.6%" title="Jul 10"><span>Jul 10</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Architecture gate (+ same-day human override on F8 email delivery)</div><div class="gtrack"><div class="gbar s" style="left:0.0%;width:4.545%" title="Jul 10"><span>Jul 10</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 1 &mdash; F1&ndash;F5: profiles, age math, guarded chat, activities, disclaimer</div><div class="gtrack"><div class="gbar s" style="left:0.0%;width:4.545%" title="Jul 10&ndash;11"><span>Jul 10&ndash;11</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 2 &mdash; F6 timeline, F7 photos, F8 digest content</div><div class="gtrack"><div class="gbar s" style="left:4.545%;width:4.545%" title="Jul 11"><span>Jul 11</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 3 &mdash; F8 delivery, F9 buying recs, F10 multi-caregiver auth</div><div class="gtrack"><div class="gbar s" style="left:4.545%;width:4.545%" title="Jul 11"><span>Jul 11</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 4 &mdash; F14 avatars, F15 lightbox, F16 gallery</div><div class="gtrack"><div class="gbar s" style="left:9.091%;width:4.545%" title="Jul 12"><span>Jul 12</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 5 &mdash; F13 chat history + suggested prompts</div><div class="gtrack"><div class="gbar s" style="left:9.091%;width:4.545%" title="Jul 12"><span>Jul 12</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 6 &mdash; F12 hardened auth: reset, TOTP MFA, session hardening</div><div class="gtrack"><div class="gbar s" style="left:9.091%;width:4.545%" title="Jul 12"><span>Jul 12</span></div></div></div>
+<div class="grow" data-k="s"><div class="glab">Increment 7 &mdash; F17 Google Photos import</div><div class="gtrack"><div class="gbar s" style="left:9.091%;width:9.091%" title="Jul 12&ndash;13"><span>Jul 12&ndash;13</span></div></div></div>
+</div><div class="glane"><h4><span class="dot p"></span>Built in this window</h4>
+<div class="grow" data-k="p"><div class="glab">F18 &mdash; native mobile app (React Native / Expo) + bearer-token transport</div><div class="gtrack"><div class="gbar p" style="left:72.727%;width:13.636%" title="Jul 26&ndash;28"><span>Jul 26&ndash;28</span></div></div></div>
+<div class="grow" data-k="p"><div class="glab">Mobile phases A&ndash;D &mdash; parity, capture [+], photos/lightbox, security card</div><div class="gtrack"><div class="gbar p" style="left:72.727%;width:13.636%" title="Jul 26&ndash;28"><span>Jul 26&ndash;28</span></div></div></div>
+<div class="grow" data-k="p"><div class="glab">Synthetic test data, run 2 &mdash; second (preterm) profile</div><div class="gtrack"><div class="gbar p" style="left:77.273%;width:4.545%" title="Jul 27"><span>Jul 27</span></div></div></div>
+<div class="grow" data-k="p"><div class="glab">Cross-surface test infrastructure &mdash; run-all.sh, RNTL harness, red-team slug</div><div class="gtrack"><div class="gbar p" style="left:77.273%;width:9.091%" title="Jul 27&ndash;28"><span>Jul 27&ndash;28</span></div></div></div>
 </div>
+    <div class="legend">
+      <span><span class="dot s"></span>Shipped &mdash; all gates closed</span>
+      <span><span class="dot p"></span>Built in this window</span>
+      <span><span class="dot u"></span>Upcoming, unscheduled</span>
+    </div>
+  </div>
 
-<footer>little-milestones — generated by deliverables-agent, design by ui-ux-designer, 2026-07-13 · this file makes zero external network requests</footer>
+  <h2>Upcoming &mdash; unscheduled</h2>
+  <p>None of the following carries a committed date, so none is placed on the timeline above.
+    Several are deliberate deferrals with stated reasons rather than backlog residue.</p>
+  <ul class="clean">
+    <li><strong>Mobile night theme</strong><span>UX_KB &sect;13.7 &mdash; specified, not yet implemented</span></li>
+<li><strong>Mobile offline queue</strong><span>UX_KB &sect;13.4 &mdash; specified, not yet implemented</span></li>
+<li><strong>Android verification</strong><span>No Android SDK/JDK on this machine</span></li>
+<li><strong>Physical-device verification</strong><span>Touch targets and safe areas unproven on real hardware</span></li>
+<li><strong>Push notifications</strong><span>Deliberately undesigned &mdash; needs its own Experience Design pass</span></li>
+<li><strong>Google Photos import on mobile</strong><span>Release 2 &mdash; a mobile binary cannot hold the OAuth client secret</span></li>
+<li><strong>Caregiver invite creation on mobile</strong><span>Rare, one-time act; easier to hand off from a desktop</span></li>
+<li><strong>F11 &mdash; RAG-grounded answering</strong><span>Conditional; requires a vetted pediatric corpus. No trigger yet</span></li>
+<li><strong>Resend sending-domain verification</strong><span>Unmet precondition gating real digest sending &mdash; not a code gap</span></li>
+<li><strong>dev/scripts/seed-data.sh</strong><span>One-command test-data reset; does not exist yet</span></li>
+  </ul>
+
+  <div class="note warn"><strong>Backlog state cannot be read from <code>FEATURES.md</code>
+    alone.</strong> Its <em>Released</em> and <em>Ready for Release</em> sections are both empty
+    headings, even though F1&ndash;F17 are recorded as shipped and deployed in
+    <code>PROJECT_CONTEXT.md</code>. The delivery state above was reconstructed from the Decisions
+    Log. <code>FEATURES.md</code>'s F18 entry is also stale in three specifics: it reports 284
+    backend tests (now 294), states the app was never run on a device (it was, on an iPhone 17 Pro
+    simulator on 26 July), and lists the Capture tab and You tab as remaining (both have since
+    been built &mdash; night theme and offline queue are the genuine remainder).</div>
+</section>
+
+<!-- =========================== BUILT WITH MAS =========================== -->
+<section class="panel" id="p-mas" role="tabpanel" aria-labelledby="t-mas" hidden>
+  <h2>How this was actually built</h2>
+  <p>little-milestones was built by <strong>Conclave</strong>, a multi-agent SDLC system: a roster of
+    specialist agents convened per project, deliberating under one orchestrator, with the human
+    holding final say at every gate. What follows is this project's real history &mdash; not a
+    description of how the system works in general.</p>
+
+  <figure>
+    <svg viewBox="0 0 980 380" role="img" aria-label="Hierarchy diagram: the human approves at every gate; the orchestrator is the single point of contact; gates run in sequence; specialist subagents own knowledge bases and test suites.">
+      <g font-family="var(--sans)">
+        <rect x="330" y="14" width="320" height="52" rx="14" fill="var(--terra)"/>
+        <text x="490" y="38" font-size="14.5" font-weight="700" text-anchor="middle" fill="#FFF7F0">HUMAN</text>
+        <text x="490" y="55" font-size="10.5" text-anchor="middle" fill="#FFF7F0">final say at every gate &middot; approve, redirect, override</text>
+
+        <path d="M490,66 L490,100" stroke="var(--terra)" stroke-width="2" fill="none"/>
+
+        <rect x="330" y="100" width="320" height="50" rx="14" fill="var(--card)" stroke="var(--terra)" stroke-width="2"/>
+        <text x="490" y="122" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--fg)">ORCHESTRATOR</text>
+        <text x="490" y="139" font-size="10.5" text-anchor="middle" fill="var(--muted)">the conversation itself &mdash; never a registered agent</text>
+
+        <path d="M490,150 L490,178 M120,178 L860,178" stroke="var(--line)" stroke-width="2" fill="none"/>
+
+        <g font-size="10.5" font-weight="700" text-anchor="middle">
+          <g fill="var(--fg)">
+          <path d="M120,178 L120,200 M243,178 L243,200 M366,178 L366,200 M490,178 L490,200 M613,178 L613,200 M736,178 L736,200 M860,178 L860,200" stroke="var(--line)" stroke-width="2" fill="none"/>
+          <rect x="62" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="120" y="224">Plan &amp; Backlog</text>
+          <rect x="185" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="243" y="224">Experience Design</text>
+          <rect x="308" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="366" y="224">Architecture</text>
+          <rect x="432" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="490" y="224">Code</text>
+          <rect x="555" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="613" y="224">Test</text>
+          <rect x="678" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="736" y="224">Review</text>
+          <rect x="802" y="200" width="116" height="38" rx="9" fill="var(--slate-tint)" stroke="var(--slate)"/><text x="860" y="224">Deploy</text>
+          </g>
+        </g>
+
+        <path d="M613,238 L613,262 L490,262" stroke="var(--terra)" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#art)"/>
+        <text x="700" y="258" font-size="10" font-weight="700" fill="var(--terra)">findings sent back to Code &mdash; this really happened, twice</text>
+
+        <g font-size="10" text-anchor="middle" fill="var(--muted)">
+          <rect x="40" y="292" width="176" height="66" rx="10" fill="var(--card)" stroke="var(--line)"/>
+          <text x="128" y="312" font-size="11" font-weight="700" fill="var(--fg)">solution-architect</text>
+          <text x="128" y="328">ARCHITECTURE_KB.md</text><text x="128" y="343">architecture suite</text>
+          <rect x="228" y="292" width="176" height="66" rx="10" fill="var(--card)" stroke="var(--line)"/>
+          <text x="316" y="312" font-size="11" font-weight="700" fill="var(--fg)">security-architect</text>
+          <text x="316" y="328">SECURITY_KB.md</text><text x="316" y="343">security suite</text>
+          <rect x="416" y="292" width="176" height="66" rx="10" fill="var(--card)" stroke="var(--line)"/>
+          <text x="504" y="312" font-size="11" font-weight="700" fill="var(--fg)">ui-ux-designer</text>
+          <text x="504" y="328">UX_KB.md</text><text x="504" y="343">ux + accessibility suite</text>
+          <rect x="604" y="292" width="176" height="66" rx="10" fill="var(--card)" stroke="var(--line)"/>
+          <text x="692" y="312" font-size="11" font-weight="700" fill="var(--fg)">responsible-ai-architect</text>
+          <text x="692" y="328">RESPONSIBLE_AI_KB.md</text><text x="692" y="343">red-team suite</text>
+          <rect x="792" y="292" width="148" height="66" rx="10" fill="var(--card)" stroke="var(--line)"/>
+          <text x="866" y="312" font-size="11" font-weight="700" fill="var(--fg)">industry-expert</text>
+          <text x="866" y="328">INDUSTRY_KB.md</text><text x="866" y="343">industry suite</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>Each specialist owns exactly one knowledge base and one test suite, so no two
+      agents can quietly disagree in the same file. Agent roles from
+      <code>admin/MAS_REGISTRY.md</code>.</figcaption>
+  </figure>
+
+  <h2>This project's actual gate history</h2>
+  <table>
+    <tr><th>When</th><th>What happened</th></tr>
+    <tr><td><strong>10 Jul</strong></td><td>Intake. Domain: child development and parenting.
+      <code>functional-agent</code> and <code>industry-expert</code> produced DOMAIN_KB and
+      INDUSTRY_KB.</td></tr>
+    <tr><td><strong>10 Jul</strong></td><td><strong>Plan &amp; Backlog gate &mdash; human
+      override.</strong> <code>plan-agent</code> proposed a first slice of F1&ndash;F5. The human
+      reviewed the itemized backlog and approved <strong>F1&ndash;F10</strong> &mdash; a much larger
+      scope &mdash; which pulled F7's compliance preconditions into the run and forced a real auth
+      decision at Architecture instead of deferring it.</td></tr>
+    <tr><td><strong>10 Jul</strong></td><td><strong>Platform decision, explicitly confirmed:</strong>
+      responsive web, not a PWA and not a native app. Recorded as settled, not to be reopened.</td></tr>
+    <tr><td><strong>10 Jul</strong></td><td>Architecture gate, held jointly by
+      <code>solution-architect</code> and <code>security-architect</code> with
+      <code>responsible-ai-architect</code> advising.</td></tr>
+    <tr><td><strong>10 Jul</strong></td><td><strong>Human override, same day.</strong> The
+      architecture had deferred F8's email as &ldquo;opt-in machinery only, no real delivery&rdquo;.
+      The human overruled it and requested real delivery; the section was fully replaced rather than
+      appended to, and <code>security-architect</code> independently re-reviewed the revision.</td></tr>
+    <tr><td><strong>11 Jul</strong></td><td><strong>Test gate sent work back.</strong> Increment 1
+      closed with 7 findings fixed plus 3 further defects found by a live red-team run &mdash;
+      defects that static review had missed.</td></tr>
+    <tr><td><strong>11 Jul</strong></td><td><strong>Test gate sent work back again.</strong>
+      Increment 2 returned blocking FAILs from both the architecture and UX/accessibility suites
+      &mdash; 13 findings. It was routed to <code>code-agent</code> for a fix pass rather than
+      proceeding to Review. All 13 closed, and one real defect surfaced in the process.</td></tr>
+    <tr><td><strong>12 Jul</strong></td><td>Post-MVP roadmap approved by human checkbox review:
+      four increments, sequenced by file overlap so concurrent passes could not fight over the same
+      files. Increments 4&ndash;7 (F12&ndash;F17) then ran back to back.</td></tr>
+    <tr><td><strong>26 Jul</strong></td><td><strong>Platform decision reversed [human].</strong> The
+      human directed that a native mobile app be built &mdash; reversing the 10 July decision.
+      <em>Both <code>security-architect</code> and <code>ui-ux-designer</code> independently flagged
+      the conflict and refused to resolve it themselves.</em> That was the correct behaviour: it was
+      the human's decision to reverse and the orchestrator's to record. The original entry was
+      superseded, not deleted.</td></tr>
+    <tr><td><strong>26 Jul</strong></td><td>Mobile Architecture and Experience Design gates. Bearer
+      transport designed in SECURITY_KB &sect;9; release-1 experience scoped in UX_KB &sect;13 with
+      rendered previews, because a visual gate is never approved from spec text alone.</td></tr>
+    <tr><td><strong>26 Jul</strong></td><td><strong>A test caught a real bug before it shipped.</strong>
+      A new mobile-auth test found that logout over bearer only cleared the token locally, leaving a
+      live 30-day session on the server. Fixed and regression-tested.</td></tr>
+    <tr><td><strong>26 Jul</strong></td><td><strong>Honest partial status recorded.</strong> The Code
+      gate closed with an explicit delta against the approved design: 4 tabs built where 5 were
+      specified, and no night theme or offline queue. Recorded as a gap rather than reported as
+      complete.</td></tr>
+    <tr><td><strong>26 Jul</strong></td><td><strong>A defect only a running app could find.</strong>
+      On the iOS simulator, the Journey timeline threw duplicate-React-key warnings: the timeline
+      endpoint merges memories and milestones, each with an independent id sequence. Invisible to
+      every source-level check &mdash; typecheck passed, the bundle built, all backend tests passed.
+      This is the concrete argument for rendered-UI verification.</td></tr>
+    <tr><td><strong>28 Jul</strong></td><td>Cross-surface test runner, an RNTL native rendering
+      backend, and a suite-slug rename. All three surfaces plus six SME suites now run from one
+      command.</td></tr>
+  </table>
+
+  <div class="note"><strong>Where the human actually intervened.</strong> Four times, and each
+    changed the product: expanding the approved backlog from 5 features to 10; overruling a
+    deferral to require real email delivery; approving a sequenced post-MVP roadmap by checkbox;
+    and reversing a decision the system had recorded as settled. In every case the agents surfaced
+    the conflict and stopped, rather than resolving it on the human's behalf.</div>
+
+  <h2>Verification as it stands today</h2>
+  <div class="grid">
+    <div class="card"><span class="num">499</span><h4>tests green</h4><p>Backend 294, desktop web
+      80, mobile 7, and 118 across six SME suites &mdash; all executed on 28 July from a single
+      command.</p></div>
+    <div class="card"><span class="num">6</span><h4>SME-owned suites</h4><p>functional, industry,
+      ux, architecture, security and red-team &mdash; each owned by the specialist whose knowledge
+      base defines what it checks.</p></div>
+    <div class="card"><span class="num">3</span><h4>surfaces covered</h4><p>A change to shared
+      backend code lands on web and mobile alike, so a run proving only one of them is a run that
+      can pass while the product is broken.</p></div>
+  </div>
+  <p>The runner treats &ldquo;no scenarios defined&rdquo; and &ldquo;could not execute&rdquo; as
+    <em>not green</em>, on purpose: <em>we didn't check</em> must never render the same as
+    <em>we checked and it was fine</em>.</p>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>Generated 28 July 2026 by <code>deliverables-agent</code>, one-way from this project's
+    markdown sources. The markdown remains the source of truth; nothing in the platform reads back
+    from <code>deliverables/</code>. Test figures are measured from a real run, not estimated.</p>
+</footer>
 
 <script>
 (function () {
-  var tabs = document.querySelectorAll('.tab-pills button');
-  var panels = document.querySelectorAll('section.panel');
-  tabs.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      tabs.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
-      panels.forEach(function (p) { p.removeAttribute('data-active'); });
-      btn.setAttribute('aria-selected', 'true');
-      document.querySelector('section.panel[data-panel="' + btn.dataset.tab + '"]').setAttribute('data-active', 'true');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function select(id) {
+    tabs.forEach(function (t) {
+      var on = t.id === id;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
     });
-  });
-  var toggle = document.getElementById('themeToggle');
-  var root = document.documentElement;
-  toggle.addEventListener('click', function () {
-    var current = root.getAttribute('data-theme');
-    if (current === 'dark') { root.setAttribute('data-theme', 'light'); }
-    else if (current === 'light') { root.setAttribute('data-theme', 'dark'); }
-    else {
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'light' : 'dark');
-    }
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { select(t.id); });
+    t.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(t), n = null;
+      if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (n) { e.preventDefault(); n.focus(); select(n.id); }
+    });
   });
 })();
 </script>
-
 </body>
 </html>
