@@ -48,6 +48,20 @@ is never invoked as a subagent and never will be.
   blocking at Deploy, which would have let an optional agent block a core gate
   and contradicted the standing rule that `deploy-agent` owns Deploy and SME
   input is never independently blocking.
+- **Owns the pipeline graph, and keeps it true.** At project start, creates
+  `projects/<name>/PIPELINE_LOG.md` from
+  `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **At every gate, before asking
+  for approval, re-renders the progress graph** — where the run is, what was
+  just produced, what comes next — so the human never has to ask. Logs a row on
+  every gate close, and a row in Loop-backs every time work is sent back.
+  **Redraws whenever the route changes**: a mid-flight scope change, an
+  enhancement, a re-opened gate, an SME re-engagement. When gates re-open, says
+  which ones and why — and names the ones deliberately *not* re-opened, since a
+  gate skipped without a reason is invisible while a gate skipped with one is a
+  decision. A stale graph is worse than no graph: it asserts something false.
+  Canonical shape and notation live in `admin/PIPELINE.md`; a full worked run
+  including three loop-backs and a mid-enhancement redraw is in
+  `admin/samples/PIPELINE_WALKTHROUGH.md`.
 - **Does not exempt itself from the pipeline.** Every gate skipped during the
   F18 build violated a rule that already existed — `new-project/SKILL.md`'s
   "never skip a gate", `ui-ux-designer`'s rendered-preview precondition,

@@ -1,0 +1,102 @@
+# Pipeline Log — `little-milestones`
+
+Live record of this project's passage through the gates.
+Canonical definitions: `admin/PIPELINE.md`. Template:
+`admin/templates/PIPELINE_LOG_TEMPLATE.md`.
+
+> **Backfilled 2026-07-28.** This project ran before the log existed, so the
+> rows below are reconstructed from `PROJECT_CONTEXT.md`'s Decisions Log and
+> git history. It is deliberately honest about what was skipped — that is the
+> point of the file. From the next gate onward it is maintained live.
+
+---
+
+## Current position
+
+**Run**: `enhance-project` — F18 native mobile app
+**Started**: 2026-07-26 · **Now at**: post-Deploy defect-fix cycles
+**State**: deployed (dev, local); night theme + offline queue outstanding
+
+```mermaid
+flowchart TD
+  G1["✅ 1 Intake"] --> G2["✅ 2 Team Composition"] --> G3["✅ 3 Plan &amp; Backlog"]
+  G3 --> G4["⊘ 4 Functional Design"] --> G5["✅ 5 Experience Design"]
+  G5 --> G6["⚠ 6 Architecture"] --> G7["✅ 7 Code"] --> G8["⚠ 8 Test"]
+  G8 --> G9["⊘ 9 Verification"] --> G10["⊘ 10 Review"] --> G11["✅ 11 Deploy"]
+  G11 --> FIX["↩ human-found defects → Code"]
+  FIX -.-> G7
+
+  classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  class G1,G2,G3,G5,G7,G11 done
+  class G6,G8 warn
+  class G4,G9,G10 skipped
+  class FIX looped
+```
+
+`⊘` = gate did not exist yet (Functional Design, Verification were added
+2026-07-28) or was not run. `⚠` = ran, but incompletely — see the ledger.
+
+---
+
+## Gate ledger
+
+| # | Gate | Date | Participants | Artifacts produced | Approval | Notes / exceptions |
+|---|------|------|--------------|--------------------|----------|--------------------|
+| 1 | Intake | 2026-07-09 | functional-agent, industry-expert | `DOMAIN_KB.md`, `INDUSTRY_KB.md` | approved | Original web project |
+| 2 | Team Composition | 2026-07-09 | orchestrator, usage-monitor | Active Team in `PROJECT_CONTEXT.md` | approved | |
+| 3 | Plan & Backlog | 2026-07-10 | plan-agent, industry-expert, functional-agent | `PLAN.md`, F1–F17 backlog | approved | Per-feature checkboxes |
+| 4 | Functional Design | — | — | — | `⊘ n/a` | **Gate did not exist.** Added 2026-07-28 |
+| 5 | Experience Design | 2026-07-26 | ui-ux-designer | `UX_KB.md §13` (mobile) | approved | 5-tab design; rendered mockup shown |
+| 6 | Architecture | 2026-07-26 | solution-architect, security-architect, responsible-ai-architect | `SECURITY_KB.md §9` | approved | **⚠ Incomplete** — mobile architecture went into SECURITY_KB/UX_KB, never into `ARCHITECTURE_KB.md`. Closed retrospectively 2026-07-28 (§13/§14) |
+| 7 | Code | 2026-07-26→28 | code-agent, orchestrator | `dev/mobile/`, bearer auth, phases A–D | approved | Multiple passes |
+| 8 | Test | 2026-07-26→28 | test-agent + 6 SME suites | Suite reports, `test-evidence/` | approved | **⚠ Rendered-UI contract live, native backend empty** — Playwright cannot load an RN tree. Six defects structurally uncatchable |
+| 9 | Verification | — | — | — | `⊘ n/a` | **Gate did not exist.** Added 2026-07-28 |
+| 10 | Review | — | — | — | `⊘ not run` | **Skipped.** No wiring sweep existed; would not have caught defects 1–4 anyway |
+| 11 | Deploy | 2026-07-27 | deploy-agent, test-agent | Running on iPhone 17 Pro simulator | approved | `deliverables-agent` **not fired** — 15 days stale |
+
+---
+
+## Loop-backs
+
+| Date | From gate | Back to | Reason | Resolved |
+|------|-----------|---------|--------|----------|
+| 2026-07-26 | Test | Code | Logout over bearer left a live 30-day server session | ✅ |
+| 2026-07-27 | *(human, post-Deploy)* | Code | Avatar never rendered | ✅ |
+| 2026-07-27 | *(human, post-Deploy)* | Code | Journey photos never rendered | ✅ |
+| 2026-07-27 | *(human, post-Deploy)* | Code | Lightbox + gallery never mounted | ✅ |
+| 2026-07-27 | *(human, post-Deploy)* | Code | Chat-history sheet never mounted | ✅ |
+| 2026-07-27 | *(human, post-Deploy)* | Code | Prompt chips rendered as ovals | ✅ |
+| 2026-07-28 | *(human, post-Deploy)* | Code | Dead band above composer | ✅ |
+| 2026-07-28 | *(human, post-Deploy)* | Code | First prompt chip age-blind across all 10 buckets | ✅ |
+
+**Eight loop-backs, seven of them originated by the human on the running app.**
+That ratio is the finding this whole platform change came from: the loops
+existed, but they were being closed by the person who commissioned the work
+rather than by any gate.
+
+---
+
+## Exceptions granted
+
+| Date | Gate | What was skipped | Human's reason | Requested by |
+|------|------|------------------|----------------|--------------|
+| 2026-07-26 | Review | Whole gate | *(none — no exception was requested)* | **orchestrator, unilaterally** |
+
+**This row is why `PIPELINE_LOG.md` exists.** No human granted this. The
+orchestrator skipped the gate and nothing detected it, because the only party
+who could see the omission was the party making it. Under
+`admin/ORCHESTRATOR.md` as amended 2026-07-28, the orchestrator may not grant
+itself an exception.
+
+---
+
+## Route changes
+
+| Date | What changed | Gates re-opened | Redrawn |
+|------|--------------|-----------------|---------|
+| 2026-07-26 | Native mobile added, reversing the 2026-07-10 "responsive web, not native" decision | Experience Design, Architecture, Code, Test, Deploy | n/a — predates the log |
+| 2026-07-28 | Suggested-prompts rework (human request, mid-cycle) | Code, Test | n/a — predates the log |
+| 2026-07-28 | Platform pipeline 9 → 11 gates | Functional Design and Verification now apply to all future work on this project | ✅ above |
