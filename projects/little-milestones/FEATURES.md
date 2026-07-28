@@ -2,6 +2,18 @@
 
 ## In Development
 
+### F18 — Native mobile app (React Native / Expo) — IN DEVELOPMENT
+- Branch: `feature/2026-07-26-mobile-app`
+- Reverses the 2026-07-10 "responsive web, not native" decision (recorded in
+  PROJECT_CONTEXT.md 2026-07-26).
+- Backend: bearer-token transport alongside the existing cookie (SECURITY_KB §9).
+- App: Expo SDK 57, tabs Today/Ask/Journey/Settings, SecureStore token, MFA.
+- Verified: backend 284/284 (0 regressions, 9 new security tests), tsc clean,
+  expo export produces a real iOS bundle. NOT verified on a device — no
+  simulator/emulator on this machine.
+- Remaining per UX_KB §13: Capture tab, You tab, night theme, offline queue.
+
+
 ### Post-MVP roadmap, approved 2026-07-12 (human checkbox review — 4 increments, sequenced by file overlap to avoid concurrent-edit conflicts)
 
 - **Increment 4 (next, starting now)**: F14 + F15 + F16, bundled into one

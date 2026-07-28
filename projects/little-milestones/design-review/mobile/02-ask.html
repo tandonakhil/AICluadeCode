@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile — Ask tab (chat)</title>
+<link rel="stylesheet" href="_preview.css">
+</head>
+<body>
+
+<h1 class="pv-title">Ask tab — milestone chat</h1>
+<p class="pv-lede">The hardest screen to get right on mobile, because it is the one that fights the keyboard. Backed by <code>POST /chat</code>, <code>GET /profiles/{id}/suggested_prompts</code>, <code>GET /profiles/{id}/chat_sessions</code>, <code>GET /chat_sessions/{id}/messages</code>.</p>
+
+<div class="pv-note"><b>Keyboard contract:</b> the composer is pinned to the keyboard, not to the screen. Implemented with <code>KeyboardAvoidingView</code> (<code>padding</code> on iOS, <code>height</code> on Android with <code>adjustResize</code>); the message list is inverted so new messages appear at the bottom without a scroll-to-end race, and <code>keyboardDismissMode=&quot;interactive&quot;</code> lets a parent swipe the keyboard away with the same thumb that is scrolling.</div>
+
+<div class="pv-row">
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="display:flex;flex-direction:column">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">🕘</span></div>
+        <div class="card" style="padding:12px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <span class="dot ph" style="width:38px;height:38px;flex:0 0 38px"></span>
+            <div><b style="font-size:14px">Maya</b><div style="font-size:11.5px;color:var(--lm-ink-soft)">431 days of Maya’s story so far ✦</div></div>
+          </div>
+          <p style="margin-top:10px;font-size:13px;color:var(--lm-ink)">Around 14 months, a lot is happening with first words and steady steps.</p>
+          <div class="chips" style="margin-top:10px">
+            <span class="pchip">🗣 Words</span><span class="pchip">🤸 Moving</span><span class="pchip">🧩 Figuring out</span><span class="pchip">💛 Together</span>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="chips" style="margin-bottom:8px">
+          <span class="pchip">Ideas for rainy-day play</span><span class="pchip">What’s a good first book?</span>
+        </div>
+      </div>
+      <div class="composer"><span class="fld">Ask about Maya…</span><span class="send">↑</span></div>
+      <div class="disc">Not medical advice — for concerns, talk to your pediatrician.</div>
+      <nav class="tabs">
+        <span class="t"><i>🏠</i>Today</span><span class="t on"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Empty / first-open state.</b> The stage card (§9.5) is preserved verbatim — four equal-weight domain chips, no bar, ring or fill (any partial-fill reads as progress-toward-a-norm, which R1 forbids). Suggested prompt chips sit <i>directly above</i> the composer, in the thumb zone, not at the top where the web put them. Tapping a chip sends immediately — a one-tap question for a parent with one free hand.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="display:flex;flex-direction:column;overflow:hidden">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">🕘</span></div>
+        <div style="flex:1;overflow:hidden">
+          <div class="bub u">She’s not saying many words yet — should I be worried?</div>
+          <div class="bub a">Most children say a few single words by around 15 months, and the range is genuinely wide — plenty of 14-month-olds are still mostly babbling and gesturing.</div>
+          <div class="ped">If you’d like a second opinion on Maya’s words, it’s worth mentioning at her next pediatrician visit.</div>
+          <div class="bub a">Things that help: narrate what you’re doing, pause after you ask, and give her a beat to fill the gap.</div>
+          <div class="bub u">What about books?</div>
+          <div class="bub a" style="opacity:.7">Board books with one big image per page are…<span style="opacity:.5">▍</span></div>
+        </div>
+      </div>
+      <div class="composer"><span class="fld" style="color:var(--lm-ink)">What about books?</span><span class="send" style="background:rgba(193,80,42,.35)">■</span></div>
+      <div class="kbd">
+        <span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span>
+        <span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span><span>⌫</span>
+        <span style="grid-column:span 3">123</span><span style="grid-column:span 5">space</span><span style="grid-column:span 2;background:var(--lm-terracotta);color:#fff">send</span>
+      </div>
+    </div>
+    <p class="pv-cap"><b>Keyboard-up + streaming.</b> With the keyboard raised the tab bar and disclaimer are <i>covered</i>, not compressed — the disclaimer re-appears the instant the keyboard dismisses, and it is still present on the route (UXR-4 satisfied by route presence, not by pixel visibility during text entry; flagged for the test suite to assert accordingly). The send button becomes a <b>stop</b> control during streaming. Pediatrician guidance renders in the calm slate card, never red (UXR-2).</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="filter:blur(1px);opacity:.7">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">🕘</span></div>
+        <div class="bub u">She’s not saying many words yet…</div>
+        <div class="bub a">Most children say a few single words by around 15 months…</div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet" style="max-height:72%">
+        <div class="grab"></div>
+        <h3>Past conversations</h3>
+        <div class="srow on"><span><b>Today</b><small>“She’s not saying many words yet…” · 6 messages</small></span></div>
+        <div class="srow"><span><b>Tuesday</b><small>“Ideas for rainy-day play” · 4 messages</small></span></div>
+        <div class="srow"><span><b>2 weeks ago</b><small>“Is it normal to skip crawling?” · 9 messages</small></span></div>
+        <div class="srow"><span><b>Last month</b><small>“First shoes — when?” · 3 messages</small></span></div>
+        <div style="border-top:1px solid rgba(61,56,51,.08);margin-top:8px;padding-top:10px">
+          <button class="btn s full">+ Start a new conversation</button>
+        </div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>History — a sheet, not a rail.</b> The web desktop rail has no mobile equivalent; the 🕘 header button opens this sheet. Swipe-left on a row reveals Delete (<code>DELETE /chat_sessions/{id}</code>) with a confirm — destructive, so the one red surface applies. Rows show relative date + literal snippet + message count, exactly the web anatomy (§9.1).</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>2:14</span><span>▮▮ ⌁</span></div>
+      <div class="offline">Offline — you can read past answers</div>
+      <div class="scr pad" style="display:flex;flex-direction:column">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">🕘</span></div>
+        <div style="flex:1">
+          <div class="bub u">She’s not saying many words yet — should I be worried?</div>
+          <div class="bub a">Most children say a few single words by around 15 months…</div>
+          <div class="bub u" style="opacity:.55;position:relative">And what about pointing?<div style="font-size:10px;margin-top:4px;opacity:.9">⏳ Will send when you’re back online</div></div>
+        </div>
+      </div>
+      <div class="composer"><span class="fld">Ask about Maya…</span><span class="send" style="background:var(--lm-ink-soft)">↑</span></div>
+      <div class="disc">Not medical advice — for concerns, talk to your pediatrician.</div>
+      <nav class="tabs">
+        <span class="t"><i>🏠</i>Today</span><span class="t on"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Offline.</b> Chat needs the server, and we say so plainly rather than failing silently. Past messages stay readable from cache; a typed question is held as a pending bubble and sent on reconnect — <b>once</b>, with an explicit “Send now / Discard” if more than 15 minutes have passed, because an answer conditioned on a stale question is worse than no answer.</p>
+  </div>
+
+</div>
+</body>
+</html>

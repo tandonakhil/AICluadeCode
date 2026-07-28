@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile — Cold start & navigation architecture</title>
+<link rel="stylesheet" href="_preview.css">
+</head>
+<body>
+
+<h1 class="pv-title">Cold start &amp; navigation architecture</h1>
+<p class="pv-lede">The path from a cold launch to a selected child, and the tab set every other screen hangs off. Five states, left to right, in the order a parent meets them.</p>
+
+<div class="pv-note"><b>Navigation decision:</b> bottom tabs (4 + one center capture action), each tab owning its own native stack. No drawer. Child switching is <i>not</i> a tab — it is the header chip on every tab, opening a bottom sheet, so switching child never costs a parent their place. Caregiver/account lives under <b>You</b>.</p>
+
+<div class="pv-row">
+
+  <!-- 1. Launch / session restore -->
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:80px">
+        <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--lm-coral),var(--lm-peach));margin-bottom:16px"></div>
+        <div style="font-family:var(--lm-font-display);font-size:20px">little&#8209;milestones</div>
+        <p style="font-size:12.5px;color:var(--lm-ink-soft);margin-top:6px">Restoring your session…</p>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>1 · Launch (≤600ms budget).</b> Native splash holds while the stored session token is read from secure storage and <code>GET /auth/me</code> is attempted. There is no spinner-only dead end: if the call has not resolved in 3s the screen swaps to the offline shell (screen 5 of <a href="05-states-2am-a11y.html">states</a>) with a Retry, never an infinite “Loading…” (the exact failure logged live 2026-07-11).</p>
+  </div>
+
+  <!-- 2. Sign in -->
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div style="text-align:center;margin:10px 0 18px">
+          <div style="width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,var(--lm-coral),var(--lm-peach));margin:0 auto 10px"></div>
+          <div style="font-family:var(--lm-font-display);font-size:19px">Welcome back</div>
+        </div>
+        <div class="card" style="padding:12px">
+          <label style="font-size:12px;font-weight:700">Email</label>
+          <div style="min-height:44px;border:1px solid rgba(61,56,51,.18);border-radius:12px;padding:11px 12px;font-size:13px;color:var(--lm-ink-soft);margin:5px 0 12px">sam@example.com</div>
+          <label style="font-size:12px;font-weight:700">Password</label>
+          <div style="min-height:44px;border:1px solid rgba(61,56,51,.18);border-radius:12px;padding:11px 12px;font-size:13px;color:var(--lm-ink-soft);margin:5px 0 4px;display:flex;justify-content:space-between">••••••••<span style="color:var(--lm-terracotta);font-weight:700">Show</span></div>
+          <div style="text-align:right;margin-bottom:12px"><span class="btn q" style="min-height:44px;font-size:12.5px">Forgot password?</span></div>
+          <button class="btn p full">Sign in</button>
+          <div style="text-align:center;margin-top:10px"><span class="btn q" style="font-size:12.5px">Create an account</span></div>
+        </div>
+        <div class="ped" style="margin-top:12px">Joining a family? Tap the invite link your co&#8209;parent sent, or <b>enter an invite code</b>.</div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information and ideas — it is not medical advice or a developmental screening tool.</div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>2 · Sign in (modal stack, no tabs).</b> Maps to <code>POST /auth/login</code>; a 2FA-enabled account pushes a 6-digit TOTP screen (<code>/auth/totp/login</code>) with a “Use a recovery code” quiet link. Email field <code>autoComplete=&quot;username&quot;</code>, password <code>&quot;current-password&quot;</code> so the OS password manager fills it — a 2am parent must not type a password from memory.</p>
+  </div>
+
+  <!-- 3. App lock -->
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>2:14</span><span>▮▮ ⌁</span></div>
+      <div class="scr" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:70px">
+        <div style="font-size:34px">🔒</div>
+        <div style="font-family:var(--lm-font-display);font-size:18px;margin-top:10px">Locked</div>
+        <p style="font-size:12.5px;color:var(--lm-ink-soft);max-width:220px;margin:6px auto 18px">Maya’s photos and memories are hidden until you unlock.</p>
+        <button class="btn p">Unlock with Face ID</button>
+        <div style="margin-top:10px"><span class="btn q" style="font-size:12.5px">Use password instead</span></div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>3 · App lock (opt-in, default OFF).</b> Purely local — a device-biometric gate over an already-valid session, never a second authentication factor to the server. <b>Privacy flag for security-architect:</b> unlock state, timeout, and whether failing biometrics falls back to the account password or the device passcode are their call, not mine. Also gates the screenshot/app-switcher blur (see states).</p>
+  </div>
+
+  <!-- 4. Profile switcher sheet -->
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="filter:blur(1px);opacity:.75">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero"><div class="row"><span class="av"></span><h2>Maya is 14 months</h2></div></div>
+        <div class="card"><h3>Stacking cups</h3><p>Nest and knock down — early cause and effect.</p></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>Switch child</h3>
+        <div class="srow on"><span class="dot ph" style="width:36px;height:36px;flex:0 0 36px"></span><span><b>Maya</b><small>14 months</small></span><span style="margin-left:auto;color:var(--lm-terracotta);font-size:16px">✓</span></div>
+        <div class="srow"><span class="dot sky" style="width:36px;height:36px;flex:0 0 36px"></span><span><b>Theo</b><small>6 months · about 4 months corrected</small></span></div>
+        <div class="srow"><span class="dot moss" style="width:36px;height:36px;flex:0 0 36px"></span><span><b>Sam</b><small>2 years 7 months</small></span></div>
+        <div style="border-top:1px solid rgba(61,56,51,.08);margin-top:8px;padding-top:10px">
+          <button class="btn s full">+ Add a child</button>
+        </div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>4 · Child switcher — a bottom sheet, thumb-reachable.</b> Opened from the header chip on any tab; the sheet’s rows start at the <i>bottom</i> of the sheet stack so the most-used child is nearest the thumb. Corrected age shown inline (UXR-5). Long-press or swipe-left on a row reveals “Remove profile”, still typed-confirmation, still the only red surface (UXR-9). Selecting a child re-scopes every tab and pops each stack to its root.</p>
+  </div>
+
+  <!-- 5. Tab bar anatomy -->
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="card"><h3>Tab set — final</h3>
+          <p style="margin-top:6px"><b>Today</b> — activities, this-week, ideas.<br>
+          <b>Ask</b> — milestone chat + history.<br>
+          <b>[+]</b> — Capture. Not a tab: a modal action.<br>
+          <b>Journey</b> — timeline / gallery.<br>
+          <b>You</b> — account, caregivers, privacy.</p>
+        </div>
+        <div class="card"><h3>Why a centre capture button</h3><p>The single most time-sensitive thing a parent does on a phone is record a moment that is happening <i>right now</i>. It gets the largest, most central, most reliably thumb-reachable target in the app — 56pt, one tap from anywhere, never buried in a tab.</p></div>
+        <div class="a11y">Every tab: 44×44pt minimum, icon <code>aria-hidden</code>, label is the accessible name, selected tab exposes <code>selected: true</code>.</div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information and ideas — it is not medical advice.</div>
+      <nav class="tabs">
+        <span class="t on"><i>🏠</i>Today</span>
+        <span class="t"><i>💬</i>Ask</span>
+        <span class="t cap"><i>＋</i></span>
+        <span class="t"><i>✦</i>Journey</span>
+        <span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>5 · The shell.</b> Tab bar sits above the 34pt home-indicator inset; the fixed disclaimer is a quiet strip <i>above</i> the tab bar on every tab (UXR-4 — present on every route, never dismissible). Android renders the same tab bar (Material bottom navigation metrics), with the system back gesture popping the active tab’s stack rather than exiting the app.</p>
+  </div>
+
+</div>
+</body>
+</html>

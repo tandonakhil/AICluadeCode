@@ -264,6 +264,21 @@
   </div>
 </section>
 
-<footer>Generated from ui-ux-designer's Experience Design gate output · little-milestones · Increment 4, 2026-07-12</footer>
+<section id="mobile-app">
+  <h2>Mobile app — React Native / Expo <span class="badge inc4">2026-07-26</span></h2>
+  <p class="desc">A new enhancement: a native mobile app version of the existing web product. Six preview pages — cold start &amp; navigation architecture, Today, Ask (chat), Journey, Capture, and the You tab / 2am night mode / accessibility &amp; system states — each showing real phone-framed screens with their loading, empty, error and offline variants. <b>Opens in its own review page:</b> <a href="mobile/index.html"><b>mobile/index.html</b></a>. Full written design intent, release-1 scope cut, deferrals, and privacy flags: <code>knowledge/UX_KB.md</code> §13.</p>
+  <div class="flag-box">
+    <b>Flagged before anything is built:</b> <code>PROJECT_CONTEXT.md</code>'s Decisions Log records (2026-07-10) an explicitly confirmed platform decision — "responsive web app… <b>not a PWA and not a native iOS/Android app</b>… treat this as settled, not reopen it." This enhancement reopens exactly that decision and needs a new, explicit Decisions Log entry recording the change. Also flagged for security-architect (designing the mobile auth/secrets model in parallel): biometric app lock, local photo caching/offline queue durability, screenshot &amp; app-switcher exposure, and camera-roll write-back — all detailed in UX_KB §13.8.
+  </div>
+  <div class="screen-grid">
+    <div>
+      <h2 style="font-size:1rem">Mobile design review — all six pages</h2>
+      <p class="desc">Embedded here for convenience; the standalone page above is easier to scroll.</p>
+      <iframe src="mobile/index.html" height="1600" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>Generated from ui-ux-designer's Experience Design gate output · little-milestones · Increment 4, 2026-07-12 · Mobile app pass, 2026-07-26</footer>
 </body>
 </html>

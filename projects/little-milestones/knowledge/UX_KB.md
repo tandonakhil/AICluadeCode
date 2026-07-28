@@ -2239,3 +2239,454 @@ describes.
 Not re-verified here (unchanged from §12.9's scope, still Architecture's):
 OAuth token storage/refresh, duplicate-detection hashing, backend
 routes/schema.
+
+---
+
+## 13. Revision — 2026-07-26: Mobile app (React Native / Expo) — experience design
+
+New enhancement: a native mobile app version of the shipped web product.
+This section is the design intent for **release 1**. Rendered previews (the
+reviewable artifact this gate requires, never spec text alone) are at
+`projects/little-milestones/design-review/mobile/index.html`, six pages,
+each phone-framed with loading/empty/error/offline variants.
+
+### 13.0 A recorded decision this reopens — flagged, not silently overwritten
+
+`PROJECT_CONTEXT.md`'s Decisions Log, 2026-07-10, records an **explicitly
+confirmed** platform decision: "responsive web app (any browser, no
+install), **not a PWA and not a native iOS/Android app** … solution-architect
+should treat this as settled, not reopen it." This enhancement reopens
+exactly that decision. The design below assumes the human is knowingly
+changing it. **A new Decisions Log entry must record the change before build
+starts** — a design KB section is not the place a platform decision gets
+reversed.
+
+Also binding and honoured here: §1.1 (sleep-deprived parent, one-handed,
+2am), §1.2 (storybook-not-chart, banned motifs), §4.2's rev-2 palette,
+§1.9's UXR-1…UXR-13, and §1.10's exact sensitive copy — **none of which is
+re-litigated for mobile.** Every copy string in §1.10 ports verbatim.
+
+### 13.1 Release-1 scope — the honest cut
+
+The API surface is ~40 endpoints. Porting all of it would produce a worse
+app, not a more complete one. What a parent does on a phone is different in
+kind from what they do at a desk: it is short, one-handed, camera-in-hand,
+frequently at 2am, and frequently interrupted. That is the cut criterion —
+not feature parity.
+
+**In release 1:**
+
+| Surface | Endpoints |
+|---|---|
+| Sign in / sign up / join-by-invite / TOTP login / sign out | `/auth/login`, `/auth/signup`, `/auth/join`, `/auth/totp/login`, `/auth/logout`, `GET /auth/me` |
+| Child switcher, add a child, delete a profile | `GET/POST /profiles`, `DELETE /profiles/{id}` |
+| Today | `GET /profiles/{id}/activities`, `/digest`, `/products` |
+| Ask (chat) | `POST /chat`, `/suggested_prompts`, `/chat_sessions`, `/chat_sessions/{id}/messages`, `DELETE /chat_sessions/{id}` |
+| Journey (timeline, gallery, lightbox) | `GET /profiles/{id}/timeline`, photo get, memory delete |
+| Capture (camera, picker, text-only, offline queue) | memory create, photo upload/delete |
+| You (account, caregivers list, digest toggle, security, delete) | `PATCH /auth/me`, session list |
+
+**Deferred, and why — each a real reason, not a scope dodge:**
+
+1. **Google Photos import (F17).** A browser-redirect OAuth flow, a
+   third-party picker, and an import-review table with per-item skip
+   toggles: the least phone-shaped surface in the product, and the one
+   carrying the most compliance to re-verify on a new platform. The You tab
+   links to web. Revisit when the mobile OAuth/secrets model (security-
+   architect's parallel work) is settled — a mobile binary cannot hold the
+   client secret, which is precisely why this cannot be a straight port.
+2. **Caregiver invite *creation*.** Viewing the caregiver list ships;
+   generating a code does not. It is a rare, one-time act and a code is
+   easier to hand off from a desktop.
+3. **Password reset, TOTP *enrolment*, session-revoke UI.** Reset is
+   already an emailed browser link; TOTP enrolment needs a QR code shown on
+   a second screen. Login *with* TOTP ships, because being locked out of a
+   phone app is a dead end.
+4. **Push notifications.** Not designed here at all, deliberately. A
+   parenting app that pushes about child development is an anxiety machine
+   unless designed with the same care §1.9 applies to everything else. It
+   needs its own Experience Design pass, not a checkbox in this one.
+5. **Complete offline mirror of the journey.** Release 1 caches recently
+   viewed content. A full local copy of every photo of a child is a privacy
+   decision (see §13.8), not a caching decision.
+
+### 13.2 Navigation architecture
+
+**Bottom tabs, five slots, each tab owning its own native stack. No
+drawer** — a drawer hides navigation behind a gesture and an off-thumb
+corner, which contradicts §1.1's one-handed rule.
+
+```
+Today  ·  Ask  ·  [ + ]  ·  Journey  ·  You
+```
+
+- **[+] is not a tab.** It is a modal capture action, given the largest,
+  most central, most reliably thumb-reachable target (56pt) in the app —
+  because the most time-sensitive thing a parent does on a phone is record
+  something that is happening *right now*.
+- **Child switching is not a tab either.** It is the header chip present on
+  Today, Ask and Journey; tapping it opens a bottom sheet (rows ordered so
+  the most-used child sits nearest the thumb). Selecting a child re-scopes
+  every tab and pops each stack to root. This means switching child never
+  costs a parent their place in the app, and never costs a tab slot.
+- **Caregiver/account lives under You**, not in the switcher — a
+  caregiver is a person with access, a profile is a child; conflating them
+  in one sheet was tempting and is wrong.
+- **Modal stacks** (auth, capture/compose, onboarding) render above the tab
+  bar, not inside a tab.
+- **Android**: same tab bar at Material bottom-navigation metrics; the
+  system back gesture pops the active tab's stack, and from a tab root
+  returns to Today before it will exit the app.
+
+**Cold-start path** (previews page 1):
+
+```
+launch → native splash (secure-storage token read + GET /auth/me, ≤600ms budget)
+  ├─ no token / 401 → Sign in (modal stack)  → [TOTP if enabled] → …
+  ├─ token valid + app lock on → Locked screen (biometric) → …
+  └─ token valid → profiles loaded
+        ├─ 0 profiles → onboarding (Add your child), §1.10 copy verbatim
+        ├─ 1 profile  → auto-select, land on Today
+        └─ 2+ profiles → auto-select last-used (persisted), land on Today
+```
+
+If `/auth/me` has not resolved in 3 seconds the splash swaps to the offline
+shell with a Retry. **There is no state in which this app sits on a
+spinner forever** — that exact failure was found live in the web build on
+2026-07-11 and must not be re-introduced on a platform where a user cannot
+simply reload the page.
+
+### 13.3 Screen-by-screen
+
+Each entry: purpose · layout · primary action · empty · loading · error.
+
+**Sign in** — *purpose*: get an existing caregiver in with the least
+typing. *Layout*: logo, email, password (with Show), Forgot-password quiet
+link, primary Sign in, quiet Create-an-account, and a slate info card for
+"joining a family? use your invite code". *Primary*: Sign in. *Empty*: n/a.
+*Loading*: button label → spinner, fields disabled, never a full-screen
+block. *Error*: inline under the form, calm plain language, never the raw
+HTTP status; a 401 says the credentials didn't match without saying which
+field was wrong. Fields carry `autoComplete` username/current-password so
+the OS password manager fills them — a parent at 2am must not type a
+password from memory.
+
+**Locked (app lock)** — *purpose*: keep a child's photos off a handed-over
+phone. *Layout*: lock glyph, one line of copy, "Unlock with Face ID"
+primary, "Use password instead" quiet. Opt-in, **default off**. This is a
+local device gate over an already-valid session, never a second factor to
+the server.
+
+**Child switcher sheet** — *purpose*: change scope in one thumb reach.
+*Layout*: grabber, title, one row per child (avatar or identity dot, name,
+age line including corrected age per UXR-5), checkmark on current, "+ Add a
+child" below a divider. *Primary*: tap a row. *Empty*: cannot be empty (a
+family with zero children goes to onboarding). Swipe-left or long-press a
+row reveals Remove → typed-name confirmation, §1.10's exact copy, still the
+only red surface (UXR-9).
+
+**Today** — *purpose*: how old is my child, and what can I do with them.
+*Layout*, in this order and for this reason: hero (avatar + "{Name} is
+{age}", photo-derived accent gradient or the fixed default) → activity
+cards with sage supervision lines → "Things to look forward to" (invitation
+framing, UXR-8) → this-week digest panel → ideas-for-this-stage. Products
+sit last, always: a parent scrolls past everything useful before they see
+anything purchasable. *Primary*: none — this screen is for reading; the
+[+] is the standing action. *Empty*: activities empty never leaves a dead
+screen, it offers Ask as the next move. *Loading*: skeleton cards, not a
+spinner — the shell paints immediately so a slow LAN never looks like a
+broken app. *Error*: the hero still renders (age is computed from a locally
+stored DOB, so it is always answerable offline), last-good activities show
+dimmed with an honest "showing what we saved last time you were online",
+plus a real Retry button. Pull-to-refresh re-fetches activities + digest +
+products as one gesture.
+
+**Ask (chat)** — *purpose*: the 2am question. *Layout*: header chip + a 🕘
+history button; the §9.5 stage card (identity strip, days-of-story line,
+current-stage sentence, four **equal-weight** domain chips — no bar, ring
+or fill, because any partial fill reads as progress-toward-a-norm, which R1
+forbids); message list; suggested-prompt chips **directly above the
+composer**, in the thumb zone (the web put them at the top; on a phone that
+is the wrong end); composer pinned to the keyboard. *Primary*: send.
+*Empty*: stage card + prompt chips; a chip sends immediately — a whole
+question in one tap for a parent with one free hand. *Loading*: streaming
+text with the send button becoming a **stop** control. *Error*: a failed
+send leaves the user's bubble in place, marked, with a Retry — never
+silently swallowed (the `crypto.randomUUID` defect of 2026-07-11 was
+exactly a silently-dropped message). Pediatrician sentences render in the
+calm slate card, never red (UXR-2). *History*: the 🕘 button opens a sheet
+(no room for the desktop rail); rows keep the §9.1 anatomy — relative date,
+literal snippet, message count — and swipe-left reveals Delete with a
+confirm.
+
+**Journey** — *purpose*: the family story, and the screen a parent actually
+shows other people. *Layout*: header chip + a ✦/▦ segmented toggle; the
+timeline is the single left-spine mobile river from §7 (photo 1 as a
+full-bleed 120pt banner at 12px radius per §7.3, photos 2+ as a 44pt
+thumbnail row); gallery is a 3-column grid (4 on tablet/landscape), grouped
+under the same neutral chapter markers. *Primary*: tap a photo → lightbox.
+*Lightbox*: swipe left/right between photos in scope, **swipe down to
+dismiss**, pinch and double-tap to zoom, and a persistent ✕ for anyone who
+doesn't find the gestures. Prev/next scope is unchanged from §8.3 — one
+memory's photos from the timeline, the whole profile from the gallery.
+*Empty*: "{Name}'s story starts here", an Add-a-moment primary, and the
+verbatim privacy line — the empty journey is the moment a parent decides
+whether to trust this app with photos of their baby. *Loading*: skeleton
+cards with placeholder banners. *Error*: retry card, cached entries stay
+visible. **UXR-1 re-verified for all three views**: no axis, no second
+series, no typical-range band, no status colour; the coral spine is
+decorative and screen-reader-hidden, chapter markers are neutral text.
+**No share/export affordance anywhere** — UXR-10's rule survives the port,
+and "save to camera roll" is precisely the thing a native app adds by
+reflex and must not add here without an explicit decision.
+
+**Capture ([+])** — *purpose*: get a moment recorded in seconds.
+*Flow*: sheet (Take a photo · Choose from photos · Write it down, each row
+≥52pt) → permission pre-prompt if needed → full-screen compose modal
+(photo strip with remove/add, "What happened?" autofocused so the keyboard
+is already up, optional note, date defaulting to today and one tap to
+change — a parent often logs yesterday's moment at 2am, optional milestone
+tag chips, the verbatim privacy line) → Save. *Primary*: Save, enabled as
+soon as there is a title **or** a photo. A text-only memory is savable in
+**3 taps + typing** — UXR-7 carries over unchanged. *Error/offline*: the
+moment appears on the journey **immediately**, marked "saved on this phone
+· will upload automatically", and uploads on reconnect. This is the most
+important offline behaviour in the app: a parent capturing a first step in
+a basement with no signal must not lose it. A permanently failed upload
+shows a plain retry and keeps the memory on-device until it succeeds or is
+deleted. A queued upload is **never** styled as an error (UXR-2).
+
+**You** — *purpose*: account, consent, and deletion, all shallow and
+boring. *Layout*: one list — profile row; Children; Caregivers; Weekly
+digest toggle (renders **off** for a fresh caregiver, one action to change,
+one to revoke, no retention dialog — UXR-12); Lock with Face ID; Night
+colours (Automatic / Light / Night); Sign in & security (password, TOTP,
+sessions — reusing the web `SecurityCard` design, not redesigned); Privacy
+& your data; Sign out. *Error*: per-row inline, never a screen-level
+failure that hides the sign-out control.
+
+### 13.4 Mobile-native concerns the web version never had
+
+- **Safe areas.** Content respects the top inset; the status bar is never
+  overlapped by text. The tab bar sits above the 34pt home-indicator inset
+  and the fixed disclaimer strip sits directly above the tab bar on every
+  tab (UXR-4 — present on every route, never dismissible).
+- **Touch targets.** 44×44pt floor everywhere, including quiet underlined
+  links: the visible label may be small, the hit area may not. This is
+  already the web rule (UXR-6) and it is stricter to enforce here because
+  there is no hover to compensate.
+- **Keyboard avoidance.** The composer is pinned to the *keyboard*, not the
+  screen: `KeyboardAvoidingView` (`padding` on iOS, `height` on Android
+  with `adjustResize`), an inverted message list so new messages land at
+  the bottom without a scroll race, and `keyboardDismissMode="interactive"`
+  so the same thumb that scrolls can dismiss the keyboard. With the
+  keyboard raised the tab bar and disclaimer are **covered, not
+  compressed** — flagged for the test suite: UXR-4 must be asserted as
+  *route presence*, not pixel visibility during text entry.
+- **Pull-to-refresh** on Today and Journey; not on Ask (a chat log is not a
+  feed, and pull-to-refresh there would compete with scrollback).
+- **Offline.** Three tiers: (a) age and cached content always readable;
+  (b) chat states plainly that it needs a connection and holds a typed
+  question as a pending bubble, sent once on reconnect — with an explicit
+  "Send now / Discard" if >15 minutes have passed, because an answer to a
+  stale 2am question is worse than no answer; (c) captured memories queue
+  and upload automatically. A persistent slate offline strip (never red)
+  appears under the status bar.
+- **Camera / photo-library permission.** Always a **pre-prompt first**: the
+  OS dialog is one-shot and a denial is expensive, so the app explains why
+  in its own card (carrying the verbatim privacy line) before triggering
+  the system prompt. Denied → a calm inline card offering the text-only
+  path plus a deep link to app settings. Never a nag loop.
+- **Slow LAN.** The project's own history makes this concrete: the web
+  build broke on LAN testing over a hardcoded API host and a
+  secure-context-only API. Mobile equivalents — skeletons over spinners, a
+  3s splash timeout, per-request timeouts with calm copy, image
+  `loading`/progressive decode on the gallery, and no screen whose only
+  state is "waiting".
+- **Error copy names the app, never the protocol.** No "Network request
+  failed", no host, no port, no status code. This is §1.2's calm-copy rule,
+  and it is the rule the web build was caught breaking.
+
+### 13.5 Visual language — translated, not reinvented
+
+Every token is the rev-2 palette from §4.2, used verbatim: `--lm-cream`
+`#FDF8F2`, `--lm-ink` `#3D3833`, `--lm-ink-soft` `#6E6259`,
+`--lm-terracotta` `#C1502A`, `--lm-terracotta-deep` `#8F3A1D`, `--lm-sage`
+`#2F7A4E`, `--lm-slate` `#3D6188` / `--lm-slate-tint` `#EEF3F8`,
+`--lm-gold` `#E8A317`, `--lm-blush` `#FADCC5`, `--lm-coral` `#FF7A50`,
+`--lm-danger` `#A33B2E`, identity hues peach/sky/moss. **No new colour is
+introduced by this pass**, and every §1.3 hard rule holds: red only on
+destructive confirmations, slate for pediatrician notes, colour never the
+sole carrier of meaning.
+
+- **Type**: Nunito Sans (bundled via `expo-font`) with the system stack as
+  fallback; Fraunces reserved for journey chapter headings and screen
+  titles, exactly its web role. Base 16pt/1.6, driven by the OS dynamic-type
+  scale rather than fixed points.
+- **Shape**: 16pt card radius, 999pt pills, 12pt photo banner radius
+  (§7.3's confirmed literal value), 20pt top radius on bottom sheets.
+- **Spacing**: web's `clamp(20px, 1.4vw, 28px)` card padding resolves to
+  ≤20px at every mobile width, so mobile uses a flat **14–16pt** card
+  padding and **10pt** inter-card gap — slightly tighter than web because a
+  phone screen is 812pt tall and the web value was already at its mobile
+  floor.
+- **Motion**: 200–300ms ease-out, the single "settle" animation when a
+  memory lands, and nothing else. No bouncing badges, no pulses.
+- **Platform differences honoured where they matter**: iOS uses sheet
+  presentation with a grabber and swipe-down dismissal, Android uses
+  Material bottom sheets and the system back gesture; iOS date picker vs.
+  Android calendar dialog; iOS PHPicker vs. Android Photo Picker; haptics
+  on save (iOS) and the platform-standard equivalent on Android. Everything
+  else — palette, type, spacing, copy — is identical across platforms.
+
+### 13.6 Accessibility
+
+- **Dynamic type**: every text style scales with the OS setting. Build
+  rules: no fixed `height` on a text-bearing container, no `numberOfLines`
+  on text a parent wrote, and the disclaimer's 13px web value becomes a
+  *floor*, not a ceiling. At accessibility sizes the tab bar switches to
+  the platform's stacked large-label treatment. Previewed at ~130%.
+- **Screen-reader labels on every interactive element**, phrased as a
+  person would say them ("Switch child, currently Maya"), with an
+  `accessibilityRole` and a hint only where the outcome isn't obvious.
+  Decorative elements (coral spine, chapter flourishes, tab icons) are
+  hidden — safe precisely because they carry no meaning (UXR-1).
+- **Journey is traversable as a flat list of moments** by screen reader;
+  photo labels use the parent-entered title, never "image".
+- **Contrast**: AA on every token as used, in **both** light and night
+  themes, including text over any photo-derived accent — UXR-13's
+  pre-render check ports unchanged, and a failing check still falls back to
+  the fixed default theme rather than rendering an unchecked accent.
+- **Reduce Motion** disables the settle animation, the lightbox zoom
+  transition and all skeleton shimmer; screen transitions become
+  cross-fades, never slides.
+
+### 13.7 The 2am test
+
+Named explicitly because this is the app's defining use case, not an edge
+case:
+
+1. **Night colours** — the warm-dark theme §1.3 specified as a fast-follow
+   and the web never shipped. `#211D1A` background (never pure black: harsh
+   at 2am and off-palette), `#2C2724` cards, `#F2E9E0` ink; terracotta
+   shifts to peach for AA on dark; slate keeps its non-alarm role,
+   lightened. Splash, modals and lightbox all honour it — **no white
+   flash**, ever, which is the single most jarring thing a phone can do to
+   someone holding a sleeping baby. Automatic (follows OS) with a manual
+   override, because a parent's phone can be on Light in a dark house.
+2. **One-handed reach** — every primary action lives in the bottom third:
+   composer, prompt chips, [+], tab bar, sheet rows.
+3. **One-tap questions** — suggested prompt chips send immediately. At 2am
+   the ability to ask without typing is the feature.
+4. **Nothing is lost when attention breaks** — compose state persists if
+   the app backgrounds mid-entry; a queued memory survives app termination.
+5. **No interruptions** — no push, no badges, no "you haven't logged
+   anything in 5 days". The app never initiates contact about a child's
+   development.
+6. **Nothing shouts** — no red, no alarm iconography, no urgency copy
+   anywhere outside a delete confirmation (UXR-2, UXR-9 unchanged).
+
+### 13.8 Privacy decisions flagged for security-architect
+
+This is a children's-data product and a mobile binary cannot hold secrets.
+Each item below is a **UX decision with a privacy consequence**; the
+decision belongs to security-architect, and the design will follow theirs.
+
+1. **Biometric app lock** — opt-in, default off, local-only gate over a
+   valid session. Their call: timeout behaviour, whether biometric failure
+   falls back to the account password or the device passcode, and whether
+   the lock also gates a cold start or only a resume.
+2. **Local photo caching** — the gallery is unusable without cached
+   thumbnails, but a cache of infant photos in the app sandbox is a real
+   exposure. Their call: encrypted cache vs. plaintext-in-sandbox, cache
+   size/TTL, and whether it is purged on lock, sign-out, or both. The
+   design assumes purge on sign-out at minimum.
+3. **Screenshots and the app switcher** — the design specifies an
+   app-switcher snapshot blur (replacing the OS snapshot with the app
+   mark). Going further and blocking screenshots outright on photo screens
+   (Android `FLAG_SECURE`; iOS has no true equivalent) is a genuine
+   trade-off — parents legitimately screenshot to show a grandparent — and
+   is theirs to decide, not mine.
+4. **Camera-roll write-back** — the design says captured photos go to
+   app-scoped temporary storage and are deleted after successful upload,
+   **not** to the device camera roll, because the roll is backed up to a
+   third-party cloud outside this product's encryption and deletion
+   promises. Confirm or overrule.
+5. **Offline upload queue durability** — how long a queued photo may sit in
+   the sandbox, and in what form. A queue that survives app termination
+   (which the UX requires) is a queue that persists child photos on disk.
+6. **Photo-library scope** — the design assumes the OS limited-selection
+   APIs (iOS PHPicker, Android Photo Picker) so the app **never** holds
+   full-library permission. This mirrors F17's picker-based,
+   never-library-wide scope-minimisation rule.
+7. **Token storage and the F17 client secret** — noted only to hand off:
+   the reason Google Photos import is deferred (§13.1) is that the OAuth
+   client secret cannot live in the binary. Their design decides whether a
+   mobile import is possible at all in release 2.
+8. **EXIF/GPS stripping** — the design assumes it happens client-side
+   **and** server-side, never one or the other. A photo of a child with
+   home GPS coordinates attached is the worst single failure this product
+   could have.
+
+### 13.9 Preview mockups produced (the required reviewable artifact)
+
+Written to `projects/little-milestones/design-review/mobile/`:
+
+| File | Contents |
+|---|---|
+| `index.html` | Assembled scrollable review page — scope tables, the §13.0 flag, and all six pages embedded |
+| `_preview.css` | Shared harness; tokens copied verbatim from `dev/frontend/app/globals.css` |
+| `00-coldstart-nav.html` | Launch/session restore, sign in, app lock, child-switcher sheet, tab-bar anatomy |
+| `01-today.html` | Today loaded, loading (skeletons), error/stale-cache, empty |
+| `02-ask.html` | Chat first-open, keyboard-up + streaming, history sheet, offline with queued question |
+| `03-journey.html` | Timeline river, gallery grid, native lightbox, empty state |
+| `04-capture.html` | Capture sheet, permission pre-prompt, compose modal, optimistic save + offline queue |
+| `05-states-2am-a11y.html` | You tab, night theme, dynamic type at ~130%, app-switcher blur, hard-offline cold start, accessibility contract |
+
+`design-review/index.html` gained a "Mobile app — React Native / Expo"
+section linking and embedding the above. Every referenced file was created
+before the reference to it.
+
+### 13.10 Coverage note — what this pass does and does not cover
+
+**Covers:** release-1 scope and its deferrals with reasons; navigation
+architecture and the full cold-start path; every in-scope screen with
+purpose/layout/primary/empty/loading/error; safe areas, touch targets,
+keyboard avoidance, pull-to-refresh, offline, permissions, slow-LAN;
+palette/type/spacing translation and iOS-vs-Android conventions;
+accessibility; the 2am behaviours; eight flagged privacy decisions.
+
+**Does not cover, stated rather than implied:** tablet/iPad layouts (phone
+metrics only in release 1); landscape beyond the lightbox; push
+notifications (deliberately — see §13.1); deep-link / universal-link
+routing; app-store assets; and a *new* mobile onboarding flow — release 1
+either assumes the account was created on web or reuses the existing
+onboarding copy verbatim in a native stack (§1.10's exact strings are
+binding either way, and the prematurity screen's Skip must still be visible
+without scrolling — UXR-3 — which on a 375×812 phone is tighter than on
+web and needs checking against real rendered text at accessibility type
+sizes).
+
+**Decisions Log re-read (per contract) before finalising:** the full log
+was read. The one binding item this output conflicts with is the 2026-07-10
+native-app prohibition, surfaced in §13.0 rather than quietly overridden.
+The responsive-web-app product itself is unaffected by this pass — nothing
+here changes a shipped web screen.
+
+### 13.11 DesignSync push — not performed this pass, flagged
+
+No DesignSync push was made for this pass; the component library
+(`172e0c51-e31a-46e7-aedb-bead17b38868`) still reflects the web system
+through Increment 4. If a push is wanted for the mobile component set it
+should be additive under a new `mobile/**` path — never a wholesale
+replace, and never overwriting the existing web component paths, which
+remain the live design for the shipped web product.
+
+### 13.12 Observed post-deploy behaviour (mobile)
+
+_None yet — the mobile app does not exist. To be populated after release
+with: which tab parents land on and stay in; whether [+] capture actually
+displaces web logging; how often the offline queue is used in anger;
+night-theme adoption vs. Automatic; app-lock opt-in rate; and whether the
+deferred surfaces (invite creation, Google Photos import) generate real
+requests or were correctly cut._

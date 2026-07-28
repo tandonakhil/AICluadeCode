@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile — Today tab</title>
+<link rel="stylesheet" href="_preview.css">
+</head>
+<body>
+
+<h1 class="pv-title">Today tab</h1>
+<p class="pv-lede">The default landing tab. One job: in the first three seconds, tell a parent how old their child is today and give them something to actually do with them. Backed by <code>GET /profiles/{id}/activities</code> plus <code>/digest</code> and <code>/products</code>.</p>
+
+<div class="pv-note"><b>Order is deliberate:</b> hero (who + how old) → activities (do-now) → what’s coming (invitation, never a deadline — UXR-8) → this week → ideas. Products sit last and always: a parent scrolls past everything useful before they see anything purchasable.</div>
+
+<div class="pv-row">
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero">
+          <div class="row"><span class="av"></span><h2>Maya is 14 months</h2></div>
+        </div>
+        <div class="card"><h3>Stacking cups</h3><p>Nest them, knock them down, start again — early cause and effect.</p><span class="sup">✋ Stay within arm’s reach; cups larger than a fist only.</span></div>
+        <div class="card"><h3>Naming walk</h3><p>Point and name five things on the way to the door.</p><span class="sup">✋ Hold hands near steps and kerbs.</span></div>
+        <div class="card" style="background:var(--lm-blush)"><h3>Things to look forward to</h3><p style="color:var(--lm-ink)">Around 15 months, many children start stacking two blocks. No rush — here are two things that make it fun when it comes.</p></div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information — not medical advice.</div>
+      <nav class="tabs">
+        <span class="t on"><i>🏠</i>Today</span><span class="t"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Loaded state.</b> Pull-to-refresh at the top of the scroll re-fetches activities, digest and products together (one refresh gesture, three calls, one spinner). The hero uses the photo-derived accent (<code>photo_accent_mid/deep</code>) where it exists, and the fixed coral/peach gradient where it doesn’t (§6.4 — the default is a complete theme, not a placeholder).</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero" style="background:linear-gradient(135deg,#E8CBB6,#E0BBA0)">
+          <div class="row"><span class="av" style="background:rgba(255,255,255,.5)"></span><div style="flex:1"><div class="skel w60" style="background:rgba(255,255,255,.55);height:15px"></div><div class="skel w40" style="background:rgba(255,255,255,.4);margin-bottom:0"></div></div></div>
+        </div>
+        <div class="card"><div class="skel w60" style="height:14px"></div><div class="skel w85"></div><div class="skel w40" style="margin-bottom:0"></div></div>
+        <div class="card"><div class="skel w60" style="height:14px"></div><div class="skel w85"></div><div class="skel w40" style="margin-bottom:0"></div></div>
+        <div class="card"><div class="skel w60" style="height:14px"></div><div class="skel w85"></div><div class="skel w40" style="margin-bottom:0"></div></div>
+        <div class="a11y">Screen reader announces “Loading Maya’s activities” once via a live region; the skeletons themselves are <code>accessibilityElementsHidden</code>. Shimmer is disabled under Reduce Motion — static tint only.</div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information — not medical advice.</div>
+      <nav class="tabs">
+        <span class="t on"><i>🏠</i>Today</span><span class="t"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Loading state — skeletons, not a spinner.</b> The web build showed a bare “Loading Maya’s activities…” line; on mobile the shell (header chip, hero shape, tab bar) paints immediately so the app never looks broken on a slow LAN. Cards fade in as data lands.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero"><div class="row"><span class="av"></span><h2>Maya is 14 months</h2></div><p>Showing what we saved last time you were online.</p></div>
+        <div class="card" style="opacity:.85"><h3>Stacking cups</h3><p>Nest them, knock them down, start again.</p><span class="sup">✋ Stay within arm’s reach.</span></div>
+        <div class="card" style="text-align:center">
+          <p style="margin-bottom:10px">Couldn’t reach the server just now.</p>
+          <button class="btn s">Try again</button>
+        </div>
+        <div class="a11y">Error copy is calm and plain (§1.2) — never a raw “Network request failed”, never a red banner. <code>role=&quot;alert&quot;</code> on the retry card only, so it isn’t announced twice.</div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information — not medical advice.</div>
+      <nav class="tabs">
+        <span class="t on"><i>🏠</i>Today</span><span class="t"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Error / stale-cache state.</b> Age is computed from a locally-stored DOB, so the hero is <i>always</i> answerable offline. The last successful activities payload renders dimmed with an honest “saved last time” line rather than an empty screen. Retry is a real button, not a pull gesture a tired parent has to guess at.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero"><div class="row"><span class="av"></span><h2>Maya is 14 months</h2></div></div>
+        <div class="card" style="text-align:center;padding:22px 14px">
+          <div style="font-size:26px">✦</div>
+          <h3 style="margin-top:8px">Nothing for this stage yet</h3>
+          <p>We don’t have activity ideas for this age range right now — Ask is still here if there’s something on your mind.</p>
+          <div style="margin-top:12px"><button class="btn s">Ask a question</button></div>
+        </div>
+        <div class="card" style="background:var(--lm-slate-tint)"><h3 style="color:var(--lm-slate)">This week</h3><p style="color:var(--lm-ink)">Weekly email is off. Turn it on in <b>You → Weekly digest</b> whenever you want it.</p></div>
+        <div class="card"><h3>Ideas for this stage</h3><p>Soft stacking cups · First board books · Push-along walker</p><span class="sup" style="color:var(--lm-ink-soft);font-weight:400">Ideas only — no prices, no brands, nothing sponsored.</span></div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information — not medical advice.</div>
+      <nav class="tabs">
+        <span class="t on"><i>🏠</i>Today</span><span class="t"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>Empty state + the bottom of the scroll.</b> An empty activities list never leaves a dead screen — it always offers Ask as the next move. Digest and product panels keep their web behaviour and copy exactly (UXR-11: no price, brand, affiliate link, urgency copy or sponsored badge).</p>
+  </div>
+
+</div>
+</body>
+</html>

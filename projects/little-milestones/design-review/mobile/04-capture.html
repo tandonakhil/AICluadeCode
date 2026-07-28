@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile — Capture (add a moment)</title>
+<link rel="stylesheet" href="_preview.css">
+</head>
+<body>
+
+<h1 class="pv-title">Capture — the centre [+] action</h1>
+<p class="pv-lede">The one genuinely new thing mobile brings: the camera is already in the parent’s hand. This is the flow from the [+] tab-bar button to a memory on the journey, in three taps and a sentence.</p>
+
+<div class="pv-flag"><b>Privacy decisions flagged for security-architect (all in this flow):</b> (1) whether captured images are written to the device camera roll before upload — the design says <b>no</b>, capture into app-scoped temporary storage and delete after successful upload; (2) how long a queued offline photo may sit unencrypted in the app sandbox; (3) whether the image picker uses the OS limited-selection API (iOS PHPicker / Android Photo Picker) so the app <i>never</i> holds full-library permission; (4) EXIF/GPS strip — the design assumes it happens client-side <b>and</b> server-side, never one or the other.</div>
+
+<div class="pv-row">
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="filter:blur(1px);opacity:.7">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="hero"><div class="row"><span class="av"></span><h2>Maya is 14 months</h2></div></div>
+        <div class="card"><h3>Stacking cups</h3><p>Nest and knock down.</p></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet" style="max-height:auto">
+        <div class="grab"></div>
+        <h3>Add to Maya’s journey</h3>
+        <div class="srow" style="border:1px solid rgba(61,56,51,.1);margin-bottom:8px"><span style="font-size:20px">📷</span><span><b>Take a photo</b><small>Camera opens straight away</small></span></div>
+        <div class="srow" style="border:1px solid rgba(61,56,51,.1);margin-bottom:8px"><span style="font-size:20px">🖼</span><span><b>Choose from photos</b><small>Pick just the ones you want</small></span></div>
+        <div class="srow" style="border:1px solid rgba(61,56,51,.1);margin-bottom:8px"><span style="font-size:20px">✎</span><span><b>Write it down</b><small>No photo needed</small></span></div>
+        <div style="text-align:center;margin-top:6px"><span class="btn q">Cancel</span></div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>1 · Capture sheet.</b> Three routes, largest target first. Every row is ≥52pt tall. “Write it down” is listed last but is the fastest path — a text-only memory is savable in <b>3 taps + typing</b> (UXR-7 carries over). Sheet is dismissible by swipe-down and by Cancel.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad" style="opacity:.55">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span class="iconbtn">⚙︎</span></div>
+        <div class="card" style="margin-top:10px">
+          <h3>Photos stay in your family</h3>
+          <p>We’ll ask for camera access next. Photos you add are encrypted, visible only to caregivers you invite, and never used to train AI. You can delete any photo permanently at any time.</p>
+        </div>
+      </div>
+      <div class="scrim" style="background:rgba(33,29,26,.35)"></div>
+      <div class="osdlg">
+        <div class="b"><b>“little-milestones” Would Like to Access the Camera</b><span>To add photos to your child’s journey.</span></div>
+        <div class="acts"><u>Don’t Allow</u><u>OK</u></div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>2 · Permission — pre-prompt first, always.</b> The OS dialog is one-shot: a denied prompt is expensive to recover from. So the app explains <i>why</i> in its own card (with the verbatim privacy line) and only then triggers the system prompt. Denied → a calm inline card: “Camera access is off. You can still write moments down, or turn camera access on in Settings” with a deep link to app settings. Never a nag loop, never a modal that reappears.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+      <div class="scr pad">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 10px">
+          <span class="btn q" style="padding-left:0">Cancel</span>
+          <b style="font-size:14px">New moment</b>
+          <span style="font-weight:800;color:var(--lm-terracotta);font-size:14px">Save</span>
+        </div>
+        <div style="height:150px;border-radius:12px;background:linear-gradient(135deg,#E7C3A8,#B4705A);position:relative;margin-bottom:10px">
+          <span style="position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">✕</span>
+          <span style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:3px 7px;border-radius:8px">+ Add another</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">What happened?</div>
+        <div style="min-height:44px;border:1px solid rgba(61,56,51,.18);border-radius:12px;padding:11px 12px;font-size:13px;margin-bottom:10px">First steps across the rug</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">Anything you want to remember <span style="font-weight:400;color:var(--lm-ink-soft)">(optional)</span></div>
+        <div style="min-height:56px;border:1px solid rgba(61,56,51,.18);border-radius:12px;padding:11px 12px;font-size:13px;color:var(--lm-ink-soft);margin-bottom:10px">Three of them, then a very pleased sit-down.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:8px 0;border-top:1px solid rgba(61,56,51,.08)">
+          <span>When</span><span style="color:var(--lm-terracotta);font-weight:700">Today, 4 Mar ›</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin:6px 0 6px">Tag it <span style="font-weight:400;color:var(--lm-ink-soft)">(optional)</span></div>
+        <div class="chips"><span class="pchip" style="background:var(--lm-blush);border-color:transparent;color:var(--lm-ink)">First steps</span><span class="pchip">First words</span><span class="pchip">Food</span></div>
+        <p style="font-size:11px;color:var(--lm-ink-soft);margin-top:12px">Private to your family · encrypted · never used to train AI.</p>
+      </div>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>3 · Compose.</b> A full-screen modal, not a sheet — it holds a keyboard and a photo at once. Title autofocuses so the keyboard is already up. Date defaults to today and is one tap to change (a parent often logs yesterday’s moment at 2am). Save is enabled the moment there is a title <i>or</i> a photo. Maps to memory create + photo upload.</p>
+  </div>
+
+  <div class="pv-item">
+    <div class="dev">
+      <div class="notch"></div>
+      <div class="sb"><span>2:14</span><span>▮▮ ⌁</span></div>
+      <div class="offline">Offline — 1 moment waiting to upload</div>
+      <div class="scr pad">
+        <div class="hdr"><span class="chip"><span class="dot ph"></span>Maya <span class="caret">▾</span></span><span style="display:flex;gap:6px"><span class="iconbtn" style="background:var(--lm-blush)">✦</span><span class="iconbtn">▦</span></span></div>
+        <div class="chapter">✦ Around 12 months</div>
+        <div class="river">
+          <div class="spine"></div>
+          <div class="node" style="top:6px;background:var(--lm-ink-soft)"></div>
+          <div class="card" style="opacity:.75">
+            <div class="banner" style="position:relative"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;background:rgba(33,29,26,.3);border-radius:12px">⏳ Waiting for connection</span></div>
+            <h3>First steps across the rug</h3>
+            <p style="margin-top:4px">Three of them, then a very pleased sit-down.</p>
+            <div style="font-size:11px;color:var(--lm-ink-soft);margin-top:8px">Saved on this phone · will upload automatically</div>
+          </div>
+        </div>
+        <div class="a11y">Row label: “First steps across the rug, saved on this phone, waiting to upload.” Never a red badge — a queued upload is not an error (UXR-2).</div>
+      </div>
+      <div class="disc">little-milestones offers general parenting information — not medical advice.</div>
+      <nav class="tabs">
+        <span class="t"><i>🏠</i>Today</span><span class="t"><i>💬</i>Ask</span><span class="t cap"><i>＋</i></span><span class="t on"><i>✦</i>Journey</span><span class="t"><i>☺</i>You</span>
+      </nav>
+      <div class="homebar"></div>
+    </div>
+    <p class="pv-cap"><b>4 · Optimistic save + offline queue.</b> The moment appears on the journey <i>immediately</i>, marked as pending, and uploads when connectivity returns. This is the single most important offline behaviour in the app: a parent capturing a first step in a basement with no signal must never lose it. If the upload ultimately fails, the card shows a plain “Couldn’t upload — try again” with a retry, and the memory stays on the device until it succeeds or the parent deletes it.</p>
+  </div>
+
+</div>
+</body>
+</html>

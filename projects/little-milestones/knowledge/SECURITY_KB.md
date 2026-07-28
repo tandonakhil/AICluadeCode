@@ -1300,3 +1300,442 @@ found.**
 **Net: implementation matches this section's design on every checked
 point. No blocking finding for Test gate on the security suite's F17
 scope.**
+
+---
+
+## 9. Mobile client (React Native / Expo) — authentication & authorization design (Architecture gate, 2026-07-26)
+
+*(Dedicated authn/authz subsection per this role's contract — the decision,
+the criteria reasoned to it, and explicit revisit triggers. This section
+**extends** §1.1's baseline and §7's F12 hardening; it contradicts neither.
+Every existing web behaviour stays byte-for-byte unchanged — that is a hard
+constraint on this design, not an aspiration.)*
+
+### 9.0 What changed since the last binding decision, stated explicitly
+
+The 2026-07-10 Decisions Log entry marked "Platform decision, explicitly
+confirmed — responsive web app… not a native iOS/Android app… treat this as
+settled, not reopen it" is the binding decision this enhancement **changes**.
+It is not being quietly overridden here: the human's new request for a React
+Native (Expo) client is a deliberate reopening of that decision by the
+decision's own owner, and it must be recorded as such in the Decisions Log by
+the orchestrator. This section designs the security consequences of that
+change; it does not itself authorize it.
+
+### 9.1 Decision — one path, not a menu
+
+**Add `Authorization: Bearer <session_token>` as an additional accepted
+transport for the *existing* session token. Same token, same `sessions` table,
+same SHA-256-at-rest hashing, same 30-day sliding / 90-day absolute expiry,
+same `mfa_pending` semantics, same revocation surface. The cookie path is
+untouched and is checked first.**
+
+Rejected, with reasons:
+
+- **(b) Make RN carry cookies manually — rejected.** RN's `fetch` does in
+  fact hand off to the platform HTTP stack (NSURLSession / OkHttp), which
+  has its own persistent cookie jar, so this "almost works" — which is
+  precisely why it is dangerous. That jar is undocumented-by-contract,
+  differs between Expo Go / dev client / release builds, and stores the
+  cookie in the app sandbox (iOS `Cookies.binarycookies`, Android
+  `webviewCookiesChromium.db`) — **unencrypted, and inside the default
+  backup set**. Adopting it would silently place a 30-day credential for a
+  children's-data account in plaintext at rest on the device, defeating
+  §9.2's entire storage design. `HttpOnly` also buys nothing on a client
+  that has no DOM, and `SameSite` has no meaning without a browser origin
+  model, so the mechanism's actual protections don't transfer either.
+- **(c) A separate mobile token type / mobile-only endpoint — rejected as
+  gold-plating.** It would fork the credential model in two: two lifetimes,
+  two revocation paths, two places for `mfa_pending` to be wrong, and a
+  second thing `/auth/sessions` (§7.4) must learn to list and revoke.
+  Nothing about the mobile client's threat model differs enough from the
+  web's to earn a second credential type — the difference is *transport and
+  storage*, and this design addresses exactly those.
+- **(d) Full OAuth2 / PKCE — rejected.** This project runs its own identity
+  (§1.3: no OAuth login, deliberately, on children's-privacy grounds); a
+  first-party app talking to its own first-party backend has no third party
+  to delegate to. OAuth2/PKCE here would mean standing up an authorization
+  server to issue tokens to ourselves. (Note: PKCE *is* correctly used in
+  this project already, at §8.4 — for the Google Photos grant, a genuine
+  third-party delegation. That is not a precedent for login.)
+
+**Why (a) is the right size**: it is a read-side change only. The server
+already resolves everything it needs from one opaque string; the only
+question is where that string is read from. Extending the read point costs
+one helper function and weakens nothing.
+
+### 9.2 Criteria evaluated (checkable against the project's actual attributes)
+
+| Criterion | This project's attribute | Effect on the decision |
+|---|---|---|
+| Does the client have a browser cookie jar with enforceable `HttpOnly`/`SameSite`? | No — RN has no DOM; the platform jar is unencrypted-at-rest and backup-included | Rules out (b) |
+| Is there a third party to delegate identity to? | No — first-party app, first-party backend, and §1.3 deliberately rejected third-party identity for children's-privacy reasons | Rules out (d) |
+| Does the mobile threat model differ from web in *credential lifetime or authority*? | No — same user, same family scope, same roles (`owner`/`caregiver`), same routes | Rules out (c); supports one shared token type |
+| Is there an existing revocation/listing surface a second token type would fragment? | Yes — F12's `/auth/sessions` list/revoke/revoke-others (§7.4) | Supports (a) strongly |
+| Can the device hold a secret safely? | Only in Keychain/Keystore, never in app-sandbox plaintext (§9.4) | Makes (a) conditional on §9.4, not free |
+| Does the change touch the web session model's security properties? | No — cookie path is first-checked and unmodified; `SameSite=Lax`, `HttpOnly`, conditional `Secure` all unchanged | Confirms "no regression" constraint is satisfiable |
+
+### 9.3 Exact backend changes required (for code-agent — this is the complete list)
+
+1. **`app/auth.py` — new private helper, the only new read path:**
+   `_extract_raw_token(request) -> Optional[str]` — returns
+   `request.cookies.get(SESSION_COOKIE_NAME)` if present; **otherwise** parses
+   `Authorization: Bearer <token>` (case-insensitive scheme, single space,
+   nothing else accepted). **Cookie is checked first and wins on conflict** —
+   this is what structurally guarantees no browser request's resolution
+   behaviour can change. Call sites: `get_current_session_user`,
+   `get_pending_session`, and `routes/auth.py::logout`'s
+   `request.cookies.get(...)` read. No other line in `auth.py` changes;
+   `_resolve_session_row`, expiry, sliding-renewal, and `mfa_pending` gating
+   are all reached identically regardless of transport.
+2. **Issuing the token to a mobile client — via a response *header*, not the
+   response body.** New helper in `app/auth.py`:
+   `maybe_issue_token_header(request, response, raw_token)` — sets
+   `response.headers["X-LM-Session-Token"] = raw_token` **only when** the
+   request carries `X-LM-Client: mobile`. Called at the four sites that
+   currently call `set_session_cookie`: `signup`, `login` (both the normal
+   and the `mfa_required` branch), `join`, and `totp_login`.
+   **Why a header and not a body field:** `signup`/`join` declare
+   `response_model=User` and `login`/`totp_login` declare
+   `response_model=LoginResult`. Adding a body field means changing a
+   response model the web frontend parses — a real regression surface for
+   zero benefit. A header changes no schema at all. It also fails safe in a
+   browser: custom response headers are unreadable to cross-origin JS unless
+   named in CORS `expose_headers`, and **`X-LM-Session-Token` must never be
+   added to `expose_headers`** — so even if a browser sent the trigger
+   header, its JS could not read the token back out, and `HttpOnly`'s
+   guarantee for the web client survives intact.
+3. **Suppress `Set-Cookie` when `X-LM-Client: mobile` is present.** At those
+   same four sites, `set_session_cookie` is skipped for mobile clients. This
+   is not cosmetic: it is what prevents the platform cookie jar from keeping
+   a second, plaintext, backup-included copy of the token alongside the
+   Keychain copy (§9.1's rejection of (b) is only true if we don't
+   accidentally do (b) as a side effect of doing (a)).
+4. **`sessions.client TEXT NOT NULL DEFAULT 'web'`** — additive nullable-safe
+   column via `db.py`'s existing idempotent migration convention (same shape
+   as `sessions.id`/`mfa_pending`/`last_seen_at` in §7.4). Set to `'mobile'`
+   at `create_session` when the trigger header is present. Surfaced as a new
+   optional field on `SessionInfo` (`app/sessions.py`) so F12's "log out
+   everywhere" screen can say *which* device is being revoked — without
+   this, a caregiver whose phone is lost sees an undifferentiated list of
+   session rows, which makes the existing revocation control materially less
+   usable exactly when it matters most.
+5. **Logging: unchanged, and that is load-bearing.** There is still no global
+   request-logging middleware in `main.py` (re-verified this pass), so no
+   default path logs headers. The standing §2.5 / §8.2-point-3 rule is
+   extended by one line: **the `Authorization` header value is never logged,
+   in any form, anywhere** — including any future error/exception handler
+   that might be tempted to dump request headers. A bearer token in an
+   access log is a live credential in a plaintext file; a cookie in a log is
+   too, but this change adds a second, more log-prone place for it to appear.
+6. **Nothing else.** No change to rate limiting (keys are IP/email-based and
+   transport-agnostic), no change to `require_owner`, no change to the
+   cross-family-404 rule, no new route, no new dependency.
+
+**Does this weaken the web session model? No, and here is the specific
+reasoning rather than an assurance:** (i) the cookie is read first, so no
+browser request's resolution path changes; (ii) `HttpOnly`/`SameSite=Lax`/
+conditional-`Secure` are untouched, so browser CSRF and XSS-exfiltration
+posture is identical; (iii) bearer credentials are *not* ambient — a browser
+never attaches one automatically — so the new path is inherently CSRF-immune
+and adds no cross-site attack surface; (iv) CORS stays a single explicit
+origin with `allow_credentials=True` (§9.7), so no browser origin gains
+anything. The one genuine new property is that a *stolen* token is now usable
+without a cookie jar — which was already true of a stolen cookie value, and
+is mitigated by the same control either way (`/auth/sessions` revocation,
+§7.4).
+
+### 9.4 Token storage on device
+
+**Decision: `expo-secure-store` only. `AsyncStorage` is prohibited for the
+session token, and this is a real vulnerability, not a style preference.**
+
+- **Why AsyncStorage is wrong**: it is an unencrypted file/SQLite store in
+  the app sandbox. Its contents are readable on a jailbroken/rooted device,
+  by any process that gains sandbox access, and — the case that actually
+  matters here — **it is included in unencrypted iTunes/Finder backups and
+  Android auto-backup by default**. A 30-day sliding session token for an
+  account holding a named infant's DOB, prematurity status, developmental
+  notes and photographs, sitting in cleartext in a desktop backup folder, is
+  a credential compromise with a children's-data blast radius. That is
+  categorically different from the same mistake in a to-do app.
+- **What to use instead**: `SecureStore.setItemAsync` with
+  `keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY` — iOS
+  Keychain / Android Keystore-backed. `THIS_DEVICE_ONLY` is deliberate: it
+  keeps the token out of encrypted backups and out of Keychain sync, so a
+  restore onto a *different* device cannot resurrect a live session. The
+  correct behaviour on a new device is "log in again," not "inherit a
+  session."
+- **Backups**: additionally set `android:allowBackup="false"` (or an empty
+  backup-rules set) and mark any app cache directory
+  `NSURLIsExcludedFromBackupKey` on iOS. SecureStore covers the token;
+  this covers §9.8's photo-cache surface.
+- **App background**: **the token is not purged on background** — a 30-day
+  sliding session is the deliberate low-friction posture this product's
+  retention model depends on (§1.3's reasoning, unchanged), and forcing
+  re-login on every task-switch would be the mobile equivalent of the MFA
+  friction §1.3 rejected. What *is* required on background is the
+  app-switcher snapshot overlay in §9.8 — the exposure on backgrounding is
+  the visible child photo, not the token.
+- **Logout**: call `POST /auth/logout` with the bearer header **first** (so
+  the server-side row is genuinely deleted, per §1.5 — a client-side wipe
+  alone leaves a live token), then `SecureStore.deleteItemAsync`
+  **unconditionally, including when the network call fails**. A user who
+  taps "log out" on a flaky connection must not end up still logged in
+  locally. The residual case (server row survives because the call failed)
+  is covered by `/auth/sessions` revocation from another device.
+- **Token expiry**: there is no refresh token and none is needed — the
+  server already re-issues the sliding expiry on every authenticated request
+  (`_resolve_session_row`), so an active user never expires; the 90-day
+  absolute cap eventually forces a real re-login, which is intended. Client
+  rule: **on any `401` from any route, delete the stored token and route to
+  the login screen once — never retry, never loop.** A retry loop against
+  `/auth/login` would also collide with the §1.5 rate limiter and lock the
+  user out of their own account.
+
+### 9.5 MFA on mobile
+
+The two-step flow works unchanged, because `clear_mfa_pending` mutates the
+existing session row in place and **does not rotate the token string** —
+the same opaque token that was `mfa_pending` becomes the full session token.
+So:
+
+1. `POST /auth/login` with `X-LM-Client: mobile` and a correct password for
+   an enrolled user → `{"mfa_required": true}` body (unchanged) plus
+   `X-LM-Session-Token: <pending raw token>` header.
+2. **The pending token is held in JS memory only — never written to
+   SecureStore.** It is a 5-minute credential that can reach exactly one
+   route (`get_pending_session` rejects it everywhere else, §7.3), so
+   persisting it adds an at-rest secret with no recoverable benefit: if the
+   app is killed mid-MFA, the correct outcome is "start login again," which
+   is also what happens today on web if the cookie is lost.
+3. `POST /auth/totp/login` with `Authorization: Bearer <pending token>` →
+   `get_pending_session` resolves it through the same `_extract_raw_token`
+   helper. On success the flag clears and **the same token is now a full
+   session** — persist it to SecureStore at this point, and only this point.
+4. Failure semantics are transport-independent: the 5-attempt pending-session
+   destruction (§7.3) already keys off `token_hash`, not the cookie.
+
+**Residual risk accepted, stated rather than hidden**: the token string does
+not rotate at the pending→full privilege transition. This is pre-existing web
+behaviour, not something mobile introduces, and the pending token is only
+ever held by the same client that will hold the full one — so the practical
+exposure is nil. Rotating on MFA completion would be a genuine improvement
+but is a *change to shared web behaviour*, which this enhancement's "no web
+regression" constraint puts out of scope. Recorded as a candidate for a
+future hardening pass, not smuggled in here.
+
+### 9.6 Transport
+
+**Dev (physical device → LAN → `http://<host>:8000`): acceptable, but only
+under all four of these conditions, stated plainly because "it's just dev"
+is exactly how a plaintext credential reaches a real account.**
+
+1. The LAN is a private, trusted network (a home/office Wi-Fi the developer
+   controls) — not a café, hotel, conference, or guest network. On the wire,
+   **the password and the session token are cleartext and readable by anyone
+   on that segment.**
+2. Only synthetic/test child profiles and photos are used. No real child's
+   name, DOB, prematurity status, or photograph goes over plaintext HTTP.
+3. Test accounts use throwaway passwords never reused anywhere else.
+4. The backend stays bound to the LAN interface behind NAT — never
+   port-forwarded, tunnelled, or otherwise made internet-reachable while
+   serving plaintext.
+
+**Production: HTTPS is mandatory and non-negotiable.** Concretely:
+
+- `ENV=production` must be set so `set_session_cookie`'s `Secure` flag
+  actually engages (§1.4 — still the one line that must be *revisited*, not
+  merely re-verified, before any non-local deploy; a mobile client does not
+  retire that trigger, it adds a second client that depends on it).
+- **iOS App Transport Security**: the production build must carry **no**
+  `NSAllowsArbitraryLoads` / `NSExceptionAllowsInsecureHTTPLoads` exception.
+  **Android**: `usesCleartextTraffic` must be `false` in the production
+  build. The cleartext allowance for §9.6-dev must live in a **dev-only Expo
+  config profile** (`app.config.js` keyed on the build profile), so it is
+  structurally impossible to ship it — the same "structural absence of the
+  capability" standard §1.7 point 3 and §8.3 already apply elsewhere in this
+  file. A single `app.json` with a permanent cleartext exception is a
+  rejected design.
+- **Certificate handling**: standard OS trust-store validation. **Certificate
+  pinning is deliberately not adopted** — it converts a routine cert
+  rotation into a bricked app for every installed user, and the threat it
+  defends against (a trusted-CA mis-issuance targeting this specific app)
+  is not this product's realistic threat model. Right-sized, stated as a
+  trade-off, with a revisit trigger (§9.9). **What is absolutely prohibited
+  either way**: any code that disables or short-circuits certificate
+  validation to "make the dev build work" — the dev story is cleartext HTTP
+  on a trusted LAN under conditions 1–4, never a weakened TLS validator,
+  because a weakened validator is the kind of thing that ships by accident.
+
+### 9.7 CORS / origin
+
+**Nothing changes, and adding anything would be a mistake.**
+
+- A native RN client sends no browser `Origin` and is not subject to the
+  same-origin policy; CORS is enforced *by browsers*, not by servers. The
+  `allow_origins=["http://localhost:3000"]` + `EXTRA_CORS_ORIGINS` config in
+  `main.py` therefore neither blocks nor needs to permit the mobile app.
+- **Do not** add `"*"`, and **do not** add a placeholder entry "for the
+  app." `allow_credentials=True` is already set; combining it with a
+  wildcard is both spec-invalid and, if worked around, a real credential-
+  exposure bug. There is no mobile-related reason to touch this line.
+- **Do not** add `X-LM-Session-Token` to `expose_headers` (§9.3 item 2).
+- **One narrow exception, dev-only**: if anyone runs the RN app in a browser
+  via Expo Web (`expo start --web`, typically `http://localhost:8081`), that
+  *is* a browser and *does* send `Origin`, and would need an
+  `EXTRA_CORS_ORIGINS` entry — in the local `.env` only, never committed,
+  never in a deployed config. Note also that the Expo Web target reintroduces
+  every browser-storage concern §9.4 designs away (no Keychain in a browser),
+  so it should be treated as a debugging convenience, not a supported client.
+- **Framing check**: CORS is not and never was an authorization control here.
+  The actual boundary is `get_current_session_user` + the family-scoped
+  404 rule (§1.1), and both are transport-agnostic and unchanged.
+
+### 9.8 Children's-data compliance posture on mobile — what genuinely changes
+
+The existing commitments (retention/delete, encryption at rest,
+private-by-default, no face processing, no AI training on child photos —
+INDUSTRY_KB §2.1–2.2, §2.1–2.4 of this file) were all designed for a
+server-side system boundary. A mobile client **adds a device-side at-rest
+surface that none of them currently cover.** Four real changes:
+
+1. **Local photo caching is a new at-rest copy of child photos, and it is
+   plaintext.** RN/Expo image components cache remote images to the app
+   sandbox on disk by default. §2.1's entire encryption-at-rest design
+   (Fernet, decrypt-on-serve, never write decrypted bytes back to disk)
+   is silently undone if the client then writes those same decrypted bytes
+   to an unencrypted device cache. **Requirements**: (a) prefer
+   `expo-image` with an explicitly memory-only cache policy for photo
+   surfaces (Journey, gallery, lightbox, avatars); (b) if a disk cache is
+   unavoidable for performance, its directory must be excluded from backup
+   (§9.4) and cleared on logout; (c) **no "save to camera roll" / download-
+   to-device feature** — that would place an unencrypted child photo outside
+   the app's control entirely, and is the mobile equivalent of §2.6 trigger
+   2's export concern; (d) **deleting a photo in-app must also purge the
+   device cache entry**, or UX_KB §1.10's "immediately and permanently… we
+   keep no copies" promise becomes literally false on mobile. Item (d) is a
+   correctness requirement on the delete promise, not a nice-to-have.
+2. **Screenshot / app-switcher exposure.** iOS and Android both capture a
+   snapshot of the foreground screen when the app backgrounds, stored
+   unencrypted-ish in the app container and shown in the task switcher — of
+   a screen that may be a full-bleed photo of a named infant.
+   **Requirement**: render an opaque/blurred overlay on `AppState` transition
+   to `inactive`/`background`. Full screenshot *blocking* (Android
+   `FLAG_SECURE`) is **not** required — it is heavy-handed for a product
+   whose users legitimately want to share a milestone screenshot with a
+   grandparent, and it would fight the product's own purpose. Stated as a
+   trade-off, available to the human if they'd rather have it.
+3. **Biometric lock: recommended as a later opt-in, not MVP — and only if
+   built correctly.** An `expo-local-authentication` gate that merely hides
+   the UI while the token sits freely readable in the Keychain is security
+   theatre. The only version worth building is SecureStore with
+   `requireAuthentication: true`, so the OS itself will not release the token
+   without a successful biometric/passcode check. Deferred this pass for the
+   same reason §1.3 deferred MFA and §7.1 made it opt-in: friction against a
+   near-zero-friction retention model. Not asserted as unnecessary — reasoned
+   as not-yet-earned, with a revisit trigger.
+4. **No third-party mobile SDKs without re-running §5's processor
+   assessment.** Any analytics, crash-reporting, or session-replay SDK in a
+   mobile app can capture screen contents, breadcrumbs, and PII by default —
+   a materially larger disclosure than §5's Resend case (an email address).
+   §5.4's standing "third-party processors inventory" trigger fires on *any*
+   such addition; none is approved by this section. EAS Update / build
+   tooling is a code-delivery relationship, not a user-data processor, and
+   is fine — but it must not be used as an argument that "we already ship
+   through a third party, so an SDK is no different."
+5. **Push notifications (not in scope, flagged now because the mistake is
+   easy).** If the F8 digest ever becomes a push notification, the payload
+   must be **content-free** — no child name, age, or milestone content —
+   exactly as ARCHITECTURE_KB §5.7 already requires for the email body, and
+   for a sharper reason: lock-screen previews are visible **without
+   unlocking the device**. A push notification is a strictly more exposed
+   channel than email, not a more private one.
+
+### 9.9 Explicit revisit triggers (additive to §1.6, §2.6, §7.6, §8.9 — all of which remain in force)
+
+1. **Before the app is distributed to anyone beyond the developer's own
+   devices** (TestFlight, internal distribution, any store listing): §9.6's
+   dev-cleartext conditions no longer hold by definition — HTTPS,
+   `ENV=production`, and the ATS/cleartext build-profile check must all be
+   verified live, not assumed from config.
+2. **Before any non-local backend deployment**: merges with §1.6 trigger 1 —
+   the mobile client makes `Secure`/HTTPS a two-client dependency, and the
+   §2.6 trigger 1 key-management question (`PHOTO_ENCRYPTION_KEY` in `.env`)
+   is unchanged but now guards photos that also cache on devices.
+3. **Before any real child data goes on a device** (i.e. before the first
+   non-synthetic profile is used from the app): §9.8 items 1 and 2 must be
+   implemented and verified, not merely designed.
+4. **Before push notifications, any third-party mobile SDK, or a
+   save-to-camera-roll / export feature**: each independently re-opens §9.8
+   and §5.4's processor inventory.
+5. **If biometric/device-lock expectations change** (e.g. a caregiver shares
+   a device, or the human asks for an app lock): build §9.8 item 3 properly
+   (`requireAuthentication: true`), never the UI-only version.
+6. **If certificate pinning is ever reconsidered** (§9.6) — e.g. if the app
+   ever handles payments or account recovery flows of higher value than
+   today's.
+7. **If Expo Web is ever promoted from debugging convenience to a supported
+   client**: §9.4's entire storage design does not apply in a browser, and
+   §9.7's CORS posture would need a real, deployed origin — re-run this
+   whole section, don't patch it.
+
+### 9.10 Test-suite additions (extends §4, §7.5, §8.10 — this role's suite at Test gate)
+
+- Bearer path: a valid token in `Authorization: Bearer` authenticates
+  identically to the cookie on a representative authenticated route; a
+  malformed/absent/garbage scheme is 401; an expired and a revoked token are
+  both 401 over bearer exactly as over cookie.
+- **No-regression assertion (the load-bearing one)**: with *both* a valid
+  cookie and a different valid bearer token present, the **cookie** wins —
+  a direct test of §9.3 item 1's ordering guarantee.
+- `X-LM-Session-Token` is absent from every response unless
+  `X-LM-Client: mobile` was sent; `Set-Cookie` is absent when it was sent.
+- `X-LM-Session-Token` is **not** in the CORS `expose_headers` list
+  (regression test that would fail loudly if someone adds it).
+- MFA over bearer: a `mfa_pending` bearer token gets 401 on every route
+  except `POST /auth/totp/login`; 5 failed codes destroy the pending session
+  over bearer identically to cookie.
+- Authz boundary unchanged over bearer: cross-family access is 404,
+  caregiver-on-owner-route is 403, cross-user session revoke is 404 — the
+  §1.1/§7.5 boundary tests re-run with bearer transport.
+- Secrets-leak sweep extended: no `Authorization` header value and no raw
+  session token appears in any log line across signup → login → TOTP →
+  authenticated request → logout, over bearer.
+- Evidence per-scenario in `projects/little-milestones/test-evidence/`, same
+  convention as §4/§7.5/§8.10. **Note: `dev/tests/suites/security/run.sh`
+  does not exist in this repo today** — the security suite has historically
+  been executed as direct code review plus pytest. That is a gap to close
+  with test-agent/code-agent before this section's scenarios can be reported
+  as executed rather than statically reviewed.
+
+### 9.11 Residual risks explicitly accepted
+
+1. **No `HttpOnly` equivalent on mobile.** The token necessarily passes
+   through JS memory to be attached as a header. Accepted: RN has no DOM and
+   therefore no DOM-XSS exfiltration path; the realistic attack is a
+   compromised device, which SecureStore + `/auth/sessions` revocation
+   mitigate but do not eliminate.
+2. **No token rotation at the MFA pending→full transition** (§9.5) —
+   pre-existing web behaviour, out of scope for a no-regression enhancement.
+3. **Cleartext credentials on the dev LAN** (§9.6) — bounded by four stated
+   conditions, chief among them "no real child data."
+4. **A 30-day sliding token on a lost device grants long-lived access** until
+   revoked. Mitigation is the F12 session-management surface, which is why
+   §9.3 item 4 (`sessions.client`) matters: the mobile app **must** expose
+   the session list and revocation, or this mitigation exists only in theory.
+
+### 9.12 Joint-presentation note
+
+This section is presented for the Architecture gate **jointly with
+solution-architect**, per this role's contract. Items that are theirs to
+finalize, not mine to assume: the `sessions.client` column's placement
+against `ARCHITECTURE_KB`'s schema conventions (§9.3 item 4) — the same
+authority split that resolved F12's `sessions.id` type (§7.7,
+ARCHITECTURE_KB §11.1a) and F17's connections-table question (§8.11, Decisions
+Log 2026-07-12), and I defer to it identically here — and the RN client's own
+module/state shape. **No disagreement with solution-architect is anticipated
+or recorded on the authentication decision itself.** One item is the
+human's/orchestrator's, not either architect's: recording the reversal of the
+2026-07-10 "responsive web, not native" platform decision in the Decisions
+Log (§9.0).

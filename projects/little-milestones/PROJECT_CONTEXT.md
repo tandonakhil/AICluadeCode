@@ -2742,3 +2742,58 @@ which is still pending (asked to review Increments 5/6/7 together).
   **All three increments from this batch (5, 6, 7) are now fully shipped
   — every gate closed, per the human's "I will see 5.6 and 7 together. do
   not stop" instruction.** [deploy-agent]
+
+- 2026-07-26 — **PLATFORM DECISION REVERSED [human]: native mobile app.**
+  The 2026-07-10 entry recorded, explicitly, "responsive web app (any
+  browser, no install), not a PWA and not a native iOS/Android app …
+  treat this as settled, not reopen it." The human has now directed that a
+  native mobile app version be built. Recording the reversal here because a
+  platform decision is reversed in the Decisions Log, not silently inside a
+  design or security KB. **Both security-architect and ui-ux-designer
+  independently flagged the conflict and refused to resolve it themselves** —
+  correct behaviour; it was the human's to reverse and the orchestrator's to
+  record. The 2026-07-10 entry is superseded, not deleted.
+  Orchestrator acted as the human's delegate for this run's gate approvals,
+  at the human's explicit instruction ("act as human, make all the calls").
+
+- 2026-07-26 — MOBILE ENHANCEMENT, Architecture + Experience Design gates.
+  Branch `feature/2026-07-26-mobile-app`. Stack: **React Native + Expo (SDK
+  57)** — reuses the platform's proven TypeScript/React competence; native
+  Swift+Kotlin and Flutter were considered and rejected (two toolchains /
+  zero existing Dart competence, no requirement justifying either).
+  **Auth (security-architect, SECURITY_KB §9)**: the SAME session token is
+  now accepted from `Authorization: Bearer` as well as the cookie. Cookie is
+  read FIRST and wins on conflict, so no browser request's resolution can
+  change. RN cookie-jars were rejected as "a trap" — the jar is unencrypted
+  AND inside the default backup set, which would put a 30-day children's-data
+  credential in cleartext in a desktop backup. Native clients send
+  `X-LM-Client: mobile`, receive the token in an `X-LM-Session-Token` response
+  header, and are deliberately sent NO `Set-Cookie` (a cookie would recreate
+  the rejected design by accident). Token stored in SecureStore with
+  `WHEN_UNLOCKED_THIS_DEVICE_ONLY`; the MFA-pending token stays in memory and
+  is persisted only after TOTP succeeds. `X-LM-Session-Token` must never be
+  added to CORS `expose_headers`.
+  **Experience design (UX_KB §13)**: release-1 scope cut to what a parent
+  actually does on a phone; Google Photos import, invite creation, TOTP
+  enrolment, push, and a full offline mirror deferred with reasons. Rendered
+  previews at `design-review/mobile/index.html`.
+
+- 2026-07-26 — MOBILE CODE gate (partial, honest status). Built and verified:
+  bearer-token backend support (5 changes), and a working Expo app —
+  auth incl. MFA, profile switcher, Today/Ask/Journey/Settings tabs, secure
+  token storage, keyboard-aware chat, full loading/empty/error states,
+  accessibility labels throughout. **Verified for real**: backend 284/284
+  passing (275 pre-existing, zero regressions, + 9 new mobile-auth security
+  tests); `tsc --noEmit` clean; `expo export` produces a real 1.9MB iOS
+  Hermes bundle. **A new mobile-auth test caught a real bug before it
+  shipped** — logout over bearer only cleared the token locally and left a
+  live 30-day session on the server (`routes/auth.py::logout` still read the
+  cookie directly); fixed and regression-tested.
+  **NOT verified**: no simulator or emulator exists on this machine (Xcode
+  Command Line Tools only, no Android SDK/JDK), so the app has never been
+  seen running. Honest ceiling: it compiles and bundles; it is unproven on a
+  device. Running it requires Expo Go on a physical phone.
+  **Delta vs. the approved design**: ui-ux-designer specified a 5-tab release
+  (adding a central Capture action and a "You" tab), a night theme, an
+  offline queue, and prompt chips in the thumb zone. Built here: the 4-tab
+  core. The remainder is specified in UX_KB §13 and not yet implemented.

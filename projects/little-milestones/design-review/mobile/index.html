@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>little-milestones — Mobile app (React Native / Expo) design review</title>
+<style>
+  :root { --ink:#3D3833; --soft:#6E6259; --terra:#C1502A; --slate:#3D6188; --tint:#EEF3F8; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:0 0 60px; background:#FDF8F2; color:var(--ink);
+         font-family:"Nunito Sans",-apple-system,"Segoe UI",sans-serif; line-height:1.6; }
+  header { background:linear-gradient(135deg,#FF7A50,#F0A574); color:#fff; padding:34px 28px 28px; }
+  header h1 { font-family:Fraunces,Georgia,serif; margin:0 0 6px; font-size:30px; }
+  header p { margin:0; max-width:80ch; }
+  main { padding:28px; max-width:1500px; margin:0 auto; }
+  section { margin-bottom:44px; }
+  h2 { font-family:Fraunces,Georgia,serif; font-size:22px; margin:0 0 6px; }
+  .desc { color:var(--soft); max-width:92ch; margin:0 0 14px; }
+  iframe { width:100%; height:1150px; border:1px solid rgba(61,56,51,.14); border-radius:14px; background:#fff; }
+  .note { background:var(--tint); border-left:4px solid var(--slate); border-radius:10px; padding:14px 18px; margin:0 0 24px; max-width:100ch; }
+  .flag { background:#FFF3E6; border-left:4px solid var(--terra); border-radius:10px; padding:14px 18px; margin:0 0 24px; max-width:100ch; }
+  nav.toc { background:#fff; border-radius:14px; padding:16px 20px; margin-bottom:28px; box-shadow:0 1px 3px rgba(61,56,51,.08); }
+  nav.toc a { display:inline-block; margin:4px 14px 4px 0; color:var(--terra); font-weight:700; }
+  table { border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; margin:0 0 24px; }
+  th,td { text-align:left; padding:9px 14px; border-bottom:1px solid rgba(61,56,51,.08); font-size:14px; vertical-align:top; }
+  th { background:#F6EFE6; }
+  footer { padding:20px 28px; color:var(--soft); font-size:14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mobile app — React Native / Expo</h1>
+  <p>Experience Design gate, 2026-07-26 · ui-ux-designer · little-milestones. Six rendered preview pages below, each showing real phone-framed screens with loading, empty, error and offline states. Full written design intent: <code>knowledge/UX_KB.md</code> §13.</p>
+</header>
+
+<main>
+
+<nav class="toc">
+  <b style="margin-right:12px">Jump to:</b>
+  <a href="#scope">Release scope</a>
+  <a href="#nav">Cold start &amp; navigation</a>
+  <a href="#today">Today</a>
+  <a href="#ask">Ask (chat)</a>
+  <a href="#journey">Journey</a>
+  <a href="#capture">Capture</a>
+  <a href="#states">You / 2am / accessibility</a>
+</nav>
+
+<div class="flag">
+  <b>One recorded decision this supersedes — needs an explicit human decision, not a silent overwrite.</b>
+  <code>PROJECT_CONTEXT.md</code>’s Decisions Log records, 2026-07-10: “<i>Platform decision, explicitly confirmed — responsive web app (any browser, no install), <b>not a PWA and not a native iOS/Android app</b>… solution-architect should treat this as settled, not reopen it.</i>” This enhancement reopens exactly that. The design below assumes the human is knowingly changing it and that a new Decisions Log entry will record the change; if that is not the intent, stop here rather than build.
+</div>
+
+<section id="scope">
+  <h2>Release 1 scope — the honest cut</h2>
+  <p class="desc">The web product exposes roughly 40 endpoints. Release 1 of the mobile app deliberately ports the journey a parent actually performs on a phone, one-handed, in interstitial moments — and defers everything that is genuinely better on a bigger screen with a keyboard.</p>
+  <table>
+    <tr><th>In release 1</th><th>Why</th></tr>
+    <tr><td>Sign in / sign up / join-by-invite, TOTP, sign out</td><td>Non-negotiable entry. Password <i>reset</i> deep-links to web.</td></tr>
+    <tr><td>Child switcher, add a child, corrected age</td><td>Multi-child and preterm handling are core, not advanced.</td></tr>
+    <tr><td>Today — activities, coming-next, this-week, ideas</td><td>The daily re-open reason.</td></tr>
+    <tr><td>Ask — chat, suggested prompts, history, delete session</td><td>The 2am reason.</td></tr>
+    <tr><td>Journey — timeline, gallery, lightbox</td><td>The retention core, and the best thing about having it on a phone.</td></tr>
+    <tr><td>Capture — camera, library picker, text-only memory, offline queue</td><td>The one thing mobile does that web cannot.</td></tr>
+    <tr><td>You — profile, caregivers list, digest toggle, security, delete</td><td>Consent and deletion must never be web-only.</td></tr>
+  </table>
+  <table>
+    <tr><th>Deferred</th><th>Why</th></tr>
+    <tr><td><b>Google Photos import (F17)</b></td><td>A browser-redirect OAuth flow plus a third-party picker plus an import-review table — the single least phone-shaped surface in the product, and the one with the most compliance surface to re-verify on a new platform. Web link in the You tab.</td></tr>
+    <tr><td><b>Caregiver invite creation</b></td><td>Viewing caregivers ships; <i>generating</i> an invite code ships in release 2. Rare, one-time, and a code is easier to hand off from a desktop.</td></tr>
+    <tr><td><b>Password reset, TOTP enrolment, session revoke UI</b></td><td>Reset is an emailed browser link already; TOTP enrolment needs a QR on a second screen. Login <i>with</i> TOTP ships.</td></tr>
+    <tr><td><b>Push notifications</b></td><td>Not designed here at all. A parenting app that pushes about development is an anxiety machine unless designed carefully — that deserves its own gate, not a checkbox.</td></tr>
+    <tr><td><b>Full offline read of the whole journey</b></td><td>Release 1 caches what was recently viewed. A complete local mirror of every child photo is a privacy decision, not a caching decision.</td></tr>
+  </table>
+</section>
+
+<section id="nav">
+  <h2>1 · Cold start &amp; navigation architecture</h2>
+  <p class="desc">Launch → session restore → sign in → optional app lock → child selected. Bottom tabs (Today · Ask · [+] · Journey · You), each owning a native stack; child switching is a header-chip sheet on every tab, never a tab of its own.</p>
+  <iframe src="00-coldstart-nav.html" height="1180" loading="lazy" title="Cold start and navigation"></iframe>
+</section>
+
+<section id="today">
+  <h2>2 · Today tab</h2>
+  <p class="desc">Loaded, loading (skeletons), error/stale-cache, and empty states.</p>
+  <iframe src="01-today.html" height="1180" loading="lazy" title="Today tab"></iframe>
+</section>
+
+<section id="ask">
+  <h2>3 · Ask tab — chat</h2>
+  <p class="desc">First-open, keyboard-up with streaming, history sheet, and offline with a queued question. The keyboard-avoidance contract is stated on the page.</p>
+  <iframe src="02-ask.html" height="1180" loading="lazy" title="Ask tab"></iframe>
+</section>
+
+<section id="journey">
+  <h2>4 · Journey tab</h2>
+  <p class="desc">Timeline river, gallery grid, native lightbox with swipe/pinch, and the empty state. UXR-1 (no norm axis, no comparison) re-verified for every one of them.</p>
+  <iframe src="03-journey.html" height="1180" loading="lazy" title="Journey tab"></iframe>
+</section>
+
+<section id="capture">
+  <h2>5 · Capture — the centre [+] action</h2>
+  <p class="desc">Capture sheet → permission pre-prompt → compose → optimistic save with offline queue. Four privacy decisions are flagged on this page for security-architect.</p>
+  <iframe src="04-capture.html" height="1180" loading="lazy" title="Capture flow"></iframe>
+</section>
+
+<section id="states">
+  <h2>6 · You tab, 2am mode, accessibility &amp; system states</h2>
+  <p class="desc">Account surface; the warm-dark night theme; dynamic type at ~130%; the app-switcher privacy blur; hard-offline cold start; and the accessibility contract the Test gate will assert against.</p>
+  <iframe src="05-states-2am-a11y.html" height="1520" loading="lazy" title="You tab, night mode, accessibility"></iframe>
+</section>
+
+<div class="note">
+  <b>What this pass does not cover, stated rather than implied:</b> tablet/iPad layouts (phone-first only; the app runs on tablet at phone metrics in release 1), landscape beyond the lightbox, push notifications, deep-link/universal-link routing, an onboarding flow for a brand-new account on mobile (release 1 assumes an account created on web <i>or</i> the existing web onboarding copy reused verbatim in a native stack — the copy is unchanged either way, §1.10 is binding), and app-store assets. No DesignSync push was performed this pass — see UX_KB §13.11.
+</div>
+
+</main>
+
+<footer>ui-ux-designer · Experience Design gate · little-milestones mobile app · 2026-07-26</footer>
+</body>
+</html>
