@@ -107,13 +107,30 @@ build. That is a human choice at gate 2, not a rule.
 
 ---
 
-## [OPEN] Questions the human still owes
+## RESOLVED — human decisions, 2026-07-28
 
 | # | Question | Why it matters |
 |---|---|---|
-| **O1** | **Process lifetime.** Manual `python app.py` when wanted, or a real always-on service (`launchd`)? | Determines whether "we can go to that link" is actually true. Nothing in this platform keeps a service alive across sessions today; this would be the first. `LESSONS.md` 2026-07-09: a server started inside a subagent's shell dies with that turn. |
-| **O2** | **Does `admin/kb-server/` move and retire, or stay and get extended in place?** | Follows from the placement decision. `app.py` is 28 lines; the real assets are `index.html` and `DESIGN_SPEC.md`. Moving is a `git mv` plus a blueprint split. |
-| **O3** | **Does the Artifact-publishing obligation survive** once a live page renders the same graphs? | Recommend keeping both this round — Artifacts are shareable and already work — but it should be a decision, not an accretion. |
+| **O1** | **Manual start.** `python app.py` when wanted. No daemon, no launchd, no new operational surface. Consistent with every other project here. |
+| **O2** | **Move and retire.** `admin/kb-server/` migrates into `dev/`. One app, one port, two routes — `/` knowledge base, `/status` dashboard. Its 18-day staleness is fixed structurally by reading from state rather than by a content edit. |
+| **O3** | **Dashboard replaces Artifacts at gate report-outs** — *with the reachability caveat below.* |
+
+### Conflict between O1 and O3, and how it is resolved
+
+O1 (manual start) and O3 (dashboard replaces Artifacts) are in direct tension:
+if the server is usually not running, and gate report-outs link to it instead
+of publishing, then most report-outs hand the human a **dead link**. That is
+strictly worse than today, and it is exactly the failure mode this project
+exists to prevent — an authoritative-looking pointer to nothing.
+
+**Resolution, orchestrator judgement, pending human correction:** the gate
+report-out links to the dashboard **when it is reachable**, and falls back to
+publishing an Artifact when it is not. The obligation is "the human can see the
+graph," not "an Artifact exists." Revisit if O1 changes to always-on, at which
+point O3 applies unconditionally.
+
+This is recorded as a decision rather than absorbed silently, because it
+changes what `admin/PIPELINE.md` §3a requires and that file is binding.
 
 ## Recorded risks (answered "we don't know yet" or accepted)
 
