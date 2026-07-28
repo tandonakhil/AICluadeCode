@@ -11,6 +11,23 @@ full procedure — this skill is the thin entry point).
 1. Identify the target project (ask if ambiguous) and confirm its
    `PROJECT_CONTEXT.md` shows status `deployed` — if not, this is a
    `/new-project` situation, not an enhancement.
+1a. **Run intake — Path B of `admin/templates/INTAKE_FORM.md`.** A free-form
+   prompt is a request, not an intake. Read `PROJECT_CONTEXT.md` FIRST and
+   **do not re-ask what it already answers** — Path B is deliberately short
+   for that reason. Pre-fill what the prompt answered; ask only what's open,
+   as checkboxes, never bundled.
+
+   Non-negotiable on this path: **B4 (which surfaces it touches, and which it
+   does NOT and why)** — that answer seeds `solution-architect`'s mandatory
+   Impact Analysis, and it is the exact question whose absence let a shared
+   backend change ship to desktop web with zero web-side test coverage. Also
+   **B9 (what's out of scope)**, because mid-flight scope growth is what
+   forces a route redraw.
+
+   If research or an SME surfaced options rather than an answer, each option
+   is its own candidate with its own checkbox — never bundled, never
+   implicitly chosen. Append the completed form to the `FEATURES.md` entry.
+
 2. Collect the feature request and hand off to `enhance-agent`, which:
    - Asks for a feature name.
    - Runs the re-engagement decision (ask about dropped SMEs; always

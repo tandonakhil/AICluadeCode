@@ -13,6 +13,32 @@ agent roster or gate order changes, not left stale.
 
 ## Procedure
 
+0. **Run intake before anything else — a prompt is not an intake.**
+   Open `admin/templates/INTAKE_FORM.md`, **pre-fill every question the prompt
+   already answered**, show the human what was inferred, and ask only what is
+   still open — as checkboxes, one question at a time, never bundled. A form
+   that re-asks what was just said is the fastest way to make people stop
+   using it.
+
+   - **First**, confirm the path at Q0. If this is really a new capability on
+     an existing project, stop and route to `/enhance-project`; if it's a fix,
+     `/modify-feature`. When genuinely unsure, default to **enhancement** — a
+     wrongly-split project costs far more to merge than a wrongly-merged one
+     costs to split.
+   - **A5 (which surfaces) and A7.2 (worst plausible harm if confidently
+     wrong) are never skipped.** Both have already cost this platform real
+     defects. A multi-surface answer at A5 makes `solution-architect`
+     non-droppable at step 4.
+   - **If research or an SME produced options rather than an answer**, each
+     option enters through the form as its own candidate and is presented as a
+     per-option checkbox. Rejected options are recorded with their reason so
+     they aren't silently re-proposed.
+   - **An unanswered mandatory question blocks this gate.** "We don't know
+     yet" is a fine *answer* and is recorded as a known risk; leaving the
+     question unasked is not.
+
+   Record the completed form at `projects/<name>/INTAKE.md`.
+
 1. **Collect the request**: project name (slug it) and one-line description.
    **Do not ask the human to pick a template up front** — invoke `plan-agent`
    with the description to get a recommended template + reasoning (it reads

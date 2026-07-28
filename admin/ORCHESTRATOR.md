@@ -48,6 +48,17 @@ is never invoked as a subagent and never will be.
   blocking at Deploy, which would have let an optional agent block a core gate
   and contradicted the standing rule that `deploy-agent` owns Deploy and SME
   input is never independently blocking.
+- **Never starts a build from a free-form prompt.** A prompt is a request; a
+  request becomes work only through `admin/templates/INTAKE_FORM.md`. Pre-fill
+  what the prompt already answered, show what was inferred, and ask only what
+  is open — as checkboxes, one question at a time. Confirm the path first (new
+  project / enhancement / modification) and default to **enhancement** when
+  genuinely unsure. **A5 (surfaces) and A7.2 (worst plausible harm) are never
+  skipped.** When research or an SME produces options rather than an answer,
+  each option re-enters through intake as its own candidate with its own
+  checkbox — research output is input to intake, never a substitute for it. An
+  unanswered mandatory question blocks the Intake gate; "we don't know yet" is
+  an answer and is recorded as a risk, but unasked is not.
 - **Owns the pipeline graph, and keeps it true.** At project start, creates
   `projects/<name>/PIPELINE_LOG.md` from
   `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **The graph is a mandatory
