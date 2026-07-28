@@ -66,18 +66,45 @@ kept; it simply stops being updated.
 **Graph rendered for the human at this gate:**
 
 ```mermaid
-flowchart LR
-  G1["✅ 1<br/>Intake"] --> G2["▶ 2<br/>Team"] --> G3["⬜ 3<br/>Plan"]
-  G3 --> G4["⬜ 4<br/>Functional"] --> G5["⬜ 5<br/>Experience"]
-  G5 --> G6["⬜ 6<br/>Architecture"] --> G7["⬜ 7<br/>Code"] --> G8["⬜ 8<br/>Test"]
-  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
-
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["▶ 2<br/>Team"] --> H2{"✋ YOU<br/>approve?"} --> G3["⬜ 3<br/>Plan"] --> H3{"✋<br/>—"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["⬜ 4<br/>Functional"] --> H4{"✋<br/>—"} --> G5["⬜ 5<br/>Experience"] --> H5{"✋<br/>—"} --> G6["⬜ 6<br/>Architecture"] --> H6{"✋<br/>—"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["⬜ 7<br/>Code"] --> H7{"✋<br/>—"} --> G8["⬜ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
   class G1 done
+  class H1 hdone
   class G2 active
+  class H2 hwait
   class G3,G4,G5,G6,G7,G8,G9,G10,G11 pending
+  class H3,H4,H5,H6,H7,H8,H9,H10,H11 hpend
+  class r1,r2,r3,r4 rowbox
 ```
 
 ---
@@ -170,18 +197,45 @@ never generated** — the model may quote and explain a published estimate, and
 is forbidden from computing one.
 
 ```mermaid
-flowchart LR
-  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"]
-  G3 --> G4["✅ 4<br/>Functional"] --> G5["✅ 5<br/>Experience"]
-  G5 --> G6["▶ 6<br/>Architecture"] --> G7["⬜ 7<br/>Code"] --> G8["⬜ 8<br/>Test"]
-  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
-
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["✅ 2<br/>Team"] --> H2{"✋<br/>approved"} --> G3["✅ 3<br/>Plan"] --> H3{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["✅ 4<br/>Functional"] --> H4{"✋<br/>approved"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["▶ 6<br/>Architecture"] --> H6{"✋ YOU<br/>approve?"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["⬜ 7<br/>Code"] --> H7{"✋<br/>—"} --> G8["⬜ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G4,G5 done
+  class H1,H2,H3,H4,H5 hdone
   class G6 active
+  class H6 hwait
   class G7,G8,G9,G10,G11 pending
+  class H7,H8,H9,H10,H11 hpend
+  class r1,r2,r3,r4 rowbox
 ```
 
 ---
@@ -226,17 +280,45 @@ The failures:
 **Blocking suites failed → gate does not pass. Loop back to Code.**
 
 ```mermaid
-flowchart LR
-  G6["✅ 6<br/>Architecture"] --> G7["↩ 7<br/>Code"] --> G8["↩ 8<br/>Test"]
-  G8 -.->|"2 blocking suites FAILED<br/>AC-F3-02 violated"| G7
-  G8 --> G9["⬜ 9<br/>Verify"] --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
-
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["✅ 2<br/>Team"] --> H2{"✋<br/>approved"} --> G3["✅ 3<br/>Plan"] --> H3{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["✅ 4<br/>Functional"] --> H4{"✋<br/>approved"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["↩ 7<br/>Code"] --> H7{"✋<br/>—"} --> G8["↩ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
+  G8 -.->|2 blocking suites FAILED| G7
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
-  class G6 done
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
+  class G1,G2,G3,G4,G5,G6 done
+  class H1,H2,H3,H4,H5,H6 hdone
   class G7,G8 looped
+  class H7,H8,H9,H10,H11 hpend
   class G9,G10,G11 pending
+  class r1,r2,r3,r4 rowbox
 ```
 
 **Logged** in `PIPELINE_LOG.md` → Loop-backs. The row stays forever; the
@@ -272,17 +354,45 @@ agent repeating an estimate to a customer is the entire safeguard.
 > would have caught four of the seven defects in the F18 mobile build.
 
 ```mermaid
-flowchart LR
-  G7["↩ 7<br/>Code"] --> G8["✅ 8<br/>Test"] --> G9["↩ 9<br/>Verify"]
-  G9 -.->|"AC-F3-03 NOT VERIFIED<br/>no rendered evidence"| G7
-  G9 --> G10["⬜ 10<br/>Review"] --> G11["⬜ 11<br/>Deploy"]
-
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["✅ 2<br/>Team"] --> H2{"✋<br/>approved"} --> G3["✅ 3<br/>Plan"] --> H3{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["✅ 4<br/>Functional"] --> H4{"✋<br/>approved"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["↩ 7<br/>Code"] --> H7{"✋<br/>—"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["↩ 9<br/>Verify"] --> H9{"✋<br/>—"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
+  G9 -.->|AC-F3-03 NOT VERIFIED| G7
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
-  class G8 done
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
+  class G1,G2,G3,G4,G5,G6,G8 done
+  class H1,H2,H3,H4,H5,H6,H8 hdone
   class G7,G9 looped
+  class H7,H9,H10,H11 hpend
   class G10,G11 pending
+  class r1,r2,r3,r4 rowbox
 ```
 
 **Code adds** a Playwright rendered-UI check asserting the source line is
@@ -320,14 +430,42 @@ cannot fire its own trigger, and this is the obligation that was missed for
 fifteen days on little-milestones.
 
 ```mermaid
-flowchart LR
-  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"] --> G4["✅ 4<br/>Functional"]
-  G4 --> G5["✅ 5<br/>Experience"] --> G6["✅ 6<br/>Architecture"] --> G7["✅ 7<br/>Code"]
-  G7 --> G8["✅ 8<br/>Test"] --> G9["✅ 9<br/>Verify"] --> G10["✅ 10<br/>Review"] --> G11["✅ 11<br/>Deploy"]
-  G11 --> DONE(["Deployed · dev local"])
-
-  classDef done fill:#eef6ef,stroke:#2f6f43,color:#123021
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["✅ 2<br/>Team"] --> H2{"✋<br/>approved"} --> G3["✅ 3<br/>Plan"] --> H3{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["✅ 4<br/>Functional"] --> H4{"✋<br/>approved"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["✅ 9<br/>Verify"] --> H9{"✋<br/>approved"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["✅ 10<br/>Review"] --> H10{"✋<br/>approved"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
+  H11 --> DONE(["Deployed · dev local"])
+  classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,DONE done
+  class H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11 hdone
+  class r1,r2,r3,r4 rowbox
 ```
 
 **Run summary — 3 loop-backs.** Test caught an invented restoration time;
@@ -351,19 +489,37 @@ Composition. Multilingual customer communications carry regulatory obligations
 in several jurisdictions. **Human re-engages it for this feature only.**
 
 ```mermaid
-flowchart LR
-  S(["/enhance-project · F6 multilingual"]) --> R{{"re-engage industry-expert?"}}
-  R -->|"human: yes"| E3["▶ Plan"]
-  E3 --> E4["⬜ Functional"] --> E5["⬜ Experience"]
-  E5 --> E6["⬜ Architecture"] --> E7["⬜ Code"] --> E8["⬜ Test"]
-  E8 --> E9["⬜ Verify"] --> E10["⬜ Review"] --> E11["⬜ Deploy"]
-
+flowchart TB
+  S(["/enhance-project · F6 multilingual"]) --> RE{{"✋ YOU<br/>re-engage<br/>industry-expert?"}} --> E3
+  class S,RE hwait
+  subgraph r1 [" "]
+    direction LR
+    E3["▶ 3<br/>Plan"] --> A3{"✋ YOU<br/>approve?"} --> E4["⬜ 4<br/>Functional"] --> A4{"✋<br/>—"} --> E5["⬜ 5<br/>Experience"] --> A5{"✋<br/>—"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    E6["⬜ 6<br/>Architecture"] --> A6{"✋<br/>—"} --> E7["⬜ 7<br/>Code"] --> A7{"✋<br/>—"} --> E8["⬜ 8<br/>Test"] --> A8{"✋<br/>—"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    E9["⬜ 9<br/>Verify"] --> A9{"✋<br/>—"} --> E10["⬜ 10<br/>Review"] --> A10{"✋<br/>—"} --> E11["⬜ 11<br/>Deploy"] --> A11{"✋<br/>—"}
+  end
+  A5 --> E6
+  A8 --> E9
+  classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
   classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
-  classDef term    fill:#eef4fb,stroke:#2b6cb0,color:#0f2b46
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef note    fill:#fff8e6,stroke:#8a6410,color:#3d2c04
+  classDef rowbox  fill:none,stroke:none
   class E3 active
+  class A3 hwait
   class E4,E5,E6,E7,E8,E9,E10,E11 pending
-  class S,R term
+  class A4,A5,A6,A7,A8,A9,A10,A11 hpend
+  class r1,r2,r3 rowbox
 ```
 
 ### The redraw
@@ -376,23 +532,40 @@ retention question, new acceptance criteria. **The route changes, so the graph
 is redrawn**, and the orchestrator says plainly which gates re-open and why:
 
 ```mermaid
-flowchart LR
-  E3["✅ Plan"] --> E4["↩ Functional"]
-  E4 --> E5["✅ Experience"] --> E6["↩ Architecture"]
-  E6 --> E7["↩ Code"] --> E8["⬜ Test"] --> E9["⬜ Verify"]
-  E9 --> E10["⬜ Review"] --> E11["⬜ Deploy"]
-
-  NEW(["scope added at Code:<br/>remember language preference"]) -.->|"new AC needed"| E4
-  NEW -.->|"new stored data<br/>retention + PII"| E6
-
+flowchart TB
+  NEW(["scope added at Code:<br/>remember language preference"])
+  NEW -.->|new AC needed| E4
+  NEW -.->|new stored data<br/>retention + PII| E6
+  class NEW note
+  subgraph r1 [" "]
+    direction LR
+    E3["✅ 3<br/>Plan"] --> A3{"✋<br/>approved"} --> E4["↩ 4<br/>Functional"] --> A4{"✋<br/>—"} --> E5["✅ 5<br/>Experience"] --> A5{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    E6["↩ 6<br/>Architecture"] --> A6{"✋<br/>—"} --> E7["↩ 7<br/>Code"] --> A7{"✋<br/>—"} --> E8["⬜ 8<br/>Test"] --> A8{"✋<br/>—"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    E9["⬜ 9<br/>Verify"] --> A9{"✋<br/>—"} --> E10["⬜ 10<br/>Review"] --> A10{"✋<br/>—"} --> E11["⬜ 11<br/>Deploy"] --> A11{"✋<br/>—"}
+  end
+  A5 --> E6
+  A8 --> E9
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef note    fill:#fff8e6,stroke:#8a6410,color:#3d2c04
+  classDef rowbox  fill:none,stroke:none
   class E3,E5 done
+  class A3,A5 hdone
   class E4,E6,E7 looped
+  class A4,A6,A7,A8,A9,A10,A11 hpend
   class E8,E9,E10,E11 pending
-  class NEW note
+  class r1,r2,r3 rowbox
 ```
 
 **Re-opened**: Functional Design (new criteria for persistence and for changing

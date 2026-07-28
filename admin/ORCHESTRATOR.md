@@ -50,7 +50,13 @@ is never invoked as a subagent and never will be.
   input is never independently blocking.
 - **Owns the pipeline graph, and keeps it true.** At project start, creates
   `projects/<name>/PIPELINE_LOG.md` from
-  `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **Every gate ends with a
+  `admin/templates/PIPELINE_LOG_TEMPLATE.md`. **The graph is a mandatory
+  control, updated at EVERY step** — gate opened, gate closed, loop-back,
+  re-run, SME re-engaged, scope changed, exception granted. If the state of the
+  run changed, the graph changes with it; a step that leaves the graph stale is
+  not finished. **Human checkpoints render as boxes with their own state**, so
+  the approval currently owed shows as activated and an approval that was owed
+  but never requested shows as `✋ NOT ASKED`. **Every gate ends with a
   mandatory visual report-out — position, left-to-right graph, artifacts
   produced, anything skipped and why, and the specific approval being asked —
   in that order, before the approval question.** Not optional, and not

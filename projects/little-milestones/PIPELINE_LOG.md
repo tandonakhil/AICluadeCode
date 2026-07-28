@@ -18,22 +18,49 @@ Canonical definitions: `admin/PIPELINE.md`. Template:
 **State**: deployed (dev, local); night theme + offline queue outstanding
 
 ```mermaid
-flowchart LR
-  G1["✅ 1<br/>Intake"] --> G2["✅ 2<br/>Team"] --> G3["✅ 3<br/>Plan"]
-  G3 --> G4["⊘ 4<br/>Functional"] --> G5["✅ 5<br/>Experience"]
-  G5 --> G6["⚠ 6<br/>Architecture"] --> G7["✅ 7<br/>Code"] --> G8["⚠ 8<br/>Test"]
-  G8 --> G9["⊘ 9<br/>Verify"] --> G10["⊘ 10<br/>Review"] --> G11["✅ 11<br/>Deploy"]
-  G11 --> FIX["↩ human-found defects → Code"]
-  FIX -.-> G7
-
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["✅ 1<br/>Intake"] --> H1{"✋<br/>approved"} --> G2["✅ 2<br/>Team"] --> H2{"✋<br/>approved"} --> G3["✅ 3<br/>Plan"] --> H3{"✋<br/>approved"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["⚠ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["⚠ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⊘ 10<br/>Review"] --> H10{"✋<br/>NOT ASKED"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
+  FIX -.->|8 human-found defects| G7
+  FIX["↩ post-deploy<br/>defect cycle"]
+  H11 --> FIX
+  class FIX looped
   classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G7,G11 done
-  class G6,G8 warn
+  class H1,H2,H3,H5,H6,H7,H8,H11 hdone
   class G4,G9,G10 skipped
-  class FIX looped
+  class H4,H9 hskip
+  class G6,G8 warn
+  class H10 hnone
+  class r1,r2,r3,r4 rowbox
 ```
 
 `⊘` = gate did not exist yet (Functional Design, Verification were added

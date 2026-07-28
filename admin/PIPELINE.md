@@ -14,46 +14,64 @@ review and human approval first, exactly like an agent contract.
 
 ## 1. The pipeline
 
-Eleven gates. Every arrow marked ✋ is a **human approval that cannot be
-skipped**. A gate never advances on the orchestrator's own judgement.
+Eleven gates, each followed by a **human approval that cannot be skipped**. A
+gate never advances on the orchestrator's own judgement.
 
-**Layout is left-to-right.** A pipeline reads as a journey, and a journey reads
-along the page, not down it. Every progress graph in this platform uses
-`flowchart LR` — the whole point is that the human sees distance travelled at a
-glance.
+**Layout.** Reads left-to-right, **max 7 boxes per row**, wrapping to the next
+line. A pipeline is a journey and a journey reads along the page — but eleven
+gates plus eleven approvals in one line is unreadable, so rows carry **3 gates
+and their 3 approvals (6 boxes)** and wrap. Rows never split a gate from the
+approval that closes it.
+
+**Human checkpoints are boxes, not edge labels.** The `✋` diamonds are
+first-class nodes with their own state, because the approval *is* a step — the
+single step where the pipeline stops and waits for a person. Rendering it as a
+decoration on an arrow understates what it is. When the run is waiting on you,
+that diamond renders **activated** — thick border, `✋ YOU / approve?` — and is
+the loudest thing in the graph.
 
 ```mermaid
-flowchart LR
-  REQ([Request]) --> G1
-
-  G1["1<br/>**Intake**"]
-  G2["2<br/>**Team**"]
-  G3["3<br/>**Plan**"]
-  G4["4<br/>**Functional**"]
-  G5["5<br/>**Experience**"]
-  G6["6<br/>**Architecture**"]
-  G7["7<br/>**Code**"]
-  G8["8<br/>**Test**"]
-  G9["9<br/>**Verify**"]
-  G10["10<br/>**Review**"]
-  G11["11<br/>**Deploy**"]
-  DONE([Deployed])
-
-  G1 -->|✋| G2 -->|✋| G3 -->|✋| G4 -->|✋| G5 -->|✋| G6 -->|✋| G7
-  G7 -->|✋| G8 -->|✋| G9 -->|✋| G10 -->|✋| G11 -->|✋| DONE
-
-  G8  -.->|FAILED| G7
-  G9  -.->|NOT VERIFIED| G7
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1["⬜ 1<br/>Intake"] --> H1{"✋<br/>—"} --> G2["⬜ 2<br/>Team"] --> H2{"✋<br/>—"} --> G3["⬜ 3<br/>Plan"] --> H3{"✋<br/>—"}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4["⬜ 4<br/>Functional"] --> H4{"✋<br/>—"} --> G5["⬜ 5<br/>Experience"] --> H5{"✋<br/>—"} --> G6["⬜ 6<br/>Architecture"] --> H6{"✋<br/>—"}
+  end
+  subgraph r3 [" "]
+    direction LR
+    G7["⬜ 7<br/>Code"] --> H7{"✋<br/>—"} --> G8["⬜ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+  end
+  subgraph r4 [" "]
+    direction LR
+    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+  end
+  H3 --> G4
+  H6 --> G7
+  H9 --> G10
+  H11 --> DONE(["Deployed · dev local"])
+  G8 -.->|FAILED| G7
+  G9 -.->|NOT VERIFIED| G7
   G10 -.->|request-changes| G7
   G10 -.->|escalate| G6
   G11 -.->|smoke failed| G7
-
-  classDef gate fill:#eef4fb,stroke:#2b6cb0,stroke-width:1px,color:#0f2b46
-  classDef block fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
-  classDef term fill:#eef6ef,stroke:#2f6f43,color:#123021
-  class G1,G2,G3,G4,G5,G6,G7,G8,G10,G11 gate
-  class G9 block
-  class REQ,DONE term
+  classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
+  classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+  classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
+  classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
+  classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+  classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+  classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+  classDef rowbox  fill:none,stroke:none
+  class G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,DONE pending
+  class H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11 hpend
+  class r1,r2,r3,r4 rowbox
 ```
 
 Gate owners and artifacts are in the table below rather than in the node
@@ -98,30 +116,90 @@ perfect.
 
 ## 3. Progress notation
 
-The orchestrator re-renders the graph **at every gate**, using these states.
-The notation is deliberately small — five states, one glyph each.
+The orchestrator re-renders the graph **at every step**, using these states.
 
-| Glyph | State | Meaning |
+### Gate states
+
+| Glyph | Class | Meaning |
 |-------|-------|---------|
 | `✅` | `done` | Gate closed, human approved |
-| `▶` | `active` | Currently running, or awaiting human approval |
+| `▶` | `active` | Currently running |
 | `↩` | `looped` | Failed and sent work back; will re-run |
+| `⚠` | `warn` | Ran, but incompletely — see the log |
 | `⬜` | `pending` | Not started |
-| `⊘` | `skipped` | N/A for this template, or SMEs dropped — recorded |
+| `⊘` | `skipped` | Not applicable, or not run — the log says which |
 
-Mermaid class definitions to reuse verbatim, so every render looks the same:
+### Human-checkpoint states
+
+| Label | Class | Meaning |
+|-------|-------|---------|
+| `✋ approved` | `hdone` | The human approved this gate |
+| **`✋ YOU / approve?`** | `hwait` | **Activated — waiting on the human right now** |
+| `✋ —` | `hpend` | Not reached yet |
+| `✋ n/a` | `hskip` | Gate not applicable, so no approval was owed |
+| **`✋ NOT ASKED`** | `hnone` | **A gate closed without the approval it owed** |
+
+`hnone` exists because of a real event: the orchestrator skipped
+little-milestones' Review gate and asked nobody. It renders in alarm red and
+should be rare enough to be shocking. It is not the same as `hskip` — one is a
+gate that owed no approval, the other is an approval that was owed and never
+requested.
+
+### Class definitions — copy verbatim
 
 ```
 classDef done    fill:#eef6ef,stroke:#2f6f43,color:#123021
 classDef active  fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
 classDef looped  fill:#fdf0ec,stroke:#a3341f,stroke-width:2px,color:#3d1109
+classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
 classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
 classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
+classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
+classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
+classDef rowbox  fill:none,stroke:none
+```
+
+### Row structure — copy verbatim
+
+Three gates and their three approvals per row, wrapping. Rows are invisible
+`subgraph` containers (`rowbox`), which is what produces the wrap:
+
+```
+flowchart TB
+  subgraph r1 [" "]
+    direction LR
+    G1[...] --> H1{...} --> G2[...] --> H2{...} --> G3[...] --> H3{...}
+  end
+  subgraph r2 [" "]
+    direction LR
+    G4[...] --> H4{...} --> G5[...] --> H5{...} --> G6[...] --> H6{...}
+  end
+  H3 --> G4
 ```
 
 ---
 
-## 3a. Mandatory gate report-out
+## 3a. The graph is a mandatory control
+
+**The graph is not a status decoration. It is a control, and it is maintained
+at every step.** Three obligations, all binding:
+
+1. **Update it at every step**, not only at gate boundaries — a gate opening, a
+   gate closing, a loop-back, a re-run, an SME re-engagement, a scope change, an
+   exception granted. If the state of the run changed, the graph changed.
+2. **Show it at every gate**, before the approval question.
+3. **Keep it true.** A graph that lags the run is worse than no graph: it
+   asserts a position that is false, and it is *believed*, because it looks
+   authoritative.
+
+**A step that does not update the graph is not finished.** The graph in
+`projects/<name>/PIPELINE_LOG.md` and the actual state of the run are the same
+fact recorded twice; if they ever disagree, the run is not under control.
+
+### Mandatory gate report-out
 
 **Every gate ends with a visual report-out. This is not optional and it is not
 conditional on the human asking.** A gate that closes without one has not
