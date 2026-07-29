@@ -25,15 +25,15 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["⚠ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["⚠ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["⚠ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["⚠ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
-    G10["⊘ 10<br/>Review"] --> H10{"✋<br/>NOT ASKED"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
+    G10["⊘ 10<br/>Review<br/><i>SKIPPED</i>"] --> H10{"✋<br/>NOT ASKED"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
   end
   H3 --> G4
   H6 --> G7
@@ -48,23 +48,31 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G7,G11 done
   class H1,H2,H3,H5,H6,H7,H8,H11 hdone
-  class G4,G9,G10 skipped
-  class H4,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
   class G6,G8 warn
+  class G10 skip_owed
   class H10 hnone
   class r1,r2,r3,r4 rowbox
 ```
 
-`⊘` = gate did not exist yet (Functional Design, Verification were added
-2026-07-28) or was not run. `⚠` = ran, but incompletely — see the ledger.
+`⊘ pre-gate` = the gate did not exist when this ran (Functional Design,
+Verification, added 2026-07-28) — a real coverage gap. `⊘ SKIPPED` = owed and
+skipped, no exception requested. `⚠` = ran, but incompletely — see the ledger.
+The three are rendered distinctly on purpose; collapsing them is how the
+skipped Review gate stayed invisible.
 
 ---
 
@@ -75,13 +83,13 @@ flowchart TB
 | 1 | Intake | 2026-07-09 | functional-agent, industry-expert | `DOMAIN_KB.md`, `INDUSTRY_KB.md` | approved | Original web project |
 | 2 | Team Composition | 2026-07-09 | orchestrator, usage-monitor | Active Team in `PROJECT_CONTEXT.md` | approved | |
 | 3 | Plan & Backlog | 2026-07-10 | plan-agent, industry-expert, functional-agent | `PLAN.md`, F1–F17 backlog | approved | Per-feature checkboxes |
-| 4 | Functional Design | — | — | — | `⊘ n/a` | **Gate did not exist.** Added 2026-07-28 |
+| 4 | Functional Design | — | — | — | `⊘ pre-gate` | **Gate did not exist.** Added 2026-07-28 — a coverage gap, not a template exclusion |
 | 5 | Experience Design | 2026-07-26 | ui-ux-designer | `UX_KB.md §13` (mobile) | approved | 5-tab design; rendered mockup shown |
 | 6 | Architecture | 2026-07-26 | solution-architect, security-architect, responsible-ai-architect | `SECURITY_KB.md §9` | approved | **⚠ Incomplete** — mobile architecture went into SECURITY_KB/UX_KB, never into `ARCHITECTURE_KB.md`. Closed retrospectively 2026-07-28 (§13/§14) |
 | 7 | Code | 2026-07-26→28 | code-agent, orchestrator | `dev/mobile/`, bearer auth, phases A–D | approved | Multiple passes |
 | 8 | Test | 2026-07-26→28 | test-agent + 6 SME suites | Suite reports, `test-evidence/` | approved | **⚠ Rendered-UI contract live, native backend empty** — Playwright cannot load an RN tree. Six defects structurally uncatchable |
-| 9 | Verification | — | — | — | `⊘ n/a` | **Gate did not exist.** Added 2026-07-28 |
-| 10 | Review | — | — | — | `⊘ not run` | **Skipped.** No wiring sweep existed; would not have caught defects 1–4 anyway |
+| 9 | Verification | — | — | — | `⊘ pre-gate` | **Gate did not exist.** Added 2026-07-28 — a coverage gap, not a template exclusion |
+| 10 | Review | — | — | — | `⊘ SKIPPED` / `✋ NOT ASKED` | **Owed and skipped.** No wiring sweep existed; would not have caught defects 1–4 anyway |
 | 11 | Deploy | 2026-07-27 | deploy-agent, test-agent | Running on iPhone 17 Pro simulator | approved | `deliverables-agent` **not fired** — 15 days stale |
 
 ---

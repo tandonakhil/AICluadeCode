@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>conclave-dashboard — Experience Design review (gate 5)</title>
+<style>
+/* ==========================================================================
+   conclave-dashboard · design review mockup
+   Reconciles "The Signal Path" (admin/kb-server/DESIGN_SPEC.md):
+     kept      — void/floor/surface scaffolding, hairlines, mono eyebrow +
+                 leading rule, aperture/slit gate motif, tabular-nums, grain
+     superseded— dark-only, theatrical display type, ambient animation,
+                 ember accent (see UX_KB.md §6)
+   Status hues are lifted VERBATIM from admin/PIPELINE.md §3 classDef block.
+   ========================================================================== */
+
+:root{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+}
+
+/* ---------- LIGHT (canonical: identical to PIPELINE.md §3 classDef) ------- */
+html[data-theme="light"]{
+  --void:#f2f3f5; --floor:#e9ebee; --surface:#ffffff; --surface2:#f6f7f9;
+  --hair:rgba(18,24,38,.10); --hair-hi:rgba(18,24,38,.22);
+  --ink:#141922; --ink-dim:#5a6373; --ink-faint:#8b93a3;
+  --accent:#1d4d8f; --accent-soft:rgba(29,77,143,.10);
+
+  --g-fill:#eef6ef; --g-line:#2f6f43; --g-text:#123021;
+  --a-fill:#fff8e6; --a-line:#8a6410; --a-text:#3d2c04;
+  --r-fill:#fdf0ec; --r-line:#a3341f; --r-text:#3d1109;
+  --u-fill:#f4f5f7; --u-line:#b8bfc9; --u-text:#767f8d;
+  --hdone-fill:#dcefe2; --hwait-fill:#ffe9a8; --hnone-fill:#f8ded7;
+  --shadow:0 1px 2px rgba(18,24,38,.06),0 8px 24px -16px rgba(18,24,38,.28);
+}
+/* ---------- DARK (same hues, lifted; --good/--warn/--crit from kb-server) -- */
+html[data-theme="dark"]{
+  --void:#030405; --floor:#0a0c10; --surface:#10131a; --surface2:#161b26;
+  --hair:rgba(235,240,255,.08); --hair-hi:rgba(235,240,255,.18);
+  --ink:#f4f2ec; --ink-dim:#a8abb8; --ink-faint:#6b7182;
+  --accent:#6fb4ff; --accent-soft:rgba(111,180,255,.14);
+
+  --g-fill:rgba(63,214,143,.12); --g-line:#3fd68f; --g-text:#8ee9bd;
+  --a-fill:rgba(232,185,63,.12); --a-line:#e8b93f; --a-text:#f2d484;
+  --r-fill:rgba(242,100,94,.12); --r-line:#f2645e; --r-text:#f9a5a1;
+  --u-fill:rgba(139,147,163,.10); --u-line:#6b7182; --u-text:#8b93a3;
+  --hdone-fill:rgba(63,214,143,.18); --hwait-fill:rgba(232,185,63,.24);
+  --hnone-fill:rgba(242,100,94,.20);
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 28px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--void);color:var(--ink);font-family:var(--sans);
+  font-size:13.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+a{color:var(--accent)}
+
+/* transitions limited to <=200ms state changes only (UX_KB §6.3) */
+body,.card,.tile,.chip{transition:background-color .18s,color .18s,border-color .18s}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------------- review chrome (not part of the product) ---------------- */
+.reviewbar{position:sticky;top:0;z-index:50;display:flex;gap:14px;align-items:center;
+  padding:10px 22px;background:var(--surface);border-bottom:1px solid var(--hair-hi);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+.reviewbar .sp{flex:1}
+.reviewbar b{letter-spacing:-.01em;text-transform:none;font-size:13px;font-family:var(--sans)}
+.reviewbar a{color:var(--ink-dim);text-decoration:none;padding:4px 8px;border-radius:5px}
+.reviewbar a:hover{background:var(--surface2);color:var(--ink)}
+.tbtn{cursor:pointer;border:1px solid var(--hair-hi);background:var(--surface2);
+  color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.sampleribbon{background:var(--a-fill);color:var(--a-text);border-bottom:1px solid var(--a-line);
+  padding:8px 22px;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em}
+
+.page{max-width:1280px;margin:0 auto;padding:0 22px 90px}
+.screen{margin:44px 0}
+.screenhead{display:flex;align-items:baseline;gap:14px;margin:0 0 12px;
+  padding-bottom:9px;border-bottom:1px solid var(--hair)}
+.screenhead .num{font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--accent)}
+.screenhead h2{font-size:20px;font-weight:650}
+.screenhead p{margin:0;color:var(--ink-dim);font-size:12.5px}
+
+/* ---------------- product surface ---------------- */
+.app{background:var(--floor);border:1px solid var(--hair-hi);border-radius:10px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.apphead{background:var(--surface);border-bottom:1px solid var(--hair);padding:14px 20px 0}
+.brandrow{display:flex;align-items:center;gap:12px;padding-bottom:12px}
+.slit{width:2px;height:14px;background:var(--accent);flex:none}
+.brandrow .nm{font-family:var(--mono);font-size:12.5px;font-weight:700}
+.brandrow .rt{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.brandrow .sp{flex:1}
+
+/* eyebrow with leading rule — kept from Signal Path */
+.eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:.28em;color:var(--accent);display:flex;align-items:center;
+  gap:12px;margin:0 0 12px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);flex:none}
+.eyebrow .qt{color:var(--ink-faint);letter-spacing:.06em;text-transform:none;font-size:11px}
+
+/* ---- project rail (R1: my counter-proposal) ---- */
+.rail{display:flex;gap:2px;overflow:auto}
+.railseg{flex:1 1 0;min-width:132px;background:var(--surface2);border:1px solid var(--hair);
+  border-bottom:none;border-radius:8px 8px 0 0;padding:9px 11px 10px;cursor:pointer;
+  text-align:left;color:var(--ink-dim);font-family:var(--sans);font-size:12px}
+.railseg[aria-selected="true"]{background:var(--floor);color:var(--ink);
+  border-color:var(--hair-hi);box-shadow:inset 0 2px 0 var(--accent)}
+.railseg .rn{display:block;font-family:var(--mono);font-size:11.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.railseg .rr{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase}
+.railseg:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+.body{padding:18px 20px 22px}
+
+/* ---- freshness strip ---- */
+.fresh{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;
+  background:var(--surface2);border:1px solid var(--hair);border-radius:7px;
+  padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--ink-dim);
+  margin-bottom:16px}
+.fresh b{color:var(--ink);font-weight:600}
+
+/* ---- KPI tiles ---- */
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:1279px){.tiles{grid-template-columns:repeat(3,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--hair);border-radius:8px;
+  padding:11px 12px 12px;min-height:104px;display:flex;flex-direction:column}
+.tile .lab{font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-dim);margin-bottom:7px}
+.tile .num{font-size:32px;font-weight:600;line-height:1.05;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+.tile .sub{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);
+  line-height:1.5}
+.tile.lead{border-width:2px}
+
+/* ---- chips: LAYER 1, the attention index ---- */
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:4px;
+  padding:2px 7px;font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+.chip .why{font-weight:400;letter-spacing:.02em;opacity:.85;text-transform:none}
+.c-g{background:var(--g-fill);border-color:var(--g-line);color:var(--g-text)}
+.c-a{background:var(--a-fill);border-color:var(--a-line);color:var(--a-text)}
+.c-r{background:var(--r-fill);border-color:var(--r-line);color:var(--r-text)}
+.c-u{background:var(--u-fill);border-color:var(--u-line);color:var(--u-text);
+  border-style:dashed}
+.chip.big{font-size:12px;padding:4px 10px}
+
+/* ---- callouts ---- */
+.callouts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.co{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:start;
+  border:1px solid;border-left-width:4px;border-radius:7px;padding:10px 13px;
+  background:var(--surface)}
+.co.r{border-color:var(--r-line);background:var(--r-fill)}
+.co.a{border-color:var(--a-line);background:var(--a-fill)}
+.co.u{border-color:var(--u-line);background:var(--u-fill);border-left-style:dashed}
+.co.g{border-color:var(--g-line);background:var(--g-fill)}
+.co .gl{font-family:var(--mono);font-size:17px;line-height:1.2;text-align:center}
+.co h4{margin:0 0 3px;font-size:13.5px;font-weight:650}
+.co .ev{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);
+  margin-top:5px;display:block}
+.co.r h4,.co.r .ev{color:var(--r-text)} .co.r .gl{color:var(--r-line)}
+.co.a h4,.co.a .ev{color:var(--a-text)} .co.a .gl{color:var(--a-line)}
+.co.g h4,.co.g .ev{color:var(--g-text)} .co.g .gl{color:var(--g-line)}
+.co.u h4,.co.u .ev{color:var(--u-text)} .co.u .gl{color:var(--u-line)}
+.co p{margin:0;font-size:12.5px}
+.co .sev{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  opacity:.8;white-space:nowrap;padding-top:2px}
+
+/* ---- tables ---- */
+table{width:100%;border-collapse:collapse;background:var(--surface);
+  border:1px solid var(--hair);border-radius:8px;overflow:hidden}
+caption{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-dim);padding:0 0 7px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--hair);
+  font-size:12.5px;vertical-align:top}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-dim);font-weight:600;background:var(--surface2)}
+tr:last-child td{border-bottom:none}
+td .pname{font-family:var(--mono);font-weight:600}
+td.n{font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:11.5px}
+
+/* ---- LAYER 2: analytical gate strip (11 apertures) ---- */
+.stripwrap{background:var(--surface);border:1px solid var(--hair);border-radius:8px;
+  padding:14px 14px 12px;margin-bottom:18px;overflow-x:auto}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(84px,1fr);gap:6px}
+.gcell{display:flex;flex-direction:column;gap:5px}
+.gate{border:1px solid;border-radius:6px;padding:6px 7px 7px;position:relative;
+  min-height:62px;background:var(--u-fill);border-color:var(--u-line);color:var(--u-text)}
+.gate .gnum{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;opacity:.85}
+.gate .gglyph{position:absolute;top:5px;right:6px;font-size:12px;line-height:1}
+.gate .gname{font-size:11.5px;font-weight:600;line-height:1.25;margin-top:2px}
+.gate .gstate{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:4px;opacity:.95}
+/* aperture slit — the Signal Path motif, kept literally */
+.gate::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:2px;
+  background:currentColor;opacity:.5}
+.g-done{background:var(--g-fill);border-color:var(--g-line);color:var(--g-text)}
+.g-active{background:var(--a-fill);border-color:var(--a-line);color:var(--a-text);border-width:2px}
+.g-warn{background:var(--a-fill);border-color:var(--a-line);color:var(--a-text);border-width:2px}
+.g-looped{background:var(--r-fill);border-color:var(--r-line);color:var(--r-text);border-width:2px}
+.g-pending{border-style:solid;opacity:.75}
+/* the three flavours of ⊘ — three distinct marks, never one */
+.g-na{border-style:dashed}
+.g-pregate{border-style:dashed;
+  background:repeating-linear-gradient(45deg,var(--u-fill),var(--u-fill) 5px,
+    transparent 5px,transparent 10px)}
+.g-noexc{background:var(--r-fill);border:2px solid var(--r-line);color:var(--r-text)}
+
+.appr{border:1px solid;border-radius:4px;padding:4px 6px;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.06em;text-align:center;line-height:1.3;
+  background:var(--u-fill);border-color:var(--u-line);color:var(--u-text)}
+.a-done{background:var(--hdone-fill);border-color:var(--g-line);color:var(--g-text)}
+.a-wait{background:var(--hwait-fill);border:4px solid var(--a-line);color:var(--a-text);
+  font-weight:700}
+.a-pend{border-style:dashed;opacity:.8}
+.a-skip{border-style:dashed;opacity:.8}
+.a-none{background:var(--hnone-fill);border:3px solid var(--r-line);color:var(--r-text);
+  font-weight:700}
+
+/* ---- canonical graph panel: a reproduced document, does NOT theme ---- */
+.canon{background:#ffffff;color:#141922;border:1px solid #d5dae2;border-radius:8px;
+  padding:16px;margin-bottom:18px}
+.canon .cnote{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:#767f8d;margin-bottom:12px}
+.crow{display:flex;align-items:center;gap:0;margin-bottom:10px;flex-wrap:nowrap}
+.cbox{border:1px solid;border-radius:3px;padding:6px 9px;font-family:var(--mono);
+  font-size:10.5px;text-align:center;line-height:1.35;min-width:78px}
+.cdia{border:1px solid;padding:6px 8px;font-family:var(--mono);font-size:10px;
+  text-align:center;line-height:1.3;min-width:70px;
+  clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}
+.carr{flex:0 0 22px;height:1px;background:#9aa3b0;position:relative}
+.carr::after{content:"";position:absolute;right:0;top:-3px;border-left:5px solid #9aa3b0;
+  border-top:3.5px solid transparent;border-bottom:3.5px solid transparent}
+/* verbatim from admin/PIPELINE.md §3 */
+.k-done{background:#eef6ef;border-color:#2f6f43;color:#123021}
+.k-active{background:#fff8e6;border-color:#8a6410;border-width:2px;color:#3d2c04}
+.k-warn{background:#fff8e6;border-color:#8a6410;border-width:2px;color:#3d2c04}
+.k-looped{background:#fdf0ec;border-color:#a3341f;border-width:2px;color:#3d1109}
+.k-pending{background:#f4f5f7;border-color:#b8bfc9;color:#767f8d}
+.k-skipped{background:#f4f5f7;border-color:#b8bfc9;color:#767f8d;border-style:dashed}
+.k-hdone{background:#dcefe2;border-color:#2f6f43;color:#123021}
+.k-hwait{background:#ffe9a8;border-color:#8a6410;border-width:4px;color:#3d2c04}
+.k-hpend{background:#fafbfc;border-color:#cfd5dd;color:#98a1ad;border-style:dashed}
+.k-hskip{background:#fafbfc;border-color:#cfd5dd;color:#98a1ad;border-style:dashed}
+.k-hnone{background:#f8ded7;border-color:#a3341f;border-width:3px;color:#3d1109}
+
+/* ---- runtime gallery ---- */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px}
+.rt{background:var(--surface);border:1px solid var(--hair);border-radius:8px;padding:11px 13px}
+.rt .rtv{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;
+  font-weight:700;letter-spacing:.06em}
+.rt .dot{font-size:15px;line-height:1}
+.rt .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:6px;
+  line-height:1.6}
+.rt .age{display:inline-block;margin-top:5px;font-family:var(--mono);font-size:10px;
+  border:1px solid var(--hair-hi);border-radius:3px;padding:1px 5px;color:var(--ink-dim)}
+.v-up{color:var(--g-line)} .v-deg{color:var(--a-line)} .v-down{color:var(--r-line)}
+.v-unk{color:var(--u-line)}
+
+/* ---- misc ---- */
+.note{background:var(--surface2);border:1px solid var(--hair);border-left:3px solid var(--accent);
+  border-radius:0 7px 7px 0;padding:11px 14px;margin:14px 0;font-size:12.5px;color:var(--ink-dim)}
+.note b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+details{background:var(--surface);border:1px solid var(--hair);border-radius:7px;
+  padding:9px 13px;margin-top:8px}
+summary{cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-dim)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.prov{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);
+  border-top:1px solid var(--hair);padding-top:11px;margin-top:18px;line-height:1.8}
+.prov b{color:var(--ink-dim)}
+.sel{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:6px;
+  border:1px solid var(--hair-hi);background:var(--surface);color:var(--ink);min-width:280px}
+.legendgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.lgcard{background:var(--surface);border:1px solid var(--hair);border-radius:8px;padding:12px 14px}
+.lgcard h4{margin:0 0 8px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-dim)}
+.lgrow{display:flex;gap:10px;align-items:center;padding:5px 0;font-size:12px;
+  border-bottom:1px solid var(--hair)}
+.lgrow:last-child{border-bottom:none}
+.lgrow .lgw{flex:0 0 108px}
+</style>
+</head>
+<body>
+
+<div class="reviewbar">
+  <b>conclave-dashboard</b>
+  <span>Gate 5 · Experience Design · proposal</span>
+  <span class="sp"></span>
+  <a href="#s1">1 Portfolio</a>
+  <a href="#s2">2 Project</a>
+  <a href="#s3">3 Active gate</a>
+  <a href="#s4">4 Degradation</a>
+  <a href="#s5">5 Encoding</a>
+  <a href="#s6">6 R1 fallback</a>
+  <button class="tbtn" id="tt" aria-pressed="false">Theme · light</button>
+</div>
+
+<div class="sampleribbon">
+  SAMPLE DATA — every count, name, gate label and timestamp below is illustrative.
+  Nothing here is hardcoded in the product: all figures are read from state at render time (INTAKE A7.3).
+  Runtime probes shown were taken live on 2026-07-29 and are real.
+</div>
+
+<div class="page">
+
+<!-- ============================ SCREEN 1 ============================ -->
+<section class="screen" id="s1">
+  <div class="screenhead">
+    <span class="num">Screen 1</span>
+    <h2>Portfolio — the default landing</h2>
+    <p>One table, not stacked graphs. Answers "is anything wrong?" above the fold.</p>
+  </div>
+
+  <div class="app">
+    <div class="apphead">
+      <div class="brandrow">
+        <span class="slit"></span>
+        <span class="nm">conclave</span><span class="rt">/status</span>
+        <span class="sp"></span>
+        <span class="chip c-r big">● RED <span class="why">· portfolio · 6 findings</span></span>
+      </div>
+      <div class="rail" role="tablist" aria-label="Project selector">
+        <button class="railseg" role="tab" aria-selected="true"><span class="rn">▸ ALL PROJECTS</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">grid-assistant</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">load-alert-agent</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">policy-lookup-assistant</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-marketing</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">little-milestones</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-dashboard</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="fresh">
+        <span>AS OF <b>2026-07-29 09:14:22</b></span>
+        <span>PIPELINE SHAPE <b>admin/PIPELINE.md · 11 gates · read 09:14:22</b></span>
+        <span>OLDEST SOURCE <b style="color:var(--a-line)">admin/PORTFOLIO_STATUS.md · 21h 11m</b></span>
+        <span>SOURCES READ <b>13 of 13</b></span>
+        <span>PROBES <b>7 of 7 completed</b></span>
+      </div>
+
+      <p class="eyebrow">Status summary <span class="qt">— Highlight Report · overall &amp; by area</span></p>
+      <div class="tiles">
+        <div class="tile lead" style="border-color:var(--r-line);background:var(--r-fill)">
+          <div class="lab" style="color:var(--r-text)">Overall</div>
+          <div class="num" style="color:var(--r-text)">● RED</div>
+          <div class="sub" style="color:var(--r-text)">6 findings across 4 projects<br>derived from 13 sources</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Awaiting you</div>
+          <div class="num" style="color:var(--a-line)">1</div>
+          <div class="sub">conclave-dashboard<br>gate 2 · Team</div>
+        </div>
+        <div class="tile" style="border-color:var(--r-line)">
+          <div class="lab">Approval never asked</div>
+          <div class="num" style="color:var(--r-line)">1</div>
+          <div class="sub">little-milestones<br>gate 10 · Review</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Gates not run</div>
+          <div class="num" style="font-size:16px;line-height:1.35">
+            <span style="color:var(--u-text)">10 pre-gate</span><br>
+            <span style="color:var(--u-text)">1 n/a</span> ·
+            <span style="color:var(--r-line);font-weight:700">1 no-exception</span>
+          </div>
+          <div class="sub">never summed — three different facts</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Runtime</div>
+          <div class="num" style="font-size:16px;line-height:1.35">
+            <span style="color:var(--g-line)">2 up</span> ·
+            <span style="color:var(--a-line)">1 degraded</span><br>
+            <span style="color:var(--r-line)">3 down</span> ·
+            <span style="color:var(--u-text)">1 not deployed</span>
+          </div>
+          <div class="sub">7 endpoints · all checked 12s ago</div>
+        </div>
+        <div class="tile" style="border-color:var(--a-line)">
+          <div class="lab">Freshness</div>
+          <div class="num" style="color:var(--a-line);font-size:26px">21h</div>
+          <div class="sub">oldest source mtime<br>threshold 24h</div>
+        </div>
+      </div>
+
+      <p class="eyebrow">Exceptions <span class="qt">— what needs attention, before any detail</span></p>
+      <div class="callouts">
+        <div class="co r">
+          <span class="gl">✋</span>
+          <div>
+            <h4>A gate closed without the approval it owed</h4>
+            <p>little-milestones · gate 10 Review · <span class="mono">hnone</span>. The orchestrator skipped
+              the gate and requested no human exception.</p>
+            <span class="ev">evidence — projects/little-milestones/PIPELINE_LOG.md · "Exceptions granted" row 1 · read 09:14:20</span>
+          </div>
+          <span class="sev">Red</span>
+        </div>
+        <div class="co r">
+          <span class="gl">○</span>
+          <div>
+            <h4>3 projects record a deployed endpoint that is not answering</h4>
+            <p>grid-assistant <span class="mono">:8420</span>, load-alert-agent <span class="mono">:8422</span>,
+              policy-lookup-assistant <span class="mono">:8421</span> — connection refused.</p>
+            <span class="ev">evidence — probe at 09:14:22 · endpoints from each PROJECT_CONTEXT.md</span>
+          </div>
+          <span class="sev">Red</span>
+        </div>
+        <div class="co a">
+          <span class="gl">◐</span>
+          <div>
+            <h4>One service is running but not serving what we expect</h4>
+            <p>little-milestones backend <span class="mono">:8000</span> answered <span class="mono">404</span>
+              at <span class="mono">/</span>. Neither UP nor DOWN is a true statement about it.</p>
+            <span class="ev">evidence — probe at 09:14:22 · HTTP 404 · 1ms</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+        <div class="co a">
+          <span class="gl">⊘</span>
+          <div>
+            <h4>Coverage gap — 10 gates were never run because they did not exist</h4>
+            <p>Functional Design and Verification were added after all five original projects ran.
+              These are <b>not</b> "not applicable" — today they render identically in
+              <span class="mono">admin/PORTFOLIO_STATUS.md</span>, which is the conflation this dashboard exists to end.</p>
+            <span class="ev">evidence — admin/PORTFOLIO_STATUS.md ·  5 graphs × G4,G9 · mtime 2026-07-28 12:03</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+        <div class="co a">
+          <span class="gl">✋</span>
+          <div>
+            <h4>One approval is waiting on you right now</h4>
+            <p>conclave-dashboard · gate 2 Team Composition · <span class="mono">hwait</span>.</p>
+            <span class="ev">evidence — projects/conclave-dashboard/PIPELINE_LOG.md · "Current position" · read 09:14:21</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+        <div class="co a">
+          <span class="gl">◷</span>
+          <div>
+            <h4>A source is approaching its staleness threshold</h4>
+            <p><span class="mono">admin/PORTFOLIO_STATUS.md</span> is 21h 11m old against a 24h threshold.</p>
+            <span class="ev">evidence — filesystem mtime 2026-07-28 12:03:44 · read 09:14:22</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+      </div>
+
+      <p class="eyebrow">Portfolio <span class="qt">— one row per project · no graphs at this level</span></p>
+      <table>
+        <caption>All projects · attention index, position, approvals owed, runtime</caption>
+        <thead><tr>
+          <th>Attention</th><th>Project</th><th>Template</th><th>Position</th>
+          <th>Gates not run</th><th>Approvals</th><th>Runtime</th><th>Last activity</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="chip c-r">● RED <span class="why">2</span></span></td>
+            <td><span class="pname">grid-assistant</span></td><td class="n">genai-chatbot</td>
+            <td>released <span class="mono">v1.0.0</span> · prod</td>
+            <td class="n">2 pre-gate</td><td class="n">9 approved</td>
+            <td><span class="v-down">○ DOWN</span> <span class="mono" style="color:var(--ink-faint)">:8420 refused · 12s</span></td>
+            <td class="n">2026-07-09</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-r">● RED <span class="why">2</span></span></td>
+            <td><span class="pname">load-alert-agent</span></td><td class="n">agentic-workflow</td>
+            <td>released <span class="mono">v1.0.0</span> · prod</td>
+            <td class="n">2 pre-gate · <b>1 n/a</b></td><td class="n">8 approved</td>
+            <td><span class="v-down">○ DOWN</span> <span class="mono" style="color:var(--ink-faint)">:8422 refused · 12s</span></td>
+            <td class="n">2026-07-09</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-r">● RED <span class="why">2</span></span></td>
+            <td><span class="pname">policy-lookup-assistant</span></td><td class="n">rag-knowledge-base</td>
+            <td>deployed · dev, local</td>
+            <td class="n">2 pre-gate</td><td class="n">9 approved</td>
+            <td><span class="v-down">○ DOWN</span> <span class="mono" style="color:var(--ink-faint)">:8421 refused · 12s</span></td>
+            <td class="n">2026-07-09</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-a">▲ AMBER <span class="why">1</span></span></td>
+            <td><span class="pname">conclave-marketing</span></td><td class="n">custom (FastAPI)</td>
+            <td>deployed · dev, local</td>
+            <td class="n">2 pre-gate</td><td class="n">9 approved</td>
+            <td><span class="v-up">● UP</span> <span class="mono" style="color:var(--ink-faint)">:8100 · 200 · 8ms · 12s</span></td>
+            <td class="n">2026-07-17</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-r">● RED <span class="why">4</span></span></td>
+            <td><span class="pname">little-milestones</span></td><td class="n">genai-chatbot</td>
+            <td>deployed + post-deploy fixes</td>
+            <td class="n">2 pre-gate · <b style="color:var(--r-line)">1 no-exception</b></td>
+            <td class="n">8 approved · <b style="color:var(--r-line)">1 NOT ASKED</b></td>
+            <td><span class="v-up">● UP</span> <span class="mono" style="color:var(--ink-faint)">:3000 · 200 · 37ms</span>
+                <br><span class="v-deg">◐ DEGRADED</span> <span class="mono" style="color:var(--ink-faint)">:8000 · 404 at /</span></td>
+            <td class="n">2026-07-28</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-a">▲ AMBER <span class="why">1</span></span></td>
+            <td><span class="pname">conclave-dashboard</span></td><td class="n">custom (Flask)</td>
+            <td><b>gate 2 · Team</b> — awaiting you</td>
+            <td class="n">—</td><td class="n">1 approved · <b style="color:var(--a-line)">1 awaiting</b></td>
+            <td><span class="v-unk">— NOT DEPLOYED</span> <span class="mono" style="color:var(--ink-faint)">no endpoint recorded</span></td>
+            <td class="n">2026-07-28</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="prov">
+        <b>PROVENANCE</b> — every figure above derives from these reads, at these times.<br>
+        admin/PIPELINE.md · mtime 2026-07-28 11:02 · read ok ·
+        admin/PORTFOLIO_STATUS.md · mtime 2026-07-28 12:03 · read ok ·
+        projects/*/pipeline-state.json · 6 files · read ok ·
+        7 HTTP probes · 7 completed, 0 timed out.<br>
+        No figure on this page is written into the template. Gate count, gate names and project list
+        are iterated from state at render time.
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>Why a table and not five graphs.</b> R1 asks for a selector so the page is not
+  five stacked graphs. The portfolio view satisfies that literally — it contains no graph at all.
+  Graphs live in the project view, one at a time. The attention column is the leftmost column
+  because it is the only column that can send you somewhere.</div>
+</section>
+
+<!-- ============================ SCREEN 2 ============================ -->
+<section class="screen" id="s2">
+  <div class="screenhead">
+    <span class="num">Screen 2</span>
+    <h2>Project view — little-milestones</h2>
+    <p>The richest real case: a NOT ASKED, two ⚠, three flavours of ⊘, eight loop-backs.</p>
+  </div>
+
+  <div class="app">
+    <div class="apphead">
+      <div class="brandrow">
+        <span class="slit"></span>
+        <span class="nm">conclave</span><span class="rt">/status/little-milestones</span>
+        <span class="sp"></span>
+        <span class="chip c-r big">● RED <span class="why">· 4 findings</span></span>
+      </div>
+      <div class="rail" role="tablist" aria-label="Project selector">
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">▸ ALL PROJECTS</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">grid-assistant</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">load-alert-agent</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">policy-lookup-assistant</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-marketing</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+        <button class="railseg" role="tab" aria-selected="true"><span class="rn">little-milestones</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-dashboard</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="fresh">
+        <span>AS OF <b>2026-07-29 09:14:22</b></span>
+        <span>RUN <b>enhance-project · F18 native mobile</b></span>
+        <span>SOURCE <b>projects/little-milestones/PIPELINE_LOG.md · 21h 11m old</b></span>
+        <span>PROBES <b>2 of 2 · 12s ago</b></span>
+      </div>
+
+      <div class="tiles">
+        <div class="tile lead" style="border-color:var(--r-line);background:var(--r-fill)">
+          <div class="lab" style="color:var(--r-text)">Overall</div>
+          <div class="num" style="color:var(--r-text)">● RED</div>
+          <div class="sub" style="color:var(--r-text)">4 findings · enumerated below</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Position</div>
+          <div class="num" style="font-size:19px;line-height:1.25">post-Deploy<br>defect cycle</div>
+          <div class="sub">after gate 11 · not blocked</div>
+        </div>
+        <div class="tile" style="border-color:var(--r-line)">
+          <div class="lab">Approvals</div>
+          <div class="num" style="font-size:16px;line-height:1.35">
+            <span style="color:var(--g-line)">8 approved</span><br>
+            <span style="color:var(--u-text)">2 n/a</span> ·
+            <span style="color:var(--r-line);font-weight:700">1 NOT ASKED</span>
+          </div>
+          <div class="sub">owed-and-never-requested is its own count</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Gates not run</div>
+          <div class="num" style="font-size:16px;line-height:1.35">
+            <span style="color:var(--u-text)">2 pre-gate</span><br>
+            <span style="color:var(--r-line);font-weight:700">1 no-exception</span>
+          </div>
+          <div class="sub">0 n/a · never summed</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Runtime</div>
+          <div class="num" style="font-size:16px;line-height:1.35">
+            <span style="color:var(--g-line)">● UP</span> <span class="mono" style="font-size:11px">:3000</span><br>
+            <span style="color:var(--a-line)">◐ DEGRADED</span> <span class="mono" style="font-size:11px">:8000</span>
+          </div>
+          <div class="sub">both checked 12s ago</div>
+        </div>
+        <div class="tile">
+          <div class="lab">Loop-backs</div>
+          <div class="num">8</div>
+          <div class="sub">7 originated by you<br>on the running app</div>
+        </div>
+      </div>
+
+      <p class="eyebrow">Exceptions <span class="qt">— ordered by severity, then age of the underlying fact</span></p>
+      <div class="callouts">
+        <div class="co r">
+          <span class="gl">✋</span>
+          <div>
+            <h4>Gate 10 Review closed without the approval it owed</h4>
+            <p>Skipped by the orchestrator, unilaterally. No human exception was requested and none was granted.
+              This is <span class="mono">hnone</span>, which is not <span class="mono">hskip</span>.</p>
+            <span class="ev">evidence — PIPELINE_LOG.md · Exceptions granted · row dated 2026-07-26 · read 09:14:20</span>
+          </div>
+          <span class="sev">Red</span>
+        </div>
+        <div class="co a">
+          <span class="gl">⚠</span>
+          <div>
+            <h4>Two gates ran incompletely</h4>
+            <p>Gate 6 Architecture — mobile design landed in <span class="mono">SECURITY_KB §9</span> /
+              <span class="mono">UX_KB §13</span>, never in <span class="mono">ARCHITECTURE_KB.md</span>.
+              Gate 8 Test — rendered-UI contract live with no native backend; six defects structurally uncatchable.</p>
+            <span class="ev">evidence — PIPELINE_LOG.md · gate ledger rows 6 and 8 · read 09:14:20</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+        <div class="co a">
+          <span class="gl">◐</span>
+          <div>
+            <h4>Backend responding, but not at the recorded path</h4>
+            <p><span class="mono">:8000</span> returned <span class="mono">404</span> for
+              <span class="mono">GET /</span> in 1ms. The process is alive. What it is serving is not what
+              was recorded. Reported as DEGRADED, never as UP and never as DOWN.</p>
+            <span class="ev">evidence — probe 09:14:22 · endpoint from PROJECT_CONTEXT.md</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+        <div class="co a">
+          <span class="gl">⊘</span>
+          <div>
+            <h4>Two gates were never run because they did not exist</h4>
+            <p>Gate 4 Functional Design and gate 9 Verification were added 2026-07-28. No acceptance criteria
+              with stable IDs exist for this project, and no evidence trail has been audited against them.</p>
+            <span class="ev">evidence — PIPELINE_LOG.md · ledger rows 4 and 9 · admin/PIPELINE.md mtime 2026-07-28 11:02</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+      </div>
+
+      <p class="eyebrow">Milestone status <span class="qt">— analytical layer · 11 gates, each with the approval that closes it</span></p>
+      <div class="stripwrap">
+        <div class="strip">
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 01</div>
+            <div class="gname">Intake</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 02</div>
+            <div class="gname">Team</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 03</div>
+            <div class="gname">Plan</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-pregate"><span class="gglyph">⊘</span><div class="gnum">GATE 04</div>
+            <div class="gname">Functional</div><div class="gstate">pre-gate · did not exist</div></div>
+            <div class="appr a-skip">✋ n/a</div></div>
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 05</div>
+            <div class="gname">Experience</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-warn"><span class="gglyph">⚠</span><div class="gnum">GATE 06</div>
+            <div class="gname">Architecture</div><div class="gstate">ran incompletely</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 07</div>
+            <div class="gname">Code</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-warn"><span class="gglyph">⚠</span><div class="gnum">GATE 08</div>
+            <div class="gname">Test</div><div class="gstate">ran incompletely</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-pregate"><span class="gglyph">⊘</span><div class="gnum">GATE 09</div>
+            <div class="gname">Verify</div><div class="gstate">pre-gate · did not exist</div></div>
+            <div class="appr a-skip">✋ n/a</div></div>
+          <div class="gcell"><div class="gate g-noexc"><span class="gglyph">⊘</span><div class="gnum">GATE 10</div>
+            <div class="gname">Review</div><div class="gstate">SKIPPED · no exception</div></div>
+            <div class="appr a-none">✋ NOT ASKED</div></div>
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 11</div>
+            <div class="gname">Deploy</div><div class="gstate">done</div></div>
+            <div class="appr a-done">✋ approved</div></div>
+        </div>
+        <div style="margin-top:11px;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)">
+          ⊘ appears three times above and means three different things. Gate 4 and 9 are hatched
+          (the gate did not exist). Gate 10 is solid red (the gate existed, was skipped, and no exception
+          was requested). Neither is "n/a".
+        </div>
+      </div>
+
+      <p class="eyebrow">Canonical graph <span class="qt">— reproduced verbatim from admin/PIPELINE.md §3 · does not theme</span></p>
+      <div class="canon">
+        <div class="cnote">admin/PIPELINE.md §3 notation · classDef block emitted verbatim · this panel keeps
+          the canonical light palette in both themes, because the palette is part of the artefact</div>
+        <div class="crow">
+          <span class="cbox k-done">✅ 1<br>Intake</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-done">✅ 2<br>Team</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-done">✅ 3<br>Plan</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span>
+        </div>
+        <div class="crow">
+          <span class="cbox k-skipped">⊘ 4<br>Functional</span><span class="carr"></span>
+          <span class="cdia k-hskip">✋<br>n/a</span><span class="carr"></span>
+          <span class="cbox k-done">✅ 5<br>Experience</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-warn">⚠ 6<br>Architecture</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span>
+        </div>
+        <div class="crow">
+          <span class="cbox k-done">✅ 7<br>Code</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-warn">⚠ 8<br>Test</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-skipped">⊘ 9<br>Verify</span><span class="carr"></span>
+          <span class="cdia k-hskip">✋<br>n/a</span>
+        </div>
+        <div class="crow">
+          <span class="cbox k-skipped">⊘ 10<br>Review</span><span class="carr"></span>
+          <span class="cdia k-hnone">✋<br>NOT ASKED</span><span class="carr"></span>
+          <span class="cbox k-done">✅ 11<br>Deploy</span><span class="carr"></span>
+          <span class="cdia k-hdone">✋<br>approved</span><span class="carr"></span>
+          <span class="cbox k-looped">↩ post-deploy<br>defect cycle</span>
+        </div>
+      </div>
+      <div class="note"><b>Why both layers are on the page.</b> The canonical graph is the control that
+      <span class="mono">admin/PIPELINE.md §3a</span> makes mandatory, and it must render identically
+      everywhere it appears — so the dashboard reproduces it, palette included, and does not improve it.
+      The strip above it is the analytical layer that says what the graph structurally cannot: which
+      <span class="mono">⊘</span> is which. Look at gates 4, 9 and 10 in the graph — they are three
+      identical grey dashed boxes. In the strip they are three visibly different things. That difference
+      is the entire product.</div>
+
+      <details>
+        <summary>Gate ledger — 11 rows</summary>
+        <table style="margin-top:9px">
+          <caption>Products delivered, per gate</caption>
+          <thead><tr><th>#</th><th>Gate</th><th>Date</th><th>Artifacts</th><th>Approval</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="n">6</td><td>Architecture</td><td class="n">2026-07-26</td>
+              <td class="mono" style="font-size:11px">SECURITY_KB.md §9</td>
+              <td><span class="chip c-g">approved</span></td>
+              <td>⚠ incomplete — closed retrospectively 2026-07-28</td></tr>
+            <tr><td class="n">8</td><td>Test</td><td class="n">2026-07-26→28</td>
+              <td class="mono" style="font-size:11px">test-evidence/</td>
+              <td><span class="chip c-g">approved</span></td>
+              <td>⚠ six defects structurally uncatchable</td></tr>
+            <tr><td class="n">10</td><td>Review</td><td class="n">—</td><td>—</td>
+              <td><span class="chip c-r">NOT ASKED</span></td>
+              <td>skipped by orchestrator, unilaterally</td></tr>
+          </tbody>
+        </table>
+      </details>
+      <details>
+        <summary>Loop-backs — 8 rows · Exceptions granted — 1 row · Route changes — 3 rows</summary>
+        <p style="font-size:12.5px;color:var(--ink-dim);margin:9px 0 0">
+          Collapsed by default: these are the Highlight Report's risk/issue log, needed for audit
+          (flow F-D) but not for triage. Disclosure is a <span class="mono">&lt;details&gt;</span>,
+          never hover — every fact on this page must survive a screenshot.</p>
+      </details>
+
+      <div class="prov">
+        <b>PROVENANCE</b> — projects/little-milestones/PIPELINE_LOG.md · mtime 2026-07-28 12:03 · read ok ·
+        projects/little-milestones/pipeline-state.json · read ok ·
+        2 HTTP probes at 09:14:22 · both completed.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SCREEN 3 ============================ -->
+<section class="screen" id="s3">
+  <div class="screenhead">
+    <span class="num">Screen 3</span>
+    <h2>Project view — a run in flight, waiting on you</h2>
+    <p>Flow F-B. <span class="mono">hwait</span> is the loudest element the design can produce.</p>
+  </div>
+
+  <div class="app">
+    <div class="apphead">
+      <div class="brandrow">
+        <span class="slit"></span><span class="nm">conclave</span>
+        <span class="rt">/status/conclave-dashboard</span>
+        <span class="sp"></span>
+        <span class="chip c-a big">▲ AMBER <span class="why">· 1 finding · awaiting you</span></span>
+      </div>
+      <div class="rail" role="tablist" aria-label="Project selector">
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">▸ ALL PROJECTS</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">little-milestones</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="true"><span class="rn">conclave-dashboard</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+      </div>
+    </div>
+    <div class="body">
+      <div class="fresh">
+        <span>AS OF <b>2026-07-29 09:14:22</b></span>
+        <span>RUN <b>new-project · custom (Flask)</b></span>
+        <span>SOURCE <b>PIPELINE_LOG.md · 19h 05m old</b></span>
+      </div>
+      <div class="tiles">
+        <div class="tile lead" style="border-color:var(--a-line);background:var(--a-fill)">
+          <div class="lab" style="color:var(--a-text)">Overall</div>
+          <div class="num" style="color:var(--a-text)">▲ AMBER</div>
+          <div class="sub" style="color:var(--a-text)">1 finding · you are the blocker</div>
+        </div>
+        <div class="tile" style="border-color:var(--a-line);border-width:2px">
+          <div class="lab">Position</div>
+          <div class="num" style="font-size:19px;line-height:1.25;color:var(--a-text)">Gate 2<br>Team</div>
+          <div class="sub" style="color:var(--a-line)"><b>AWAITING YOUR APPROVAL</b></div>
+        </div>
+        <div class="tile"><div class="lab">Awaiting you</div>
+          <div class="num" style="color:var(--a-line)">1</div><div class="sub">gate 2 · Team Composition</div></div>
+        <div class="tile"><div class="lab">Gates not run</div>
+          <div class="num" style="font-size:16px">0 pre-gate<br>0 n/a · 0 no-exception</div>
+          <div class="sub">first project to run all 11</div></div>
+        <div class="tile"><div class="lab">Runtime</div>
+          <div class="num" style="font-size:16px;color:var(--u-text)">— NOT<br>DEPLOYED</div>
+          <div class="sub">no endpoint recorded · not an error</div></div>
+        <div class="tile"><div class="lab">Freshness</div>
+          <div class="num" style="font-size:26px">19h</div><div class="sub">threshold 24h</div></div>
+      </div>
+
+      <div class="callouts">
+        <div class="co a">
+          <span class="gl">✋</span>
+          <div>
+            <h4>Gate 2 · Team Composition is waiting on your approval</h4>
+            <p>The run has stopped here. Nothing advances until you answer.</p>
+            <span class="ev">evidence — projects/conclave-dashboard/PIPELINE_LOG.md · Current position · read 09:14:21</span>
+          </div>
+          <span class="sev">Amber</span>
+        </div>
+      </div>
+
+      <div class="stripwrap">
+        <div class="strip">
+          <div class="gcell"><div class="gate g-done"><span class="gglyph">✅</span><div class="gnum">GATE 01</div>
+            <div class="gname">Intake</div><div class="gstate">done</div></div><div class="appr a-done">✋ approved</div></div>
+          <div class="gcell"><div class="gate g-active"><span class="gglyph">▶</span><div class="gnum">GATE 02</div>
+            <div class="gname">Team</div><div class="gstate">running</div></div>
+            <div class="appr a-wait">✋ YOU<br>approve?</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 03</div>
+            <div class="gname">Plan</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 04</div>
+            <div class="gname">Functional</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 05</div>
+            <div class="gname">Experience</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 06</div>
+            <div class="gname">Architecture</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 07</div>
+            <div class="gname">Code</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 08</div>
+            <div class="gname">Test</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 09</div>
+            <div class="gname">Verify</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 10</div>
+            <div class="gname">Review</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+          <div class="gcell"><div class="gate g-pending"><span class="gglyph">⬜</span><div class="gnum">GATE 11</div>
+            <div class="gname">Deploy</div><div class="gstate">pending</div></div><div class="appr a-pend">✋ —</div></div>
+        </div>
+      </div>
+      <div class="note">The strip has <b>eleven</b> cells because the pipeline definition read at
+      09:14:22 contained eleven gates. It is a loop over that definition, not a layout. A twelfth gate
+      adds a twelfth cell and changes no design, no CSS and no copy — which is exactly what
+      <span class="mono">DESIGN_SPEC.md</span> failed to do when it wrote "Nine gates" into a heading.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SCREEN 4 ============================ -->
+<section class="screen" id="s4">
+  <div class="screenhead">
+    <span class="num">Screen 4</span>
+    <h2>Honest degradation — the states that must never render as fine</h2>
+    <p>Constraint A7.2. Unknown, unreachable and stale are visible states, not absences.</p>
+  </div>
+
+  <div class="app"><div class="body">
+    <p class="eyebrow">Runtime states <span class="qt">— seven, none collapsible into up/down</span></p>
+    <div class="gallery">
+      <div class="rt"><div class="rtv v-up"><span class="dot">●</span> UP</div>
+        <div class="meta">http://127.0.0.1:8100/<br>200 · 8ms</div><span class="age">checked 12s ago</span></div>
+      <div class="rt" style="border-color:var(--a-line)"><div class="rtv v-deg"><span class="dot">◐</span> RESPONDING</div>
+        <div class="meta">http://127.0.0.1:8000/<br>404 at / · 1ms<br>alive, but not serving what was recorded</div>
+        <span class="age">checked 12s ago</span></div>
+      <div class="rt" style="border-color:var(--r-line)"><div class="rtv v-down"><span class="dot">○</span> DOWN</div>
+        <div class="meta">http://127.0.0.1:8420/<br>connection refused</div><span class="age">checked 12s ago</span></div>
+      <div class="rt" style="border-color:var(--r-line)"><div class="rtv v-down"><span class="dot">⊗</span> UNREACHABLE</div>
+        <div class="meta">host did not answer<br>timeout after 2000ms</div><span class="age">checked 12s ago</span></div>
+      <div class="rt"><div class="rtv v-unk"><span class="dot">—</span> NOT DEPLOYED</div>
+        <div class="meta">no endpoint recorded<br>this is a fact, not a failure</div><span class="age">n/a</span></div>
+      <div class="rt" style="border-style:dashed"><div class="rtv v-unk"><span class="dot">?</span> UNKNOWN</div>
+        <div class="meta">no probe result this session<br>probe did not complete</div><span class="age">never checked</span></div>
+      <div class="rt" style="border-style:dashed"><div class="rtv v-unk"><span class="dot">◌</span> LAST KNOWN UP</div>
+        <div class="meta">verdict older than 5m threshold<br>demoted from ● UP</div><span class="age">checked 41m ago</span></div>
+    </div>
+
+    <div class="note"><b>Green never survives its own freshness window.</b> The last card was green
+    41 minutes ago. It is slate now, and it says so in words. Nothing on this page stays green by inertia.</div>
+
+    <p class="eyebrow" style="margin-top:22px">Degraded page states <span class="qt">— what the top of the page does when it cannot establish something</span></p>
+    <div class="grid2">
+      <div>
+        <div class="callouts">
+          <div class="co u">
+            <span class="gl">?</span>
+            <div>
+              <h4>UNKNOWN — 2 of 13 sources could not be read</h4>
+              <p><span class="mono">projects/grid-assistant/pipeline-state.json</span> — no such file.<br>
+                 <span class="mono">projects/load-alert-agent/pipeline-state.json</span> — malformed JSON at line 41.<br>
+                 No overall status is asserted while any input is unreadable.</p>
+              <span class="ev">read attempted 09:14:22 · 2 failures</span>
+            </div>
+            <span class="sev">Unknown</span>
+          </div>
+        </div>
+        <div class="tiles" style="grid-template-columns:repeat(2,1fr)">
+          <div class="tile lead" style="border-color:var(--u-line);border-style:dashed;background:var(--u-fill)">
+            <div class="lab">Overall</div><div class="num" style="color:var(--u-text)">? UNKNOWN</div>
+            <div class="sub">2 of 13 sources unreadable</div>
+          </div>
+          <div class="tile" style="border-style:dashed">
+            <div class="lab">Gates not run</div><div class="num" style="color:var(--u-text);font-size:20px">?</div>
+            <div class="sub">cannot be established<br>not rendered as 0</div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:10px"><b>The single most important rule in the design.</b>
+          An all-clear is never rendered when any input failed to read. Green is an intersection over a
+          complete fact set; uncertainty falls to Unknown, never to Green. A count that cannot be
+          established renders <span class="mono">?</span>, never <span class="mono">0</span> —
+          because 0 is an assertion.</div>
+      </div>
+      <div>
+        <div class="callouts">
+          <div class="co g">
+            <span class="gl">✓</span>
+            <div>
+              <h4>No findings</h4>
+              <p>All 11 gates closed with the approval each owed. Runtime up. Derived from 13 sources,
+                all read successfully, newest 4s old, oldest 6m.</p>
+              <span class="ev">this is a positive statement, not an empty region</span>
+            </div>
+            <span class="sev">Green</span>
+          </div>
+        </div>
+        <div class="tiles" style="grid-template-columns:repeat(2,1fr)">
+          <div class="tile lead" style="border-color:var(--g-line);background:var(--g-fill)">
+            <div class="lab">Overall</div><div class="num" style="color:var(--g-text)">✓ GREEN</div>
+            <div class="sub">0 findings · 13 of 13 sources fresh</div>
+          </div>
+          <div class="tile"><div class="lab">Gates not run</div>
+            <div class="num" style="font-size:20px">0</div><div class="sub">asserted over a complete read</div></div>
+        </div>
+        <div class="note" style="margin-top:10px"><b>The empty state is a sentence.</b> A quiet page and
+          a broken reader must never look alike. Green always shows the size of the fact set it was
+          derived from — "0 findings" alone is unfalsifiable.</div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============================ SCREEN 5 ============================ -->
+<section class="screen" id="s5">
+  <div class="screenhead">
+    <span class="num">Screen 5</span>
+    <h2>Encoding legend — the component sheet</h2>
+    <p>Published on the product itself. A derivation the reader cannot inspect is one they cannot distrust.</p>
+  </div>
+
+  <div class="app"><div class="body">
+    <div class="legendgrid">
+      <div class="lgcard">
+        <h4>Layer 1 · attention index (4 states)</h4>
+        <div class="lgrow"><span class="lgw"><span class="chip c-r">● RED</span></span>
+          <span>approval never asked · gate skipped without exception · recorded endpoint down</span></div>
+        <div class="lgrow"><span class="lgw"><span class="chip c-a">▲ AMBER</span></span>
+          <span>gate ran incompletely · open loop-back · degraded runtime · stale source · coverage gap</span></div>
+        <div class="lgrow"><span class="lgw"><span class="chip c-u">? UNKNOWN</span></span>
+          <span>any input unreadable, any probe inconclusive, any chip that cannot enumerate its reasons</span></div>
+        <div class="lgrow"><span class="lgw"><span class="chip c-g">✓ GREEN</span></span>
+          <span>every gate closed, every approval given, runtime up, all sources fresh — an intersection</span></div>
+        <div class="lgrow" style="color:var(--ink-dim);font-size:11.5px">
+          Red and amber are unions — any one finding trips them. Green is an intersection — everything
+          must hold. Precedence: RED → UNKNOWN → AMBER → GREEN.</div>
+      </div>
+
+      <div class="lgcard">
+        <h4>Layer 2 · gate states (from admin/PIPELINE.md §3)</h4>
+        <div class="lgrow"><span class="lgw"><span class="gate g-done" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">✅</span><span style="font-size:11px">done</span></span></span><span>closed, human approved</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-active" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">▶</span><span style="font-size:11px">active</span></span></span><span>currently running</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-looped" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">↩</span><span style="font-size:11px">looped</span></span></span><span>failed and sent work back</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-warn" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">⚠</span><span style="font-size:11px">warn</span></span></span><span>ran, but incompletely</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-pending" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">⬜</span><span style="font-size:11px">pending</span></span></span><span>not started</span></div>
+      </div>
+
+      <div class="lgcard" style="border-color:var(--r-line)">
+        <h4>The three flavours of ⊘ — three marks, never one</h4>
+        <div class="lgrow"><span class="lgw"><span class="gate g-na" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">⊘</span><span style="font-size:11px">n/a</span></span></span>
+          <span><b>not applicable</b> — by template. Dashed. No approval was owed.</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-pregate" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">⊘</span><span style="font-size:11px">pre-gate</span></span></span>
+          <span><b>the gate did not exist</b> — hatched. A real coverage gap.</span></div>
+        <div class="lgrow"><span class="lgw"><span class="gate g-noexc" style="min-height:0;padding:3px 22px 3px 8px"><span class="gglyph" style="position:static;float:right">⊘</span><span style="font-size:11px">skipped</span></span></span>
+          <span><b>skipped without an exception</b> — solid red. Second-loudest thing the page can render.</span></div>
+        <div class="lgrow" style="color:var(--ink-dim);font-size:11.5px">
+          These three rendered identically for weeks. That is how a skipped Review gate stayed invisible.
+          Distinguishing them is not a nicety; it is the requirement.</div>
+      </div>
+
+      <div class="lgcard">
+        <h4>Approval states (5)</h4>
+        <div class="lgrow"><span class="lgw"><span class="appr a-done">✋ approved</span></span><span>the human approved</span></div>
+        <div class="lgrow"><span class="lgw"><span class="appr a-wait">✋ YOU approve?</span></span><span><b>waiting on you right now</b> — loudest element in the system</span></div>
+        <div class="lgrow"><span class="lgw"><span class="appr a-pend">✋ —</span></span><span>not reached yet</span></div>
+        <div class="lgrow"><span class="lgw"><span class="appr a-skip">✋ n/a</span></span><span>gate not applicable, no approval owed</span></div>
+        <div class="lgrow"><span class="lgw"><span class="appr a-none">✋ NOT ASKED</span></span><span><b>an approval was owed and never requested</b></span></div>
+      </div>
+
+      <div class="lgcard">
+        <h4>Type — provenance made typographic</h4>
+        <div class="lgrow"><span class="lgw mono" style="font-size:12.5px">mono 12.5</span>
+          <span>anything the machine produced: IDs, paths, timestamps, glyphs, states</span></div>
+        <div class="lgrow"><span class="lgw" style="font-size:13.5px">sans 13.5</span>
+          <span>anything a human wrote: callout titles, ledger notes</span></div>
+        <div class="lgrow"><span class="lgw" style="font-size:24px;font-weight:600">32/600</span>
+          <span>KPI numerals — tabular, weight 600. Not 200-weight ultralight: a hairline 5rem numeral
+            is the least legible element on most dashboards.</span></div>
+        <div class="lgrow"><span class="lgw"><span class="eyebrow" style="margin:0">Section</span></span>
+          <span>mono 11 · 0.28em · leading rule — kept verbatim from The Signal Path</span></div>
+      </div>
+
+      <div class="lgcard">
+        <h4>Reconcile / supersede — The Signal Path</h4>
+        <div class="lgrow"><span class="lgw" style="color:var(--g-line);font-family:var(--mono);font-size:11px">KEPT</span>
+          <span>void/floor/surface scaffolding · hairlines · mono eyebrow + rule · aperture slit as the
+            gate motif · tabular-nums · grain at 0.03</span></div>
+        <div class="lgrow"><span class="lgw" style="color:var(--r-line);font-family:var(--mono);font-size:11px">SUPERSEDED</span>
+          <span><b>dark-only</b> — the canonical classDef palette is a light palette; a dark-only surface
+            cannot host the verbatim graph honestly</span></div>
+        <div class="lgrow"><span class="lgw" style="color:var(--r-line);font-family:var(--mono);font-size:11px">SUPERSEDED</span>
+          <span><b>theatrical display type</b> — a status report is dense by requirement; the
+            "≥1 element over 3rem" test is explicitly waived for /status</span></div>
+        <div class="lgrow"><span class="lgw" style="color:var(--r-line);font-family:var(--mono);font-size:11px">SUPERSEDED</span>
+          <span><b>ambient animation</b> — motion connotes liveness. A permanently animated status page
+            asserts "live" every frame, including when the data is 18 days stale. Nothing loops, nothing idles.</span></div>
+        <div class="lgrow"><span class="lgw" style="color:var(--r-line);font-family:var(--mono);font-size:11px">SUPERSEDED</span>
+          <span><b>ember accent</b> — #f5a83c sits on top of the canonical warn amber. Status hues are
+            reserved for status; the accent is reserved for navigation, selection and focus. Never crossed.</span></div>
+      </div>
+    </div>
+
+    <div class="note"><b>Accessibility acceptance test.</b> Print any screen greyscale: no fact may be
+    lost. Every state carries a glyph and a word; colour only intensifies a distinction already legible
+    in monochrome. No fact is reachable by hover alone — which also means every fact survives a
+    screenshot, and screenshots are how this platform records test evidence.</div>
+  </div></div>
+</section>
+
+<!-- ============================ SCREEN 6 ============================ -->
+<section class="screen" id="s6">
+  <div class="screenhead">
+    <span class="num">Screen 6</span>
+    <h2>R1 as literally written — the dropdown, for comparison</h2>
+    <p>Same state, different control. Rendered so the choice can be judged rather than argued.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="app"><div class="apphead" style="padding-bottom:14px">
+      <div class="brandrow" style="padding-bottom:10px">
+        <span class="slit"></span><span class="nm">conclave</span><span class="rt">/status</span>
+      </div>
+      <label class="mono" style="font-size:11px;color:var(--ink-dim);display:block;margin-bottom:6px">PROJECT</label>
+      <select class="sel">
+        <option>little-milestones</option><option>grid-assistant</option>
+        <option>load-alert-agent</option><option>policy-lookup-assistant</option>
+        <option>conclave-marketing</option><option>conclave-dashboard</option>
+      </select>
+    </div><div class="body">
+      <p style="margin:0;color:var(--ink-dim);font-size:12.5px">
+        Four other projects are <span class="chip c-r">● RED</span> right now.
+        You cannot tell from this screen. The control's job is to hide the options.</p>
+    </div></div>
+
+    <div class="app"><div class="apphead" style="padding-bottom:0">
+      <div class="brandrow" style="padding-bottom:10px">
+        <span class="slit"></span><span class="nm">conclave</span><span class="rt">/status</span>
+      </div>
+      <div class="rail" role="tablist" aria-label="Project selector">
+        <button class="railseg" role="tab" aria-selected="true"><span class="rn">little-milestones</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">grid-assistant</span>
+          <span class="rr"><span class="chip c-r">● RED</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-marketing</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+        <button class="railseg" role="tab" aria-selected="false"><span class="rn">conclave-dashboard</span>
+          <span class="rr"><span class="chip c-a">▲ AMBER</span></span></button>
+      </div>
+    </div><div class="body">
+      <p style="margin:0;color:var(--ink-dim);font-size:12.5px">
+        Same switch, one click, and every other project's state is on screen while you read this one.
+        <b>Degrades to the <span class="mono">&lt;select&gt;</span> above ~8 projects</b>, where the
+        rail's advantages invert and R1's original instinct becomes correct.</p>
+    </div></div>
+  </div>
+
+  <div class="note"><b>My recommendation, stated as disagreement rather than compliance.</b>
+  R1 asks for a dropdown; I am proposing the rail plus a portfolio landing view. The intent of R1 —
+  "switch projects, not five stacked graphs" — is fully met, and better met, because the portfolio
+  view contains no graph at all. My objection to the literal dropdown is narrow and specific: a closed
+  dropdown cannot carry state, so while you read one project, a red one is invisible <i>by design</i> —
+  the same class of failure as the ⊘ conflation. If you prefer the dropdown, it drops straight in; the
+  two are the same state differently rendered. The one thing I would push back hard on is a dropdown
+  <i>without</i> an always-visible portfolio row, because that puts the bad news one interaction away.</div>
+</section>
+
+<!-- ============================ CLOSING ============================ -->
+<section class="screen">
+  <div class="screenhead"><span class="num">Coverage</span>
+    <h2>What this proposal does and does not cover</h2></div>
+  <div class="grid2">
+    <div class="lgcard">
+      <h4>Covered</h4>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">R1</span><span>selector — rail + portfolio landing, with the literal dropdown rendered for comparison (screen 6)</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">R2</span><span>analytical layout — inverted pyramid, KPI row → exceptions → detail</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">R3</span><span>callouts before detail, encoded in form (glyph + word + border weight) as well as colour</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">R4</span><span>PRINCE2 Highlight Report section order, mapped region by region in UX_KB §3.1</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">R5</span><span>this file</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">A7.2</span><span>unknown / unreachable / stale / degraded are visible states (screen 4)</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">A7.3</span><span>no count, gate name or agent list is design copy; the strip is a loop over the pipeline definition</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">A5.1</span><span>desktop only; both themes; no auth surface; no write affordance anywhere</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">A9.4</span><span>canonical classDef block reproduced verbatim, palette included</span></div>
+    </div>
+    <div class="lgcard" style="border-color:var(--a-line)">
+      <h4>Not covered — flagged, not hidden</h4>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">GATE 3/4</span>
+        <span>This design was made <b>ahead of Plan &amp; Backlog and Functional Design</b>. There is no
+        approved backlog and no acceptance criteria to design against, so this is drawn from intake
+        requirements. If gate 3/4 change scope, this is the loop-back target.</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">STALENESS</span>
+        <span>Thresholds (5m runtime / 24h source) are proposed, not decided. Human's call at gate 4.</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">PROBES</span>
+        <span>On-load only vs. a manual re-check button — undecided. A button is a write-shaped
+        affordance on a read-only page; I lean on-load-only.</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">DRIFT</span>
+        <span>Comparing state mtime against the generated markdown would directly attack A2.1, but is
+        arguably beyond A8.3's smallest-useful. Recommended in, as a callout kind. Human's call.</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">MERMAID</span>
+        <span>The canonical graph here is drawn in HTML using the verbatim classDef hex values.
+        Production embeds real mermaid so it is byte-identical to PIPELINE_LOG.md. Same palette, same
+        row structure; confirm the rendering approach at gate 6.</span></div>
+      <div class="lgrow"><span class="lgw mono" style="font-size:11px">DESIGNSYNC</span>
+        <span>Not available in this invocation's tool grant, so no component library was pushed.
+        Screen 5 is the push-ready inventory.</span></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('tt'),h=document.documentElement;
+  function set(t){h.setAttribute('data-theme',t);
+    b.textContent='Theme · '+t; b.setAttribute('aria-pressed', t==='dark');}
+  b.addEventListener('click',function(){
+    set(h.getAttribute('data-theme')==='dark'?'light':'dark');});
+  // default follows the OS, per UX_KB §6
+  if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) set('dark');
+})();
+</script>
+</body>
+</html>

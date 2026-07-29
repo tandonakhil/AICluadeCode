@@ -63,10 +63,14 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,DONE pending
@@ -127,7 +131,23 @@ The orchestrator re-renders the graph **at every step**, using these states.
 | `↩` | `looped` | Failed and sent work back; will re-run |
 | `⚠` | `warn` | Ran, but incompletely — see the log |
 | `⬜` | `pending` | Not started |
-| `⊘` | `skipped` | Not applicable, or not run — the log says which |
+
+### The three reasons a gate shows `⊘` — never one glyph
+
+| Label | Class | Meaning |
+|-------|-------|---------|
+| `⊘ n/a` | `skip_na` | **Not applicable by template.** No approval was owed. |
+| `⊘ pre-gate` | `skip_pre` | **The gate did not exist** when this project ran. A real coverage gap, not a template exclusion. |
+| **`⊘ SKIPPED`** | `skip_owed` | **Owed and skipped.** Renders in alarm red. |
+
+These were a single `⊘` with a single `✋ n/a` until 2026-07-29, when
+`ui-ux-designer` found that `admin/PORTFOLIO_STATUS.md` was committing the
+conflation *in the file that is supposed to be the source of truth*: all five
+projects rendered gate 4 identically to `load-alert-agent`'s genuinely
+not-applicable gate 5, while the prose above them said the gates did not exist.
+Two different facts, one glyph. That is the same failure that hid a skipped
+Review gate for two days, rebuilt by the party who had just written the rule
+against it.
 
 ### Human-checkpoint states
 
@@ -136,7 +156,8 @@ The orchestrator re-renders the graph **at every step**, using these states.
 | `✋ approved` | `hdone` | The human approved this gate |
 | **`✋ YOU / approve?`** | `hwait` | **Activated — waiting on the human right now** |
 | `✋ —` | `hpend` | Not reached yet |
-| `✋ n/a` | `hskip` | Gate not applicable, so no approval was owed |
+| `✋ n/a` | `hskip` | Gate not applicable by template — no approval owed |
+| `✋ pre-gate` | `hpre` | The gate did not exist yet — no approval owed |
 | **`✋ NOT ASKED`** | `hnone` | **A gate closed without the approval it owed** |
 
 `hnone` exists because of a real event: the orchestrator skipped

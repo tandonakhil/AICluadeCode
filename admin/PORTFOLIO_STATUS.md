@@ -9,7 +9,7 @@ name = that project's detail).
 Notation and gate definitions: `admin/PIPELINE.md`.
 Per-project detail: `projects/<name>/PIPELINE_LOG.md`.
 
-**Last regenerated**: 2026-07-28
+**Last regenerated**: 2026-07-29
 
 ---
 
@@ -24,7 +24,8 @@ Per-project detail: `projects/<name>/PIPELINE_LOG.md`.
 | [little-milestones](#little-milestones) | genai-chatbot | Deployed + post-deploy fixes | dev, local | 7 of 11 | **2026-07-28** |
 
 > **All five predate the 11-gate pipeline.** Functional Design and Verification
-> were added 2026-07-28 and show as `⊘` throughout — the gates did not exist
+> were added 2026-07-28 and show as **`⊘ pre-gate`** throughout — visually
+> distinct from `⊘ n/a` since 2026-07-29, because the gates did not exist
 > when these ran. That is a real coverage gap, not a formatting artefact: none
 > of these projects has acceptance criteria with stable IDs, and none has had
 > its evidence trail audited against them. Any future enhancement to any of
@@ -44,11 +45,11 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
@@ -64,16 +65,20 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G6,G7,G8,G10,G11,REL done
   class H1,H2,H3,H5,H6,H7,H8,H10,H11 hdone
-  class G4,G9 skipped
-  class H4,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
   class r1,r2,r3,r4 rowbox
 ```
 
@@ -94,11 +99,11 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["⊘ 5<br/>Experience"] --> H5{"✋<br/>n/a"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["⊘ 5<br/>Experience<br/><i>n/a</i>"] --> H5{"✋<br/>n/a"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
@@ -114,16 +119,22 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G6,G7,G8,G10,G11,REL done
   class H1,H2,H3,H6,H7,H8,H10,H11 hdone
-  class G4,G5,G9 skipped
-  class H4,H5,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
+  class G5 skip_na
+  class H5 hskip
   class r1,r2,r3,r4 rowbox
 ```
 
@@ -146,11 +157,11 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
@@ -165,16 +176,20 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G6,G7,G8,G10,G11 done
   class H1,H2,H3,H5,H6,H7,H8,H10,H11 hdone
-  class G4,G9 skipped
-  class H4,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
   class r1,r2,r3,r4 rowbox
 ```
 
@@ -194,11 +209,11 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["✅ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
@@ -213,16 +228,20 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G6,G7,G8,G10,G11 done
   class H1,H2,H3,H5,H6,H7,H8,H10,H11 hdone
-  class G4,G9 skipped
-  class H4,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
   class r1,r2,r3,r4 rowbox
 ```
 
@@ -243,15 +262,15 @@ flowchart TB
   end
   subgraph r2 [" "]
     direction LR
-    G4["⊘ 4<br/>Functional"] --> H4{"✋<br/>n/a"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["⚠ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
+    G4["⊘ 4<br/>Functional<br/><i>pre-gate</i>"] --> H4{"✋<br/>pre-gate"} --> G5["✅ 5<br/>Experience"] --> H5{"✋<br/>approved"} --> G6["⚠ 6<br/>Architecture"] --> H6{"✋<br/>approved"}
   end
   subgraph r3 [" "]
     direction LR
-    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["⚠ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify"] --> H9{"✋<br/>n/a"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>approved"} --> G8["⚠ 8<br/>Test"] --> H8{"✋<br/>approved"} --> G9["⊘ 9<br/>Verify<br/><i>pre-gate</i>"] --> H9{"✋<br/>pre-gate"}
   end
   subgraph r4 [" "]
     direction LR
-    G10["⊘ 10<br/>Review"] --> H10{"✋<br/>NOT ASKED"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
+    G10["⊘ 10<br/>Review<br/><i>SKIPPED</i>"] --> H10{"✋<br/>NOT ASKED"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>approved"}
   end
   H3 --> G4
   H6 --> G7
@@ -266,17 +285,22 @@ flowchart TB
   classDef warn    fill:#fff8e6,stroke:#8a6410,stroke-width:2px,color:#3d2c04
   classDef pending fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d
   classDef skipped fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_na  fill:#f4f5f7,stroke:#b8bfc9,color:#767f8d,stroke-dasharray:4 3
+  classDef skip_pre fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
+  classDef skip_owed fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef hdone   fill:#dcefe2,stroke:#2f6f43,color:#123021
   classDef hwait   fill:#ffe9a8,stroke:#8a6410,stroke-width:4px,color:#3d2c04
   classDef hpend   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
   classDef hskip   fill:#fafbfc,stroke:#cfd5dd,color:#98a1ad,stroke-dasharray:3 3
+  classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
   class G1,G2,G3,G5,G7,G11 done
   class H1,H2,H3,H5,H6,H7,H8,H11 hdone
-  class G4,G9,G10 skipped
-  class H4,H9 hskip
+  class G4,G9 skip_pre
+  class H4,H9 hpre
   class G6,G8 warn
+  class G10 skip_owed
   class H10 hnone
   class r1,r2,r3,r4 rowbox
 ```
