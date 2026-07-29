@@ -147,5 +147,107 @@
       "resolved": true,
       "origin": "human"
     }
+  ],
+  "features": [
+    {
+      "id": "F1",
+      "name": "Kid profile creation",
+      "status": "built"
+    },
+    {
+      "id": "F2",
+      "name": "Age computation (chronological + corrected)",
+      "status": "built"
+    },
+    {
+      "id": "F3",
+      "name": "Age-aware milestone chat + guardrails",
+      "status": "built"
+    },
+    {
+      "id": "F4",
+      "name": "Activity suggestions",
+      "status": "built"
+    },
+    {
+      "id": "F5",
+      "name": "Non-medical disclaimer",
+      "status": "built"
+    },
+    {
+      "id": "F6",
+      "name": "Life-journey timeline",
+      "status": "built"
+    },
+    {
+      "id": "F7",
+      "name": "Photo upload + storage",
+      "status": "built"
+    },
+    {
+      "id": "F8",
+      "name": "Weekly prompt digest",
+      "status": "built"
+    },
+    {
+      "id": "F9",
+      "name": "Buying recommendations",
+      "status": "built"
+    },
+    {
+      "id": "F10",
+      "name": "Multi-caregiver access",
+      "status": "built"
+    },
+    {
+      "id": "F11",
+      "name": "RAG-grounded answering",
+      "status": "built"
+    },
+    {
+      "id": "F12",
+      "name": "Hardened auth suite + MFA",
+      "status": "built"
+    },
+    {
+      "id": "F13",
+      "name": "Chat history + suggested prompts",
+      "status": "built"
+    },
+    {
+      "id": "F14",
+      "name": "Profile avatar display",
+      "status": "built"
+    },
+    {
+      "id": "F15",
+      "name": "Journey image lightbox",
+      "status": "built"
+    },
+    {
+      "id": "F16",
+      "name": "Journey gallery view",
+      "status": "built"
+    },
+    {
+      "id": "F17",
+      "name": "Google Photos import",
+      "status": "built"
+    },
+    {
+      "id": "F18",
+      "name": "Native mobile app (React Native/Expo)",
+      "status": "built"
+    },
+    {
+      "id": "F19",
+      "name": "Night theme (mobile)",
+      "status": "backlog"
+    },
+    {
+      "id": "F20",
+      "name": "Offline queue (mobile)",
+      "status": "backlog"
+    }
   ]
 }

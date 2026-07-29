@@ -86,5 +86,62 @@
       "resolved": true,
       "origin": "gate"
     }
+  ],
+  "features": [
+    {
+      "id": "F1",
+      "name": "Pipeline state schema",
+      "status": "built"
+    },
+    {
+      "id": "F2",
+      "name": "admin/PIPELINE.yaml",
+      "status": "built"
+    },
+    {
+      "id": "F3",
+      "name": "Backfill all projects",
+      "status": "built"
+    },
+    {
+      "id": "F4",
+      "name": "Renderer (state \u2192 md + html)",
+      "status": "built"
+    },
+    {
+      "id": "F5",
+      "name": "Dashboard: selector + pipeline status",
+      "status": "built"
+    },
+    {
+      "id": "F6",
+      "name": "Runtime status probes",
+      "status": "built"
+    },
+    {
+      "id": "F7",
+      "name": "Migrate + retire kb-server",
+      "status": "built"
+    },
+    {
+      "id": "F8",
+      "name": "Staleness surfacing",
+      "status": "built"
+    },
+    {
+      "id": "F9",
+      "name": "Rewrite kb-server content from registry",
+      "status": "backlog"
+    },
+    {
+      "id": "F10",
+      "name": "Always-on service (launchd)",
+      "status": "backlog"
+    },
+    {
+      "id": "F11",
+      "name": "Auto-refresh",
+      "status": "backlog"
+    }
   ]
 }

@@ -1,7 +1,7 @@
 # Portfolio status — all projects
 
 > **GENERATED FILE — do not edit.**
-> Source: `projects/*/pipeline-state.json` · rendered 2026-07-29 18:24 UTC
+> Source: `projects/*/pipeline-state.json` · rendered 2026-07-29 19:15 UTC
 
 **6 project(s)**
 

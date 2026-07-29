@@ -78,5 +78,72 @@
       "approval": "approved"
     }
   ],
-  "loop_backs": []
+  "loop_backs": [],
+  "features": [
+    {
+      "id": "F1",
+      "name": "MVP feature 1",
+      "status": "built"
+    },
+    {
+      "id": "F2",
+      "name": "MVP feature 2",
+      "status": "built"
+    },
+    {
+      "id": "F3",
+      "name": "MVP feature 3",
+      "status": "built"
+    },
+    {
+      "id": "F4",
+      "name": "MVP feature 4",
+      "status": "built"
+    },
+    {
+      "id": "F5",
+      "name": "MVP feature 5",
+      "status": "built"
+    },
+    {
+      "id": "F6",
+      "name": "MVP feature 6",
+      "status": "built"
+    },
+    {
+      "id": "F7",
+      "name": "MVP feature 7",
+      "status": "built"
+    },
+    {
+      "id": "F8",
+      "name": "MVP feature 8",
+      "status": "built"
+    },
+    {
+      "id": "F9",
+      "name": "MVP feature 9",
+      "status": "built"
+    },
+    {
+      "id": "F10",
+      "name": "MVP feature 10",
+      "status": "built"
+    },
+    {
+      "id": "F11",
+      "name": "MVP feature 11",
+      "status": "built"
+    },
+    {
+      "id": "F12",
+      "name": "MVP feature 12",
+      "status": "built"
+    },
+    {
+      "id": "F13",
+      "name": "Real contact address",
+      "status": "backlog"
+    }
+  ]
 }
