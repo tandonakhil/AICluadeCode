@@ -461,6 +461,81 @@ Rule: **anything the machine produced is mono; anything a human wrote is sans.**
 Provenance made typographic — you can tell at a glance which parts of the page
 are derived and which are quoted.
 
+### 7.3 Palette variants — the "heavy on the eyes" pass (2026-07-29)
+
+Human feedback on the approved mockup: *"I like the rendered mockup, can you
+give some different color themes, it looks very heavy on eyes."* Structure,
+the RAG-with-UNKNOWN resolution and the information design were approved in
+substance; this was a colour/visual-weight pass only. Nothing was restructured.
+
+**What I measured before changing anything.** The mockup now computes its own
+contrast at render time (the audit panel under the switcher), so these are
+measurements rather than claims:
+
+| Finding | Measured | Verdict |
+|---|---|---|
+| Ground ladder is **non-monotonic** — `--void #f2f3f5` is *lighter* than `--floor #e9ebee` | void↔surface ≈ **1.06:1** | Defect. The page ground reads as sitting above the card it contains, so the eye re-hunts for every edge. |
+| `--ink #141922` on white | ≈ **17.4:1** | ~2.5× the AAA floor. Correct for an audit, tiring to re-scan. |
+| `--ink-faint` on surface | **3.05:1** light / **3.74:1** dark | **Fails 4.5:1** while carrying small mono metadata. A real accessibility failure missed at the first pass. |
+| Saturated fills at tile scale (the hypothesis put to me) | `#fff8e6` ≈ 97% L, `#fdf0ec` ≈ 94% L | **Largely not the cause.** The canonical fills are already near-white and carry very little weight against the surface. |
+
+**So where is the weight actually coming from?** Not the canonical hue values —
+their *usage*: dark saturated `--*-line` strokes at 2–4px, six of them stacked
+down the callout column; whole paragraphs set in `--r-text #3d1109` /
+`--a-text #3d2c04`; and ~20 bold-uppercase-mono chips per screen. All of that is
+chrome-adjacent or rule-level, and all of it is fixable without touching
+`admin/PIPELINE.md`.
+
+**Chrome-only vs. canonical — the split.** Variants override chrome tokens only
+(`--void --floor --surface --surface2 --hair --hair-hi --ink --ink-dim
+--ink-faint --accent --accent-soft --shadow`). §7.1's guarantee survives intact:
+`--*-line` and `--*-text` stay byte-identical to the `classDef` block and the
+canonical graph panel is untouched, so a tile and the graph beside it still
+agree about what green means.
+
+| # | Variant | Scope | One line | Greyscale test |
+|---|---|---|---|---|
+| 1 | **Canonical** (baseline) | — | As approved; kept so the comparison is fair | Passes |
+| 2 | **Quiet Ledger** | Chrome-only | Ink off near-black; monotonic ladder at ~3.5× the plane separation | Passes |
+| 3 | **Paper** | Chrome-only | Warm cream ground, brown-black ink, near-zero blue — print, not screen | Passes |
+| 4 | **Low Light** | Chrome-only | Cool and dim, dark-first; floor raised off `#030405`, ink to ~10.6:1 | Passes |
+| 5 | **Chartroom** | Chrome **+ colour area** | Colour rationed, not desaturated: hues stay canonical, their *area* shrinks | Passes — least colour-dependent of the five |
+
+All four variants fix both baseline defects (monotonic ladder; `--ink-faint`
+raised to pass 4.5:1). All keep §7.1, and all preserve the greyscale acceptance
+test in §8 — no variant makes any fact colour-dependent, because glyph + word
+were already carrying every state.
+
+Variant-specific notes worth keeping:
+
+- **Paper** is the one variant where a canonical change would genuinely help —
+  the amber fill `#fff8e6` nearly disappears against a cream surface. Amber
+  still survives on line + glyph + word, but the "colour intensifies" layer is
+  weakest here. Not proposed: the price is 15+ regenerated graphs to rescue a
+  variant I am not recommending. Its accent stays blue deliberately; a warm
+  accent would collide with canonical amber, which §6 forbids.
+- **Low Light** adjusts dark fill **alpha only** (.12 → .16) because the ground
+  it composites onto is lighter. Hue unchanged.
+- **Chartroom** softens `*-fill` only, and deliberately keeps `--hwait-fill` and
+  `--hnone-fill` at *full* canonical strength — §4.2 calls `hwait` the loudest
+  element in the system, so if colour is rationed those two keep all of it. It
+  also returns callout prose to neutral ink, retaining the status hue on glyph,
+  border and chip where it *identifies* the state. Its risk: §7.1 agreement is
+  preserved by hue but weakened by area.
+
+**Recommendation: variant 2, Quiet Ledger, chrome-only.** It is the smallest
+change that addresses the cause the measurements point at, it costs nothing
+outside this project, and it fixes the two defects. **No change to
+`admin/PIPELINE.md` §3 is recommended or required.** If the human wants colour
+to recede further after living with it, Chartroom (5) is the next step and is
+*still* a project-local change.
+
+**Deliberately not fixed, flagged instead.** The canonical graph panel is
+hardcoded `#ffffff` in every theme by design (§7.1 — the palette is part of the
+artefact). In a dim theme it is a bright rectangle. Dimming a reproduced
+artefact makes it a different artefact, so it stays verbatim; **open question
+for gate 6**, added to §9.
+
 ---
 
 ## 8. Accessibility
@@ -495,6 +570,17 @@ are derived and which are quoted.
 4. **Does `conclave-dashboard` appear in its own portfolio?** I say yes — it is
    the only project that can demonstrate `▶ active` and `✋ YOU approve?`, and a
    status board that omits itself has a blind spot at exactly its own location.
+5. **The canonical graph panel in a dark or dim theme** (raised by §7.3). §7.1
+   requires the panel to reproduce `admin/PIPELINE.md §3` verbatim, palette
+   included, so it is hardcoded `#ffffff` in every theme — a bright rectangle in
+   a dark UI. Dimming it makes it a different artefact; the alternatives are (a)
+   leave it and accept the glare, (b) mat it in a wider recessed frame so it
+   reads as a quoted document rather than a panel, or (c) collapse it behind a
+   `<details>` in dark themes only — which §8 disallows if any fact lives only
+   there. Left verbatim for now. **Decide at gate 6.**
+6. **Which palette variant ships** (raised by §7.3). Five are rendered in the
+   mockup's switcher; my recommendation is variant 2, Quiet Ledger, chrome-only.
+   Human's call, and it is a project-local decision either way.
 
 ---
 
@@ -503,7 +589,7 @@ are derived and which are quoted.
 | Artifact | Path |
 |---|---|
 | This document | `projects/conclave-dashboard/knowledge/UX_KB.md` |
-| Rendered mockup (both themes, all screens) | `projects/conclave-dashboard/design-review/index.html` |
+| Rendered mockup (all screens · 5 palette variants × light/dark · live contrast audit · greyscale-test toggle) | `projects/conclave-dashboard/design-review/index.html` |
 
 **DesignSync**: not available in this invocation's tool grant, so no component
 library was pushed. Recorded rather than silently omitted; the mockup's

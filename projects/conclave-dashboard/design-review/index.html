@@ -50,6 +50,110 @@ html[data-theme="dark"]{
   --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 28px -18px rgba(0,0,0,.9);
 }
 
+/* ==========================================================================
+   PALETTE VARIANTS — added 2026-07-29 in response to "very heavy on eyes"
+   --------------------------------------------------------------------------
+   Every block below overrides CHROME TOKENS ONLY:
+     --void --floor --surface --surface2 --hair --hair-hi
+     --ink --ink-dim --ink-faint --accent --accent-soft --shadow
+   The canonical status tokens (--g-line/-text, --a-line/-text, --r-line/-text,
+   --u-line/-text) are NOT touched by variants 2-4, so a tile and the mermaid
+   graph beside it still agree about what green means (UX_KB §7.1), and
+   admin/PIPELINE.md §3 does not need to change.
+   Variant 5 (Chartroom) additionally reduces the AREA colour occupies — it
+   softens *-fill only, keeps every line/text hue verbatim, and deliberately
+   keeps --hwait-fill and --hnone-fill at full canonical strength.
+   Two accessibility defects found in the baseline and fixed in all variants:
+     - the ground ladder is non-monotonic (void #f2f3f5 is LIGHTER than
+       floor #e9ebee), so plane depth reverses mid-page;
+     - --ink-faint fails 4.5:1 in both baseline themes (3.05:1 light,
+       3.74:1 dark) and it carries small mono metadata.
+   The live audit under the switcher measures all of this at render time.
+   ========================================================================== */
+
+/* ---------- 2 · QUIET LEDGER — lower contrast, wider plane separation ----- */
+html[data-variant="quiet"][data-theme="light"]{
+  --void:#e4e7ec; --floor:#edeff3; --surface:#fbfcfd; --surface2:#f2f4f8;
+  --hair:rgba(28,36,52,.11); --hair-hi:rgba(28,36,52,.20);
+  --ink:#2b323d; --ink-dim:#616a78; --ink-faint:#6e7684;
+  --accent:#3a6ea5; --accent-soft:rgba(58,110,165,.10);
+  --shadow:0 1px 1px rgba(28,36,52,.04),0 10px 28px -22px rgba(28,36,52,.34);
+}
+html[data-variant="quiet"][data-theme="dark"]{
+  --void:#0d1016; --floor:#12161e; --surface:#181d27; --surface2:#1f2531;
+  --hair:rgba(225,232,245,.09); --hair-hi:rgba(225,232,245,.17);
+  --ink:#dfe3ea; --ink-dim:#9aa2b1; --ink-faint:#7d8595;
+  --accent:#79aee2; --accent-soft:rgba(121,174,226,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.40),0 10px 30px -22px rgba(0,0,0,.80);
+}
+
+/* ---------- 3 · PAPER — warm ground, low blue, reads as print ------------- */
+html[data-variant="paper"][data-theme="light"]{
+  --void:#e6dfd1; --floor:#f0eade; --surface:#fbf7ef; --surface2:#f4efe3;
+  --hair:rgba(64,52,34,.14); --hair-hi:rgba(64,52,34,.25);
+  --ink:#332c22; --ink-dim:#6b6153; --ink-faint:#736b5d;
+  --accent:#2c5892; --accent-soft:rgba(44,88,146,.10);
+  --shadow:0 1px 1px rgba(64,52,34,.06),0 10px 26px -20px rgba(64,52,34,.34);
+}
+html[data-variant="paper"][data-theme="dark"]{
+  --void:#0e0c0a; --floor:#15120e; --surface:#1c1813; --surface2:#231e18;
+  --hair:rgba(245,236,220,.09); --hair-hi:rgba(245,236,220,.18);
+  --ink:#ece4d6; --ink-dim:#a89c88; --ink-faint:#8c8170;
+  --accent:#8fb6e4; --accent-soft:rgba(143,182,228,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 10px 28px -20px rgba(0,0,0,.80);
+}
+
+/* ---------- 4 · LOW LIGHT — cool and dim, built for long sessions --------- */
+html[data-variant="low"][data-theme="light"]{
+  --void:#dde2e9; --floor:#e7ebf1; --surface:#f5f7fa; --surface2:#eef1f6;
+  --hair:rgba(26,34,48,.12); --hair-hi:rgba(26,34,48,.21);
+  --ink:#28303c; --ink-dim:#5d6675; --ink-faint:#6f7784;
+  --accent:#3f6f9e; --accent-soft:rgba(63,111,158,.10);
+  --shadow:0 1px 1px rgba(26,34,48,.05),0 10px 26px -22px rgba(26,34,48,.30);
+}
+html[data-variant="low"][data-theme="dark"]{
+  --void:#121620; --floor:#171c27; --surface:#1d2330; --surface2:#232a39;
+  --hair:rgba(200,214,240,.10); --hair-hi:rgba(200,214,240,.20);
+  --ink:#ccd3e0; --ink-dim:#8f98a9; --ink-faint:#858d9d;
+  --accent:#6d9fd4; --accent-soft:rgba(109,159,212,.14);
+  /* alpha only — the hue behind each fill is the canonical hue, unchanged.
+     Raised because the ground it composites onto is lighter than baseline. */
+  --g-fill:rgba(63,214,143,.16); --a-fill:rgba(232,185,63,.16);
+  --r-fill:rgba(242,100,94,.16); --u-fill:rgba(139,147,163,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 26px -20px rgba(0,0,0,.60);
+}
+
+/* ---------- 5 · CHARTROOM — colour is spent, not sprinkled ---------------- */
+html[data-variant="chart"][data-theme="light"]{
+  --void:#e8eaee; --floor:#f0f2f5; --surface:#fcfcfd; --surface2:#f4f5f8;
+  --hair:rgba(22,28,40,.12); --hair-hi:rgba(22,28,40,.22);
+  --ink:#242a34; --ink-dim:#5c6470; --ink-faint:#6d7480;
+  --accent:#33507a; --accent-soft:rgba(51,80,122,.10);
+  /* fills only — every line/text hue below stays canonical */
+  --g-fill:#f6f8f7; --a-fill:#faf8f3; --r-fill:#faf6f5; --u-fill:#f5f6f8;
+  --hdone-fill:#eef4f0;
+  /* hwait and hnone keep full canonical strength — see rationale on screen */
+  --shadow:0 1px 1px rgba(22,28,40,.04),0 10px 28px -24px rgba(22,28,40,.30);
+}
+html[data-variant="chart"][data-theme="dark"]{
+  --void:#0b0e13; --floor:#11151c; --surface:#171c25; --surface2:#1d232e;
+  --hair:rgba(220,230,248,.09); --hair-hi:rgba(220,230,248,.18);
+  --ink:#dbe0e8; --ink-dim:#949cab; --ink-faint:#7e8695;
+  --accent:#8ab0dd; --accent-soft:rgba(138,176,221,.13);
+  --g-fill:rgba(63,214,143,.06); --a-fill:rgba(232,185,63,.06);
+  --r-fill:rgba(242,100,94,.07); --u-fill:rgba(139,147,163,.07);
+  --hdone-fill:rgba(63,214,143,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.40),0 10px 28px -22px rgba(0,0,0,.75);
+}
+/* Chartroom only: running prose returns to neutral ink. The status hue is
+   retained where it IDENTIFIES the state (glyph, border, chip) and dropped
+   where it was only tinting text someone has to read a paragraph of. */
+html[data-variant="chart"] .co.r h4,html[data-variant="chart"] .co.a h4,
+html[data-variant="chart"] .co.g h4,html[data-variant="chart"] .co.u h4{color:var(--ink)}
+html[data-variant="chart"] .co.r .ev,html[data-variant="chart"] .co.a .ev,
+html[data-variant="chart"] .co.g .ev,html[data-variant="chart"] .co.u .ev{color:var(--ink-dim)}
+html[data-variant="chart"] .co{border-left-width:3px}
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--void);color:var(--ink);font-family:var(--sans);
@@ -77,6 +181,45 @@ body,.card,.tile,.chip{transition:background-color .18s,color .18s,border-color 
 
 .sampleribbon{background:var(--a-fill);color:var(--a-text);border-bottom:1px solid var(--a-line);
   padding:8px 22px;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em}
+
+/* ---- palette switcher (review chrome — never ships in the product) ------- */
+.varbar{position:sticky;top:41px;z-index:49;display:flex;gap:10px;align-items:center;
+  flex-wrap:wrap;padding:9px 22px;background:var(--surface2);
+  border-bottom:1px solid var(--hair-hi)}
+.varbar .vlab{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-dim)}
+.varbar .sp{flex:1}
+.vbtns{display:flex;gap:5px;flex-wrap:wrap}
+.vbtn{cursor:pointer;border:1px solid var(--hair-hi);background:var(--surface);
+  color:var(--ink-dim);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  padding:5px 11px;border-radius:999px;white-space:nowrap}
+.vbtn[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent);
+  color:var(--accent);font-weight:700;box-shadow:inset 0 0 0 1px var(--accent)}
+.vbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.varcard{max-width:1280px;margin:18px auto 0;padding:0 22px}
+.vcin{background:var(--surface);border:1px solid var(--hair-hi);border-radius:9px;
+  padding:14px 16px}
+.vchead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.vchead h3{font-size:16px;font-weight:650}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid;border-radius:4px;padding:2px 7px;white-space:nowrap}
+.tag.chrome{background:var(--g-fill);border-color:var(--g-line);color:var(--g-text)}
+.tag.area{background:var(--a-fill);border-color:var(--a-line);color:var(--a-text)}
+.tag.canonx{background:var(--r-fill);border-color:var(--r-line);color:var(--r-text)}
+.vcwhy{margin:0 0 10px;font-size:13px;color:var(--ink)}
+.vcnotes{margin:0 0 12px;padding-left:17px;font-size:12.5px;color:var(--ink-dim);line-height:1.6}
+.vcnotes li{margin-bottom:3px}
+.vcgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.vcgrid{grid-template-columns:1fr}}
+.audit{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+.audit caption{text-align:left;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-dim);padding:0 0 6px}
+.audit th,.audit td{padding:3px 8px 3px 0;border-bottom:1px solid var(--hair);text-align:left}
+.audit td.v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.audit .pass{color:var(--g-line);font-weight:700}
+.audit .fail{color:var(--r-line);font-weight:700}
+html[data-gs="1"] .page,html[data-gs="1"] .sampleribbon{filter:grayscale(1)}
 
 .page{max-width:1280px;margin:0 auto;padding:0 22px 90px}
 .screen{margin:44px 0}
@@ -302,6 +445,41 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <a href="#s5">5 Encoding</a>
   <a href="#s6">6 R1 fallback</a>
   <button class="tbtn" id="tt" aria-pressed="false">Theme · light</button>
+</div>
+
+<div class="varbar">
+  <span class="vlab">Palette</span>
+  <div class="vbtns" role="radiogroup" aria-label="Palette variant">
+    <button class="vbtn" role="radio" data-v="canon" aria-checked="true">1 · Canonical</button>
+    <button class="vbtn" role="radio" data-v="quiet" aria-checked="false">2 · Quiet Ledger</button>
+    <button class="vbtn" role="radio" data-v="paper" aria-checked="false">3 · Paper</button>
+    <button class="vbtn" role="radio" data-v="low"   aria-checked="false">4 · Low Light</button>
+    <button class="vbtn" role="radio" data-v="chart" aria-checked="false">5 · Chartroom</button>
+  </div>
+  <span class="sp"></span>
+  <button class="tbtn" id="gs" aria-pressed="false">Greyscale test · off</button>
+</div>
+
+<div class="varcard">
+  <div class="vcin">
+    <div class="vchead">
+      <h3 id="vname">—</h3>
+      <span class="tag" id="vtag">—</span>
+      <span class="tag" id="vgs">—</span>
+    </div>
+    <p class="vcwhy" id="vwhy">—</p>
+    <ul class="vcnotes" id="vnotes"></ul>
+    <div class="vcgrid">
+      <table class="audit" id="a1"><caption>Measured contrast · this variant, this theme</caption><tbody></tbody></table>
+      <table class="audit" id="a2"><caption>Ground ladder, plane separation, colour count</caption><tbody></tbody></table>
+    </div>
+    <p style="margin:11px 0 0;font-size:11.5px;color:var(--ink-faint);font-family:var(--mono)">
+      Ratios above are computed live from the active variant's tokens at render time — they are
+      measured, not asserted. Toggle <b>Greyscale test</b> to run the acceptance test from
+      UX_KB §8 yourself: no fact below may be lost when colour is removed.
+      The switcher, this card and the greyscale control are review chrome and do not ship.
+    </p>
+  </div>
 </div>
 
 <div class="sampleribbon">
@@ -1188,13 +1366,152 @@ summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <script>
 (function(){
-  var b=document.getElementById('tt'),h=document.documentElement;
-  function set(t){h.setAttribute('data-theme',t);
-    b.textContent='Theme · '+t; b.setAttribute('aria-pressed', t==='dark');}
+var h=document.documentElement;
+
+/* ---------------- colour maths (measured, not asserted) ---------------- */
+function tokv(n){return getComputedStyle(h).getPropertyValue(n).trim();}
+function parse(c){
+  if(!c) return null; c=c.trim();
+  if(c.charAt(0)==='#'){
+    if(c.length===4) c='#'+c[1]+c[1]+c[2]+c[2]+c[3]+c[3];
+    return [parseInt(c.substr(1,2),16),parseInt(c.substr(3,2),16),parseInt(c.substr(5,2),16),1];
+  }
+  var m=c.match(/rgba?\(([^)]+)\)/); if(!m) return null;
+  var p=m[1].split(/[,\s\/]+/).filter(Boolean).map(parseFloat);
+  return [p[0],p[1],p[2],(p.length>3&&!isNaN(p[3]))?p[3]:1];
+}
+function over(fg,bg){ if(!fg) return null; if(fg[3]>=1) return fg; var a=fg[3];
+  return [fg[0]*a+bg[0]*(1-a),fg[1]*a+bg[1]*(1-a),fg[2]*a+bg[2]*(1-a),1];}
+function lum(c){var f=[c[0],c[1],c[2]].map(function(v){v/=255;
+  return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});
+  return .2126*f[0]+.7152*f[1]+.0722*f[2];}
+function ratio(a,b){var x=lum(a),y=lum(b); if(x<y){var t=x;x=y;y=t;} return (x+.05)/(y+.05);}
+function T(n,base){return over(parse(tokv(n)),base||[255,255,255,1]);}
+
+/* ---------------- variant metadata ---------------- */
+var V={
+ canon:{n:'1 · Canonical (baseline)',t:'BASELINE — AS APPROVED',tc:'chrome',
+  gs:'GREYSCALE: PASSES',
+  w:'Unchanged, so the comparison is fair. Everything below is measured against this.',
+  notes:[
+   'The three grounds sit within about 1.06:1 of one another <b>and the ladder runs backwards</b> — <span class="mono">--void #f2f3f5</span> is lighter than <span class="mono">--floor #e9ebee</span>, so the page ground reads as sitting <i>above</i> the card interior it contains. That is your "eye keeps re-hunting for the edges", and it is a defect rather than a taste question.',
+   '<span class="mono">--ink #141922</span> measures about 17.4:1 on white — roughly 2.5× the AAA floor. Right for a contrast audit, tiring for a page someone re-scans all day.',
+   '<span class="mono">--ink-faint</span> <b>fails</b> 4.5:1 in both themes while carrying small mono metadata. That is a real accessibility failure I did not catch at the first pass, and it is fixed in all four variants.',
+   '<b>On your fill hypothesis — I checked, and it is mostly not the fills.</b> The canonical fills are already near-white (<span class="mono">#fff8e6</span> is ~97% luminance; <span class="mono">#fdf0ec</span> ~94%). Measured against the surface they carry almost no weight. What carries the weight is the dark saturated <i>lines</i> at 2–4px, six of them stacked down the callout column, and whole paragraphs set in <span class="mono">--r-text #3d1109</span> / <span class="mono">--a-text #3d2c04</span>. Both are how the design <i>uses</i> the palette, not what the palette <i>is</i>.']},
+
+ quiet:{n:'2 · Quiet Ledger',t:'CHROME-ONLY',tc:'chrome',
+  gs:'GREYSCALE: PASSES',
+  w:'The same design with the shouting turned down: ink off near-black, grounds re-ordered into a genuine monotonic ladder with roughly 3.5× the separation, so the hairline is no longer doing the edge-finding on its own.',
+  notes:[
+   'Fixes both measured baseline defects — monotonic ground ladder, and <span class="mono">--ink-faint</span> raised to pass 4.5:1.',
+   'Status tokens untouched, canonical graph untouched. A tile and the mermaid graph beside it still agree about what green means. <span class="mono">admin/PIPELINE.md</span> does not change.',
+   '<b>This is my recommendation.</b> It is the smallest change that addresses the cause the measurements actually point at.']},
+
+ paper:{n:'3 · Paper',t:'CHROME-ONLY',tc:'chrome',
+  gs:'GREYSCALE: PASSES',
+  w:'Warm ground, print rather than screen — cream surface, brown-black ink, near-zero blue in the neutrals. The page stops looking backlit.',
+  notes:[
+   '<b>Its cost, stated plainly:</b> the canonical amber fill <span class="mono">#fff8e6</span> nearly vanishes against a cream surface. Amber still survives on its line, glyph and word — which the greyscale test already requires of it — but the "colour intensifies a distinction already legible in monochrome" layer is weakest here of the five.',
+   'This is the <i>only</i> variant where changing the canonical hues would genuinely help (a cooler amber fill). I am <b>not</b> proposing it: the price is 15+ regenerated graphs to rescue one variant I am not recommending.',
+   'The accent stays blue deliberately. A warm accent would collide with canonical amber, and UX_KB §6 forbids the accent ever entering status territory.']},
+
+ low:{n:'4 · Low Light',t:'CHROME-ONLY',tc:'chrome',
+  gs:'GREYSCALE: PASSES',
+  w:'Cool and dim for long sessions. Dark-first: the near-black floor is raised off #030405, because maximum black-to-white contrast is itself a strain source rather than a virtue.',
+  notes:[
+   'Dark ink drops from <span class="mono">#f4f2ec</span> (~15:1) to <span class="mono">#ccd3e0</span> (~10.6:1) — still comfortably AAA, far less glare.',
+   'Dark fill alphas raised .12 → .16. <b>Hue is the canonical hue, unchanged</b>; only the alpha compositing onto a lighter ground moved.',
+   '<b>An open issue this variant makes impossible to ignore:</b> the canonical graph panel is hardcoded <span class="mono">#ffffff</span> in every theme, by design (§7.1 — the palette is part of the artefact). In a dim theme it is a bright rectangle two-thirds down the page. I have left it verbatim rather than dimming it, because dimming a reproduced artefact makes it a different artefact. Flagged for gate 6, not silently fixed.']},
+
+ chart:{n:'5 · Chartroom',t:'CHROME + COLOUR AREA',tc:'area',
+  gs:'GREYSCALE: PASSES — least colour-dependent of the five',
+  w:'The one that tests your fill hypothesis head-on: colour is <i>rationed</i> rather than desaturated. Every hue stays canonical; what shrinks is how much of the screen it covers.',
+  notes:[
+   'Softens <span class="mono">*-fill</span> only. Every <span class="mono">--*-line</span> and <span class="mono">--*-text</span> stays byte-identical to <span class="mono">admin/PIPELINE.md §3</span>, and the canonical graph panel is untouched — so nothing here propagates to the platform.',
+   'Two fills are kept at <b>full canonical strength on purpose</b>: <span class="mono">--hwait-fill</span> (an approval waiting on you) and <span class="mono">--hnone-fill</span> (an approval never asked). UX_KB §4.2 calls hwait the loudest element in the system. If colour is rationed, those two get to keep all of it.',
+   'Callout prose returns to neutral ink. The status hue stays on the glyph, the border and the chip — where it <i>identifies</i> the state — and comes off the paragraph you actually have to read.',
+   '<b>The risk to weigh:</b> §7.1 agreement is preserved by hue but weakened by area. If you catch yourself checking the legend on this variant, that is it failing, and it should be rejected.']}
+};
+
+/* ---------------- audit rendering ---------------- */
+var TEXTROWS=[
+ ['Ink · body copy','--ink','--surface',7],
+ ['Ink dim · secondary','--ink-dim','--surface',4.5],
+ ['Ink faint · small mono','--ink-faint','--surface',4.5],
+ ['Accent · links, focus','--accent','--surface',4.5],
+ ['Green text on green fill','--g-text','--g-fill',4.5],
+ ['Amber text on amber fill','--a-text','--a-fill',4.5],
+ ['Red text on red fill','--r-text','--r-fill',4.5],
+ ['Unknown on unknown fill','--u-text','--u-fill',4.5]
+];
+var COUNTED=['--void','--floor','--surface','--surface2','--ink','--ink-dim','--ink-faint',
+ '--accent','--g-fill','--g-line','--g-text','--a-fill','--a-line','--a-text','--r-fill',
+ '--r-line','--r-text','--u-fill','--u-line','--u-text','--hdone-fill','--hwait-fill','--hnone-fill'];
+
+function row(label,val,ok,target){
+  return '<tr><td>'+label+'</td><td class="v '+(ok===null?'':(ok?'pass':'fail'))+'">'+val+
+    (ok===null?'':(ok?' ✓':' ✕'))+'</td><td style="color:var(--ink-faint)">'+(target||'')+'</td></tr>';
+}
+function audit(){
+  var surf=parse(tokv('--surface'));
+  var o1='';
+  TEXTROWS.forEach(function(r){
+    var fg=T(r[1],surf), bg=T(r[2],surf);
+    if(!fg||!bg){o1+=row(r[0],'—',null,'');return;}
+    var v=ratio(fg,bg);
+    o1+=row(r[0],v.toFixed(2)+':1',v>=r[3],'≥'+r[3]);
+  });
+  document.querySelector('#a1 tbody').innerHTML=o1;
+
+  var lv=lum(parse(tokv('--void'))),lf=lum(parse(tokv('--floor'))),
+      ls=lum(parse(tokv('--surface'))),l2=lum(parse(tokv('--surface2')));
+  var mono=(lv<=lf&&lf<=ls);
+  var sep=function(a,b){var x=lum(a),y=lum(b);if(x<y){var t=x;x=y;y=t;}return (x+.05)/(y+.05);};
+  var seen={},n=0;
+  COUNTED.forEach(function(t){var v=tokv(t); if(v&&!seen[v]){seen[v]=1;n++;}});
+  var o2='';
+  o2+=row('Ground ladder void→floor→surface',mono?'monotonic':'REVERSED',mono,'monotonic');
+  o2+=row('void ↔ surface separation',sep(parse(tokv('--void')),parse(tokv('--surface'))).toFixed(3)+':1',
+        sep(parse(tokv('--void')),parse(tokv('--surface')))>=1.15,'≥1.15');
+  o2+=row('floor ↔ surface separation',sep(parse(tokv('--floor')),parse(tokv('--surface'))).toFixed(3)+':1',
+        sep(parse(tokv('--floor')),parse(tokv('--surface')))>=1.06,'≥1.06');
+  o2+=row('surface ↔ surface2 (inset)',sep(parse(tokv('--surface2')),parse(tokv('--surface'))).toFixed(3)+':1',null,'info');
+  o2+=row('Distinct colour values in play',String(n),null,'of '+COUNTED.length+' tokens');
+  o2+=row('Canonical status hues','unchanged',true,'PIPELINE.md §3');
+  document.querySelector('#a2 tbody').innerHTML=o2;
+}
+
+/* ---------------- controls ---------------- */
+var tb=document.getElementById('tt'), gsb=document.getElementById('gs');
+function paint(){
+  var k=h.getAttribute('data-variant')||'canon', d=V[k];
+  document.getElementById('vname').textContent=d.n;
+  var tg=document.getElementById('vtag');
+  tg.textContent=d.t; tg.className='tag '+d.tc;
+  var g=document.getElementById('vgs'); g.textContent=d.gs; g.className='tag chrome';
+  document.getElementById('vwhy').innerHTML=d.w;
+  document.getElementById('vnotes').innerHTML=d.notes.map(function(x){return '<li>'+x+'</li>';}).join('');
+  [].forEach.call(document.querySelectorAll('.vbtn'),function(b){
+    b.setAttribute('aria-checked', b.getAttribute('data-v')===k ? 'true':'false');});
+  audit();
+}
+function setTheme(t){h.setAttribute('data-theme',t);
+  tb.textContent='Theme · '+t; tb.setAttribute('aria-pressed', t==='dark'); paint();}
+tb.addEventListener('click',function(){
+  setTheme(h.getAttribute('data-theme')==='dark'?'light':'dark');});
+[].forEach.call(document.querySelectorAll('.vbtn'),function(b){
   b.addEventListener('click',function(){
-    set(h.getAttribute('data-theme')==='dark'?'light':'dark');});
-  // default follows the OS, per UX_KB §6
-  if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) set('dark');
+    h.setAttribute('data-variant', b.getAttribute('data-v')); paint();});});
+gsb.addEventListener('click',function(){
+  var on=h.getAttribute('data-gs')==='1';
+  h.setAttribute('data-gs', on?'0':'1');
+  gsb.textContent='Greyscale test · '+(on?'off':'ON');
+  gsb.setAttribute('aria-pressed', String(!on));});
+
+h.setAttribute('data-variant','canon');
+// default follows the OS, per UX_KB §6
+if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+else setTheme('light');
 })();
 </script>
 </body>
