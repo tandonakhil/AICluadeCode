@@ -1,0 +1,68 @@
+# The Conclave pipeline — machine-readable SHAPE.
+#
+# Source of truth for gate order, names, owners and skip rules.
+# admin/PIPELINE.md sections 1-2 are GENERATED from this file.
+# Per-project STATE lives in projects/<name>/pipeline-state.json.
+#
+# Lands the roadmap item deferred 2026-07-28: "a single PIPELINE.yaml declaring
+# gate order ... with the workflow diagram rendered from that same file so
+# picture and rule cannot drift."
+
+version: 1
+updated: 2026-07-29
+
+# Rendering contract. The renderer MUST emit these verbatim (AC-F4-01, AC-F4-03).
+render:
+  rows_of_gates: 3          # 3 gates + 3 approvals = 6 boxes, max 7 per row
+  direction: LR
+  outer: TB
+
+gate_states:
+  done:    {glyph: "✅", label: "Gate closed, human approved"}
+  active:  {glyph: "▶",  label: "Currently running"}
+  looped:  {glyph: "↩",  label: "Failed and sent work back"}
+  warn:    {glyph: "⚠",  label: "Ran, but incompletely"}
+  pending: {glyph: "⬜", label: "Not started"}
+  skipped: {glyph: "⊘",  label: "Not run — skip_reason says why"}
+
+# The three reasons a gate shows the same glyph. They MUST render distinctly
+# (AC-F1-02). Collapsing them is how a skipped Review gate stayed invisible.
+skip_reasons:
+  not_applicable:            {suffix: "n/a",     class: skip_na,   approval: hpre_na}
+  gate_did_not_exist:        {suffix: "pre-gate", class: skip_pre,  approval: hpre}
+  skipped_without_exception: {suffix: "SKIPPED", class: skip_owed, approval: hnone}
+
+approvals:
+  approved:          {label: "✋<br/>approved",     class: hdone}
+  approved_override: {label: "✋<br/>override",     class: hdone}
+  batch_authorized:  {label: "✋<br/>batch-auth",   class: hbatch}
+  request_changes:   {label: "✋<br/>changes",      class: hnone}
+  escalate:          {label: "✋<br/>escalate",     class: hnone}
+  skipped_recorded:  {label: "✋<br/>n/a",          class: hskip}
+  exception_human:   {label: "✋<br/>exception",    class: hbatch}
+  not_asked:         {label: "✋<br/>NOT ASKED",    class: hnone}
+  awaiting:          {label: "✋ YOU<br/>approve?", class: hwait}
+  pending:           {label: "✋<br/>—",            class: hpend}
+
+gates:
+  - {n: 1,  key: intake,      name: Intake,            owner: orchestrator}
+  - {n: 2,  key: team,        name: Team,              owner: orchestrator}
+  - {n: 3,  key: plan,        name: Plan,              owner: plan-agent}
+  - {n: 4,  key: functional,  name: Functional,        owner: functional-design-agent,
+     added: 2026-07-28}
+  - {n: 5,  key: experience,  name: Experience,        owner: ui-ux-designer,
+     not_applicable_when: "template has no UI surface"}
+  - {n: 6,  key: architecture, name: Architecture,     owner: "solution-architect + security-architect"}
+  - {n: 7,  key: code,        name: Code,              owner: code-agent}
+  - {n: 8,  key: test,        name: Test,              owner: test-agent,   loops_to: 7}
+  - {n: 9,  key: verification, name: Verify,           owner: verification-agent,
+     added: 2026-07-28, blocking: true, loops_to: 7}
+  - {n: 10, key: review,      name: Review,            owner: review-agent, loops_to: 7}
+  - {n: 11, key: deploy,      name: Deploy,            owner: deploy-agent, loops_to: 7}
+
+runtime_states:
+  up:              {label: "Up",              rag: green}
+  degraded:        {label: "Degraded",        rag: amber}
+  down:            {label: "Down",            rag: red}
+  unknown:         {label: "Unknown",         rag: unknown}
+  no_url_recorded: {label: "No URL recorded", rag: unknown}

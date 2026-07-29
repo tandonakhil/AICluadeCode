@@ -1,0 +1,82 @@
+{
+  "name": "policy-lookup-assistant",
+  "template": "rag-knowledge-base",
+  "position": "Deployed",
+  "env": "dev, local",
+  "last_activity": "2026-07-09",
+  "served_url": "http://127.0.0.1:8030/",
+  "notes": "Full-SME verification run \u2014 all five SMEs engaged at once.",
+  "gates": [
+    {
+      "n": 1,
+      "name": "Intake",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 2,
+      "name": "Team",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 3,
+      "name": "Plan",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 4,
+      "name": "Functional",
+      "status": "skipped",
+      "approval": "skipped_recorded",
+      "skip_reason": "gate_did_not_exist",
+      "note": "Gate added 2026-07-28 \u2014 coverage gap, not a template exclusion"
+    },
+    {
+      "n": 5,
+      "name": "Experience",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 6,
+      "name": "Architecture",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 7,
+      "name": "Code",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 8,
+      "name": "Test",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 9,
+      "name": "Verify",
+      "status": "skipped",
+      "approval": "skipped_recorded",
+      "skip_reason": "gate_did_not_exist",
+      "note": "Gate added 2026-07-28 \u2014 coverage gap, not a template exclusion"
+    },
+    {
+      "n": 10,
+      "name": "Review",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 11,
+      "name": "Deploy",
+      "status": "done",
+      "approval": "approved"
+    }
+  ],
+  "loop_backs": []
+}

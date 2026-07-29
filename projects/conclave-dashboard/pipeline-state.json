@@ -1,0 +1,79 @@
+{
+  "name": "conclave-dashboard",
+  "template": "custom (Flask)",
+  "position": "In build \u2014 gate 7",
+  "env": "dev, local",
+  "last_activity": "2026-07-29",
+  "served_url": "http://127.0.0.1:5050/",
+  "notes": "This dashboard. First project to run all eleven gates.",
+  "gates": [
+    {
+      "n": 1,
+      "name": "Intake",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 2,
+      "name": "Team",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 3,
+      "name": "Plan",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 4,
+      "name": "Functional",
+      "status": "done",
+      "approval": "batch_authorized"
+    },
+    {
+      "n": 5,
+      "name": "Experience",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 6,
+      "name": "Architecture",
+      "status": "done",
+      "approval": "batch_authorized"
+    },
+    {
+      "n": 7,
+      "name": "Code",
+      "status": "active",
+      "approval": "batch_authorized",
+      "note": "In progress"
+    },
+    {
+      "n": 8,
+      "name": "Test",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 9,
+      "name": "Verify",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 10,
+      "name": "Review",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 11,
+      "name": "Deploy",
+      "status": "pending",
+      "approval": "pending"
+    }
+  ],
+  "loop_backs": []
+}

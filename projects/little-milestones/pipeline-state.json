@@ -1,0 +1,151 @@
+{
+  "name": "little-milestones",
+  "template": "genai-chatbot",
+  "position": "Deployed + post-deploy fixes",
+  "env": "dev, local",
+  "last_activity": "2026-07-28",
+  "served_url": "http://127.0.0.1:8000/",
+  "notes": "F1-F17 web + F18 native mobile. 499 tests green. Night theme + offline queue outstanding.",
+  "gates": [
+    {
+      "n": 1,
+      "name": "Intake",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 2,
+      "name": "Team",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 3,
+      "name": "Plan",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 4,
+      "name": "Functional",
+      "status": "skipped",
+      "approval": "skipped_recorded",
+      "skip_reason": "gate_did_not_exist",
+      "note": "Gate added 2026-07-28 \u2014 coverage gap, not a template exclusion"
+    },
+    {
+      "n": 5,
+      "name": "Experience",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 6,
+      "name": "Architecture",
+      "status": "warn",
+      "approval": "approved",
+      "note": "Mobile architecture landed in SECURITY_KB \u00a79 / UX_KB \u00a713, never in ARCHITECTURE_KB. Closed retrospectively 2026-07-28."
+    },
+    {
+      "n": 7,
+      "name": "Code",
+      "status": "done",
+      "approval": "approved"
+    },
+    {
+      "n": 8,
+      "name": "Test",
+      "status": "warn",
+      "approval": "approved",
+      "note": "Rendered-UI contract live with no native backend \u2014 Playwright cannot load an RN tree. Six defects structurally uncatchable."
+    },
+    {
+      "n": 9,
+      "name": "Verify",
+      "status": "skipped",
+      "approval": "skipped_recorded",
+      "skip_reason": "gate_did_not_exist",
+      "note": "Gate added 2026-07-28 \u2014 coverage gap, not a template exclusion"
+    },
+    {
+      "n": 10,
+      "name": "Review",
+      "status": "skipped",
+      "approval": "not_asked",
+      "skip_reason": "skipped_without_exception",
+      "note": "Skipped by the orchestrator. No human exception was requested."
+    },
+    {
+      "n": 11,
+      "name": "Deploy",
+      "status": "done",
+      "approval": "approved"
+    }
+  ],
+  "loop_backs": [
+    {
+      "date": "2026-07-26",
+      "from_gate": 8,
+      "to_gate": 7,
+      "reason": "Logout over bearer left a live 30-day server session",
+      "resolved": true,
+      "origin": "gate"
+    },
+    {
+      "date": "2026-07-27",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Avatar built, never rendered",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-27",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Journey photos never rendered",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-27",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Lightbox + gallery never mounted",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-27",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Chat-history sheet never mounted",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-27",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Prompt chips rendered as ovals",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-28",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "Dead band above composer",
+      "resolved": true,
+      "origin": "human"
+    },
+    {
+      "date": "2026-07-28",
+      "from_gate": 11,
+      "to_gate": 7,
+      "reason": "First prompt chip age-blind across all 10 buckets",
+      "resolved": true,
+      "origin": "human"
+    }
+  ]
+}

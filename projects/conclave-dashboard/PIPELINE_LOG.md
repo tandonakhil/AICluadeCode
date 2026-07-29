@@ -61,8 +61,16 @@ flowchart TB
 | # | Gate | Date | Participants | Artifacts produced | Approval | Notes / exceptions |
 |---|------|------|--------------|--------------------|----------|--------------------|
 | 1 | Intake | 2026-07-28 | orchestrator, mas-architect | `INTAKE.md` (full form, Path A) | approved | First run of the mandatory intake process. It immediately caught a live ambiguity — "live status" meant pipeline **and** runtime, unresolved until asked |
-| 2 | Team Composition | 2026-07-28 | orchestrator, usage-monitor | Roster + estimate below | **awaiting** | `industry-expert` N/A (internal tooling). `solution-architect` droppable by rule (single surface) but recommended kept |
-| 3–11 | | | | | | |
+| 2 | Team Composition | 2026-07-28 | orchestrator, usage-monitor | Roster + estimate | approved | `industry-expert` N/A (internal tooling); `security-architect`, `responsible-ai-architect`, `synthetic-data-agent` dropped; `solution-architect` kept |
+| 3 | Plan & Backlog | 2026-07-29 | plan-agent, orchestrator | `FEATURES.md` — F1–F8 MVP, F9–F11 deferred | approved | Human: "start the build" |
+| 4 | Functional Design | 2026-07-29 | functional-design-agent | `knowledge/FUNCTIONAL_SPEC.md` | `batch-authorized` | |
+| 5 | Experience Design | 2026-07-29 | ui-ux-designer | `UX_KB.md`, `design-review/index.html` (5 themes) | approved | Human chose **Quiet Ledger**, light default. Rail + dropdown both built |
+| 6 | Architecture | 2026-07-29 | solution-architect | `ARCHITECTURE_KB.md`, schema | `batch-authorized` | |
+| 7 | Code | 2026-07-29 | code-agent, orchestrator | `dev/` | `batch-authorized` | |
+| 8 | Test | | test-agent | | pending | |
+| 9 | Verification | | verification-agent | | pending | |
+| 10 | Review | | review-agent | | pending | |
+| 11 | Deploy | | deploy-agent | | pending | |
 
 ---
 
@@ -78,7 +86,15 @@ flowchart TB
 
 | Date | Gate | What was skipped | Human's reason | Requested by |
 |------|------|------------------|----------------|--------------|
-| | | | | |
+| 2026-07-29 | 4, 6, 7 | **Per-gate human approval**, not the gates themselves | *"start the build. Loop until build is finished"* — standing authorization to run without stopping at each boundary | **human, explicitly** |
+
+**`batch-authorized` is not `approved`.** Those gates ran in full and produced
+their artifacts; what was waived is the pause for individual sign-off. It is
+recorded as a human-granted exception because that is what it is — and it is
+deliberately NOT rendered as `✋ approved`, because the human did not approve
+each one. Distinct from `NOT ASKED`, which is an approval that was owed and
+never requested. Everything is reviewable after the fact; nothing is claimed
+that did not happen.
 
 ---
 

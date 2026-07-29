@@ -24,3 +24,6 @@ node_modules/
 ~$*.pptx
 ~$*.docx
 ~$*.xlsx
+
+# conclave-dashboard local venv
+projects/conclave-dashboard/dev/.venv/
