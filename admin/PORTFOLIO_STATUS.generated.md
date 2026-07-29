@@ -1,13 +1,13 @@
 # Portfolio status — all projects
 
 > **GENERATED FILE — do not edit.**
-> Source: `projects/*/pipeline-state.json` · rendered 2026-07-29 18:20 UTC
+> Source: `projects/*/pipeline-state.json` · rendered 2026-07-29 18:24 UTC
 
 **6 project(s)**
 
 | Project | Template | Position | Env | Gates run | Pipeline |
 |---|---|---|---|---|---|
-| `conclave-dashboard` | custom (Flask) | In build — gate 7 | dev, local | 6 of 11 | `AMBER` |
+| `conclave-dashboard` | custom (Flask) | Deployed (dev, local) | dev, local | 11 of 11 | `AMBER` |
 | `conclave-marketing` | custom (FastAPI) | Deployed | dev, local | 9 of 11 | `AMBER` |
 | `grid-assistant` | genai-chatbot | Released v1.0.0 | prod | 9 of 11 | `AMBER` |
 | `little-milestones` | genai-chatbot | Deployed + post-deploy fixes | dev, local | 8 of 11 | `RED` |
@@ -16,11 +16,15 @@
 
 ## conclave-dashboard
 
-`AMBER` — 3 finding(s)
+`AMBER` — 7 finding(s)
 
 - gate 4 Functional: batch-authorized, not individually approved
 - gate 6 Architecture: batch-authorized, not individually approved
 - gate 7 Code: batch-authorized, not individually approved
+- gate 8 Test: batch-authorized, not individually approved
+- gate 9 Verify: batch-authorized, not individually approved
+- gate 10 Review: batch-authorized, not individually approved
+- gate 11 Deploy: batch-authorized, not individually approved
 
 ```mermaid
 flowchart TB
@@ -34,11 +38,11 @@ flowchart TB
   end
   subgraph r3 [" "]
     direction LR
-    G7["▶ 7<br/>Code"] --> H7{"✋<br/>batch-auth"} --> G8["⬜ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>batch-auth"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>batch-auth"} --> G9["✅ 9<br/>Verify"] --> H9{"✋<br/>batch-auth"}
   end
   subgraph r4 [" "]
     direction LR
-    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+    G10["✅ 10<br/>Review"] --> H10{"✋<br/>batch-auth"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>batch-auth"}
   end
   H3 --> G4
   H6 --> G7
@@ -60,12 +64,9 @@ flowchart TB
   classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
-  class G1,G2,G3,G4,G5,G6 done
+  class G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11 done
   class H1,H2,H3,H5 hdone
-  class H4,H6,H7 hbatch
-  class G7 active
-  class G8,G9,G10,G11 pending
-  class H8,H9,H10,H11 hpend
+  class H4,H6,H7,H8,H9,H10,H11 hbatch
   class r1,r2,r3,r4 rowbox
 ```
 

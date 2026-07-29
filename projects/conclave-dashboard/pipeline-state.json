@@ -1,7 +1,7 @@
 {
   "name": "conclave-dashboard",
   "template": "custom (Flask)",
-  "position": "In build \u2014 gate 7",
+  "position": "Deployed (dev, local)",
   "env": "dev, local",
   "last_activity": "2026-07-29",
   "served_url": "http://127.0.0.1:5050/",
@@ -46,34 +46,45 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "active",
+      "status": "done",
       "approval": "batch_authorized",
-      "note": "In progress"
+      "note": "41 tests. 3 bugs found and fixed: template path, kb-server leftovers, self-probe deadlock."
     },
     {
       "n": 8,
       "name": "Test",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized"
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized",
+      "note": "Audit reported 26/30 NOT VERIFIED on first pass; looped back to Code, now 36/36."
     },
     {
       "n": 10,
       "name": "Review",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized"
     },
     {
       "n": 11,
       "name": "Deploy",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized",
+      "note": "Manual start (INTAKE.md O1). http://127.0.0.1:5050/status"
     }
   ],
-  "loop_backs": []
+  "loop_backs": [
+    {
+      "date": "2026-07-29",
+      "from_gate": 9,
+      "to_gate": 7,
+      "reason": "4 acceptance criteria had no executed check behind them (AC-F5-03, F6-05, F8-02, and the AC-X-* family was missing from the audit entirely)",
+      "resolved": true,
+      "origin": "gate"
+    }
+  ]
 }

@@ -1,11 +1,11 @@
 # Pipeline Log — `conclave-dashboard`
 
 > **GENERATED FILE — do not edit.**
-> Source: `projects/conclave-dashboard/pipeline-state.json` · rendered 2026-07-29 18:20 UTC
+> Source: `projects/conclave-dashboard/pipeline-state.json` · rendered 2026-07-29 18:24 UTC
 > Edit the source and re-render; hand edits are overwritten.
 
-**Template**: custom (Flask) · **Position**: In build — gate 7 · **Env**: dev, local
-**Pipeline status**: `AMBER` — 3 finding(s)
+**Template**: custom (Flask) · **Position**: Deployed (dev, local) · **Env**: dev, local
+**Pipeline status**: `AMBER` — 7 finding(s)
 
 ```mermaid
 flowchart TB
@@ -19,11 +19,11 @@ flowchart TB
   end
   subgraph r3 [" "]
     direction LR
-    G7["▶ 7<br/>Code"] --> H7{"✋<br/>batch-auth"} --> G8["⬜ 8<br/>Test"] --> H8{"✋<br/>—"} --> G9["⬜ 9<br/>Verify"] --> H9{"✋<br/>—"}
+    G7["✅ 7<br/>Code"] --> H7{"✋<br/>batch-auth"} --> G8["✅ 8<br/>Test"] --> H8{"✋<br/>batch-auth"} --> G9["✅ 9<br/>Verify"] --> H9{"✋<br/>batch-auth"}
   end
   subgraph r4 [" "]
     direction LR
-    G10["⬜ 10<br/>Review"] --> H10{"✋<br/>—"} --> G11["⬜ 11<br/>Deploy"] --> H11{"✋<br/>—"}
+    G10["✅ 10<br/>Review"] --> H10{"✋<br/>batch-auth"} --> G11["✅ 11<br/>Deploy"] --> H11{"✋<br/>batch-auth"}
   end
   H3 --> G4
   H6 --> G7
@@ -45,12 +45,9 @@ flowchart TB
   classDef hpre    fill:#eef1f6,stroke:#8d99ab,color:#5b6675,stroke-dasharray:1 3
   classDef hnone   fill:#f8ded7,stroke:#a3341f,stroke-width:3px,color:#3d1109
   classDef rowbox  fill:none,stroke:none
-  class G1,G2,G3,G4,G5,G6 done
+  class G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11 done
   class H1,H2,H3,H5 hdone
-  class H4,H6,H7 hbatch
-  class G7 active
-  class G8,G9,G10,G11 pending
-  class H8,H9,H10,H11 hpend
+  class H4,H6,H7,H8,H9,H10,H11 hbatch
   class r1,r2,r3,r4 rowbox
 ```
 
@@ -59,6 +56,10 @@ flowchart TB
 - gate 4 Functional: batch-authorized, not individually approved
 - gate 6 Architecture: batch-authorized, not individually approved
 - gate 7 Code: batch-authorized, not individually approved
+- gate 8 Test: batch-authorized, not individually approved
+- gate 9 Verify: batch-authorized, not individually approved
+- gate 10 Review: batch-authorized, not individually approved
+- gate 11 Deploy: batch-authorized, not individually approved
 
 ## Gate ledger
 
@@ -70,8 +71,16 @@ flowchart TB
 | 4 | Functional | `done` | `batch_authorized` | — | — |  |
 | 5 | Experience | `done` | `approved` | — | — |  |
 | 6 | Architecture | `done` | `batch_authorized` | — | — |  |
-| 7 | Code | `active` | `batch_authorized` | — | — | In progress |
-| 8 | Test | `pending` | `pending` | — | — |  |
-| 9 | Verify | `pending` | `pending` | — | — |  |
-| 10 | Review | `pending` | `pending` | — | — |  |
-| 11 | Deploy | `pending` | `pending` | — | — |  |
+| 7 | Code | `done` | `batch_authorized` | — | — | 41 tests. 3 bugs found and fixed: template path, kb-server leftovers, self-probe deadlock. |
+| 8 | Test | `done` | `batch_authorized` | — | — |  |
+| 9 | Verify | `done` | `batch_authorized` | — | — | Audit reported 26/30 NOT VERIFIED on first pass; looped back to Code, now 36/36. |
+| 10 | Review | `done` | `batch_authorized` | — | — |  |
+| 11 | Deploy | `done` | `batch_authorized` | — | — | Manual start (INTAKE.md O1). http://127.0.0.1:5050/status |
+
+## Loop-backs
+
+1 total, **0 originated by the human**.
+
+| Date | From | To | Reason | Origin | Resolved |
+|------|------|----|--------|--------|----------|
+| 2026-07-29 | 9 | 7 | 4 acceptance criteria had no executed check behind them (AC-F5-03, F6-05, F8-02, and the AC-X-* family was missing from the audit entirely) | gate | ✅ |
