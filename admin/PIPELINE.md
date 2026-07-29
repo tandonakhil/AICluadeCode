@@ -216,7 +216,14 @@ at every step.** Three obligations, all binding:
    asserts a position that is false, and it is *believed*, because it looks
    authoritative.
 
-**A step that does not update the graph is not finished.** The graph in
+**A step that does not update the graph is not finished.**
+
+**The orchestrator monitors each project against its own record and has
+explicit human authority to STOP work** when the two disagree — eight
+mechanical triggers, listed in `admin/ORCHESTRATOR.md`. That authority is
+narrow by design: the power to pause and ask, never to decide. The orchestrator
+does not resolve a discrepancy on the human's behalf, does not grant itself the
+exception, and does not treat silence as approval. The graph in
 `projects/<name>/PIPELINE_LOG.md` and the actual state of the run are the same
 fact recorded twice; if they ever disagree, the run is not under control.
 

@@ -82,6 +82,44 @@ is never invoked as a subagent and never will be.
   Canonical shape and notation live in `admin/PIPELINE.md`; a full worked run
   including three loop-backs and a mid-enhancement redraw is in
   `admin/samples/PIPELINE_WALKTHROUGH.md`.
+- **Activates the dashboard at project initiation, and keeps it true.**
+  `projects/<name>/pipeline-state.json` is created as part of scaffolding — at
+  the same moment as `PROJECT_CONTEXT.md` and `FEATURES.md`, before Intake runs,
+  not retrofitted later. It is the **only hand-maintained record**; the markdown
+  views and the console are generated from it. Every gate open, gate close,
+  loop-back, exception and route change updates it. A step that leaves it stale
+  is not finished.
+
+- **Monitors each project against its own record, and stops work when they
+  disagree.** The human has granted explicit authority to halt and require
+  approval. The triggers are mechanical, not a judgement call — any of these is
+  an **out-of-process condition**:
+
+  1. A gate closed with approval `not_asked` — an approval that was owed and
+     never requested.
+  2. A gate skipped with `skipped_without_exception` — no human granted it.
+  3. Work proceeding past a gate whose status is not `done` or `warn`.
+  4. Gates completing out of order, or a gate re-opened without a Route-changes
+     row.
+  5. Scope changed mid-flight with no redraw and no `FEATURES.md` entry.
+  6. An agent writing outside its contract lane — another agent's KB, another
+     project, or `admin/` from a project-pipeline agent.
+  7. `pipeline-state.json` contradicting what is on disk — a gate marked `done`
+     whose artifacts do not exist.
+  8. A blocking suite reported `STATIC ONLY`, or an acceptance criterion
+     `NOT VERIFIED`, with the gate closed anyway.
+
+  **On detecting any of these: stop. Do not continue and mention it.** Say
+  plainly which trigger fired, what the record claims, what is actually true,
+  and what it would take to make them agree — then ask for an explicit
+  decision. The human may direct continuation, in which case it is recorded as
+  an exception with their reason and their name, per the rule below.
+
+  This authority is deliberately narrow: it is the power to **pause and ask**,
+  never to decide. The orchestrator does not resolve the discrepancy on the
+  human's behalf, does not grant itself the exception, and does not treat
+  silence as approval.
+
 - **Does not exempt itself from the pipeline.** Every gate skipped during the
   F18 build violated a rule that already existed — `new-project/SKILL.md`'s
   "never skip a gate", `ui-ux-designer`'s rendered-preview precondition,

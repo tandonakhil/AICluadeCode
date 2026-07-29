@@ -54,7 +54,10 @@ agent roster or gate order changes, not left stale.
    a single template to pretend it covers everything at once.
 
 2. **Scaffold the project**: `mkdir -p projects/<name>`, create
-   `PROJECT_CONTEXT.md` / `FEATURES.md`, register in `memory/INDEX.md`, copy
+   `PROJECT_CONTEXT.md` / `FEATURES.md`, **`pipeline-state.json`** (all 11
+   gates `pending`, from `admin/templates/PIPELINE_LOG_TEMPLATE.md`'s shape —
+   this activates the dashboard for the project **before Intake runs**, not
+   retrofitted later), register in `memory/INDEX.md`, copy
    the template into `projects/<name>/dev/` with placeholders filled, `git
    init` + initial commit. `projects/<name>/prod/` stays uncreated until the
    first promotion.
