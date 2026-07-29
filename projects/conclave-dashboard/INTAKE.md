@@ -139,3 +139,32 @@ changes what `admin/PIPELINE.md` §3a requires and that file is binding.
   recorded here so it is visible if the schema has to change at gate 7+.
 - **First project ever to run all eleven gates.** Both new gates get their
   first real exercise on tooling that will itself become a source of truth.
+
+---
+
+## Requirement addendum — 2026-07-28, human, arriving at gate 2
+
+Experience-Design-shaped requirements arrived before gates 3 and 4. Recorded
+here as intake input rather than acted on out of order; they feed Plan &
+Backlog (3), become acceptance criteria at Functional Design (4), and are
+designed at Experience Design (5).
+
+| Ref | Requirement |
+|---|---|
+| R1 | **Project selector** — a dropdown to switch between projects, not five stacked graphs on one page. |
+| R2 | **Analytical status-reporting layout**, not a document. Read the way a status dashboard is read: summary first, detail on demand. |
+| R3 | **Key callouts on status** — the things that need attention surfaced before the detail, encoded in form as well as number. |
+| R4 | **Follow an established project-status-report template** rather than inventing a layout. Researched, not improvised. |
+| R5 | **Show how it looks before approval** — a rendered mockup, per `ui-ux-designer`'s standing contract obligation. |
+| R6 | `ui-ux-designer` engaged for the design. |
+
+**Consequence for A8.2 (out of scope).** R2/R3 pull toward analytics —
+historical trend charts and notifications were explicitly out of scope at
+intake and **remain so** unless the human reopens them. "Analytical" here means
+the *layout and information design* of a status report, not time-series
+analysis.
+
+**Consequence for A7.2 (worst plausible harm).** R3 raises the stakes on the
+callouts specifically: a callout is the most authoritative element on a status
+page. A callout that is wrong, or that stays green while something is broken,
+is the precise harm this project was chartered to avoid.
