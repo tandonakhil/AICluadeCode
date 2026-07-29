@@ -78,7 +78,9 @@ flowchart TB
 
 | Date | From gate | Back to | Reason | Resolved |
 |------|-----------|---------|--------|----------|
-| | | | | |
+| 2026-07-29 | 9 Verification | 7 Code | 4 acceptance criteria had no executed check behind them; the audit had also missed the entire `AC-X-*` family | ✅ 36/36 |
+| 2026-07-29 | *(human, post-Deploy)* | 7 Code | Pipeline graph was mermaid **source** in a `<pre>`, not a rendering — flagged by `ui-ux-designer` at gate 5 as an open question and never resolved before Code | ✅ rendered as DOM |
+| 2026-07-29 | *(orchestrator, post-Deploy)* | 7 Code | **The entire `dev/` codebase was untracked.** Root `.gitignore` excludes `projects/*/dev/` because each project's `dev/` is its own nested repo; `git init` was never run, so earlier commits captured the docs and state but not one line of application code | ✅ repo initialised, 12 files tracked |
 
 ---
 
