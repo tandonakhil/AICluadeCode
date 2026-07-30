@@ -1,7 +1,7 @@
 # Pipeline Log — `policy-lookup-assistant`
 
 > **GENERATED FILE — do not edit.**
-> Source: `projects/policy-lookup-assistant/pipeline-state.json` · rendered 2026-07-29 19:15 UTC
+> Source: `projects/policy-lookup-assistant/pipeline-state.json` · rendered 2026-07-30 23:00 UTC
 > Edit the source and re-render; hand edits are overwritten.
 
 **Template**: rag-knowledge-base · **Position**: Deployed · **Env**: dev, local

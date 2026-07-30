@@ -141,8 +141,17 @@ contains a running application.
 
 **AC-F8-01** GIVEN any rendered view THEN the **source file's mtime** is shown.
 
-**AC-F8-02** GIVEN state older than a threshold THEN it is visibly marked
-stale, not silently served as current.
+**AC-F8-02** GIVEN a project that is **in flight** (a gate `active`, or an
+approval `awaiting`) AND whose state is older than the threshold THEN it is
+visibly marked stale.
+
+**AC-F8-03** GIVEN a project that is **not** in flight THEN it is **never**
+marked stale, however old its state file is. *Revised 2026-07-29: the original
+criterion equated "old" with "stale" and flagged all six projects, including a
+released one whose record had correctly not changed in days. A board that cries
+wolf gets ignored — which is precisely the failure this project exists to
+avoid. Staleness means "the record may not reflect reality", not "time has
+passed."*
 
 ---
 
