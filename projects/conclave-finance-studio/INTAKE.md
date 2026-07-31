@@ -108,3 +108,48 @@ central MVP question.
 - **Approval-under-pressure** (A3.2): a per-write approval model whose approvals
   are given at 11pm on day 3 is a control in name. Flagged for
   `responsible-ai-architect` and `ui-ux-designer`.
+
+---
+
+## SCOPE CORRECTION — 2026-07-31, human
+
+Issued during the gate 3 loop-back, before any F8 change was applied.
+
+> *"I want to make sure the Agentic system is not supposed to be General Ledger
+> where the close happens. It is running on top of ERP system like Oracle ERP
+> Cloud data in a data warehouse. It can trigger postings into ERP Cloud but all
+> ERP features and GL features are in GL. System's job is to automate activities
+> during close. Assume a standard close process. We help detect anomalies,
+> resolve anomalies. **Do not imitate GL.**"*
+
+**What this invalidated.** Four build-now features were rebuilding Oracle
+Account Reconciliation Cloud rather than sitting on top of it: F6 (matching
+engine + statement ingestion), F7 (auto-certification eligibility), F8
+(reconciling-item data model), F11 (certification workspace). `functional-agent`
+had already flagged bank rec as "the most commoditised activity in this domain";
+the correction turns that from a positioning risk into a scope error.
+
+**What survived unchanged.** The spine — F1–F5, F12, F13 — and the cross-period
+detectors F9/F10. All of those are *about the agents*, not about the ledger.
+
+## PRODUCT DIRECTION — 2026-07-31, human
+
+Two parts, given as the basis for all subsequent decisions.
+
+**Part 1 — research-driven backlog.** Research which parts of month-end close
+can be automated with AI agents — **anomaly detection, balancing, coding
+issues**, and whatever else the research surfaces. Build the backlog from that
+rather than from a reconciliation-engine assumption.
+
+**Part 2 — natural-language, skill-based interface.** Users select **one or
+more datasets** for analysis and ask an agent to take an action or automate it
+**under guardrails**. This is the product surface, not a reconciliation
+workspace.
+
+**Standing authorization.** Explicit approval to build **MVP1**. The
+orchestrator takes every gate to the SMEs for review and trusts their judgement
+for the first prototype phase, making necessary assumptions rather than
+returning for each one. Recorded in `pipeline-state.json` as
+`batch_authorized` — **not** `approved` — because the human authorized the run,
+not each gate individually. Every assumption is recorded in the Decisions Log
+so it is reviewable after the fact.

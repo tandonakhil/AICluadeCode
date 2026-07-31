@@ -1,11 +1,11 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 3 \u2014 Plan & Backlog",
+  "position": "Gate 3 \u2014 backlog re-cut after scope correction",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
-  "notes": "Multi-agent system for finance accountants: pre-built close agents plus a builder for custom agents/teams. Three surfaces, write-back with per-action approval.",
+  "notes": "Sits ON TOP of Oracle ERP Cloud data in a warehouse. Detects and resolves close anomalies; triggers postings into ERP. Does NOT imitate GL. Surface is a natural-language, dataset-selection agent interface with guardrails.",
   "gates": [
     {
       "n": 1,
@@ -111,6 +111,14 @@
       "reason": "functional-agent devil's-advocate pass found six required changes before the backlog can go to approval \u2014 chiefly that criterion 9 (F4 ERP tie-back) is the only blocking acceptance criterion the build as scoped cannot pass, and that F8 does not defeat the self-justification mechanism it was written for",
       "resolved": false,
       "origin": "gate"
+    },
+    {
+      "date": "2026-07-31",
+      "from_gate": 3,
+      "to_gate": 3,
+      "reason": "SCOPE CORRECTION (human): the system sits on top of Oracle ERP Cloud data in a warehouse and must not imitate the GL. F6/F7/F8/F11 were rebuilding Oracle ARCS. Backlog re-cut around anomaly detection/resolution plus a natural-language dataset-selection interface with guardrails.",
+      "resolved": false,
+      "origin": "human"
     }
   ]
 }

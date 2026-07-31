@@ -61,6 +61,28 @@ undecided.
   Recorded as answers, not gaps. Consequence: `responsible-ai-architect`
   becomes effectively non-droppable.
 
+- **2026-07-31 — SCOPE CORRECTION (human).** The system is **not** the General
+  Ledger. It runs on top of Oracle ERP Cloud data in a warehouse, triggers
+  postings into ERP, and leaves all ERP/GL features in the GL. Its job is to
+  **detect and resolve anomalies** during a standard close. *"Do not imitate
+  GL."* This invalidated F6/F7/F8/F11 — a matching engine, statement ingestion,
+  auto-certification rules and a certification workspace are Oracle Account
+  Reconciliation Cloud. `functional-agent` had already called bank rec the most
+  commoditised activity in the domain; the correction turns that from a
+  positioning risk into a scope error. The spine (F1–F5, F12, F13) and the
+  cross-period detectors (F9, F10) survive — all of those are about the agents,
+  not the ledger.
+- **2026-07-31 — PRODUCT DIRECTION (human), two parts.** (1) Build the backlog
+  from research into which close activities AI agents can genuinely automate —
+  anomaly detection, balancing, coding issues. (2) The surface is a
+  **natural-language, skill-based interface**: select one or more datasets, ask
+  an agent to act or automate **under guardrails**.
+- **2026-07-31 — STANDING AUTHORIZATION to build MVP1.** Gates go to the SMEs
+  for review and their judgement is trusted; the orchestrator makes necessary
+  assumptions rather than returning for each. Recorded as `batch_authorized`,
+  **not** `approved` — the human authorized the run, not each gate. Every
+  assumption lands in this log so it is reviewable after the fact.
+
 ## Current Status
 
-Gate 1 · Intake — **awaiting human approval**.
+Gate 3 · Plan & Backlog — re-cutting after the scope correction. SMEs researching Part 1 (automatable close activities) and the guardrail model.
