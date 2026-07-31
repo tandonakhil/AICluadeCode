@@ -250,20 +250,79 @@ undecided.
      F40/CUEC/POAR/close-clock exist to test. Each carries a README naming
      what must exist first.
 
+- **2026-07-31 — Gate 7 Code pass 2c: judgement calls made by `code-agent`.**
+  1. **The F50 refusal registry (A19–A25) is CODE, not a bundle policy
+     object** — deliberately unlike the nine behavioural guardrails, which are
+     bundle-resident as RAI-ARCH-2 requires. A bundle publication is a
+     two-human change-control act this build otherwise treats as sufficient
+     authority to change any policy; if the refusal set lived there, A20 — the
+     keystone every other guardrail is downstream of — would be one
+     publication away from removal. A test asserts no refusal ID is expressed
+     in any compiled rule.
+  2. **A20's enforcement has two legs of unequal strength, and this is
+     stated rather than smoothed.** The *structural* leg (a variance disposed
+     with no adjustment on a `magnitude`/`threshold`/`none` ground) reads
+     fields and no rewording touches it; every emission carrying a disposition
+     passes through it. The *prose* leg, for the F39 NL surface, matches the
+     shape of the speech act rather than a word list — but it is a pattern
+     matcher over English and **is evadable**. A test *demonstrates* a
+     paraphrase that evades it, then shows the structural leg catching the
+     same emission once it disposes. The residual is an executable fact.
+  3. **The predicate language gained two operators**, `subset_of` and
+     `intersects`. Without them G-SELFREF and G-SCOPE-DRIFT could only be
+     expressed by precomputing the answer in context-assembly code and having
+     the rule read `emission.selfref_ok` — which moves the real check out of
+     the versioned, fixture-backed bundle and leaves a rule that is decoration.
+  4. **Emission abstention triggers are evaluated BEFORE the guardrails**, and
+     AB5 outranks AB1. If the system should have declined, the correct output
+     is a typed decline; a bare denial leaves the human nothing to act on. And
+     an item whose evidence supports two resolution types equally is not an
+     item with insufficient evidence — calling it AB1 loses the fact that the
+     tie is what the human must break.
+  5. **R3/R4's evidence schema was widened to four fields.** Writing
+     `AC-F35-05`'s test first exposed a real fault: R5 (explanation + owner +
+     due date) cost more interactions than R3/R4 as first specified, which is
+     the thumb on the scale toward posting the criterion exists to prevent.
+     Fixed by making the proposal schema what a proposal actually needs — it
+     must name what it would move, from where, and in which direction — rather
+     than by making the safe outcomes artificially cheap.
+  6. **`decision.outcome` gained `abstain` as a peer of `deny`.** It did not
+     have one, so an abstention was not in fact recordable as anything other
+     than a denial with a special reason string.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
 
-**Pass 1 complete** (6 commits in `dev/`, 300 unit tests + 71 suite scenarios,
-all green). Built: the two-process repo skeleton and the GES credential trust
+**Passes 1, 2a, 2b and 2c complete** (14 commits in `dev/`, 782 unit tests +
+96 suite scenarios, all green; `ux` and `industry` suites exit 3).
+
+Built in pass 1: the two-process repo skeleton and the GES credential trust
 boundary; the certified query registry and its single execution operation; the
 append-only hash-chained dossier store; coverage as a closed sum type; the F29
 omission detector, the F42 negative half and the paired wedge comparison; the
-twelve-period fixture with the planted omission. Not yet built and absent
-rather than stubbed: the guardrail broker (F36), export (F40), POAR, the
-review/render surface (F41), resolution and disposition (F35/F32), the version
-registry (F2), identity and lineage (F5), the refusal registry (F50), and the
-entire front end.
+twelve-period fixture with the planted omission.
+
+Built in passes 2a–2b: the F36 guardrail broker — closed predicate language,
+hash-addressed bundle, deny-by-default FSM, blast-radius caps holding under
+real concurrency; authorship closure at the schema level; dual-authorised
+bundle publication; the threshold-widening detector; the FSM emission leg with
+`ABSTAINED` as a first-class terminal state.
+
+Built in pass 2c: the owed emission-leg test (abstention structurally distinct
+from denial; `OVERRIDE` proved unreachable from the emission leg by forward
+closure, reverse closure and exhaustive path enumeration); the nine behavioural
+guardrails as fourteen bundle-resident rules with twenty-eight compile-time
+fixtures; the emission decision path; the F50 refusal registry A19–A25 with
+A20 as a speech act; abstention as a first-class output with all six types and
+the four-state RAG; F12's label-source and promotion-readiness report; R1–R6
+and their evidence schemas; the policy-cold auto-disposal path with
+third-consecutive-period escalation; F35 close preconditions and F32 forward
+disposition with its verification job.
+
+Not yet built and absent rather than stubbed: export (F40), POAR, the
+review/render surface (F41), the version registry (F2), identity and lineage
+(F5), and the entire front end.
 
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
@@ -298,3 +357,18 @@ registry and from nowhere else.
 
 **No reachability tests exist because no UI component exists.** That Code-gate
 obligation is live and unmet; the `ux` suite exits 3 rather than reporting green.
+
+### Register entries added at pass 2c
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 9 | `RESPONSIBLE_AI_KB` §4.1 — A20 enforced on the speech act, "not by a keyword list" | a **structural leg** over fields (absolute for any emission carrying a disposition) plus a **prose leg** that is a shape matcher over English | the prose leg **is evadable and a test demonstrates a paraphrase that evades it**. A20 holds absolutely where a disposition exists and heuristically in free prose. Closing this needs the F39 NL surface plus a model call site, neither of which exists |
+| 10 | `AC-F35-11` — auto-disposed finding visible on the Exceptions screen, dossier reachable | `Outcome.as_exception_row()`, carrying the marker, the disposing rule and the bundle hash | **`AC-F35-11` NOT satisfied** — observable-UI, no UI |
+| 11 | `AC-F12-20`'s "read on screen, in a dossier and in an export" | one renderer, three surfaces, label source in the same payload | the *renderers* are built and tested; **no screen and no export file exists to read them on** |
+| 12 | `AC-F12-19` — retrospective abstention-warranted labels | nothing | **not built.** The store now distinguishes `abstain` from `deny`, so the read this criterion needs is possible; the label itself is not written |
+
+**No register entry was closed at pass 2c.** Entries 1–8 stand exactly as
+recorded at pass 1. In particular, entry 2's residual is *narrowed but not
+closed*: the two new SQLite stores added here (`policy_cold`, `disposition`)
+use the same `BEGIN IMMEDIATE` single-writer mechanism, so they inherit both
+its guarantee and its one-host bound.
