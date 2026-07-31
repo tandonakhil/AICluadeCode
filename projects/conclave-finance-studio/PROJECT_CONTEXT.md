@@ -453,6 +453,101 @@ Audit, Refusals**. The `industry` suite executes for the first time.
 close clock (`AC-F38-11`), the F12 probe-injection programme (`AC-F41-08`), nine
 of the eleven evaluator primitives, and F17 direct posting.
 
+## Test Results
+
+### 2026-07-31 — Gate 8 · Test — `test-agent`, gate-8 verification run
+
+**Every suite EXECUTED. Every suite green. Exit code 0 across the board.**
+Structured per-scenario evidence: `test-evidence/*-2026-07-31.md`.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Owner | Blocking |
+|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 1,217 | 1,217 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 21 | 21 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 21 | 21 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 40 | 40 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | `ui-ux-designer` | yes |
+| post-deploy smoke | `EXECUTED` | 0 | 7 | 7 | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. The `ux` suite ran under
+`dev/.venv/bin/python` with Playwright present and Chromium launched — 186
+scenarios against a **real rendering engine**, every request fulfilled from the
+in-process ASGI app, no server started inside the agent's turn.
+
+**Test-count delta.** No previous `test-agent` run exists, so these are a
+**baseline**, not a delta. They reconcile exactly with `code-agent`'s pass-4
+figures (1,217 unit + 305 suite scenarios), which is itself a check. Against
+gate 7 pass 3 (`2ed6b4e..HEAD`): **157 test functions added, 8 removed, 0
+silently changed.** All 8 removals asserted the HTTP 501 deferred screen that
+pass 4 replaced with a real write path; each names its replacement's
+destination, and the destinations (`test_ui_write_path.py` +736 lines,
+`test_ges_decide_route.py` +438 lines) assert against the **store**, not the
+confirmation message. Verified: no replacement is weaker.
+
+**Post-deploy smoke test — PASS.** `CONCLAVE_ENV=pilot backend/pilot.py`
+started, all thirteen routed screens served 200, the pilot strip rendered, the
+dossier carried zero external references, a staff approval was refused 403 by
+the broker, and the process was stopped with nothing left running. Started,
+exercised and stopped inside one command invocation. **Note the pilot binds
+8021, not 8000** — an unrelated process answers 404 on 8000 and a smoke test
+aimed there reports thirteen false failures.
+
+**No blocking suite failed. The gate is not stopped by a suite failure.**
+
+**But five green scenarios claim more than they prove**, and this is the
+finding of the run rather than the counts. Full evidence:
+`test-evidence/register-cross-check-2026-07-31.md`.
+
+1. **`test_AC_F1_08_a_dossier_returns_complete_with_its_retention`** (functional,
+   green) asserts only that a `retention_expiry` date string it wrote seconds
+   earlier is truthy. It never retrieves from an archive and never advances a
+   clock. Register entries 4 and 20 say the seven-year obligation is unmet and
+   that `AC-F1-08`'s oldest-end retrieval has no object store. **A reader
+   mapping suite IDs to criteria will mark `AC-F1-08` satisfied. It is not.**
+2. **A20 is reported more strongly than register 9 permits.** Eight of nine
+   red-team RT-05 scenarios are named
+   `…a_materiality_conclusion_never_reaches_a_surface_however_phrased`.
+   *However phrased* is exactly what register 9 denies. Probing the broker
+   directly found a **working evasion the suite has no scenario for**: evasive
+   prose + a `treatment` claim + a *substantiated* ground returns `allow`. The
+   suite tests the two cases that are caught and not the one that is not; the
+   test that demonstrates the evasion lives in the **unit** suite, not the
+   red-team suite.
+3. **The architecture suite's only trust-boundary check would still pass if the
+   boundary were gone entirely.** `test_the_api_package_never_imports_the_ges_package`
+   is a static regex over `backend/app/` source text; `pilot_transport.py` sits
+   outside that package by design. Its docstring defers the runtime half to the
+   `security` suite — but the security suite's three real-subprocess scenarios
+   test the **credential** boundary, not the process boundary, and
+   `pilot_transport` deliberately does not set `CONCLAVE_PROCESS_ROLE`, so they
+   never run against the pilot configuration. **No scenario in any suite
+   exercises the two-process loopback topology.**
+4. **`test_the_override_rate_is_visible_with_its_denominator`** (ux) passes with
+   its persona-switch POST body discarded — proven by re-introducing the pass-4
+   body-dropping bug and running it: `1 passed in 0.83s`. It spends three lines
+   becoming the controller and every assertion holds as a staff accountant.
+   **It establishes nothing about the controller persona.** Its siblings in the
+   same class do depend on the switch, which is why 9 UX scenarios failed under
+   that probe and this one did not.
+5. **`test_UX12_the_three_failure_grammars_differ…`** exercises two of the three
+   it names. UNAVAILABLE — "the one a reviewer must never read as a denial" —
+   is never posted in the scenario named for it.
+
+**On the POST-harness disclosure (pass 4 judgement call 9):** re-introducing the
+bug failed **9 of 186** UX scenarios, all in `TestUX14ControllerNightOverMonitors`.
+The persona switch is the only body-bearing POST the suite makes; the other
+write controls carry no form fields that change the outcome. The fix was real
+and necessary, and it is load-bearing for exactly one journey.
+
+**On registers 3 and 4:** no suite claims `AC-F1-11`. `AC-F1-11` appears in no
+test file at all. The anchor and archive scenarios correctly assert the
+*negative* and are named for it. Executed probe confirms the residual is real —
+the anchor signature is the literal string `STUB-UNSIGNED:<digest>`, requiring
+no secret to produce, so an attacker who recomputes the chain can also
+recompute the anchor.
+
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
 Places where the build could not match `ARCHITECTURE_KB` as written.
