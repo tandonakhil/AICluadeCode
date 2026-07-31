@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 7 \u2014 Code (loop-back from Test)",
+  "position": "Gate 9 \u2014 Verification",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -107,8 +107,8 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
@@ -118,19 +118,23 @@
     {
       "n": 8,
       "name": "Test",
-      "status": "looped",
-      "approval": "request_changes",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "test-agent"
       ],
-      "note": "All 8 suites EXECUTED, 0 failures, 1,528 scenarios. But 4 green scenarios claim more than they prove; 2 sent back to Code. Found a WORKING A20 evasion reaching a surface with no red-team scenario for it."
+      "note": "All 8 suites EXECUTED, 0 failures. Loop-back resolved: the A20 case-A evasion now has a red-team scenario asserting it REACHES a surface; 8 overclaiming names rescoped; AC-F1-08 claimed by nothing; the two-process topology has a real child-process witness; persona-dependent UX scenarios now fail when the persona switch fails."
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-07-31",
+      "participants": [
+        "verification-agent"
+      ]
     },
     {
       "n": 10,
@@ -174,7 +178,7 @@
       "from_gate": 8,
       "to_gate": 7,
       "date": "2026-07-31",
-      "resolved": false,
+      "resolved": true,
       "reason": "Gate 8 found green scenarios asserting what the register says is false: AC-F1-08 satisfied by a self-written date, and 8 red-team scenarios named '...never reaches a surface however phrased' while a working evasion (evasive prose + treatment + substantiated ground) reaches a surface untested."
     }
   ]
