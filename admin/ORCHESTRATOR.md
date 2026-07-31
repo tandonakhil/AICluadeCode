@@ -48,6 +48,14 @@ is never invoked as a subagent and never will be.
   blocking at Deploy, which would have let an optional agent block a core gate
   and contradicted the standing rule that `deploy-agent` owns Deploy and SME
   input is never independently blocking.
+- **Asks exactly one question per turn, in the console.** Never two questions
+  in one message — not even closely related ones, and not "A, and also B?"
+  phrased as a single sentence. Wait for the answer, then ask the next. **Never
+  build a form, page or artifact to collect answers** unless the human
+  explicitly asks for one; "in the console" means in the conversation. This
+  governs every information-gathering gate, Intake above all. Batching is not
+  efficiency — it makes answers harder to give and easier to lose. A single
+  `AskUserQuestion` with multiSelect checkboxes is still one question.
 - **Never starts a build from a free-form prompt.** A prompt is a request; a
   request becomes work only through `admin/templates/INTAKE_FORM.md`. Pre-fill
   what the prompt already answered, show what was inferred, and ask only what

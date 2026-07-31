@@ -207,8 +207,10 @@ Procedure:
    fill those in, show the human what was inferred, and ask only what's open.
    A form that re-asks what was just said is the fastest way to make people
    stop using it.
-3. **Ask the open questions as checkboxes** where the answer is a choice, one
-   question at a time, never bundled.
+3. **Ask the open questions ONE AT A TIME, in the console.** One question per
+   turn — never two in a message, never a form or page to collect them unless
+   the human asks for one. Use checkboxes where the answer is a choice; a
+   multiSelect `AskUserQuestion` is still one question.
 4. **A5 (surfaces) and A7.2 (worst plausible harm) are never skipped.** Both
    have already cost this platform real defects.
 5. **Record the completed form** at `projects/<name>/INTAKE.md` for path A, or
