@@ -1475,6 +1475,56 @@ F1–F5 slice; the approved F1–F10 scope likely runs 2.5–3.5× that (PLAN.md
 
 ## Test Results
 
+**2026-07-31: Full three-surface run + live E2E error-reproduction
+(test-agent).** Triggered by a human report that "the app is still not
+working, it is throwing an error" (no exact error text supplied). Structured
+per-scenario evidence:
+`test-evidence/unit-integration-2026-07-31.md`. Suite policy: blocking. Both
+servers were already running; nothing long-lived was started in-turn.
+
+- **Backend pytest: PASS, 294/294** (`.venv/bin/python -m pytest -v`), exit 0,
+  only pre-existing deprecation warnings. Delta: +10 vs the 2026-07-26
+  baseline of 284 (growth, no drop).
+- **Frontend vitest: PASS, 80/80 across 15 files**, exit 0. Count held exactly
+  vs 2026-07-13.
+- **Mobile jest (RNTL): PASS, 7/7 across 2 files — with a cold-start
+  flakiness finding.** The *first* full run returned 2 failed / 5 passed: both
+  failures in `ask.test.tsx` (`render function has not been called`, preceded
+  by post-teardown `act(...)` warnings from `AskScreen`'s prompt-fetch effect).
+  `ask.test.tsx` alone = 3/3; the full suite re-run 5× straight = 7 passed
+  every time. Non-deterministic cold-start race, not a hard failure — flagged
+  to code-agent as a test-isolation/timing weakness to harden, not something I
+  fix. Reported as baseline (no prior numeric jest count on record).
+- **Live end-to-end smoke against the running app: ALL PASS — no error
+  reproduced on the backend surface.** With a real cookie-jar session and
+  `Origin: http://localhost:3000`: `/health` 200; signup → session cookie set;
+  `/auth/me`, `/profiles`, `/auth/sessions` all 200; created a real profile and
+  hit `/profiles/{id}/suggested_prompts|timeline|activities|products|memories|
+  chat_sessions` — all 200, age-scoped, disclaimer present. Critically,
+  **live `POST /chat` returned 200 in 7.5s with a real Anthropic-generated,
+  guardrailed reply** — the ANTHROPIC_API_KEY is valid and `claude-sonnet-5`
+  resolves, so the most likely 500 source is healthy. No 500, no CORS
+  rejection at the correct origin, no unhandled backend exception.
+- **Most probable root cause of the human's error: wrong browser origin
+  (`127.0.0.1:3000` instead of `localhost:3000`).** Confirmed live: a preflight
+  `OPTIONS /profiles` with `Origin: http://127.0.0.1:3000` returns **400 with
+  no `access-control-allow-origin` header**, so the browser blocks every API
+  call; the identical request at `localhost:3000` returns 200 with the allow
+  header. In the browser this renders `app/page.tsx`'s `role="alert"`: "Could
+  not reach the server — check that the backend is running, then reload." — a
+  visible "error" even though the backend is fully healthy. The allowed-origin
+  whitelist (`localhost:3000`, `10.0.0.47:3000`,
+  `akhils-macbook-pro.local:3000`, `localhost:8081`) matches this machine's
+  current LAN IP and hostname; the only unreachable common origin is
+  `127.0.0.1:3000`. **Recommended fix path (code/deploy, not test): either add
+  `http://127.0.0.1:3000` to the allowed origins, or ensure the app is only
+  ever opened at `localhost:3000`.**
+- **Rendered-UI web (Playwright): STATIC ONLY — NOT EXECUTED.** Playwright is
+  not installed in `dev/frontend`; would need `@playwright/test` + a browser
+  to run. As a blocking suite this leaves the in-browser rendered state
+  (computed styles / occlusion / hydration) unverified by machine this run —
+  the CORS root cause above was reproduced at the HTTP/CORS layer instead.
+
 **2026-07-13: Test gate, Increment 7 (F17: Google Photos import) —
 unit/integration suite + live smoke run (test-agent).** Full structured
 per-scenario evidence at

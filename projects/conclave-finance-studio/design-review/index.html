@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conclave Finance Studio — Experience Design Review (Gate 5)</title>
+<style>
+/* ============================================================
+   TOKENS
+   One rule dominates this palette: THERE IS NO GREEN.
+   A green state trains a depleted reviewer that the surface
+   cannot fail. Clean is rendered in neutral ink, never colour.
+   ============================================================ */
+:root{
+  --bg:#F6F6F3; --surface:#FFFFFF; --surface-2:#F0F0EC; --surface-3:#E7E7E1;
+  --line:#D9D9D2; --line-2:#C2C2B8;
+  --ink:#14161A; --ink-2:#4A4F58; --ink-3:#7A808A;
+  --risk-1:#B45309; --risk-2:#B42318; --risk-3:#7A1214;
+  --risk-1-bg:#FBF1E4; --risk-2-bg:#FBECEA; --risk-3-bg:#F6E4E3;
+  --refuse:#334155; --refuse-bg:#EDF0F4;
+  --uncert:#6B7280; --uncert-bg:#F1F1EF;
+  --accent:#1D4ED8; --accent-bg:#ECF1FE;
+  --probe:#6D28D9;
+  --shadow:0 1px 2px rgba(20,22,26,.06),0 4px 14px rgba(20,22,26,.05);
+}
+[data-theme="dark"]{
+  --bg:#0E1013; --surface:#16191F; --surface-2:#1D212A; --surface-3:#252A34;
+  --line:#2B303A; --line-2:#3A414D;
+  --ink:#E7E9ED; --ink-2:#A6ADB9; --ink-3:#79808D;
+  --risk-1:#D9932F; --risk-2:#E8695A; --risk-3:#FF8C7C;
+  --risk-1-bg:#2A2116; --risk-2-bg:#2D1A18; --risk-3-bg:#3A1C19;
+  --refuse:#94A3B8; --refuse-bg:#1B2029;
+  --uncert:#8B93A1; --uncert-bg:#1A1E25;
+  --accent:#7AA2F7; --accent-bg:#161E2C;
+  --probe:#A98BEE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.num,.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums lining-nums;}
+h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.012em}
+a{color:var(--accent)}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+
+/* ---------- review-page chrome (not part of the product) ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;padding:10px 20px;box-shadow:var(--shadow)
+}
+.topbar h1{font-size:14px}
+.topbar .sub{color:var(--ink-3);font-size:12px}
+.spacer{flex:1}
+.toggle{
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);
+  padding:6px 12px;border-radius:6px;cursor:pointer;font:inherit;font-size:13px
+}
+.tocwrap{background:var(--surface-2);border-bottom:1px solid var(--line);padding:10px 20px}
+.toc{display:flex;flex-wrap:wrap;gap:6px;max-width:1360px;margin:0 auto}
+.toc a{
+  font-size:12px;text-decoration:none;color:var(--ink-2);border:1px solid var(--line);
+  background:var(--surface);padding:4px 9px;border-radius:999px
+}
+.toc a:hover{border-color:var(--accent);color:var(--accent)}
+main{max-width:1360px;margin:0 auto;padding:28px 20px 120px}
+section{margin:0 0 46px}
+.sechead{margin:0 0 6px}
+.sechead h2{font-size:20px}
+.sechead .meta{font-size:12px;color:var(--ink-3);margin-top:4px}
+.rationale{
+  border-left:3px solid var(--accent);background:var(--accent-bg);
+  padding:10px 14px;margin:12px 0 16px;font-size:13.5px;color:var(--ink-2);border-radius:0 6px 6px 0
+}
+.rationale b{color:var(--ink)}
+.acs{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
+.acs code{background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-right:4px;display:inline-block;font-size:11px}
+
+/* ---------- the product frame ---------- */
+.frame{
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);
+  box-shadow:var(--shadow)
+}
+.frame + .frame{margin-top:18px}
+.framecap{
+  background:var(--surface-2);border-bottom:1px solid var(--line);padding:7px 14px;
+  font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase
+}
+.app{display:flex;min-height:0}
+.nav{
+  width:186px;flex:none;background:var(--surface-2);border-right:1px solid var(--line);padding:14px 0 20px
+}
+.brand{padding:0 14px 14px;font-size:13px;font-weight:680;letter-spacing:-.01em}
+.brand span{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.navgrp{padding:10px 14px 3px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.navitem{padding:6px 14px;font-size:13.5px;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center}
+.navitem.on{background:var(--surface);color:var(--ink);font-weight:620;box-shadow:inset 3px 0 0 var(--accent)}
+.navitem .cnt{font-size:11px;color:var(--ink-3);font-family:ui-monospace,monospace}
+.body{flex:1;min-width:0;padding:18px 22px 26px}
+.crumb{font-size:11.5px;color:var(--ink-3);margin-bottom:4px}
+.ttl{font-size:19px;margin-bottom:2px}
+.sub{font-size:12.5px;color:var(--ink-3)}
+
+/* ---------- generic bits ---------- */
+.card{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px}
+.card + .card{margin-top:12px}
+.row{display:flex;gap:12px}
+.col{flex:1;min-width:0}
+.lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dotted var(--line);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--ink-3)}
+.pill{display:inline-block;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface-2);white-space:nowrap}
+.pill.r1{color:var(--risk-1);border-color:var(--risk-1);background:var(--risk-1-bg)}
+.pill.r2{color:var(--risk-2);border-color:var(--risk-2);background:var(--risk-2-bg)}
+.pill.r3{color:var(--risk-3);border-color:var(--risk-3);background:var(--risk-3-bg);font-weight:700}
+[data-theme="dark"] .pill.r3{color:var(--risk-3)}
+.pill.omission{border-color:var(--ink-2);color:var(--ink);font-weight:660}
+.pill.present{border-style:dashed}
+.pill.probe{color:var(--probe);border-color:var(--probe)}
+.btn{
+  font:inherit;font-size:13px;padding:7px 13px;border-radius:6px;border:1px solid var(--line-2);
+  background:var(--surface);color:var(--ink);cursor:default
+}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+[data-theme="dark"] .btn.primary{color:#0E1013}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.45}
+.hatch{
+  background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(120,128,140,.22) 6px 7px);
+}
+
+/* ---------- coverage strip (F38) ---------- */
+.covwrap{margin-top:10px}
+.covstrip{display:flex;height:26px;border:1px solid var(--line-2);border-radius:5px;overflow:hidden}
+.covseg{display:flex;align-items:center;justify-content:center;font-size:10.5px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;color:var(--ink-2)}
+.covseg.scanned{background:var(--surface-3);color:var(--ink)}
+.covseg.gap{border-left:1px solid var(--line-2);color:var(--risk-2);font-weight:640}
+.covlegend{display:flex;gap:16px;font-size:11.5px;color:var(--ink-3);margin-top:6px;flex-wrap:wrap}
+.partial{
+  border:1px solid var(--risk-2);border-left-width:4px;background:var(--risk-2-bg);
+  border-radius:0 6px 6px 0;padding:10px 13px;font-size:13px;color:var(--ink)
+}
+.partial b{color:var(--risk-2)}
+.partial .nodismiss{display:block;margin-top:5px;font-size:11px;color:var(--ink-3)}
+
+/* ---------- volume banner (F41-09) ---------- */
+.volume{
+  display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+  border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:var(--surface-2)
+}
+.vol-n{font-size:15px;color:var(--ink-3)}
+.vol-n b{font-size:30px;color:var(--ink);font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.vol-arrow{font-size:18px;color:var(--ink-3)}
+.vol-m b{font-size:44px;line-height:1;color:var(--ink);font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.vol-note{flex:1;min-width:200px;font-size:12px;color:var(--ink-3);text-align:right}
+
+/* ---------- exception queue ---------- */
+.q{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.qhdr,.qrow{display:grid;grid-template-columns:104px 1fr 132px 120px 92px;gap:12px;padding:9px 13px;align-items:center}
+.qhdr{background:var(--surface-2);border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.qrow{border-bottom:1px solid var(--line);font-size:13px}
+.qrow:last-child{border-bottom:0}
+.qrow .acct{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--ink)}
+.qrow .desc{color:var(--ink-2);font-size:12.5px}
+.qrow .amt{font-family:ui-monospace,monospace;text-align:right;font-variant-numeric:tabular-nums}
+.qrow.tier3{background:var(--risk-3-bg);box-shadow:inset 3px 0 0 var(--risk-3)}
+.qrow.tier2{box-shadow:inset 3px 0 0 var(--risk-2)}
+.qrow.tier1{box-shadow:inset 3px 0 0 var(--risk-1)}
+
+/* ---------- riskiest-element band (F41-03) ---------- */
+.riskband{
+  border:2px solid var(--risk-3);border-radius:8px;background:var(--risk-3-bg);padding:16px 18px;
+}
+.riskband .cap{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--risk-3);font-weight:700}
+.riskband .big{font-size:34px;line-height:1.15;font-weight:700;margin:6px 0 2px;font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.riskband .why{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+.riskband .facts{display:flex;gap:22px;flex-wrap:wrap;margin-top:11px;font-size:12px;color:var(--ink-2)}
+.riskband .facts b{display:block;font-family:ui-monospace,monospace;color:var(--ink);font-size:13.5px}
+.noexpand{font-size:11px;color:var(--ink-3);margin-top:9px;font-style:italic}
+
+/* ---------- collapsed narrative ---------- */
+.narrative{border:1px solid var(--line);border-radius:7px;background:var(--surface-2)}
+.narrative .head{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;font-size:13px;color:var(--ink-2)}
+.narrative .head .chev{color:var(--ink-3);font-size:11px}
+
+/* ---------- resolution row (F35) ---------- */
+.rrow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.rbtn{
+  border:1px solid var(--line-2);border-radius:7px;background:var(--surface);padding:9px 8px;text-align:left
+}
+.rbtn .code{font-size:12.5px;font-weight:720;font-family:ui-monospace,monospace}
+.rbtn .nm{font-size:11.5px;color:var(--ink-2);line-height:1.3;margin-top:2px}
+.rbtn .req{font-size:10px;color:var(--ink-3);margin-top:5px}
+.rbtn.sel{border-color:var(--accent);border-width:2px;background:var(--accent-bg);padding:8px 7px}
+.postsflag{font-size:10px;color:var(--risk-2);letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
+
+/* ---------- forward disposition sentence (F32-01) ---------- */
+.sentence{
+  border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);padding:13px 15px;
+  font-size:17px;line-height:1.7
+}
+.slot{
+  display:inline-block;border-bottom:2px solid var(--accent);padding:0 8px 1px;color:var(--accent);
+  font-weight:660;font-family:ui-monospace,monospace
+}
+.slot.empty{border-bottom-color:var(--risk-2);color:var(--risk-2)}
+.chips{display:flex;gap:7px;margin-top:9px}
+.chip{font-size:12px;border:1px solid var(--line-2);border-radius:999px;padding:3px 11px;color:var(--ink-2);background:var(--surface)}
+.chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);font-weight:640}
+.promise{font-size:12px;color:var(--ink-3);margin-top:8px}
+
+/* ---------- refusal cards ---------- */
+.refuse{
+  border:1px solid var(--refuse);border-left-width:6px;border-radius:0 8px 8px 0;
+  background:var(--refuse-bg);padding:13px 15px
+}
+.refuse .hd{font-size:13px;font-weight:720;color:var(--refuse);letter-spacing:.02em;text-transform:uppercase}
+.refuse .cap{font-size:15px;font-weight:660;margin:5px 0 4px}
+.refuse .bd{font-size:13px;color:var(--ink-2)}
+.refuse .never{margin-top:8px;font-size:12.5px;font-weight:660;color:var(--refuse)}
+.defer{
+  border:1px dashed var(--risk-1);border-radius:8px;background:transparent;padding:13px 15px
+}
+.defer .hd{font-size:13px;font-weight:660;color:var(--risk-1);letter-spacing:.02em;text-transform:uppercase}
+.defer .cap{font-size:15px;font-weight:660;margin:5px 0 4px}
+.defer .bd{font-size:13px;color:var(--ink-2)}
+.defer .later{margin-top:8px;font-size:12.5px;color:var(--risk-1)}
+
+/* ---------- monitors ---------- */
+.hero{border:1px solid var(--line);border-radius:8px;padding:18px;background:var(--surface-2)}
+.hero .n{font-size:52px;line-height:1;font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:var(--surface)}
+.tile .n{font-size:24px;font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.tile .zero{color:var(--ink-3)}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+table.t th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding:6px 8px;border-bottom:1px solid var(--line)}
+table.t td{padding:6px 8px;border-bottom:1px solid var(--line)}
+table.t td.n{font-family:ui-monospace,monospace;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- empty / not-run states ---------- */
+.state{border:1px dashed var(--line-2);border-radius:8px;padding:18px;background:var(--surface-2)}
+.state .hd{font-size:15px;font-weight:660;margin-bottom:5px}
+.state .bd{font-size:13px;color:var(--ink-2)}
+.notrun{color:var(--risk-1);font-weight:640}
+
+/* ---------- swatches ---------- */
+.sw{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.swatch{border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.swatch .chip2{height:52px}
+.swatch .meta{padding:7px 9px;font-size:11px;color:var(--ink-2)}
+.swatch .meta b{display:block;color:var(--ink);font-size:12px}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pairbox{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.pairbox .cap{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);color:var(--ink-3)}
+@media(max-width:1100px){.pair{grid-template-columns:1fr}.rrow{grid-template-columns:repeat(3,1fr)}.tiles{grid-template-columns:repeat(2,1fr)}.sw{grid-template-columns:repeat(3,1fr)}}
+.note{font-size:12.5px;color:var(--ink-3);margin-top:8px}
+.warnbar{border:1px solid var(--risk-2);border-left-width:4px;background:var(--risk-2-bg);padding:11px 14px;border-radius:0 6px 6px 0;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>Conclave Finance Studio — Experience Design (Gate 5)</h1>
+    <div class="sub">Rendered mockup for human approval · desktop web, MVP1 · designed against 186 acceptance criteria · 2026-07-31</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="toggle" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='light'?'dark':'light';this.textContent=h.dataset.theme==='light'?'Switch to dark':'Switch to light'">Switch to dark</button>
+</div>
+
+<div class="tocwrap"><nav class="toc">
+  <a href="#thesis">0 · The thesis</a>
+  <a href="#lang">1 · Visual language</a>
+  <a href="#ia">2 · IA &amp; navigation</a>
+  <a href="#ask">3 · Ask</a>
+  <a href="#askrefuse">4 · Ask — refusal</a>
+  <a href="#exceptions">5 · Exceptions</a>
+  <a href="#coverage">6 · Coverage states</a>
+  <a href="#review">7 · Review</a>
+  <a href="#reviewdark">8 · Review, both themes</a>
+  <a href="#reclass">9 · Reclass journal</a>
+  <a href="#superseded">10 · Superseded run</a>
+  <a href="#probe">11 · Probe reveal</a>
+  <a href="#disp">12 · Dispositions</a>
+  <a href="#cat">13 · Catalogue</a>
+  <a href="#mon">14 · Monitors</a>
+  <a href="#audit">15 · Audit &amp; Inventory</a>
+  <a href="#refusals">16 · Refusals</a>
+  <a href="#asks">17 · What I am asking for</a>
+</nav></div>
+
+<main>
+
+<!-- ============================================================ 0 -->
+<section id="thesis">
+  <div class="sechead"><h2>0 · The thesis this whole design is built on</h2>
+  <div class="meta">Read this before the screens. Every layout decision below is downstream of it.</div></div>
+
+  <div class="rationale">
+    <b>The brief's anti-recommendation is binding.</b> <code>INDUSTRY_KB</code> §15.4: reviewers given
+    <i>clearer</i> AI explanations defer <i>more</i>, not less. So the 11pm approval problem cannot be
+    solved by presenting the agent's reasoning beautifully — doing so makes the control weaker.
+    <code>DOMAIN_KB</code> §7.2 is blunter still: the constraint is attention budget, which is fixed,
+    small and already spent by the fortieth item.
+    <br><br>
+    <b>So this design does four things instead, and one of them is an inversion.</b>
+    <br>1. <b>Reduce volume, and show the reduction.</b> N detected → M routed is the largest thing on
+    the Exceptions screen, not a footnote.
+    <br>2. <b>Make effort scale with risk.</b> Uniform approval undifferentiated by risk is the same as
+    no scrutiny, so the interaction cost of the riskiest item is deliberately higher than the safest.
+    <br>3. <b>Give the riskiest element the page, not the clearest narrative the page.</b>
+    <br>4. <b>Demote the explanation.</b> The agent's narrative is the <i>collapsed</i> element on the
+    Review screen; the risk band is the uncollapsible one. This is the inversion of the intuitive design
+    and it is deliberate.
+  </div>
+
+  <div class="card">
+    <div class="lbl">Why collapsing the narrative is not merely symbolic</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      <code>AC-F12-03</code> requires the capture record to name which evidence elements the reviewer
+      expanded and which they left collapsed. If the agent's narrative is expanded by default, that label
+      is a constant for every reviewer on every item and carries <b>zero</b> information — F12's
+      ground-truth factory produces a column of identical values. Collapsing it by default turns
+      "did this person open the reasoning?" into a real, per-item, per-reviewer signal that
+      <code>AC-F12-08</code> can surface to the controller. The design decision and the measurement
+      decision are the same decision.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="lbl">And the one thing I will not design</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      <code>FUNCTIONAL_SPEC</code> §12 carries a standing exclusion: no criterion asserts explanation
+      quality and none may be added. I have not read that as a gap and I have not designed toward it.
+      There is no "explanation quality" component in this mockup, no confidence score rendered as a
+      reassuring bar, and no summary-of-the-reasoning hero. Where reasoning appears it appears
+      <i>subordinate to the evidence and collapsed by default</i>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ 1 -->
+<section id="lang">
+  <div class="sechead"><h2>1 · Visual language — an evidence instrument, not an analytics product</h2>
+  <div class="meta">Audience: staff accountant (does), controller (supervises, signs), FP&amp;A (explains). Downstream reader: an external auditor, on paper.</div></div>
+
+  <div class="rationale">
+    <b>Reference points are a working paper, a bank statement and a legal exhibit</b> — not a SaaS
+    analytics dashboard. This artefact ends up inside an audit workpaper as a PDF, so it has to survive
+    greyscale printing and it must not read as marketing. Density is high on purpose: this is a
+    desktop-web-only MVP1 (<code>PLAN</code> §9.2 A2), designed at 1440×900, and finance users read
+    dense tables fluently.
+  </div>
+
+  <div class="card">
+    <div class="lbl">The single most opinionated decision in the palette</div>
+    <p style="margin:0 0 10px;font-size:14px"><b>There is no green anywhere in this product.</b></p>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      Green means "fine, move on". That is precisely the affect a depleted reviewer must not be handed,
+      and <code>PLAN</code> §2b already warns that a control which cannot fail trains its reviewer that
+      the dashboard cannot fail. A clean result is therefore rendered in <b>neutral ink</b>, stated as a
+      sentence carrying its coverage, and given no colour at all. Colour in this product is reserved for
+      exactly three things: <b>risk</b> (a three-step single-hue ramp), <b>permanence of refusal</b>
+      (slate), and <b>interactivity</b> (one ink blue). Nothing else is coloured. Non-certified state is
+      carried by a <b>hatch pattern plus a label</b>, never by hue alone — it must survive greyscale and
+      colour-vision deficiency.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Palette</div>
+    <div class="sw">
+      <div class="swatch"><div class="chip2" style="background:var(--bg)"></div><div class="meta"><b>Base</b>paper ground</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--surface-3)"></div><div class="meta"><b>Scanned</b>population, neutral</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--risk-1);"></div><div class="meta"><b>Risk 1</b>elevated</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--risk-2);"></div><div class="meta"><b>Risk 2</b>high</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--risk-3);"></div><div class="meta"><b>Risk 3</b>blast radius</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--refuse);"></div><div class="meta"><b>Refused</b>permanent, by design</div></div>
+    </div>
+    <div class="sw" style="margin-top:10px">
+      <div class="swatch"><div class="chip2" style="background:var(--accent);"></div><div class="meta"><b>Accent</b>controls only, never data</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--probe);"></div><div class="meta"><b>Probe</b>post-disposition only</div></div>
+      <div class="swatch"><div class="chip2 hatch" style="background:var(--uncert-bg)"></div><div class="meta"><b>Uncertified</b>hatch + label, never hue alone</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--ink)"></div><div class="meta"><b>Ink</b>figures, clean states</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--ink-3)"></div><div class="meta"><b>Ink 3</b>metadata</div></div>
+      <div class="swatch"><div class="chip2" style="background:var(--line)"></div><div class="meta"><b>Rule</b>structure</div></div>
+    </div>
+    <div class="note">Risk is a <b>three-step ordinal ramp in one hue family</b>, not a rainbow, so
+    "worse" is legible without a legend and survives print. Desaturated deliberately — saturated red at
+    close volume becomes wallpaper by item ten.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Typography &amp; numerals</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      System sans for prose; <b>tabular lining numerals for every figure, without exception</b> —
+      proportional digits in a finance product are a defect, not a preference, because column comparison
+      is the primary reading act. Monospace for amounts, account codes, periods, hashes, decision IDs and
+      dataset versions, so that a bundle hash and a dollar figure are never confusable with body text.
+      Amounts are right-aligned; account codes left. Dark mode is a first-class theme, not a courtesy:
+      this product is used at 11pm on day 3.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="ia">
+  <div class="sechead"><h2>2 · Information architecture</h2>
+  <div class="meta">Nine screens named by <code>FUNCTIONAL_SPEC</code> §23. I keep every name — routes are already in <code>PLAN</code> §6.2 — and group them three ways.</div></div>
+
+  <div class="rationale">
+    <b>Grouping argument.</b> The nine screens serve three different jobs and two different people.
+    <b>Work</b> is the staff accountant's night. <b>Govern</b> is the controller's week.
+    <b>Evidence</b> is what leaves the building. Putting <b>Refusals</b> under Evidence rather than in a
+    settings drawer is deliberate: it is an artefact a controller takes to an audit committee, and burying
+    it makes the refusal look like an omission — the exact failure <code>AC-REFUSAL-02</code> exists to
+    prevent.
+  </div>
+
+  <div class="frame"><div class="framecap">Global navigation</div>
+  <div class="app">
+    <div class="nav">
+      <div class="brand">Conclave Finance Studio<span>Northwind Grid · 2026-06 · Day 3</span></div>
+      <div class="navgrp">Work</div>
+      <div class="navitem on">Ask</div>
+      <div class="navitem">Exceptions <span class="cnt">9</span></div>
+      <div class="navitem">Review <span class="cnt">3</span></div>
+      <div class="navitem">Dispositions <span class="cnt">17</span></div>
+      <div class="navgrp">Govern</div>
+      <div class="navitem">Monitors <span class="cnt">2</span></div>
+      <div class="navitem">Catalogue</div>
+      <div class="navitem">Inventory</div>
+      <div class="navgrp">Evidence</div>
+      <div class="navitem">Audit</div>
+      <div class="navitem">Refusals</div>
+    </div>
+    <div class="body">
+      <div class="crumb">Design note</div>
+      <div class="ttl">Counts in the nav are the volume control, visible before you click</div>
+      <p class="sub" style="margin-top:8px;max-width:60ch">The badge on <b>Review</b> is the number of
+      items routed to <i>this person</i> tonight — not the number the system detected. A reviewer who can
+      see "3" before opening the screen is budgeting attention correctly; a reviewer who opens a screen and
+      discovers 40 has already lost. This is volume reduction expressed in the chrome.</p>
+      <p class="sub" style="margin-top:10px;max-width:60ch">Period, entity and close day sit permanently
+      under the product name, because every figure in this product is meaningless without them and
+      <code>AC-F38-11</code> requires staleness relative to the close clock to be visible on the same
+      surface as the figure.</p>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="ask">
+  <div class="sechead"><h2>3 · Ask — natural-language skill invocation over a declared population</h2>
+  <div class="meta">F39 · F38 · <code>AC-F39-09</code> <code>AC-F39-01</code> <code>AC-F38-14</code> <code>AC-F38-10</code></div></div>
+
+  <div class="rationale">
+    <b>Dataset selection is a control surface, not a filter widget</b> (<code>INDUSTRY_KB</code> §14), and
+    <b>under-selection is the failure that bites</b> because it is invisible. So I inverted the selector:
+    the user does not pick tables from a list. <b>The skill declares the population it needs, and the
+    screen shows which parts of that declaration are covered and which are not, by name.</b> Under-selection
+    stops being an absence the user cannot perceive and becomes a list of named unmet segments they have to
+    look at. A dropdown cannot do that; a declared-population panel can.
+    <br><br>
+    Second consequence: the coverage read-out is <b>not a progress bar</b>. A bar that fills toward the
+    right reads as "70% good". This is a <b>population strip with the gaps drawn in and labelled</b> —
+    the missing segments are the graphic, not the absence of graphic.
+  </div>
+
+  <div class="frame"><div class="framecap">Ask · skill selected, population 70% covered, run not yet submitted</div>
+  <div class="app">
+    <div class="nav">
+      <div class="brand">Conclave Finance Studio<span>Northwind Grid · 2026-06 · Day 3</span></div>
+      <div class="navgrp">Work</div>
+      <div class="navitem on">Ask</div>
+      <div class="navitem">Exceptions <span class="cnt">9</span></div>
+      <div class="navitem">Review <span class="cnt">3</span></div>
+      <div class="navitem">Dispositions <span class="cnt">17</span></div>
+      <div class="navgrp">Govern</div>
+      <div class="navitem">Monitors <span class="cnt">2</span></div>
+      <div class="navitem">Catalogue</div>
+      <div class="navitem">Inventory</div>
+      <div class="navgrp">Evidence</div>
+      <div class="navitem">Audit</div>
+      <div class="navitem">Refusals</div>
+    </div>
+    <div class="body">
+      <div class="crumb">Ask</div>
+      <div class="ttl">What should the agent do?</div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="border:1px solid var(--line-2);border-radius:7px;padding:11px 13px;font-size:15px;background:var(--surface-2)">
+          Check whether any recurring accruals or amortisations that ran in the last twelve periods
+          did <i>not</i> run in June.
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <div class="col">
+            <div class="lbl">Resolved to a certified query — required before the run can be submitted</div>
+            <div class="card" style="background:var(--surface-2)">
+              <div class="kv"><span class="k">Certified query</span><span class="mono">omission.recurring_entry_absent</span></div>
+              <div class="kv"><span class="k">Version</span><span class="mono">v3.1.0</span></div>
+              <div class="kv"><span class="k">Skill</span><span class="mono">Omission Detector — recurring entries</span></div>
+              <div class="kv"><span class="k">Bound parameters</span><span class="mono">period=2026-06 · lookback=12 · min_recurrence=9</span></div>
+              <div class="kv"><span class="k">Metrics used</span><span class="mono">recurring_entry_signature v2.4 · posting_period_join v1.9</span></div>
+            </div>
+            <div class="note">No free-form SQL path exists (<code>AC-F39-02</code>). Natural language
+            <i>selects and parameterises</i> a certified query; it never authors one. The resolved name and
+            bound values are shown <b>before</b> submit is available, so the user approves the interpretation,
+            not just the answer.</div>
+          </div>
+
+          <div class="col">
+            <div class="lbl">Declared expected population — the skill states it, you close the gaps</div>
+            <div class="card" style="background:var(--surface-2);padding:11px 13px">
+              <div class="kv"><span class="k">GL balances — NGH-US-100</span><span class="mono">covered · 612 acct</span></div>
+              <div class="kv"><span class="k">Recurring journal register</span><span class="mono">covered · 188 acct</span></div>
+              <div class="kv"><span class="k">Subledger accounting — AP/FA</span><span class="mono">covered · 97 acct</span></div>
+              <div class="kv"><span class="k" style="color:var(--risk-2);font-weight:640">Intercompany — NGH-CA-200</span><span class="mono" style="color:var(--risk-2)">NOT SELECTED · 312 acct</span></div>
+              <div class="kv"><span class="k" style="color:var(--risk-2);font-weight:640">FX revaluation subledger</span><span class="mono" style="color:var(--risk-2)">NOT SELECTED · 75 acct</span></div>
+            </div>
+            <div class="covwrap">
+              <div class="covstrip">
+                <div class="covseg scanned" style="flex:897">897 accounts selected</div>
+                <div class="covseg gap hatch" style="flex:312">IC — CA-200</div>
+                <div class="covseg gap hatch" style="flex:75">FX</div>
+              </div>
+              <div class="covlegend">
+                <span><b class="mono">70%</b> coverage of 1,284 declared accounts</span>
+                <span style="color:var(--risk-2)">2 segments unscanned, named above</span>
+              </div>
+            </div>
+            <div class="note">Updates on every selection change, before submit (<code>AC-F38-14</code>).</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="partial">
+          <b>This run will be partial.</b> At 70% coverage it cannot produce a "no exceptions" conclusion —
+          on screen, in the dossier, or in the export. It can only report what it found in the 897 accounts
+          scanned, naming Intercompany — NGH-CA-200 and FX revaluation subledger as unscanned.
+          <span class="nodismiss">No control dismisses or hides this state. There is no "don't show again".</span>
+        </div>
+
+        <div class="row" style="margin-top:14px;align-items:center">
+          <button class="btn primary">Run over 897 accounts — partial, 70%</button>
+          <button class="btn">Add the two missing datasets</button>
+          <div class="spacer"></div>
+          <span class="sub">Submit label states the coverage. There is no unqualified "Run".</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="lbl">Exploration tier — uncertified data is selectable, and permanently marked</div>
+        <div class="row" style="align-items:stretch">
+          <div class="col card hatch" style="margin:0;background:var(--uncert-bg);border-color:var(--uncert)">
+            <div class="row" style="align-items:center"><span class="pill" style="border-color:var(--uncert);color:var(--uncert)">Not certified</span>
+            <span class="mono" style="font-size:12.5px">wh_stage.ap_invoice_draft_v2</span></div>
+            <p style="margin:8px 0 0;font-size:12.5px;color:var(--ink-2)">
+              <b>Not certified — cannot support a posting or a no-exceptions conclusion.</b>
+              Usable for reading, analysis and drafting only.</p>
+          </div>
+          <div class="col">
+            <div class="note" style="margin:0">Free selection across the warehouse stays available and
+            should feel unconstrained — most usage lives here (<code>INDUSTRY_KB</code> §14.2). The hatch
+            and the sentence follow the dataset onto <i>every</i> result derived from it, and no affordance
+            removes them (<code>AC-F38-10</code>). Action-capable and assurance-emitting skills refuse an
+            uncertified selection outright (<code>AC-F38-09</code>) — free-form assembly and action capability
+            never combine.</div>
+          </div>
+        </div>
+      </div>
+      <div class="acs"><code>AC-F39-09</code><code>AC-F39-01</code><code>AC-F39-04</code><code>AC-F38-14</code><code>AC-F38-10</code><code>AC-F38-02</code><code>AC-F38-11</code></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="framecap">Ask · the ambiguity fork (<code>AC-F39-07</code>) and the uncertified-source refusal (<code>AC-F39-03</code>)</div>
+  <div class="app"><div class="body" style="padding-top:16px">
+    <div class="row">
+      <div class="col card" style="margin:0">
+        <div class="lbl">Two certified queries match equally well</div>
+        <p style="margin:0 0 10px;font-size:13.5px">"Show me unusual movement in clearing accounts this month" maps equally to:</p>
+        <div class="card" style="background:var(--surface-2);padding:9px 11px"><span class="mono" style="font-size:12.5px">anomaly.balance_movement_outlier v1.6</span><div class="sub">Present-anomaly: balances that moved unusually <i>this</i> period.</div></div>
+        <div class="card" style="background:var(--surface-2);padding:9px 11px"><span class="mono" style="font-size:12.5px">crossperiod.subthreshold_accumulation v2.2</span><div class="sub">Cross-period: same account, same direction, accumulating under threshold.</div></div>
+        <div class="note">The system does <b>not</b> pick one silently. Both are named, the user chooses,
+        and the run cannot be submitted until they do. These two answer materially different questions and a
+        silent choice would hand the user the wrong one with no signal.</div>
+      </div>
+      <div class="col card" style="margin:0">
+        <div class="lbl">Cannot be answered from the certified layer</div>
+        <div class="warnbar">
+          <b>This cannot be answered from the certified layer.</b>
+          <div style="margin-top:7px;font-size:12.5px">Missing: a certified metric for <span class="mono">contract_asset_aging</span>,
+          and a certified join from revenue contracts to GL. No approximate answer has been produced.</div>
+        </div>
+        <div class="note">No best-effort answer, ever (<code>AC-F39-03</code>). A finance user cannot tell a
+        wrong join from a right one by looking at the number, so an approximate answer here is worse than no
+        answer. The refusal names <i>what is missing</i> so it becomes a catalogue request, not a dead end.</div>
+      </div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="askrefuse">
+  <div class="sechead"><h2>4 · Ask — a declared refusal, inline</h2>
+  <div class="meta"><code>AC-REFUSAL-03</code> <code>AC-REFUSAL-05</code> <code>AC-REFUSAL-06</code></div></div>
+
+  <div class="rationale">
+    <b>"Not built yet" and "will never be built" are the same blank screen to a user and opposite answers
+    to an auditor.</b> So they get two structurally different card shapes, two different header words, and
+    two different border treatments — solid slate with a heavy left bar for <i>refused permanently</i>,
+    dashed amber outline for <i>deferred</i>. They are never mixed in one list, and the distinction is
+    carried in the text as well as the form, so it survives greyscale and a screen reader.
+  </div>
+
+  <div class="frame"><div class="framecap">Ask · user asked for an impairment assessment</div>
+  <div class="app"><div class="body" style="padding-top:16px">
+    <div style="border:1px solid var(--line-2);border-radius:7px;padding:11px 13px;font-size:15px;background:var(--surface-2);margin-bottom:14px">
+      Assess whether the Ridgeline substation CWIP balance is impaired and propose a write-down.
+    </div>
+    <div class="refuse">
+      <div class="hd">Refused — by design, permanently</div>
+      <div class="cap">A19 · Estimates, reserves, allowances, impairment, valuation</div>
+      <div class="bd">This product does not assess impairment, set reserves or produce valuations. There is
+      no in-period ground truth for these judgements; they are the top statistical cause of restatement,
+      and an agent that authors an estimate and then explains it is the exact self-justifying mechanism this
+      product exists to detect.</div>
+      <div class="never">This will not be built. It is not on a roadmap and it is not awaiting prioritisation.</div>
+      <div class="note" style="margin-top:9px">Recorded as a control event — refusal invoked, user, request
+      text, timestamp — and retrievable from Audit (<code>AC-REFUSAL-04</code>).</div>
+    </div>
+    <p class="sub" style="margin:14px 0 6px">For contrast, the same screen's response to something that is merely <i>not in this release</i>:</p>
+    <div class="defer">
+      <div class="hd">Not in this release</div>
+      <div class="cap">Flux driver decomposition (F45)</div>
+      <div class="bd">Decomposing a variance into the transactions and segments that arithmetically explain
+      it is a planned capability. It is not available in MVP1.</div>
+      <div class="later">Deferred, not refused. Expected in a later release.</div>
+    </div>
+    <div class="acs"><code>AC-REFUSAL-03</code><code>AC-REFUSAL-04</code><code>AC-REFUSAL-05</code><code>AC-REFUSAL-06</code></div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="exceptions">
+  <div class="sechead"><h2>5 · Exceptions — volume reduction is the headline, not a metric</h2>
+  <div class="meta"><code>AC-F41-09</code> <code>AC-F29-12</code> <code>AC-F42-08</code> <code>AC-F26-10</code> <code>AC-F28-10</code> <code>AC-F33-12</code> <code>AC-F38-15</code></div></div>
+
+  <div class="rationale">
+    <b>N detected → M routed to a human is the largest object on this screen.</b> That is a direct reading
+    of <code>AC-F41-09</code>, but I have gone further than "both are visible": the ratio is the page's
+    masthead, because it is the only thing on the screen that tells a reviewer whether the system is
+    <i>working for them or dumping on them</i>. A product whose N/M ratio degrades is failing at its
+    actual job even when every individual finding is correct.
+    <br><br>
+    <b>Rows are ordered by risk and banded by risk, and the band is a structural left bar</b> — not a dot,
+    not a coloured word. At close volume a legend-dependent signal is not read. Three steps only.
+  </div>
+
+  <div class="frame"><div class="framecap">Exceptions · run <span class="mono">RUN-2026-06-0412</span>, partial at 70%</div>
+  <div class="app">
+    <div class="nav">
+      <div class="brand">Conclave Finance Studio<span>Northwind Grid · 2026-06 · Day 3</span></div>
+      <div class="navgrp">Work</div>
+      <div class="navitem">Ask</div>
+      <div class="navitem on">Exceptions <span class="cnt">9</span></div>
+      <div class="navitem">Review <span class="cnt">3</span></div>
+      <div class="navitem">Dispositions <span class="cnt">17</span></div>
+      <div class="navgrp">Govern</div>
+      <div class="navitem">Monitors <span class="cnt">2</span></div>
+      <div class="navitem">Catalogue</div>
+      <div class="navitem">Inventory</div>
+      <div class="navgrp">Evidence</div>
+      <div class="navitem">Audit</div>
+      <div class="navitem">Refusals</div>
+    </div>
+    <div class="body">
+      <div class="crumb">Exceptions · <span class="mono">RUN-2026-06-0412</span> · completed 03 Jul 2026 18:42 · datasets as of 03 Jul 06:15</div>
+      <div class="ttl">June 2026 · Northwind Grid Holdings</div>
+
+      <div class="volume" style="margin-top:12px">
+        <div class="vol-n"><b>214</b><br>detections</div>
+        <div class="vol-arrow">→</div>
+        <div class="vol-m"><b>9</b><div class="sub" style="margin-top:2px">routed to you</div></div>
+        <div class="vol-note">
+          205 closed without a human: 168 by standing guardrail policy approved cold,
+          31 as prior-period R1 still within its expiry, 6 as duplicates of item 3.<br>
+          Every one of the 205 is listed and reachable. None is hidden.
+        </div>
+      </div>
+
+      <div class="partial" style="margin-top:12px">
+        <b>Partial run — 70% coverage.</b> 897 of 1,284 declared accounts were scanned.
+        <b>Intercompany — NGH-CA-200</b> (312 accounts) and <b>FX revaluation subledger</b> (75 accounts)
+        were not scanned. <b>This run cannot support a no-exceptions conclusion for June.</b>
+        <span class="nodismiss">Non-dismissable. It is reproduced verbatim in the dossier and in the export.</span>
+      </div>
+
+      <div class="q" style="margin-top:14px">
+        <div class="qhdr"><span>Account</span><span>Finding</span><span>Type</span><span>Risk</span><span class="amt" style="text-align:right">Amount</span></div>
+
+        <div class="qrow tier3">
+          <span class="acct">21400</span>
+          <span><b>GR/IR Clearing</b><div class="desc">Residual has recurred and grown for 4 consecutive periods. Iron-curtain aggregate $918,240. Prior explanation restated verbatim in 3 of 4 periods.</div></span>
+          <span><span class="pill omission">Cross-period</span></span>
+          <span><span class="pill r3">Blast radius</span></span>
+          <span class="amt">312,480.00</span>
+        </div>
+
+        <div class="qrow tier2">
+          <span class="acct">18300</span>
+          <span><b>Deferred Storm Restoration Costs</b><div class="desc">Recurring amortisation <span class="mono">RJ-AMRT-18300</span> posted in 11 of the last 12 periods and <b>did not post in 2026-06</b>. Expected $412,500.</div></span>
+          <span><span class="pill omission">Omission</span></span>
+          <span><span class="pill r2">High</span></span>
+          <span class="amt">412,500.00</span>
+        </div>
+
+        <div class="qrow tier2">
+          <span class="acct">13800</span>
+          <span><b>Intercompany Receivable — NGH-CA-200</b><div class="desc">One-sided intercompany: US leg posted 2026-06-28, no counterparty leg found. <b>Counterparty dataset was not in scope for this run.</b></div></span>
+          <span><span class="pill omission">Omission</span></span>
+          <span><span class="pill r2">High</span></span>
+          <span class="amt">1,043,900.00</span>
+        </div>
+
+        <div class="qrow tier1">
+          <span class="acct">54100</span>
+          <span><b>Transmission O&amp;M Expense</b><div class="desc">14 invoices coded to <span class="mono">CC-4420 Distribution Ops</span>; comparable history codes to <span class="mono">CC-4180 Transmission Ops</span>. Cost-centre only, single LE, single period.</div></span>
+          <span><span class="pill">Coding</span></span>
+          <span><span class="pill r1">Elevated</span></span>
+          <span class="amt">86,340.00</span>
+        </div>
+
+        <div class="qrow tier1">
+          <span class="acct">11500</span>
+          <span><b>Bank Clearing — Operating</b><div class="desc">Balance movement 4.1σ above 24-period distribution.</div></span>
+          <span><span class="pill present">Present anomaly</span></span>
+          <span><span class="pill r1">Elevated</span></span>
+          <span class="amt">228,715.00</span>
+        </div>
+
+        <div class="qrow">
+          <span class="acct">19900</span>
+          <span><b>Suspense</b><div class="desc">Warehouse balance differs from ERP control extract by $1,204.06 at segment level.</div></span>
+          <span><span class="pill">Fidelity</span></span>
+          <span><span class="pill">Low</span></span>
+          <span class="amt">1,204.06</span>
+        </div>
+      </div>
+      <div class="note">Every row carries the run's coverage statement by inheritance from the banner above
+      it — a finding can never be read detached from the population it was found in.</div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="lbl">Boundary checks — five results, and "not run" is a result</div>
+        <table class="t">
+          <tr><th>Check</th><th>Result</th><th>Detail</th></tr>
+          <tr><td>A6 · Subledger ↔ GL control account</td><td><span class="pill">No break found</span></td><td class="sub">Across 897 scanned accounts</td></tr>
+          <tr><td>A7 · Intercompany pair imbalance</td><td><span class="pill notrun">Not run</span></td><td class="sub" style="color:var(--risk-1)">Counterparty dataset NGH-CA-200 not selected. This is not a pass.</td></tr>
+          <tr><td>A8 · Roll-forward continuity</td><td><span class="pill r2">Failed — 1 account</span></td><td class="sub"><span class="mono">16200 CWIP — Substation</span> opening ≠ prior closing by $47,900.00 → a closed period moved</td></tr>
+          <tr><td>A9 · FX / CTA arithmetic</td><td><span class="pill notrun">Not run</span></td><td class="sub" style="color:var(--risk-1)">FX revaluation subledger not selected. This is not a pass.</td></tr>
+          <tr><td>A10 · Suspense / clearing residual</td><td><span class="pill r3">Failed — see 21400</span></td><td class="sub">Balance only. Composition is not claimed.</td></tr>
+        </table>
+        <div class="note"><b>"Not run" renders in risk colour, not neutral.</b> Silence is never a pass
+        (<code>AC-F28-07</code>, convention C2). A check that could not run is closer in meaning to a failure
+        than to a pass, and colouring it neutral would be the single most dangerous small decision on this
+        screen.</div>
+      </div>
+      <div class="acs"><code>AC-F41-09</code><code>AC-F29-12</code><code>AC-F42-08</code><code>AC-F26-10</code><code>AC-F28-10</code><code>AC-F38-15</code><code>AC-F28-07</code></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="framecap">Exceptions · coding findings carry their measured accuracy and its bias label (<code>AC-F33-12</code>, <code>AC-F33-07</code>)</div>
+  <div class="app"><div class="body" style="padding-top:16px">
+    <div class="row">
+      <div class="col card" style="margin:0">
+        <div class="lbl">Backtest evidence for the model version that produced these findings</div>
+        <div class="kv"><span class="k">Model version</span><span class="mono">coding-detect v1.4.2</span></div>
+        <div class="kv"><span class="k">Held-out period</span><span class="mono">2026-03</span></div>
+        <div class="kv"><span class="k">Precision</span><span class="mono">0.91 (52 / 57)</span></div>
+        <div class="kv"><span class="k">Recall</span><span class="mono">0.68 (52 / 76)</span></div>
+      </div>
+      <div class="col">
+        <div class="warnbar"><b>Recall is measured against caught errors only.</b>
+        <div style="margin-top:6px;font-size:12.5px">The labels are historical reclassification journals —
+        they record the errors a human found. Recall against <i>all</i> coding errors is unknown and is not
+        claimed here.</div></div>
+        <div class="note">This label is schema, not a footnote. It renders adjacent to the recall figure at
+        the same weight, on screen and in the dossier. A precision figure with a silent bias caveat is how a
+        measurement becomes a claim.</div>
+      </div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="coverage">
+  <div class="sechead"><h2>6 · Coverage states — 100%, 70% and 0% must not be readable as the same thing</h2>
+  <div class="meta"><code>AC-F38-07</code> <code>AC-F38-04</code> <code>AC-F38-08</code> <code>AC-F41-10</code></div></div>
+
+  <div class="rationale">
+    <b><code>AC-F38-07</code> is the criterion I designed hardest against.</b> A 70% clean run and a 100%
+    clean run must be textually different. My answer is that coverage is not a status line placed near the
+    conclusion — <b>coverage changes the grammar of the conclusion itself</b>. At full coverage the sentence
+    has a universal quantifier. Below full coverage the sentence has a bounded one and names the bound. The
+    component that renders a conclusion is structurally incapable of emitting the words "clean" or "no
+    exceptions" unqualified when coverage &lt; 100%, because that string is not reachable in that state.
+  </div>
+
+  <div class="row">
+    <div class="col frame"><div class="framecap">100% coverage · clean</div>
+      <div class="body" style="padding:16px">
+        <div class="state" style="border-style:solid;border-color:var(--line)">
+          <div class="hd">No exceptions across the full declared population.</div>
+          <div class="bd">All <span class="mono">1,284</span> declared accounts were scanned
+          (<span class="mono">100%</span>). Nothing was excluded.</div>
+          <div class="covwrap"><div class="covstrip"><div class="covseg scanned" style="flex:1284">1,284 of 1,284 accounts scanned</div></div></div>
+        </div>
+        <div class="note">Rendered in <b>neutral ink with no colour at all</b>. This is the strongest result
+        the product can produce and it still does not get a green tick, because a green tick is an
+        instruction to stop reading.</div>
+      </div>
+    </div>
+    <div class="col frame"><div class="framecap">70% coverage · nothing found</div>
+      <div class="body" style="padding:16px">
+        <div class="state" style="border-color:var(--risk-2)">
+          <div class="hd" style="color:var(--risk-2)">No exceptions <i>in the 897 accounts scanned</i>.</div>
+          <div class="bd"><b>387 accounts were not scanned</b>: Intercompany — NGH-CA-200 (312) and
+          FX revaluation subledger (75). <b>This run cannot support a no-exceptions conclusion for June 2026.</b></div>
+          <div class="covwrap"><div class="covstrip">
+            <div class="covseg scanned" style="flex:897">897 scanned</div>
+            <div class="covseg gap hatch" style="flex:312">IC — CA-200</div>
+            <div class="covseg gap hatch" style="flex:75">FX</div>
+          </div></div>
+        </div>
+        <div class="note">Different sentence, different quantifier, different graphic, different border.
+        Identical to the panel on its left would be a failure of <code>AC-F38-07</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:14px">
+    <div class="col frame"><div class="framecap">0% coverage · no conclusion is produced at all</div>
+      <div class="body" style="padding:16px">
+        <div class="state hatch" style="border-color:var(--risk-3)">
+          <div class="hd" style="color:var(--risk-3)">Nothing was scanned. No findings conclusion has been produced.</div>
+          <div class="bd">The selected datasets cover <span class="mono">0%</span> of this skill's declared
+          population of <span class="mono">1,284</span> accounts. There is no result to read — not a clean
+          result, not an empty one.</div>
+        </div>
+        <div class="note">The findings region is <b>absent</b>, not empty (<code>AC-F38-08</code>). An empty
+        findings list at 0% coverage is the single most misreadable state this product could render.</div>
+      </div>
+    </div>
+    <div class="col frame"><div class="framecap">Zero pending items · a stated result, never a blank list</div>
+      <div class="body" style="padding:16px">
+        <div class="state">
+          <div class="hd">No items are waiting for you from this run.</div>
+          <div class="bd"><span class="mono">RUN-2026-06-0418</span> produced <span class="mono">61</span>
+          detections and routed <span class="mono">0</span> to a human. Full coverage: 1,284 of 1,284
+          accounts. All 61 are listed below and reachable.</div>
+        </div>
+        <div class="note">An explicit zero carrying the coverage statement (<code>AC-F41-10</code>).
+        Never a blank region, never a spinner (convention C3).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 7 -->
+<section id="review">
+  <div class="sechead"><h2>7 · Review — the 11pm screen. The riskiest element gets the page.</h2>
+  <div class="meta"><code>AC-F41-01</code> <code>AC-F41-02</code> <code>AC-F41-03</code> <code>AC-F41-05</code> <code>AC-F41-06</code> <code>AC-F41-13</code> <code>AC-F36-18</code> <code>AC-F35-09</code> <code>AC-F35-05</code> <code>AC-F32-01</code></div></div>
+
+  <div class="rationale">
+    <b>Reading order, top to bottom: risk → evidence → resolution → narrative.</b> The agent's reasoning is
+    last and collapsed. The riskiest ranked element is first, uncollapsed, at the largest type size on the
+    screen. <b>There is no "Approve" button on this screen for a finding</b> — the terminal action is
+    <i>record a resolution</i>, and approval exists only where a posting artefact exists (see §9). That is
+    a direct answer to <code>DOMAIN_KB</code> §10: if the UI makes posting the default terminal state, the
+    safe answer becomes harder to record than the risky one.
+    <br><br>
+    <b>All six resolution types are one row of six equal buttons</b>, same size, same weight, none
+    pre-selected. R2 (data-side fix) and R5 (handoff) are the majority outcome and they sit in the same
+    visual rank as R3/R4. Counting interactions to completion: <b>R2 = 3, R5 = 4, R3 = 5, R4 = 5.</b>
+    The safe outcomes are never more effortful than the posting ones — that is <code>AC-F35-05</code>
+    satisfied by construction rather than by inspection.
+    <br><br>
+    <b>Nothing on this screen is reachable only by hover or by a live query.</b> That is a real design
+    constraint imposed by <code>AC-F41-04</code>: the rendered view retained as evidence has to reproduce
+    what the approver saw, so a tooltip-only fact is a fact that vanishes from the audit record.
+  </div>
+
+  <div class="frame"><div class="framecap">Review · item 2 of 9 · the §6.2 self-justifying residual</div>
+  <div class="app">
+    <div class="nav">
+      <div class="brand">Conclave Finance Studio<span>Northwind Grid · 2026-06 · Day 3</span></div>
+      <div class="navgrp">Work</div>
+      <div class="navitem">Ask</div>
+      <div class="navitem">Exceptions <span class="cnt">9</span></div>
+      <div class="navitem on">Review <span class="cnt">3</span></div>
+      <div class="navitem">Dispositions <span class="cnt">17</span></div>
+      <div class="navgrp">Govern</div>
+      <div class="navitem">Monitors <span class="cnt">2</span></div>
+      <div class="navitem">Catalogue</div>
+      <div class="navitem">Inventory</div>
+      <div class="navgrp">Evidence</div>
+      <div class="navitem">Audit</div>
+      <div class="navitem">Refusals</div>
+    </div>
+    <div class="body">
+      <div class="crumb">Review · item 2 of 9 · <span class="mono">RUN-2026-06-0412</span> · <span class="mono">21400 GR/IR Clearing</span></div>
+      <div class="ttl">Not approved</div>
+      <div class="sub">Nothing on this screen is pre-selected, pre-checked or pre-filled.</div>
+
+      <!-- RISK BAND — first in reading order, never collapsible -->
+      <div class="riskband" style="margin-top:14px">
+        <div class="cap">Riskiest element of this proposal</div>
+        <div class="big">$918,240.00</div>
+        <div style="font-size:15px;font-weight:640">Iron-curtain aggregate across 4 consecutive periods</div>
+        <div class="why">Each period's movement was individually below the $150,000 account threshold.
+        The accumulated balance is not. Correcting it lands whole, in one period, in the current year.</div>
+        <div class="facts">
+          <span>This period<b>$312,480.00</b></span>
+          <span>Account threshold<b>$150,000.00</b></span>
+          <span>Periods recurring<b>4</b></span>
+          <span>Prior explanation restated<b>3 of 4 periods, verbatim</b></span>
+          <span>Blast radius<b>Consolidation · tax · statutory</b></span>
+        </div>
+        <div class="noexpand">This band is never inside a collapsed or expandable region and always precedes
+        the supporting narrative in the reading order.</div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <div class="col">
+          <div class="card" style="margin:0">
+            <div class="lbl">Evidence set — the data, before anyone's reasoning about it</div>
+            <table class="t">
+              <tr><th>Period</th><th class="n">Residual</th><th class="n">Δ</th><th>Explanation recorded</th></tr>
+              <tr><td class="mono">2026-03</td><td class="n">180,140.00</td><td class="n">—</td><td class="sub">"In-transit, clears next period"</td></tr>
+              <tr><td class="mono">2026-04</td><td class="n">241,020.00</td><td class="n">+60,880.00</td><td class="sub">"In-transit, clears next period"</td></tr>
+              <tr><td class="mono">2026-05</td><td class="n">276,600.00</td><td class="n">+35,580.00</td><td class="sub">"In-transit, clears next period"</td></tr>
+              <tr><td class="mono">2026-06</td><td class="n">312,480.00</td><td class="n">+35,880.00</td><td class="sub" style="color:var(--risk-2)">proposed — same wording</td></tr>
+            </table>
+            <div class="note">The narrative-recurrence leg is <b>evidence</b>, not commentary: the identical
+            wording across four periods is itself the finding (F9 leg ii).</div>
+          </div>
+        </div>
+        <div class="col" style="flex:0 0 320px">
+          <div class="card" style="margin:0">
+            <div class="lbl">In force at approval time</div>
+            <div class="kv"><span class="k">Applicable threshold</span><span class="mono">$150,000.00, inclusive</span></div>
+            <div class="kv"><span class="k">Guardrail bundle</span><span class="mono">v14 · 9f3a71c2</span></div>
+            <div class="kv"><span class="k">Decision ID</span><span class="mono">DEC-8841-2026-06</span></div>
+            <div class="kv"><span class="k">Dataset version</span><span class="mono">gl_balances v2026.06.03-a</span></div>
+            <div class="kv"><span class="k">Data as of</span><span class="mono">03 Jul 06:15 · 12h before close clock</span></div>
+            <div class="kv"><span class="k">Agent</span><span class="mono">crossperiod-surveillance v2.2.0</span></div>
+            <div class="kv"><span class="k">Coverage of this run</span><span class="mono">70% — partial</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESOLUTION -->
+      <div class="card">
+        <div class="lbl">Record a resolution — six equal outcomes, none pre-selected</div>
+        <div class="rrow">
+          <div class="rbtn"><div class="code">R1</div><div class="nm">Accepted &amp; explained</div><div class="req">Requires expiry date</div></div>
+          <div class="rbtn"><div class="code">R2</div><div class="nm">Data-side fix</div><div class="req">No posting</div></div>
+          <div class="rbtn"><div class="code">R3</div><div class="nm">Reclassification</div><div class="req">Requires journal review</div><div class="postsflag">Posts</div></div>
+          <div class="rbtn"><div class="code">R4</div><div class="nm">Correcting / accrual journal</div><div class="req">Requires journal review</div><div class="postsflag">Posts</div></div>
+          <div class="rbtn sel"><div class="code">R5</div><div class="nm">Handoff</div><div class="req">Requires owner + due date</div></div>
+          <div class="rbtn"><div class="code">R6</div><div class="nm">Control-state change</div><div class="req">Changes risk grade</div></div>
+        </div>
+        <div class="note">R3 and R4 are the only two marked <span style="color:var(--risk-2);font-weight:640">Posts</span>.
+        They are not larger, not first, and not the default. The two outcomes that actually dominate this
+        domain — R2 and R5 — sit in the middle of the row at identical weight.</div>
+
+        <div class="row" style="margin-top:12px">
+          <div class="col">
+            <div class="lbl">R5 · handoff</div>
+            <div class="kv"><span class="k">Owner</span><span class="mono">M. Okonjo — Treasury Ops</span></div>
+            <div class="kv"><span class="k">Due</span><span class="mono">2026-07-18</span></div>
+          </div>
+          <div class="col">
+            <div class="lbl">Forward disposition — required to save, at every permission level</div>
+            <div class="sentence">
+              This clears by <span class="slot">2026-07</span>.
+            </div>
+            <div class="chips">
+              <span class="chip on">Next period · 2026-07</span>
+              <span class="chip">2026-08</span>
+              <span class="chip">2026-09</span>
+              <span class="chip">Pick…</span>
+            </div>
+            <div class="promise">We will check in 2026-07 and tell you if it did not.
+            If it did not, this account's risk grade rises and auto-pass is revoked.</div>
+            <div class="note">Your predictions so far: <span class="mono">31 of 38 met</span>.</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px;align-items:center">
+          <button class="btn primary">Record R5 — handoff to M. Okonjo, clears by 2026-07</button>
+          <button class="btn">Reject — select a reason</button>
+          <div class="spacer"></div>
+          <span class="sub">One item. There is no control anywhere in this product that disposes of more than one item in a single action.</span>
+        </div>
+      </div>
+
+      <!-- NARRATIVE LAST AND COLLAPSED -->
+      <div class="narrative" style="margin-top:12px">
+        <div class="head"><span>Agent's supporting narrative and reasoning trace — collapsed</span><span class="chev">▸ expand</span></div>
+      </div>
+      <div class="note"><b>Last in the reading order and closed by default.</b> Clearer explanations increase
+      deference (<code>INDUSTRY_KB</code> §15.4), so the explanation does not get the top of the page and does
+      not open itself. Whether you opened it is recorded (<code>AC-F12-03</code>).</div>
+
+      <div class="acs"><code>AC-F41-01</code><code>AC-F41-02</code><code>AC-F41-03</code><code>AC-F41-04</code><code>AC-F41-05</code><code>AC-F41-13</code><code>AC-F36-18</code><code>AC-F35-09</code><code>AC-F35-05</code><code>AC-F35-03</code><code>AC-F32-01</code><code>AC-F12-03</code><code>AC-F12-09</code></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="framecap">Reject · structured reason from a closed list is required (<code>AC-F41-06</code>)</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <div class="row">
+      <div class="col card" style="margin:0">
+        <div class="lbl">Reason — required, closed list, none pre-selected</div>
+        <div class="kv"><span class="k">☐ Evidence insufficient for the conclusion drawn</span></div>
+        <div class="kv"><span class="k">☐ Population scanned does not cover this account</span></div>
+        <div class="kv"><span class="k">☐ Detection is correct, proposed resolution is wrong</span></div>
+        <div class="kv"><span class="k">☐ Known and already handled outside this system</span></div>
+        <div class="kv"><span class="k">☐ Data is stale or wrong at source</span></div>
+        <div class="kv"><span class="k">☐ Judgement call — I disagree, reasoning below</span></div>
+        <div class="row" style="margin-top:12px"><button class="btn" disabled>Reject — select a reason first</button></div>
+        <div class="note">Free text alone is not accepted. A rejection with no structured reason cannot
+        complete and the item stays pending.</div>
+      </div>
+      <div class="col">
+        <div class="rationale" style="margin:0">
+          <b>Why a closed list and not a text box.</b> Free text is unaggregatable, so it never becomes a
+          control signal — and rejection reasons are the highest-value labels this product manufactures
+          (F12). A closed list turns "the reviewer disagreed" into "the reviewer disagreed for reason 3,
+          which is now 40% of rejections against this agent this period", which is a thing a controller can
+          act on. Free text sits <i>underneath</i> the list, optional, for the judgement-call case.
+        </div>
+        <div class="rationale" style="margin-top:12px">
+          <b>A friction I am keeping on purpose.</b> <code>DOMAIN_KB</code> §7.2.2 predicts the designer will
+          object to deliberate friction on judgemental items. <b>I do not object — I am asking for it.</b>
+          For the highest risk band, the reject and the R1-accept paths both require the reviewer to
+          <i>type</i> a sentence that is not selectable from any list. It is slow on purpose. Every other
+          mechanism on this screen reduces work; this one specific case is where the work belongs.
+        </div>
+      </div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 8 -->
+<section id="reviewdark">
+  <div class="sechead"><h2>8 · The same risk band in both themes, side by side</h2>
+  <div class="meta">Shown simultaneously so the pair can be judged without toggling. The whole page also has a theme switch in the header.</div></div>
+  <div class="pair">
+    <div class="pairbox" data-theme="light" style="background:var(--surface)">
+      <div class="cap">Light — daytime, and the theme the PDF export renders in</div>
+      <div style="padding:16px;background:var(--bg)">
+        <div class="riskband">
+          <div class="cap">Riskiest element of this proposal</div>
+          <div class="big">$918,240.00</div>
+          <div style="font-size:15px;font-weight:640">Iron-curtain aggregate across 4 consecutive periods</div>
+          <div class="why">Each period's movement was individually below the $150,000 threshold. The accumulated balance is not.</div>
+          <div class="facts"><span>This period<b>$312,480.00</b></span><span>Threshold<b>$150,000.00</b></span><span>Periods<b>4</b></span></div>
+        </div>
+        <div class="narrative" style="margin-top:12px"><div class="head"><span>Agent's supporting narrative — collapsed</span><span class="chev">▸</span></div></div>
+      </div>
+    </div>
+    <div class="pairbox" data-theme="dark" style="background:var(--surface)">
+      <div class="cap">Dark — 11pm on day 3, which is the design condition</div>
+      <div style="padding:16px;background:var(--bg)">
+        <div class="riskband">
+          <div class="cap">Riskiest element of this proposal</div>
+          <div class="big">$918,240.00</div>
+          <div style="font-size:15px;font-weight:640">Iron-curtain aggregate across 4 consecutive periods</div>
+          <div class="why">Each period's movement was individually below the $150,000 threshold. The accumulated balance is not.</div>
+          <div class="facts"><span>This period<b>$312,480.00</b></span><span>Threshold<b>$150,000.00</b></span><span>Periods<b>4</b></span></div>
+        </div>
+        <div class="narrative" style="margin-top:12px"><div class="head"><span>Agent's supporting narrative — collapsed</span><span class="chev">▸</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Dark mode keeps the risk ramp <i>brighter</i> with rank, so the ordinal reading survives
+  inversion. It is not a hue rotation of the light theme — a desaturated dark red on a dark ground would be
+  the least visible element on the page, which is the opposite of what this band is for.</div>
+</section>
+
+<!-- ============================================================ 9 -->
+<section id="reclass">
+  <div class="sechead"><h2>9 · The one screen with an approve button — a reclass export to Oracle</h2>
+  <div class="meta">F40 · <code>AC-F40-11</code> <code>AC-F40-03</code> <code>AC-F41-04</code></div></div>
+
+  <div class="rationale">
+    <b>Approval is scoped to the artefact that leaves the building, not to every finding.</b> The exact
+    journal lines are visible before the export control is usable, and that same rendering is what is
+    retained as the evidential rendered view. MVP1 <i>exports</i>; it does not post
+    (<code>AC-F40-02</code>) — and the button says so in those words, because "Approve" alone would let a
+    user believe they had posted into Oracle.
+  </div>
+
+  <div class="frame"><div class="framecap">Review · approved reclass proposal, before export</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <div class="riskband" style="border-color:var(--risk-1);background:var(--risk-1-bg)">
+      <div class="cap" style="color:var(--risk-1)">Riskiest element of this proposal</div>
+      <div class="big">$86,340.00</div>
+      <div style="font-size:15px;font-weight:640">Largest single line · 14 invoices, cost-centre reclass within one caption</div>
+      <div class="why">Cost centre only. Same natural account, same legal entity, same period. No effect on
+      profit, EBITDA or the balance sheet — management reporting only.</div>
+      <div class="facts"><span>Sub-type<b>Cost centre</b></span><span>In scope?<b>Yes — A3 scope</b></span><span>Lines<b>2</b></span><span>Blast radius<b>Internal reporting</b></span></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Exact journal lines that will be exported — visible before the export control</div>
+      <table class="t">
+        <tr><th>Line</th><th>Ledger</th><th>Account</th><th>Cost centre</th><th class="n">Debit</th><th class="n">Credit</th></tr>
+        <tr><td class="mono">1</td><td class="mono">NGH-US-100</td><td class="mono">54100</td><td class="mono">CC-4180 Transmission Ops</td><td class="n">86,340.00</td><td class="n">—</td></tr>
+        <tr><td class="mono">2</td><td class="mono">NGH-US-100</td><td class="mono">54100</td><td class="mono">CC-4420 Distribution Ops</td><td class="n">—</td><td class="n">86,340.00</td></tr>
+      </table>
+      <div class="row" style="margin-top:10px">
+        <div class="col"><div class="kv"><span class="k">Journal source</span><span class="mono">CONCLAVE_STUDIO</span></div>
+        <div class="kv"><span class="k">Category</span><span class="mono">RECLASS</span></div>
+        <div class="kv"><span class="k">Accounting date</span><span class="mono">2026-06-30</span></div></div>
+        <div class="col"><div class="kv"><span class="k">Guardrail bundle</span><span class="mono">v14 · 9f3a71c2</span></div>
+        <div class="kv"><span class="k">Decision ID</span><span class="mono">DEC-8907-2026-06</span></div>
+        <div class="kv"><span class="k">CUEC verified</span><span class="mono">2026-06-01 · Oracle journal source restricted</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Two-key model</div>
+      <div class="kv"><span class="k">Preparer</span><span class="mono">A. Reyes — staff accountant</span></div>
+      <div class="kv"><span class="k">Approver (in-product, evidence-bearing)</span><span class="mono">not yet approved</span></div>
+      <div class="kv"><span class="k">Oracle-side poster (second key)</span><span class="mono">outside this product</span></div>
+      <div class="row" style="margin-top:12px;align-items:center">
+        <button class="btn primary">Approve these 2 lines for export</button>
+        <button class="btn">Reject — select a reason</button>
+        <div class="spacer"></div>
+        <span class="sub"><b>This does not post to Oracle.</b> It produces a Journal Import file for a human to load.</span>
+      </div>
+    </div>
+    <div class="note">The rendering above — figures, threshold, bundle version, coverage — is captured
+    verbatim at approval and retrievable afterwards even when the underlying data has changed
+    (<code>AC-F41-04</code>). Which is why nothing here is behind a hover or a lazy fetch.</div>
+    <div class="acs"><code>AC-F40-11</code><code>AC-F40-03</code><code>AC-F40-05</code><code>AC-F41-04</code><code>AC-F41-05</code></div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="superseded">
+  <div class="sechead"><h2>10 · Superseded run — the approval path is removed, not warned about</h2>
+  <div class="meta"><code>AC-F41-12</code> · convention C4</div></div>
+  <div class="rationale">
+    A toast that says "this run is stale" is dismissed by a tired reviewer in under a second and the approve
+    button is still there. So <b>the action area is structurally replaced</b>, not decorated. The only
+    forward action is to open the superseding run.
+  </div>
+  <div class="frame"><div class="framecap">Review · proposal from a superseded run</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <div class="state hatch" style="border-color:var(--risk-3);border-style:solid">
+      <div class="hd" style="color:var(--risk-3)">This proposal cannot be approved. Its run has been superseded.</div>
+      <div class="bd">It came from <span class="mono">RUN-2026-06-0412</span>. That run was superseded by
+      <span class="mono">RUN-2026-06-0447</span>, completed <span class="mono">03 Jul 2026 22:07</span>,
+      after two additional datasets were certified.</div>
+      <div class="row" style="margin-top:12px"><button class="btn primary">Open RUN-2026-06-0447</button></div>
+      <div class="note">There is no approve control on this screen in this state. It is absent, not disabled —
+      a disabled approve button still tells a tired reviewer that approving was the expected act.</div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 11 -->
+<section id="probe">
+  <div class="sechead"><h2>11 · Known-error probes — invisible before, revealed immediately after</h2>
+  <div class="meta"><code>AC-F41-08</code> <code>AC-F12-05</code> · <b>one design call beyond the criteria, argued</b></div></div>
+
+  <div class="rationale">
+    The criteria require only that a probe be indistinguishable from a genuine proposal by anything rendered
+    <b>before</b> disposition. They are silent on afterwards. <b>My call: reveal it the instant the
+    disposition is submitted, with the correct answer.</b>
+    <br><br>
+    Reasoning: the stated purpose of injected probes in <code>INDUSTRY_KB</code> §15.4 is <i>to keep
+    attention live</i>. A probe that is never revealed is a measurement instrument only — it measures decay
+    without arresting it. A probe revealed at the moment of disposition is a measurement <i>and</i> a
+    calibration signal delivered at the one moment the reviewer is still holding the item in their head.
+    It is also the fairest option for the staff accountant, who is otherwise being silently scored.
+    <br><br>
+    <b>The cost I accept:</b> reviewers will learn the probe rate and may recalibrate against it. That is a
+    real weakness. I judge it smaller than the alternative, and it is mitigated by varying the rate. The
+    consequence for the build: <b>no component may render probe status anywhere before disposition</b> —
+    not a badge, not a class name in the DOM, not a differing skeleton height. That is a testable statement
+    and I would like the UX suite to assert it.
+  </div>
+
+  <div class="row">
+    <div class="col frame"><div class="framecap">Before disposition — no probe signal exists anywhere</div>
+      <div class="body" style="padding:16px">
+        <div class="q"><div class="qhdr"><span>Account</span><span>Finding</span><span>Type</span><span>Risk</span><span class="amt" style="text-align:right">Amount</span></div>
+          <div class="qrow tier2"><span class="acct">21550</span><span><b>Accrued Liabilities — Transmission O&amp;M</b><div class="desc">Accrual reversed twice in 2026-06.</div></span><span><span class="pill">Fidelity</span></span><span><span class="pill r2">High</span></span><span class="amt">64,200.00</span></div>
+        </div>
+        <div class="note">Identical in every rendered respect to a genuine item.</div>
+      </div>
+    </div>
+    <div class="col frame"><div class="framecap">Immediately after disposition</div>
+      <div class="body" style="padding:16px">
+        <div class="card" style="border-color:var(--probe);margin:0">
+          <span class="pill probe">Known-error probe</span>
+          <div style="font-size:15px;font-weight:660;margin:8px 0 4px">You caught it.</div>
+          <div class="sub">This item was injected with a known error — the reversal was double-counted. You
+          rejected it for "Evidence insufficient for the conclusion drawn", which was correct.
+          <b>3 probes this period · 3 correct.</b></div>
+        </div>
+        <div class="note">The result is also recorded for the controller (<code>AC-F12-08</code>) — but the
+        reviewer sees it first, not last.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 12 -->
+<section id="disp">
+  <div class="sechead"><h2>12 · Dispositions — the prediction, and the product marking its own homework</h2>
+  <div class="meta"><code>AC-F32-09</code> <code>AC-F32-01</code> <code>AC-F35-07</code> <code>AC-F35-06</code></div></div>
+
+  <div class="rationale">
+    <b>The forward-disposition field is the most retrofit-hostile requirement in the backlog and the one
+    most likely to feel like a tax.</b> Three design moves stop it feeling like one.
+    <br>1. <b>It is not a field, it is the sentence you are already writing.</b> "This clears by ▾". The
+    save control reads <i>"Record — clears by 2026-07"</i>, so the prediction is the shape of the action
+    rather than a validation error that appears after you thought you were done. Until it is set the button
+    reads "Record — clears by …" and does nothing.
+    <br>2. <b>It is never pre-filled</b> (a defaulted prediction is a manufactured one, and would poison the
+    hit rate that makes this control worth having), but the three most common answers are one tap.
+    <br>3. <b>It is framed as a promise the product makes to you</b>, not a hoop: "We will check in 2026-07
+    and tell you if it did not." Micro-copy converts an obligation into a service.
+    <br><br>
+    <b>One risk I want on the record:</b> showing the user their own hit rate next to the field may push
+    people toward conservative, easily-met predictions, which would inflate the measure. I still recommend
+    showing it — an invisible score is worse — but the controller's view should watch for horizon drift, and
+    I would like that watched in the first production period rather than assumed away.
+  </div>
+
+  <div class="frame"><div class="framecap">Dispositions · open items with forward predictions</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <table class="t">
+      <tr><th>Account</th><th>Resolution</th><th>Recorded</th><th>Expected to clear</th><th>Status</th><th class="n">Amount</th></tr>
+      <tr><td class="mono">21400 GR/IR Clearing</td><td><span class="pill">R1</span> accepted &amp; explained</td><td class="mono">2026-05</td><td class="mono">2026-06</td><td><span class="pill r3">Missed — 1 period overdue</span></td><td class="n">276,600.00</td></tr>
+      <tr><td class="mono">13800 IC Receivable — CA-200</td><td><span class="pill">R5</span> handoff · M. Okonjo</td><td class="mono">2026-06</td><td class="mono">2026-07</td><td><span class="pill">Within horizon</span></td><td class="n">1,043,900.00</td></tr>
+      <tr><td class="mono">19900 Suspense</td><td><span class="pill">R2</span> data-side fix</td><td class="mono">2026-06</td><td class="mono">2026-07</td><td><span class="pill">Within horizon</span></td><td class="n">1,204.06</td></tr>
+      <tr><td class="mono">11500 Bank Clearing</td><td><span class="pill">R1</span> accepted &amp; explained</td><td class="mono">2026-04</td><td class="mono">2026-05</td><td><span class="pill r2">R1 expiry lapsed — re-opened</span></td><td class="n">88,412.00</td></tr>
+    </table>
+    <div class="note">A missed prediction is not a notification. It is a state change: the account's risk
+    grade rises and auto-pass eligibility is revoked, recorded as an R6 readable on the account
+    (<code>AC-F32-03</code>). A lapsed R1 re-enters the exception queue carrying its original explanation
+    attached, so the next reviewer sees what was promised last time (<code>AC-F35-06</code>).</div>
+
+    <div class="row" style="margin-top:14px">
+      <div class="col card" style="margin:0">
+        <div class="lbl">The moment the prediction is entered — nothing pre-filled</div>
+        <div class="sentence">This clears by <span class="slot empty">…</span>.</div>
+        <div class="chips"><span class="chip">2026-07</span><span class="chip">2026-08</span><span class="chip">2026-09</span><span class="chip">Pick…</span></div>
+        <div class="row" style="margin-top:12px"><button class="btn" disabled>Record — clears by …</button></div>
+        <div class="note">A hard save block at every permission level including administrator, not a warning
+        that can be acknowledged and bypassed (<code>AC-F32-01</code>).</div>
+      </div>
+      <div class="col card" style="margin:0">
+        <div class="lbl">Zero open dispositions — a stated result naming the period</div>
+        <div class="state"><div class="hd">No open dispositions for June 2026.</div>
+        <div class="bd">17 were opened this period and all 17 are closed. Their forward predictions remain
+        under test and are visible in Monitors.</div></div>
+      </div>
+    </div>
+    <div class="acs"><code>AC-F32-09</code><code>AC-F32-01</code><code>AC-F32-03</code><code>AC-F32-05</code><code>AC-F35-06</code><code>AC-F35-07</code></div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 13 -->
+<section id="cat">
+  <div class="sechead"><h2>13 · Catalogue — datasets as governed objects</h2>
+  <div class="meta"><code>AC-F38-01</code> <code>AC-F38-12</code> <code>AC-F38-13</code></div></div>
+  <div class="frame"><div class="framecap">Catalogue</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <table class="t">
+      <tr><th>Dataset</th><th>Source lineage</th><th>As of</th><th>Refresh</th><th class="n">Rows</th><th>Content hash</th><th>ERP tie-out</th><th>Owner</th><th>Version</th></tr>
+      <tr><td class="mono">gl_balances</td><td class="sub">Oracle ERP Cloud → GL_BALANCES</td><td class="mono">03 Jul 06:15</td><td class="sub">Current</td><td class="n">4,182,006</td><td class="mono">8c41d0…</td><td><span class="pill">Tied 03 Jul</span></td><td class="sub">R. Ng, Controller</td><td class="mono">2026.06.03-a</td></tr>
+      <tr><td class="mono">recurring_journal_register</td><td class="sub">Oracle ERP Cloud → GL_JE_BATCHES</td><td class="mono">03 Jul 06:15</td><td class="sub">Current</td><td class="n">18,442</td><td class="mono">1af907…</td><td><span class="pill">Tied 03 Jul</span></td><td class="sub">R. Ng, Controller</td><td class="mono">2026.06.03-a</td></tr>
+      <tr><td class="mono">subledger_ap_fa</td><td class="sub">Oracle ERP Cloud → XLA_AE_LINES</td><td class="mono">01 Jul 22:40</td><td class="sub" style="color:var(--risk-1)">Stale — 2 days behind close clock</td><td class="n">9,204,881</td><td class="mono">44b2ee…</td><td><span class="pill">Tied 01 Jul</span></td><td class="sub">R. Ng, Controller</td><td class="mono">2026.06.01-c</td></tr>
+      <tr><td class="mono">ic_ngh_ca_200</td><td class="sub">Oracle ERP Cloud → GL_BALANCES (CA)</td><td class="mono">03 Jul 06:15</td><td class="sub">Current</td><td class="n">712,004</td><td class="mono">bd7731…</td><td><span class="pill r2">Tie-out FAILED 03 Jul</span></td><td class="sub">R. Ng, Controller</td><td class="mono">2026.06.03-a</td></tr>
+      <tr class="hatch"><td class="mono">ap_invoice_draft_v2</td><td class="sub">Warehouse staging — not governed</td><td class="mono">02 Jul 11:02</td><td class="sub">—</td><td class="n">— </td><td class="mono">—</td><td><span class="pill" style="border-color:var(--uncert);color:var(--uncert)">Not certified</span></td><td class="sub">—</td><td class="mono">—</td></tr>
+    </table>
+    <div class="note">The failed tie-out is shown with its date, and any action-capable run selecting that
+    dataset is refused naming the failed tie-out (<code>AC-F38-12</code>). Staleness is expressed
+    <b>relative to the close clock</b>, not as an absolute timestamp, because "2 days behind close" is the
+    fact a close professional acts on and "01 Jul 22:40" is not.</div>
+    <div class="state" style="margin-top:14px"><div class="hd">No datasets have been certified in this tenant.</div>
+    <div class="bd">Action-capable and assurance-emitting skills cannot run. Exploration over uncertified data
+    is available and is marked non-evidential. Certification is performed by a named owner.</div></div>
+    <div class="note">The empty state is an explanation of what is consequently impossible — not a blank list
+    (<code>AC-F38-13</code>).</div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 14 -->
+<section id="mon">
+  <div class="sechead"><h2>14 · Monitors — the controller's screen, and the product marking itself</h2>
+  <div class="meta"><code>AC-F32-10</code> <code>AC-F41-07</code> <code>AC-F12-08</code> <code>AC-F36-19</code> <code>AC-F9-08</code></div></div>
+
+  <div class="rationale">
+    <b>The forward-disposition hit rate is the masthead of this screen, not a tile.</b> It is the product's
+    own falsifiability measure and it is displayed whether it is good or bad. Everything else on this screen
+    measures the agents and the reviewers; this one measures <i>us</i>, and putting it anywhere but first
+    would be a tell.
+    <br><br>
+    <b>No metric on this screen is coloured good or bad.</b> A high override rate could mean a reviewer is
+    catching things or that an agent is misfiring; a low one could mean the agent is right or that nobody is
+    reading. Colouring it would assert an interpretation the data does not support, and a green dashboard is
+    exactly the artefact that teaches a controller their controls cannot fail. Figures are ink; only
+    <i>escalations</i> take risk colour.
+  </div>
+
+  <div class="frame"><div class="framecap">Monitors · June 2026</div>
+  <div class="app">
+    <div class="nav">
+      <div class="brand">Conclave Finance Studio<span>Northwind Grid · 2026-06 · Day 3</span></div>
+      <div class="navgrp">Work</div>
+      <div class="navitem">Ask</div><div class="navitem">Exceptions <span class="cnt">9</span></div>
+      <div class="navitem">Review <span class="cnt">3</span></div><div class="navitem">Dispositions <span class="cnt">17</span></div>
+      <div class="navgrp">Govern</div>
+      <div class="navitem on">Monitors <span class="cnt">2</span></div><div class="navitem">Catalogue</div><div class="navitem">Inventory</div>
+      <div class="navgrp">Evidence</div><div class="navitem">Audit</div><div class="navitem">Refusals</div>
+    </div>
+    <div class="body">
+      <div class="crumb">Monitors · controller view · June 2026</div>
+      <div class="ttl">How well did this product predict reality?</div>
+
+      <div class="hero" style="margin-top:12px">
+        <div class="lbl">Forward-disposition hit rate — May 2026 predictions, tested in June</div>
+        <div class="row" style="align-items:flex-end;gap:26px">
+          <div class="n">64%</div>
+          <div style="padding-bottom:8px">
+            <div style="font-size:14px"><span class="mono">27 of 42</span> predicted clearings happened in the period predicted.</div>
+            <div class="sub"><span class="mono">15</span> missed → 15 accounts had their risk grade raised and auto-pass revoked.</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="sub" style="text-align:right;max-width:32ch">Displayed whether it is good or bad.
+          A period where this is not shown is a period where nobody tested the product's own claims.</div>
+        </div>
+      </div>
+
+      <div class="tiles" style="margin-top:12px">
+        <div class="tile"><div class="lbl">Override rate — crossperiod-surveillance</div><div class="n">11.4%</div><div class="sub">8 of 70</div></div>
+        <div class="tile"><div class="lbl">Override rate — coding-detect</div><div class="n zero">0.0%</div><div class="sub">0 of 34 · explicit zero, not omitted</div></div>
+        <div class="tile"><div class="lbl">Median review dwell</div><div class="n">1m 47s</div><div class="sub">per disposed item</div></div>
+        <div class="tile"><div class="lbl">Probes presented / correct</div><div class="n">9 / 7</div><div class="sub">2 missed by 1 reviewer</div></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl">Per user — override rate, dwell, evidence expanded</div>
+        <table class="t">
+          <tr><th>User</th><th class="n">Items disposed</th><th class="n">Override rate</th><th class="n">Median dwell</th><th class="n">Narrative expanded</th><th class="n">Probes correct</th></tr>
+          <tr><td>A. Reyes — staff accountant</td><td class="n">61</td><td class="n">13.1%</td><td class="n">2m 04s</td><td class="n">71%</td><td class="n">4 / 4</td></tr>
+          <tr><td>J. Halvorsen — staff accountant</td><td class="n">48</td><td class="n">4.2%</td><td class="n">0m 38s</td><td class="n">9%</td><td class="n">1 / 3</td></tr>
+          <tr><td>R. Ng — controller</td><td class="n">14</td><td class="n">21.4%</td><td class="n">4m 51s</td><td class="n">100%</td><td class="n">2 / 2</td></tr>
+        </table>
+        <div class="note">Row 2 is the pattern this whole design exists to make visible: 48 items at 38
+        seconds each with the narrative opened 9% of the time and 1 of 3 probes caught. <b>No colour is
+        applied to it.</b> The controller reads the row and makes the judgement; the product does not
+        pre-judge a colleague. But the row is <i>readable</i>, which it is not in any product today.</div>
+      </div>
+
+      <div class="card">
+        <div class="lbl">Cross-period escalations — open</div>
+        <table class="t">
+          <tr><th>Account</th><th class="n">Iron-curtain aggregate</th><th>Escalated at</th><th>Leg</th><th>Periods</th></tr>
+          <tr><td class="mono">21400 GR/IR Clearing</td><td class="n">918,240.00</td><td class="mono">2026-06</td><td><span class="pill r3">Both — numeric + narrative</span></td><td class="mono">2026-03 … 2026-06</td></tr>
+          <tr><td class="mono">11500 Bank Clearing — Operating</td><td class="n">142,880.00</td><td class="mono">2026-06</td><td><span class="pill r1">Narrative only</span></td><td class="mono">2026-04 … 2026-06</td></tr>
+        </table>
+        <div class="note">The narrative-only escalation on row 2 is the <i>earlier</i> signal and is shown as
+        a first-class escalation, not a sub-property of the numeric one — <code>DOMAIN_KB</code> §9 predicts
+        it will otherwise be quietly dropped.</div>
+      </div>
+      <div class="acs"><code>AC-F32-10</code><code>AC-F41-07</code><code>AC-F12-08</code><code>AC-F36-19</code><code>AC-F9-08</code></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============================================================ 15 -->
+<section id="audit">
+  <div class="sechead"><h2>15 · Audit &amp; Inventory — what leaves the building</h2>
+  <div class="meta"><code>AC-F1-09</code> <code>AC-F2-07</code> <code>AC-F5-07</code> <code>AC-REFUSAL-04</code></div></div>
+  <div class="row">
+    <div class="col frame"><div class="framecap">Audit · dossier detail with the full version tuple</div>
+      <div class="body" style="padding:16px">
+        <div class="kv"><span class="k">Dossier</span><span class="mono">DOS-2026-06-00871</span></div>
+        <div class="kv"><span class="k">Model</span><span class="mono">claude-sonnet-4.6 · 2026-05-12</span></div>
+        <div class="kv"><span class="k">Prompt</span><span class="mono">crossperiod.surveillance v2.2.0</span></div>
+        <div class="kv"><span class="k">Tool / config</span><span class="mono">cfg-7714 · e0a1b8</span></div>
+        <div class="kv"><span class="k">Corpus</span><span class="mono">policy-corpus 2026.05</span></div>
+        <div class="kv"><span class="k">Dataset version</span><span class="mono">gl_balances 2026.06.03-a</span></div>
+        <div class="kv"><span class="k">Guardrail bundle hash</span><span class="mono">9f3a71c2</span></div>
+        <div class="kv"><span class="k">Decision ID</span><span class="mono">DEC-8841-2026-06</span></div>
+        <div class="kv"><span class="k">Coverage statement</span><span class="mono">70% — partial, 2 segments unscanned</span></div>
+        <div class="kv"><span class="k">Rendered view</span><span class="mono">retained · reproduces approval-time display</span></div>
+        <div class="row" style="margin-top:12px"><button class="btn primary">Export June 2026 dossiers</button><button class="btn">Open retained rendered view</button></div>
+        <div class="note">The export is consumable by an auditor <b>without an application login</b>. The
+        rendered view is the exhibit that shows what the approver was given, which is the staff accountant's
+        defence as much as the auditor's evidence.</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="frame"><div class="framecap">Audit · refusal events are audit records</div>
+        <div class="body" style="padding:16px">
+          <table class="t">
+            <tr><th>Time</th><th>User</th><th>Refusal</th><th>Request</th></tr>
+            <tr><td class="mono">03 Jul 19:11</td><td class="sub">A. Reyes</td><td><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">A19</span></td><td class="sub">"Assess whether the Ridgeline substation CWIP balance is impaired…"</td></tr>
+            <tr><td class="mono">02 Jul 16:44</td><td class="sub">J. Halvorsen</td><td><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">A20</span></td><td class="sub">"Is the $47,900 roll-forward break material?"</td></tr>
+            <tr><td class="mono">02 Jul 09:02</td><td class="sub">A. Reyes</td><td><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">SQL</span></td><td class="sub">Free-form SQL attempt denied at the execution path</td></tr>
+          </table>
+        </div></div>
+      <div class="frame"><div class="framecap">Inventory · agents as named principals</div>
+        <div class="body" style="padding:16px">
+          <table class="t">
+            <tr><th>Agent</th><th>Version</th><th>Entitlements</th><th>Lineage</th></tr>
+            <tr><td>crossperiod-surveillance</td><td class="mono">2.2.0</td><td class="sub">read: gl_balances · propose: none</td><td class="sub">412 artefacts</td></tr>
+            <tr><td>omission-detector</td><td class="mono">3.1.0</td><td class="sub">read: 4 datasets · propose: none</td><td class="sub">1,004 artefacts</td></tr>
+            <tr><td>coding-detect</td><td class="mono">1.4.2</td><td class="sub">read: 3 datasets · propose: reclass</td><td class="sub">288 artefacts</td></tr>
+            <tr><td class="sub">fidelity-check <span class="pill">retired</span></td><td class="mono">1.0.4</td><td class="sub">revoked 2026-04-30</td><td class="sub">2,119 artefacts — still enumerable</td></tr>
+          </table>
+          <div class="note">A retired agent's lineage remains enumerable. An unanswerable blast-radius
+          question converts a contained error into a scope-wide material weakness.</div>
+        </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 16 -->
+<section id="refusals">
+  <div class="sechead"><h2>16 · Refusals — a top-level screen, because it is an audit-committee artefact</h2>
+  <div class="meta"><code>AC-REFUSAL-01</code> <code>AC-REFUSAL-02</code> <code>AC-REFUSAL-06</code></div></div>
+  <div class="rationale">
+    Refused and deferred appear on the same screen, adjacent, because <b>the contrast is the design</b>. If
+    a user only ever sees one of the two treatments they cannot learn to tell them apart. Two card shapes,
+    two header words, two border styles, two vocabularies — and the wording alone carries the distinction
+    with all styling stripped, so it survives a screen reader and a greyscale print.
+  </div>
+  <div class="frame"><div class="framecap">Refusals</div>
+  <div class="app"><div class="body" style="padding:16px">
+    <div class="ttl">What this product will never do</div>
+    <p class="sub" style="margin:4px 0 14px;max-width:78ch">These are design properties, not roadmap gaps.
+    Each one is refused because automating it would remove the thing being evidenced, or because there is no
+    ground truth against which it could ever be tested.</p>
+    <div class="row"><div class="col">
+      <div class="refuse"><div class="hd">Refused — by design, permanently</div>
+        <div class="cap">A19 · Estimates, reserves, allowances, impairment, valuation</div>
+        <div class="bd">No in-period ground truth. The top statistical cause of restatement, and the purest
+        form of the self-justifying mechanism this product exists to detect.</div>
+        <div class="never">This will not be built.</div></div>
+      <div class="refuse" style="margin-top:12px"><div class="hd">Refused — by design, permanently</div>
+        <div class="cap">A20 · Materiality, SAB 99 and iron-curtain conclusions</div>
+        <div class="bd">An agent that concludes "immaterial" has automated the decision that suppresses its
+        own errors.</div>
+        <div class="never">This will not be built.</div></div>
+    </div><div class="col">
+      <div class="refuse"><div class="hd">Refused — by design, permanently</div>
+        <div class="cap">A21 · Certification and sign-off</div>
+        <div class="bd">The signature <i>is</i> the control. Automating it removes the thing being
+        evidenced.</div>
+        <div class="never">This will not be built.</div></div>
+      <div class="refuse" style="margin-top:12px"><div class="hd">Refused — by design, permanently</div>
+        <div class="cap">A22 · Contentious cut-off and technical-accounting conclusions</div>
+        <div class="bd">No ground truth. These may be <i>supported</i> by detection output; they are never
+        concluded by this product.</div>
+        <div class="never">This will not be built.</div></div>
+    </div></div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="lbl">Also refused outright</div>
+      <div class="kv"><span class="k">Auto-posting below a threshold / "autonomous close"</span><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">Refused</span></div>
+      <div class="kv"><span class="k">One agent's review substituting for a human approval</span><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">Refused</span></div>
+      <div class="kv"><span class="k">Free-form natural-language SQL over arbitrary datasets</span><span class="pill" style="border-color:var(--refuse);color:var(--refuse)">Refused</span></div>
+    </div>
+
+    <hr style="margin:22px 0">
+    <div class="ttl" style="font-size:16px">Not in this release — different thing, different treatment</div>
+    <div class="row" style="margin-top:10px">
+      <div class="col"><div class="defer"><div class="hd">Not in this release</div>
+        <div class="cap">Flux driver decomposition (F45)</div>
+        <div class="bd">Which accounts moved, and which transactions arithmetically explain the move.</div>
+        <div class="later">Deferred, not refused. Planned.</div></div></div>
+      <div class="col"><div class="defer"><div class="hd">Not in this release</div>
+        <div class="cap">Accrual completeness search (F44)</div>
+        <div class="bd">Subsequent disbursements, received-not-invoiced, open PO receipts.</div>
+        <div class="later">Deferred, not refused. Phase 2, rank 1.</div></div></div>
+      <div class="col"><div class="defer"><div class="hd">Not in this release</div>
+        <div class="cap">Non-Oracle data sources</div>
+        <div class="bd">MVP1 reads Oracle ERP Cloud data only.</div>
+        <div class="later">Deferred, not refused. Future phase.</div></div></div>
+    </div>
+    <div class="acs"><code>AC-REFUSAL-01</code><code>AC-REFUSAL-02</code><code>AC-REFUSAL-06</code><code>AC-REFUSAL-07</code></div>
+  </div></div></div>
+</section>
+
+<!-- ============================================================ 17 -->
+<section id="asks">
+  <div class="sechead"><h2>17 · What I am asking the human to decide</h2>
+  <div class="meta">Four items. Everything else in this document is a call I have already made.</div></div>
+
+  <div class="card">
+    <div class="lbl">1 · <code>AC-F41-03</code> — I am not asking for it to be relaxed. I am asking for it to be strengthened.</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      <code>FUNCTIONAL_SPEC</code> §25.3 offers to renegotiate the riskiest-element criterion if I judge it
+      to trespass on design. <b>It does not trespass.</b> Reading order and non-collapsibility are exactly
+      the right level of specification — behavioural, testable, and silent on pixels. But they are
+      <b>insufficient</b>: an element can be first in the DOM and uncollapsed and still be visually
+      recessive, which would satisfy the criterion and defeat its purpose. I would like one more
+      behavioural clause, issued as a new ID by <code>functional-design-agent</code> rather than assumed by
+      me: <i>the riskiest element renders at the largest type size present on the Review screen, and no
+      other element on that screen renders at an equal or larger size.</i> That is checkable by comparing
+      computed font sizes and still fixes no number.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="lbl">2 · A design intent with no acceptance criterion behind it — a routing budget</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      Volume reduction is the mechanism the research supports, and <code>AC-F41-09</code> makes the volume
+      <i>visible</i> — but nothing in the 186 criteria makes it <i>bounded</i>. I would like a configured
+      per-reviewer per-night routing budget: when a run would exceed it, the run says so and a controller
+      must either raise the cap (recorded as a control event) or split the queue. That turns volume
+      reduction from an aspiration into a structural limit. <b>I am proposing it, not adding it</b> — new
+      scope is <code>plan-agent</code>'s lane and it would need a criterion from
+      <code>functional-design-agent</code>. If it is not taken, the 11pm problem is mitigated by this
+      design but not bounded by it, and that should be a recorded choice rather than an oversight.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="lbl">3 · Probe reveal timing</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      I have designed immediate post-disposition reveal (§11). The criteria permit it and are silent on it.
+      It is a judgement call with a real cost — reviewers learn the probe rate — and
+      <code>responsible-ai-architect</code> should have a view before it is built.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="lbl">4 · A recorded requirement this pass does <i>not</i> cover</div>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-2)">
+      <code>PROJECT_CONTEXT.md</code>'s header still reads <b>"Surfaces: desktop web · mobile web · native
+      mobile (multi-surface)"</b>, while the Decisions Log and <code>PLAN</code> §9.2 A2 scope MVP1 to
+      <b>one surface, desktop web</b>, with F23/F24 deferred and F24 recommended for rejection on control
+      grounds. <b>I have designed desktop web only.</b> There is no mobile layout in this document and no
+      responsive breakpoint below tablet in the product design. I am flagging the header rather than
+      silently satisfying the narrower reading — if multi-surface is still binding, this gate needs a
+      second pass and F24 needs re-deciding, because approving from mobile is the lowest-scrutiny approval
+      surface that exists and 11pm is exactly when it would be used.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="card" style="border-color:var(--accent)">
+    <div class="lbl">Provenance of this file</div>
+    <p style="margin:0;font-size:13px;color:var(--ink-2)">
+      Author: <code>ui-ux-designer</code>, gate 5 · Experience Design, 2026-07-31. Designed against
+      <code>knowledge/FUNCTIONAL_SPEC.md</code> (186 criteria, §23 observable-UI map),
+      <code>PLAN.md</code> §6.2/§7, <code>knowledge/DOMAIN_KB.md</code> §6.2/§7.2/§10,
+      <code>knowledge/INDUSTRY_KB.md</code> §14/§15.4 and the full <code>PROJECT_CONTEXT.md</code>
+      Decisions Log. Rationale and the running post-deploy observation log live in
+      <code>knowledge/UX_KB.md</code>. This file is self-contained — no external stylesheet, script,
+      font or image — so it cannot fail silently by referencing something that does not exist.
+    </p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

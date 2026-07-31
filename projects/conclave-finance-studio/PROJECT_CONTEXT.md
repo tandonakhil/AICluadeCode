@@ -8,7 +8,12 @@ combine them into agentic teams for month-end close.
 
 - **Created**: 2026-07-30
 - **Template**: pending `plan-agent` recommendation
-- **Surfaces**: desktop web · mobile web · native mobile (**multi-surface**)
+- **Surfaces**: **MVP1 desktop web only.** The product remains multi-surface
+  (desktop web · mobile web · native mobile) and `solution-architect` stays
+  non-droppable on that basis, but MVP1 ships one surface. The header
+  previously read as though all three were in MVP1, contradicting the Decisions
+  Log, `PLAN` §9.2 A2 and `FUNCTIONAL_SPEC` §21 — caught by `ui-ux-designer` at
+  gate 5, which had already designed desktop-only on the correct reading.
 - **Data**: financial data warehouse, sourced from Oracle ERP Cloud
 - **Write-back**: yes — per-action explicit human approval
 - **Current stage**: gate 1 · Intake
@@ -134,6 +139,83 @@ undecided.
   criterion asserts explanation quality and none may be added**, per
   `INDUSTRY_KB` §15.4 — clearer AI explanations make reviewers defer *more*.
 
+- **2026-07-31 — Gate 5 decisions.** (a) `AC-F41-03` **strengthened** at
+  `ui-ux-designer`'s request, not weakened: the riskiest element must render at
+  the largest type size on the screen, with no other element equal or larger —
+  behavioural, checkable by computed font-size, fixes no pixels. An element can
+  be first and uncollapsed and still visually recessive. (b) **Routing budget
+  accepted**: a per-reviewer-per-night cap requiring a recorded controller
+  override. `AC-F41-09` makes volume *visible* but nothing made it *bounded*;
+  without a cap the 11pm problem is mitigated, not bounded. (c) **Probe reveal
+  timing** routed to `responsible-ai-architect` at gate 6. (d) **Surface header
+  corrected** — see above.
+- **2026-07-31 — Gate 5 closed, `batch_authorized`.** Rendered mockup, 17
+  sections. Central call: **the agent's narrative is collapsed and last**; the
+  riskiest element is first, uncollapsible, largest. The decisive argument was
+  not the deference research but `AC-F12-03` — if the narrative is open by
+  default, "which evidence did the reviewer expand" is a constant carrying zero
+  information. Collapsing it is simultaneously the design decision and the
+  measurement decision.
+  **There is no green anywhere in the product.** Green means "fine, move on" —
+  the exact affect a depleted reviewer must not be handed.
+
+- **2026-07-31 — Gate 6 architect disagreements, resolved by the orchestrator.**
+  1. **Evidence infrastructure: SEPARATE**, `security-architect`'s position over
+     `solution-architect`'s shared cluster. Its argument decides it — the
+     difference is whether one compromised credential reaches both the state and
+     *the evidence of what changed it*. A shared cluster makes the evidence store
+     only as trustworthy as the thing it exists to witness.
+  2. **Suppression-by-injection: jointly owned, boundary stated.** The *emission*
+     constraint is `responsible-ai-architect`'s (RAI-ARCH-1 — negative assurance
+     may never be a model-authored string); the *channel* is
+     `security-architect`'s (T2); the *mechanism* is already
+     `solution-architect`'s closed sum type. The gap was ambiguity, not absence.
+  3. **SA4 accepted** — a platform admin holds no finance capability. A platform
+     admin who can approve a finance action is the ITGC finding.
+  4. **D1 resolved for G-PROBE-3**: probe results render aggregate only, never
+     per-named-user on any management surface. `AC-F12-08` is to be read that
+     way, and gate 4 must say so rather than leave `code-agent` to choose.
+  5. **D3 resolved**: A23–A25 are refusals under **F50**, which already exists as
+     a feature. No breach of the 18-feature ceiling.
+  6. **Personal data in the warehouse: ASSUME YES.** GL data carries employee
+     expense lines, payroll clearing, and supplier detail in free-text
+     descriptions. `solution-architect` asked for this before Code because it
+     means per-column exposure classification in the certified query registry
+     and a filtered resolver catalogue. Assuming *no* and being wrong is a
+     retrofit through the one component the whole no-free-form-SQL guarantee
+     rests on. Recorded as reversible: if the pilot warehouse is confirmed
+     GL-balances-only, the classification can be relaxed.
+- **2026-07-31 — Gate 6 closed, `batch_authorized`.** Three KBs written.
+  Load-bearing calls: the trust boundary is a **process** not a module (a module
+  boundary is bypassed by `import` and by a prompt-injected tool); no free-form
+  SQL by **unroutability** rather than filtering; **no ReAct** because a ReAct
+  loop's defining property is that the agent authors its own next step, which is
+  what the allowlist exists to refuse; blast-radius caps as a **concurrency**
+  property in one `SERIALIZABLE` transaction; and coverage as a **closed sum
+  type** whose no-exceptions constructor is private.
+  `responsible-ai-architect` overturned the promotion gate: **≥95% precision on
+  accepted proposals is inverted** — the labels come from what the human did, so
+  a perfectly rubber-stamping reviewer scores 100% and *the worse the deference,
+  the faster the gate opens*.
+
+- **2026-07-31 — Gate 4 loop-back closed.** 77 new criteria, 1 retired
+  (`AC-F12-08`→`-10`, disambiguating a per-named-user probe score). **261 live.**
+  `functional-design-agent` found a requirement nobody listed — gate 6 §16.3's
+  policy-cold auto-disposal path — and issued `AC-F35-10`…`-13` for it,
+  including third-consecutive-period escalation.
+  **It also refused to issue IDs it could not honestly test**, which is the
+  behaviour this gate exists for: security §10.1 items 7–8 have a falsifying
+  observation seven years out, and it would not write a criterion "a suite could
+  only satisfy by simulating a clock it doesn't control."
+- **2026-07-31 — P1/P5 promotion-gate mechanics deferred to phase 2, with the
+  silent-failure path closed.** Blind re-performance sampling and automatic
+  Tier 2 demotion presuppose F17, which is deferred, so they are out of MVP1
+  scope. What is NOT deferred: `AC-F12-20` forces every precision figure to
+  carry a mandatory **label-source** field (acceptance-derived vs independently
+  re-performed), and `AC-F12-21` forces a readiness report to state P1–P5
+  individually and **never assert readiness on precision alone**. The inverted
+  gate can no longer be used silently, which was the actual risk.
+
 ## Current Status
 
-Gate 5 · Experience Design — designing the natural-language skill interface against 186 acceptance criteria.
+Gate 7 · Code — building MVP1 in staged passes against 261 acceptance criteria.

@@ -4,7 +4,7 @@
   "position": "Deployed",
   "env": "dev, local",
   "last_activity": "2026-07-09",
-  "served_url": "http://127.0.0.1:8030/",
+  "served_url": "http://127.0.0.1:3421/",
   "notes": "Full-SME verification run \u2014 all five SMEs engaged at once.",
   "gates": [
     {

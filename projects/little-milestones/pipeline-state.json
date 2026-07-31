@@ -4,7 +4,7 @@
   "position": "Deployed + post-deploy fixes",
   "env": "dev, local",
   "last_activity": "2026-07-28",
-  "served_url": "http://127.0.0.1:8000/",
+  "served_url": "http://localhost:3000/",
   "notes": "F1-F17 web + F18 native mobile. 499 tests green. Night theme + offline queue outstanding.",
   "gates": [
     {
