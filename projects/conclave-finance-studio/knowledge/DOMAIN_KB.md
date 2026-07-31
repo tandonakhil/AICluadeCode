@@ -703,6 +703,421 @@ not, F20 is an onboarding surface over a working engine.
 
 ---
 
+## 10 · Automatable close activities above the ERP — inventory (2026-07-31)
+
+Written for the post-scope-correction product: agents over **warehouse data
+sourced from Oracle ERP Cloud**, able to **trigger** postings into the ERP but
+owning no ledger function. Replaces §8, which is withdrawn (§10.1).
+
+### 10.1 Withdrawing §8, and what the correction actually invalidated
+
+§8 recommended agent-prepared bank / cash-in-transit reconciliations as the
+first slice. **That recommendation is withdrawn.** It was internally coherent —
+it optimised for the one thing I care most about, machine-checkable ground truth
+at gate 8 — but it optimised for it by proposing to build a matching engine,
+which is Oracle Account Reconciliation Cloud. My own §8 closing warning ("the
+most commoditised activity in this domain… a proving ground, not the product")
+was the tell, and I under-weighted it because the proving-ground argument is
+seductive: it is always possible to justify building the wrong thing by calling
+it a test harness. It is worth recording the error's shape, because it will
+recur: **I let "where can I measure correctness?" silently become "what should
+we build?"** Ground truth is a *filter* on candidate features, not a *generator*
+of them.
+
+Two further consequences the correction forces, which I did not previously state:
+
+- The warehouse position makes the external-statement idea largely moot anyway.
+  Bank and custodian statements do not arrive in an ERP-sourced warehouse; they
+  arrive in a reconciliation tool or a treasury system. §2's top row —
+  "comparison to independent third-party source," the only **hard external**
+  ground truth in the domain — is **structurally out of reach from where this
+  product sits.** Every remaining activity's ground truth is internal,
+  retrospective, or absent. This is the single most important consequence of the
+  scope correction and it constrains gate 8 permanently.
+- §5.7 (warehouse lag) is promoted from a design note to a **first-class product
+  problem**, because the warehouse is now the only data source rather than one
+  of two.
+
+### 10.2 The two axes used below
+
+**Automation band** — deliberately discriminating, because "AI can do this" is
+the least useful sentence in this space:
+
+| Band | Meaning |
+|---|---|
+| **D — deterministic** | Rules, SQL, arithmetic. **No LLM required, and using one is a defect**: it makes a checkable answer unfalsifiable and adds cost, latency and non-determinism to something that had none. |
+| **L — learned / assisted** | Genuine judgment content **and** retrievable labels. The interesting band. An LLM or a classifier earns its place here. |
+| **G — generative narrative** | Output is prose with no ground truth. Assist-only, never autonomous, never a control by itself (§2 bottom row, §9.4). |
+| **H — human only** | Should not be automated at any confidence level. |
+
+**Resolution type** — what "resolve" actually consists of. This matters because
+the human said the system *triggers postings*, and most resolutions are not
+postings:
+
+| Code | Resolution | Ends in an ERP posting? |
+|---|---|---|
+| **R1** | Accepted and explained, with a stated reason **and an expiry date** | No |
+| **R2** | Data-side fix — the warehouse/interface was wrong, the ledger was right | No |
+| **R3** | **Reclassification** — segments change, economics do not | **Yes** |
+| **R4** | **Correcting or accrual journal** — the numbers change | **Yes** |
+| **R5** | Handoff — a task to a named human/function with an owner and a due date | No |
+| **R6** | Control-state change — risk grade raised, auto-pass eligibility revoked (§9.3) | No |
+
+**R2 and R5 are the majority outcome across this inventory, and no competitor
+models them as first-class.** If the architecture treats "posting" as the
+default terminal state of an anomaly, it mis-models the domain and will produce
+a UI in which the safe answer is harder to record than the risky one.
+
+### 10.3 The inventory
+
+Close-day references use §1's sequence.
+
+| # | Activity | Close day | Band | Ground truth | Resolution | Blast radius if wrong |
+|---|---|---|---|---|---|---|
+| **A1** | **Warehouse-to-ERP fidelity** — does the warehouse equal the ledger, by balance, by segment, by period | −5 to 0, continuous | **D** | **Hard (arithmetic)** | R2 | None directly; **total if absent** — every other output is unfalsifiable |
+| **A2** | Feed/interface completeness & staleness — missing batches, partial loads, refresh age vs close clock (§5.7) | continuous | **D** | Hard | R2, R5 | None directly; silent staleness is how a right agent gives a wrong answer |
+| **A3** | Unposted / incomplete accounting — SLA entries left in Draft, unaccounted transactions, untransferred batches (§5.2–5.3) | −2 to 2 | **D** | Hard | R5 | Low; it is a *known* gap, loudly visible at close |
+| **A4** | Duplicate & near-duplicate transactions (AP invoices, journals, payments) | −3 to 2 | D + L (fuzzy) | Partial. Exact = hard; fuzzy = **30–50% false positives** in practice | R5, occasionally R4 | Money: low (0.8–2.0% of disbursements industry-wide). **Attention: high** — the FP rate is the whole story |
+| **A5** | **Expected-entry-missing** — the recurring accrual/allocation/amortisation that runs every month and didn't | 1–3 | **D** | Good (prior-period recurrence is the label) | R5 → R4 | Medium-high. **Omission is a real misstatement and is invisible to every detector that looks at what posted** |
+| **A6** | Subledger-to-GL control account integrity break (AP/AR/FA/INV) | 1–3 | **D** | **Hard (internal objective, §2 row 2)** | R2, R5, R4 | Medium; usually a manual journal booked direct to a control account |
+| **A7** | Intercompany pair matching & elimination-to-zero | 2–4 | D (the number) + L (the cause) | Hard on the imbalance; **none on the cause** | R5, R3, R4 | **High** — consolidation, tax, transfer pricing, statutory accounts |
+| **A8** | Trial-balance roll-forward continuity — opening = prior closing, per account per entity | 1–2 | **D** | **Hard** | R2, R6 | **High** — a break means a closed period moved (§5.1). Almost nobody checks this and it is three lines of SQL |
+| **A9** | FX revaluation / translation / CTA integrity — applied once, at the right rate, to the right accounts | 3–4 | D (arithmetic) + **H** (policy) | Hard on arithmetic, none on policy | R4 | **High**; double-applied revaluation is a classic §6.2 residual source |
+| **A10** | **Suspense / clearing / GR-IR / in-transit residual surveillance** | 2–5 | D (balance) + L (composition) | **None on composition** (§2 row 4) | R1, R3, R4, R5 | **Highest.** This is §6.2's home address |
+| **A11** | **GL coding anomalies** — natural account, cost centre, legal entity/IC segment, and period (see §10.4) | 1–4 | **L** | **Yes — the best in this inventory** (§10.4) | **R3** predominantly | **Varies by segment by two orders of magnitude** (§10.4) |
+| **A12** | Journal-entry risk scoring — manual/top-side, back-dated, round-number, weekend, rare flow, unusual preparer | 1–5 | D + L | **Weak.** No label except the outcome of an investigation that mostly doesn't happen | R5, R6 | Attention only (read-only). But see §10.6 — wrong buyer |
+| **A13** | Accrual completeness / unrecorded-liability search — subsequent disbursements, received-not-invoiced, open PO receipts | 2–4 | D + L | **Good but retrospective** — next period's invoices are the label | **R4** | **High**; completeness errors are the top restatement category (§4) |
+| **A14** | Flux / variance **detection and driver decomposition** — which accounts moved, and which transactions/segments explain the move arithmetically | 4–6 | **D** | Hard for the decomposition; **none for the cause** | R1, R5 | Low (read-only) |
+| **A15** | Flux **narrative drafting** | 5–6 | **G** | **None** | R1 | Low ledger risk, **high representation risk** (§9.4) |
+| **A16** | **Reconciling-item aging, recurrence and forward-disposition testing** (§9.1a) | continuous, cross-period | D + L | **Yes — manufactured by the product itself** | **R6** primarily | This is a *control*; wrong = the control is absent, i.e. §6.2 |
+| **A17** | Close task/checklist orchestration, dependency and critical-path monitoring | all | **D** | Hard | R5 | Low. **Commoditised** — this is FloQast's core product |
+| **A18** | Evidence/support package assembly for a management review control | 4–6 | D (assembly) + G (summary) | None for the summary | R1 | §9.1: assembly raises reviewer *confidence* independently of item *quality* |
+| **A19** | Estimates, reserves, allowances, impairment, valuation | 3–5 | **H** | None in-period | — | Do not automate. Top restatement cause (§4), purest §6.2 mechanism |
+| **A20** | Materiality / SAB 99 / iron-curtain conclusions | 5–6 | **H** | None | — | Do not automate. An agent that concludes "immaterial" has automated the decision that suppresses its own errors |
+| **A21** | Certification and sign-off | 5–6 | **H** | — | — | Do not automate. The signature *is* the control; automating it removes what is being evidenced |
+| **A22** | Contentious cut-off and technical-accounting conclusions | 3–5 | **H** | None | — | Do not automate. May be *supported* by A13/A14 output |
+
+**A19–A22 are load-bearing.** A product that automates A1–A18 and visibly
+*refuses* A19–A22 is a product a controller can take to an audit committee. One
+that quietly extends into them is one the auditor unwinds. The refusal should be
+a stated design property, not an unbuilt backlog item — because "not built yet"
+and "will never be built" are the same screen to a user and opposite answers to
+an auditor.
+
+### 10.4 Coding issues — the human's read is right, and under-scoped
+
+The read ("misclassified GL account / cost centre / entity") is correct. It is
+incomplete in three ways that change the design.
+
+**(a) There are four sub-types, and their blast radii differ by two orders of
+magnitude.** Treating them as one feature is the mistake to avoid:
+
+| Sub-type | Effect | Blast radius |
+|---|---|---|
+| **Cost centre / department** | Management reporting and FP&A only; **no external misstatement** | Low. Internal noise, an angry budget owner, a wrong flux |
+| **Natural account within the same statement caption** (e.g. two opex accounts) | Presentation only | Low |
+| **Natural account across captions** — the **opex/capex** case above all | Changes profit, EBITDA, and the balance sheet | **High.** Restatement-grade, and the classic one |
+| **Legal entity / intercompany segment** | Consolidation, elimination, **tax and transfer pricing**, statutory filings | **High**, and slow to discover |
+| **Period (cut-off)** | Right in every segment, wrong month | **High.** A misstatement even when the coding is otherwise perfect |
+
+I read "coding issues" as including the period dimension. If the human meant
+only the segment dimensions, say so — but cut-off belongs here, because to a
+warehouse detector it is structurally the same query shape (a posting whose
+attributes disagree with its evidence), and it is the sub-type with real
+restatement exposure.
+
+**(b) The ground truth is unusually good, and it is the most valuable asset in
+this whole inventory.** Historical postings are labelled data — but far more
+useful, **subsequent reclassification journals are human-generated labels
+stating "the original coding was wrong,"** with the correct answer attached.
+They are already in the warehouse, they span years, and they were produced by
+the customer's own staff applying the customer's own policy. This means:
+
+- a **gate-8 functional suite with real pass/fail** is achievable here without
+  waiting for production data — backtest against historical reclasses, hold out
+  a period, measure precision and recall against what humans actually corrected;
+- accuracy can be **measured before shipping**, which is true of nothing else in
+  the L band;
+- the measurement is customer-specific, which is a moat of sorts: the labels
+  don't transfer, so neither does a competitor's model.
+
+The caveat, stated because it will otherwise be discovered at gate 8: reclass
+journals are a **biased** label set. They record the errors someone *caught*.
+A detector trained and evaluated only on them will be excellent at finding the
+class of error that gets caught and blind to the class that doesn't — which,
+per §6.2, is exactly the dangerous class. The suite must therefore report recall
+against caught errors *as such*, and must not present it as recall against all
+errors. That distinction has to be in the test-evidence schema, not in a
+footnote.
+
+**(c) Most coding errors originate in the subledger, not the GL** — AP invoice
+coding, expense reports, PO account defaults, item-category derivation. We sit
+above the ERP, so our detection is inherently **retrospective**: we find it
+after it posted. That is a genuine limitation and it is also the positioning.
+Oracle's own Payables Agent codes invoices *pre-post*, one document at a time,
+inside the transaction. We are **the net that catches what it let through** —
+post-hoc, across the whole ledger, across entities and periods, with the
+cross-transaction context a single-document classifier structurally cannot have.
+Those are different jobs, and this one remains ours **even inside an
+all-Oracle estate.** That is the strongest defensible claim in this document
+(§10.6).
+
+### 10.5 "Balancing" — the naive reading is worthless, the real one is unserved
+
+Taken literally, "balancing" means debits = credits. **Oracle will not post an
+unbalanced journal**; it uses balancing segments and suspense to guarantee it.
+A warehouse product that checks debits = credits is checking an invariant the
+ERP already enforces, and will report a permanent, meaningless green. If a
+balancing feature ships in that shape it is worse than nothing: a control that
+can never fail trains its reviewer that the whole dashboard can never fail.
+
+What is genuinely, chronically broken sits at boundaries the ERP does **not**
+police — every one of which is visible from the warehouse and from nowhere else:
+
+1. **A1 — warehouse vs ERP.** Nobody owns this. It is the product's own
+   precondition and it is unsold by every competitor, because they sit on the
+   ERP and don't have the problem.
+2. **A6 — subledger vs GL control account.**
+3. **A7 — intercompany pairs, and eliminations netting to zero.**
+4. **A8 — roll-forward continuity across the period boundary**, which catches
+   retro-postings into a reopened period (§5.1) and warehouse reloads.
+5. **A10 — suspense/clearing residuals**, i.e. balancing that the ERP achieved
+   *by plugging to a clearing account*, which is the ERP working as designed and
+   an accounting problem regardless.
+6. **A9 — FX/CTA**, where "it balances" and "it is right" diverge routinely.
+
+All six are band **D**. **The most reliable component of this product contains
+no AI, and the product should say so out loud rather than hide it** — a
+deterministic integrity layer that is always right is what earns the standing
+to be believed about A11 and A16, which are not.
+
+### 10.6 What IS the product — the plain answer
+
+The orchestrator asked whether anomaly detection over warehouse data is
+differentiated, and against whom. **As a capability, no. It is commoditised,
+and by the worst possible competitor.** Stating it plainly, before the build:
+
+- **Oracle itself.** Fusion Cloud ERP **Release 26B ships a Ledger Agent, GA**:
+  natural-language inquiry over the GL, configurable monitoring prompts that
+  continuously scan for accounting exceptions, unapproved manual journals and
+  revenue anomalies, with AI-generated insights correlated across ledger and
+  subledger — plus Payables, Expenses and Payments agents alongside it. That is
+  a substantial overlap with **both** parts of the stated direction: anomaly
+  detection *and* a natural-language interface. It is in the bundle, it is
+  pre-integrated, it reads live ledger data rather than a stale warehouse, and
+  it is shipped by the vendor whose data access we depend on. A competitor who
+  is free, has no latency problem, and can change our integration surface is the
+  worst competitive position there is.
+- **BlackLine** — Agentic Financial Operations (Apr 2026), "glass box"
+  governance positioning, matching/anomaly/narrative agents, WiseLayer acquired
+  Dec 2025 for exactly this.
+- **The funded startups** — Numeric ($89M total, shipping flux and cash-rec
+  products), Nominal ($20M, continuous GL monitoring rather than month-end),
+  Basis ($100M at $1.15B, Feb 2026). All are building "AI agents detect
+  anomalies in your close."
+- **MindBridge** — 30+ algorithms risk-scoring **100% of GL entries**. Note
+  this one is *not* actually a competitor: different buyer (internal/external
+  audit, not the controller's close team) and different moment (assurance, not
+  close execution). Anyone who cites MindBridge as the competitive threat has
+  misread the market; anyone who builds A12 (JE risk scoring) as a headline
+  feature is walking into their product with their buyer.
+
+**So: if the pitch is "we use AI to detect anomalies in your GL," this project
+loses, and it loses to a checkbox in the customer's existing Oracle
+subscription.** That has to be said now, and the build has to be aimed
+somewhere else.
+
+Three things are genuinely open. Only one of them is a technology claim.
+
+**(1) Resolution, not detection — and this is the real one.** Every competitor
+above terminates at a scored, flagged item in a queue. The unserved work is the
+loop: flagged → diagnosed → resolution *typed* (R1–R6) → evidenced →
+**verified against its own prediction next period**. Oracle's Ledger Agent
+surfaces and explains; it does not carry an item through a governed disposition
+with a versioned agent identity, an evidence dossier and a forward-disposition
+test. **This is exactly the spine that survived the scope correction** — F1–F5
+(dossier, version registry, threshold policy, extract provenance, agent
+identity/lineage), F12, F13. That is not a coincidence and it should be read as
+confirmation: the surviving features are the product, and the deleted ones were
+the commodity.
+
+**(2) The cross-period control (A16 / §6.2 / §9.1a).** Nobody sells the
+mechanism that catches the self-justifying explanation, because everyone is
+selling *in-period* detection and this failure is invisible in-period by
+construction. It is architecturally cheap, it is the only control that addresses
+the worst harm this system can cause, and it is the only feature here that a
+customer is **safer for having bought** — which is a different, better sales
+conversation than "close faster," and it reaches the controller at the
+audit-committee-visible moments §7.3 identifies as the only real buying
+triggers.
+
+**(3) The warehouse position — an asset only under a condition, and the
+condition must be checked.** Sitting above the ERP is a *liability* for
+detection: stale by the refresh interval (§5.7), one hop from the truth, no
+external statements (§10.1). It is an asset for exactly two things: scope no
+single ERP module sees (cross-entity, cross-period, cross-system, plus non-ERP
+data — procurement, contracts, HR, operational volumes — that the Ledger Agent
+cannot reach), and a heterogeneous or post-acquisition estate.
+
+**The targeting instruction that follows, and it is a real one:** if the target
+customer is a single-instance, all-Oracle shop with an ERP-only warehouse,
+**Oracle's own Ledger Agent wins and this product is a worse-positioned copy.**
+The product needs one of: multiple ERPs / a post-acquisition estate; or
+non-ERP data in the warehouse that materially improves detection; or the
+resolution-and-cross-period-control claim (1)+(2) carrying the whole value
+proposition on its own. (1)+(2) *can* carry it — plus A11(c), the post-hoc
+coding net, which survives even in an all-Oracle estate. But that is a narrower
+and more specific product than "an agentic close platform," and the build should
+be aimed at it deliberately rather than arriving there by attrition.
+
+**Verdict on Part 2 as a differentiator.** "Select datasets and ask an agent in
+natural language" is, on its own, a re-implementation of a bundled Oracle
+feature on staler data. The differentiated version is not the natural language —
+it is that the thing invoked is a **governed, versioned skill**: a
+change-managed control object (§7.1) with a declared dataset scope, a declared
+resolution type, a threshold policy someone approved cold (§7.2), and an
+evidence dossier as its output. **The interface is natural language; the product
+is the governance of what the language invokes.** If those are confused, this
+ships as chat-over-a-warehouse and loses.
+
+### 10.7 MVP1 — the call
+
+Re-derived, not reused. Criteria, in priority order: (i) can gate 8 produce real
+pass/fail; (ii) is it unserved by Oracle 26B / BlackLine / Numeric; (iii) blast
+radius; (iv) does it *generate the labels* that make later features possible;
+(v) does it exercise the surviving spine.
+
+**Build MVP1 as a "Close Integrity & Coding" agent set** — four things:
+
+1. **Deterministic integrity layer — A1, A6, A8, plus A2 staleness** (band D).
+   Rank 1 despite containing no AI. Hard ground truth, zero blast radius, three
+   of the four are unserved by everyone, and A1 is the **precondition for
+   believing any other number the product emits.** Ship it first because it is
+   the credibility floor, and be explicit internally that it is not the
+   differentiator.
+2. **A11 coding-anomaly detection, backtested against historical reclass
+   journals** (band L). The MVP1 headline. It is the only feature in the
+   inventory whose accuracy can be *measured before shipping* (§10.4b), its
+   resolution is R3 — the safest posting that exists — its volume makes value
+   visible in month 1, and per §10.4c it holds up even against Oracle's own
+   Payables Agent. **Scope it to cost-centre and within-caption natural-account
+   reclasses inside a single legal entity and period for MVP1.** Explicitly
+   *exclude* legal-entity/IC reclasses (tax and transfer-pricing consequences,
+   §10.4a) and opex/capex (restatement-grade) until precision is measured, and
+   detect-only on cut-off.
+3. **A16 forward-disposition and recurrence surveillance.** Cheap, cross-period,
+   unbuilt by anyone, and it is the §6.2 control. **Its input must be recorded
+   from period 1 or it cannot exist later** — an expected clearing period on
+   every disposition, tested next period against reality (§9.1a). This is the
+   single most retrofit-hostile item in the whole backlog.
+4. **F12, promoted from telemetry to a first-class MVP1 feature.** Disposition
+   capture — for every flagged item, what a human actually did with it (R1–R6),
+   how long they spent, what evidence they expanded. **This is the ground-truth
+   factory for the entire product.** Anomaly detection has no ground truth for
+   "is this an anomaly"; it has ground truth for "was it acted on," and that
+   label exists only if the product manufactures it. Ship without this and
+   every later accuracy claim, and every later gate-8 suite for A5/A7/A10/A13,
+   is unfalsifiable.
+
+**Write scope for MVP1.** MVP1 produces a **fully-formed reclass journal in
+Oracle's Journal Import shape, exported for human posting — it does not post.**
+Not because writing is wrong (the human is explicit that we trigger postings)
+but because of the §6.4 wholesale property: an agent with a wrong mapping does
+not err once, it errs 400 times in ninety seconds through exactly this path.
+**Concrete promotion gate, so this is a step and not a hedge:** enable direct
+triggering of R3 postings once F12 has one full closed period of measured
+disposition data showing ≥95% precision on accepted reclass proposals, with a
+per-batch line cap and a batch-level (not line-level) approval — §7.2's
+attention-budget argument says 400 individual approvals is not a control.
+
+**Deferred, with reasons — MVP2 candidates in order:** A5 (expected-entry-
+missing; deterministic and genuinely unserved, deferred only because A1/A8 must
+be trustworthy first), A13 (accrual completeness; high value, high blast radius,
+R4), A7 (intercompany; high value but its *cause* diagnosis has no ground
+truth), A14 flux **detection only**, A10 surveillance once F12 has labels.
+
+**Not in MVP1, and I will argue this at gate 3:**
+
+- **A12 journal-entry risk scoring.** Commoditised by MindBridge and aimed at
+  the wrong buyer. It also has the weakest ground truth in the L band.
+- **A4 duplicate detection.** Owned by the ERP, the recovery-audit industry and
+  every AP vendor; and a **30–50% false-positive rate** spends the attention
+  budget (§7.2) on the least differentiated feature we could ship.
+- **A17 close task orchestration.** FloQast's core product. Building it is
+  choosing a fight over the one part of close that is already solved.
+- **A15 flux narrative.** §9.4 stands unchanged; the scope correction does not
+  touch it. It remains the second-most-dangerous item on any list it appears on.
+- **A19–A22.** Never, and visibly never (§10.3).
+- **Free-form NL-to-SQL over arbitrary datasets.** See §10.8.
+
+### 10.8 Part 2 — the guardrail finding, which is new and specific
+
+Part 2 introduces a failure mode none of §6–§9 covers, and it is the largest
+single risk in the new direction.
+
+**A wrong query returns a plausible number, silently.** Enterprise text-to-SQL
+does not work well enough to be a control input: frontier models score
+**17–21% on Spider 2.0** (real enterprise schemas) against ~91% on the academic
+benchmark, and unmodelled text-to-SQL sits around **64.5%** even on friendlier
+harnesses. A financial data warehouse is the hard case — hundreds of tables,
+segment hierarchies, effective-dated dimensions, multiple ledgers and currencies,
+and joins whose correctness is a *policy* question ("which entities consolidate
+into this node?") rather than a schema question.
+
+The domain-specific severity: **a finance user cannot distinguish a wrong join
+from a right one by looking at the answer.** A number that is 4% wrong because a
+join dropped an entity looks exactly like a number that is right. There is no
+syntax error, no null, no crash. This is §6.1's mechanism — right most of the
+time, therefore trusted — applied to the data layer instead of the reasoning
+layer, and it is *worse* there, because a wrong narrative can at least be argued
+with and a wrong number cannot.
+
+Three guardrails, all architectural, all cheap now and none retrofittable:
+
+1. **No free-form SQL in MVP1.** Datasets are exposed through a **semantic /
+   certified-metric layer** with pre-defined, versioned joins and measures.
+   Natural language selects and parameterises a certified query; it does not
+   author one. This is the documented remedy and it is the difference between a
+   demo and a control input.
+2. **"Select one or more datasets" is a materiality decision, not a UI
+   affordance.** Which datasets a skill may see determines what it can conclude
+   and what it will silently miss. **Dataset scope must be part of the versioned
+   skill definition** (§7.1: agent definitions are change-managed objects) and
+   recorded in the F1 dossier for every run — because the same skill over a
+   different dataset selection is a different control, and an auditor sampling
+   one has not tested the other. Letting the user pick the scope at run time,
+   ad hoc, un-versioned, destroys that.
+3. **Every emitted number carries its provenance and its extract timestamp**
+   (F4, F5) **and its staleness relative to the close clock** (§5.7, A2). A
+   number whose warehouse snapshot predates a posting the user made an hour ago
+   must say so on its face. Not in a tooltip.
+
+And the one that follows from §7.1 directly: **a skill that can trigger a
+posting must be authored, versioned and approved by someone other than whoever
+invokes it.** Part 2's "ask an agent to take an action or automate it" is a
+builder surface by another name. Under guardrails, yes — but the guardrail that
+matters is author ≠ approver ≠ invoker, and it does not exist yet.
+
+### 10.9 What I would push back on, plainly
+
+Nothing in the corrected direction is wrong, and the correction itself improved
+the project — it deleted four features I should have argued harder against. The
+three things I would still change:
+
+1. **Aim the product at resolution and cross-period control explicitly, in
+   writing, at gate 3.** If it is positioned as anomaly detection, it competes
+   with a bundled Oracle feature on staler data and loses. This is the same
+   error §8 made in a different costume, and it is easy to make twice.
+2. **Check the targeting condition in §10.6(3) with the human.** Single-instance
+   all-Oracle, ERP-only warehouse is a materially weaker case than a
+   heterogeneous estate. It is a two-minute question and it changes the roadmap.
+3. **F12 is not telemetry.** It is the mechanism that makes every accuracy claim
+   in this product falsifiable. Shipped late, the first year of production
+   generates no labels and gate 8 for every MVP2 feature has nothing to test
+   against.
+
+---
+
 ## Sources
 
 - [Month-End Close in Oracle Cloud ERP — Traust](https://traust.com/blog/month-end-close-in-oracle-cloud-erp/)
@@ -728,3 +1143,33 @@ not, F20 is an onboarding surface over a working engine.
 - [8 best BlackLine alternatives in 2026: operating model comparison — Maxima](https://www.maxima.ai/articles/8-best-blackline-alternatives-in-2026-operating-model-comparison)
 - [What AI Audit Controls Actually Look Like — FloQast](https://www.floqast.com/blog/what-ai-audit-controls-actually-look-like)
 - [AI Audit Trail Requirements: 2026 Checklist — Kognitos](https://www.kognitos.com/blog/ai-audit-trail-requirements-2026-checklist/)
+
+**Added for §10 (2026-07-31)**
+
+- [Ledger Agent for Agentic AI-Powered General Ledger Experience — Oracle Fusion Financials 26B readiness](https://docs.oracle.com/en/cloud/saas/readiness/erp/26b/fins26b/26B-fin-wn-f43814.htm)
+- [Agentic AI in ERP — four agents you can use today — Oracle Fusion Insider](https://blogs.oracle.com/fusioninsider/agentic-ai-in-erp-four-agents-you-can-use-today)
+- [Oracle Advances Enterprise AI with New Agents Across Fusion Applications (Oct 2025)](https://www.oracle.com/news/announcement/ai-world-oracle-advances-enterprise-ai-with-new-agents-across-fusion-applications-2025-10-15/)
+- [Oracle Fusion Cloud Financials Release 26B — AI Agents Take the Helm — Kyte Consulting](https://www.kyteconsulting.com.au/insights/oracle-fusion-cloud-financials-release-26b-ai-agents-take-the-helm)
+- [About IPM Insights — Oracle EPM docs](https://docs.oracle.com/en/cloud/saas/freeform/ffuuu/insights_about.html)
+- [MindBridge General Ledger Analytics](https://www.mindbridge.ai/general-ledger-analytics/)
+- [MindBridge for Journal Entry Testing (memo, PDF)](https://www.mindbridge.ai/docs/library/MindBridge_for_Journal_Entry_Testing_Memo.pdf)
+- [MindBridge score — support documentation](https://support.mindbridge.ai/hc/en-us/articles/360055739874-MindBridge-score)
+- [AI Accounting Platform Numeric Raises $51M Series B — CPA Practice Advisor](https://www.cpapracticeadvisor.com/2025/11/20/ai-accounting-platform-numeric-raises-51m-series-b/173638/)
+- [Nominal Raises $20M to Scale AI Finance Automation](https://www.nominal.so/press-room/nominal-raise-announcement)
+- [Basis AI $100M Series B at $1.15B — Digital Applied](https://www.digitalapplied.com/blog/basis-ai-100m-agentic-accounting-tax-audit-guide)
+- [AI Agents for Month-End Close Automation: Use Cases, Benefits, and Control Considerations — CFI](https://corporatefinanceinstitute.com/resources/artificial-intelligence-ai/ai-agents-for-month-end-close-automation/)
+- [Building AI agent workflows for month-end close — Puzzle](https://puzzle.io/blog/ai-agents-month-end-close-guide)
+- [Automated Flux/Variance Analysis — FloQast](https://www.floqast.com/integrated-record-to-report/products/variance-analysis)
+- [Flux Analysis — Numeric](https://www.numeric.io/solutions/variance-analysis-software)
+- [Invoice Coding Automation: GL Assignment Without Manual Entry (2026) — Kognitos](https://www.kognitos.com/blog/invoice-coding-automation-gl-assignment-without-manual-entry-2026/)
+- [The 7 Places Generative AI Quietly Fails in Accounts Payable — Kognitos](https://www.kognitos.com/blog/generative-ai-fails-accounts-payable-pilot/)
+- [How AI Learns From Your General Ledger and Historical Data — Vic.ai](https://www.vic.ai/blog/how-ai-learns-from-your-general-ledger-and-historical-data)
+- [Automating GL code assignment for non-PO-backed invoices — AppZen](https://www.appzen.com/blog/your-ai-oxygen-mask-automate-general-ledger-codes-non-po-invoices)
+- [Duplicate Payment Detection: How Automation Catches What Your ERP Misses — Corpay](https://www.corpay.com/resources/blog/duplicate-payment-detection)
+- [Duplicate Payment Recovery Audit 2026 — Auditec Solutions](https://auditecsolutions.com/duplicate-payment-recovery-audit/)
+- [What is the search for unrecorded liabilities — Stampli](https://www.stampli.com/resources/unrecorded-liabilities/)
+- [How auto-reversing accruals work / keeping accruals audit-ready — Stampli](https://www.stampli.com/resources/accrual-reversal-accuracy-audit/)
+- [BEAVER: An Enterprise Benchmark for Text-to-SQL (arXiv 2409.02038)](https://arxiv.org/html/2409.02038v3)
+- [Semantic Layer vs. Text-to-SQL: 2026 Benchmark Update — dbt Developer Blog](https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026)
+- [Text-to-SQL for Enterprise: Metric Drift and Context Layer (2026) — Atlan](https://atlan.com/know/ai-agent/data-for-ai/text-to-sql-for-enterprise/)
+- [Semantic Layers for Reliable LLM-Powered Data Analytics (arXiv 2604.25149)](https://arxiv.org/pdf/2604.25149)

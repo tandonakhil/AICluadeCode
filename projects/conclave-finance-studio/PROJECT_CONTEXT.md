@@ -83,6 +83,35 @@ undecided.
   **not** `approved` — the human authorized the run, not each gate. Every
   assumption lands in this log so it is reviewable after the fact.
 
+- **2026-07-31 — MVP1 SCOPED TO ERP DATA ONLY (human).** Both SMEs independently
+  escalated the same undecidable: does the pilot warehouse carry non-Oracle
+  sources? Human's answer: **start narrow, ERP-only for MVP1; additional sources
+  are future phases.**
+
+  **Why this is viable despite both SMEs warning that single-source Oracle means
+  "Oracle's Ledger Agent wins and we are a worse-positioned copy":** the three
+  differentiators they identified do not depend on source count.
+  1. **Omission detection** — "the product detects what did not happen". The
+     evidence of an absence is *not in the ledger*, so a ledger-resident agent
+     cannot see it however many systems feed that ledger. Needs a multi-period
+     expectation model, which ERP history alone supplies.
+  2. **Resolution typing + evidence spine** — R1–R6 resolution model, forward
+     disposition, dossier. Source-independent.
+  3. **Cross-period surveillance** (`DOMAIN_KB` §6.2) — invisible in-period by
+     construction, which is why no incumbent sells it. Source-independent.
+  Plus `DOMAIN_KB` §10.4c: most coding errors originate in the subledger, where
+  Oracle's Payables Agent codes pre-post one document at a time — **we are the
+  net that catches what it let through**, post-hoc and ledger-wide. Explicitly
+  survives an all-Oracle estate.
+
+  **Deferred to phase 2, not abandoned**: the cross-system seam as a headline,
+  cross-source omission detection, and warehouse-vs-ERP fidelity as a
+  *differentiator* (it stays in MVP1 as an integrity check, per `DOMAIN_KB`
+  §10.5 — it is the credibility floor, not the wedge).
+
+  **Standing instruction**: continue making assumptions, take SME judgement, and
+  loop to MVP1 without returning for per-gate approval.
+
 ## Current Status
 
 Gate 3 · Plan & Backlog — re-cutting after the scope correction. SMEs researching Part 1 (automatable close activities) and the guardrail model.
