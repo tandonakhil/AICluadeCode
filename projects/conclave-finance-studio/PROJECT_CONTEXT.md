@@ -392,6 +392,44 @@ undecided.
      read form fields, because a click on a submit button arrived as an empty
      submission. Every earlier UX POST scenario was weaker than it read.
 
+- **2026-07-31 — Gate 7 pass 4d, LOOP-BACK FROM GATE 8: four evidence-honesty
+  fixes. Judgement calls by `code-agent`.** The brief was explicit that several
+  of these would make a passing suite *report less*, and that is what happened.
+  No scenario was made to pass by weakening what it asserts; three now assert
+  strictly more, and one criterion ID left the suite entirely.
+  1. **A red-team suite must show its own boundary.** The A20 evasion found by
+     probing the broker at gate 8 (evasive prose + `treatment` +
+     *substantiated* ground → `allow`) is now a red-team scenario that asserts
+     it **reaches a surface**, rather than a unit test no red-team reader
+     looks at. It was NOT closed by extending the shape matcher: `RESPONSIBLE
+     _AI_KB` §4.1 rules that out as an arms race against paraphrase, and the
+     structural leg — which holds absolutely wherever a disposition carries a
+     size-shaped ground — is the real control and is asserted unchanged
+     alongside it. The eight `..._however_phrased` names were renamed: *however
+     phrased* is an exhaustiveness claim over English that a shape matcher
+     cannot support.
+  2. **`AC-F1-08` now appears in no test file.** The scenario carrying that ID
+     read a retention date out of a row it had written seconds earlier. It was
+     renamed and rescoped to what it tests, with the criterion's unsatisfied
+     status stated in its first docstring line, because gate 9 joins IDs to
+     criteria mechanically. The functional suite reports one criterion fewer
+     than it did before, which is the accurate number.
+  3. **A suite may start a child process it owns; it may not start a server.**
+     The two-process topology had no executing witness, and both suites that
+     appeared to cover it would have passed with the boundary gone. The new
+     `ARCH-04` runtime scenarios start `ges/run.py` on an ephemeral port, drive
+     a decision over a real socket, and reap the child in a `finally`. The
+     distinction relied on: a *server* outlives the run and belongs to
+     `deploy-agent`; this child exists for one test and is killed if it does
+     not terminate. It fails loudly rather than skipping when GES does not
+     bind. **Register 19 stays open** — no suite in one interpreter can witness
+     that an api module cannot `import ges.executor`.
+  4. **A persona is asserted before anything that depends on it.** The persona
+     switch is the only body-bearing POST the `ux` suite makes, so its silent
+     failure was invisible. `_as_controller` now asserts the switch took
+     effect, which makes the whole controller class sensitive to it rather than
+     only the scenarios that happened to read `aria-current`.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
@@ -448,6 +486,14 @@ Import file with our identifiers in `REFERENCE21`–`25`; the CUEC register;
 `AC-F38-10`'s exploration tier with the marker rendered by the page shell; and
 the six remaining screens — **Dispositions, Catalogue, Monitors, Inventory,
 Audit, Refusals**. The `industry` suite executes for the first time.
+
+**Pass 4d — the gate-8 loop-back, four evidence-honesty fixes** (see the
+Decisions Log entry of the same date). Suite counts after it: **functional 21
+(unchanged, one criterion ID removed), architecture 23 (+2), red-team 41 (+1),
+ux 186 (unchanged, two scenarios strengthened)** — 1,525 collected in total
+against 1,522 before, **+3 added, 0 removed, 4 renamed or rescoped**. Every
+suite still exits 0. The point of the pass was that three of those scenarios
+now assert *more* and one criterion is now claimed by *nothing*.
 
 **Not built and absent rather than stubbed**: point-of-action revalidation, the
 close clock (`AC-F38-11`), the F12 probe-injection programme (`AC-F41-08`), nine
@@ -506,9 +552,19 @@ finding of the run rather than the counts. Full evidence:
    clock. Register entries 4 and 20 say the seven-year obligation is unmet and
    that `AC-F1-08`'s oldest-end retrieval has no object store. **A reader
    mapping suite IDs to criteria will mark `AC-F1-08` satisfied. It is not.**
+   *(Fixed at pass 4d: renamed to
+   `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`
+   and rescoped to what it tests — a round trip plus the presence of a
+   retention stamp, asserted alongside `StubObjectLockArchive.has_retention_lock
+   is False` so it cannot be misread as retention being in force. The string
+   `AC-F1-08` no longer appears in any test file.)*
 2. **A20 is reported more strongly than register 9 permits.** Eight of nine
    red-team RT-05 scenarios are named
    `…a_materiality_conclusion_never_reaches_a_surface_however_phrased`.
+   *(Fixed at pass 4d: renamed to
+   `…each_paraphrase_in_this_fixed_battery_of_eight_is_refused_at_the_broker`,
+   and the evasion now has its own red-team scenario asserting it reaches a
+   surface. Register 9 carries the exact shape.)*
    *However phrased* is exactly what register 9 denies. Probing the broker
    directly found a **working evasion the suite has no scenario for**: evasive
    prose + a `treatment` claim + a *substantiated* ground returns `allow`. The
@@ -607,7 +663,7 @@ suites execute.
 
 | # | Spec | Built instead | Unmet criterion / consequence |
 |---|---|---|---|
-| 9 | `RESPONSIBLE_AI_KB` §4.1 — A20 enforced on the speech act, "not by a keyword list" | a **structural leg** over fields (absolute for any emission carrying a disposition) plus a **prose leg** that is a shape matcher over English | the prose leg **is evadable and a test demonstrates a paraphrase that evades it**. A20 holds absolutely where a disposition exists and heuristically in free prose. Closing this needs the F39 NL surface plus a model call site, neither of which exists |
+| 9 | `RESPONSIBLE_AI_KB` §4.1 — A20 enforced on the speech act, "not by a keyword list" | a **structural leg** over fields (absolute for any emission carrying a disposition on a size-shaped ground) plus a **prose leg** that is a shape matcher over English | the prose leg **is evadable and a test demonstrates a paraphrase that evades it**. A20 holds absolutely where a disposition carries a size-shaped ground, and heuristically in free prose. **Updated at pass 4d with the evasion's exact shape**, found by probing the broker at gate 8: `text` = prose the shape matcher does not recognise, `claim_type="treatment"` (a disposition IS made), `treatment_ground_kind="offsetting_entry_identified"` (a *substantiated* ground, so the structural leg — which fires only on size-shaped grounds — never reaches it) → `outcome="allow"`, `reason=None`. Change that one field to `"magnitude"` and it abstains. This is now a **red-team scenario asserting the pass-through**, `test_RT05_this_paraphrase_evades_A20_entirely_and_reaches_a_surface`, not only a unit test. Closing this needs the F39 NL surface plus a model call site, neither of which exists; it is explicitly **not** closed by extending the shape matcher (§4.1 rules that out as an arms race against paraphrase) |
 | 10 | `AC-F35-11` — auto-disposed finding visible on the Exceptions screen, dossier reachable | `Outcome.as_exception_row()`, carrying the marker, the disposing rule and the bundle hash | **`AC-F35-11` NOT satisfied** — observable-UI, no UI |
 | 11 | `AC-F12-20`'s "read on screen, in a dossier and in an export" | one renderer, three surfaces, label source in the same payload | the *renderers* are built and tested; **no screen and no export file exists to read them on** |
 | 12 | `AC-F12-19` — retrospective abstention-warranted labels | nothing | **not built.** The store now distinguishes `abstain` from `deny`, so the read this criterion needs is possible; the label itself is not written |
@@ -664,7 +720,7 @@ its guarantee and its one-host bound.
 
 | # | Spec | Built instead | Unmet criterion / consequence |
 |---|---|---|---|
-| 19 | `ARCHITECTURE_KB` §3.2 — the trust boundary is a PROCESS boundary | **two transports.** `loopback` (stdlib HTTP to the GES port) is the default and the deployment configuration. `in-process`, installed only by `backend/pilot_transport.py`, puts the broker inside the api process so the pilot is operable from one command and the `ux` suite can drive a real approval without a server it is forbidden to start | **With the pilot transport running the boundary is a module boundary**: a prompt-injected tool in the api process could reach `ges.executor` by `import` alone. It is refused under `CONCLAVE_ENV=production`, it is one named file outside the `app` package, and the interface cannot tell the two transports apart — but **nothing in the `ux` suite exercises the loopback transport**, and `backend/pilot.py` is a configuration a reader could mistake for the deployment. Both say so in their own first paragraph |
-| 20 | `ARCHITECTURE_KB` §3.1 — Journal Import files in an object store | the produced file is held **in memory** for the life of the api process; the workflow store records its group id, content hash and line count | the artefact's *record* survives a restart; **the bytes do not**. A file downloaded before a restart and one downloaded after are not both available, and `AC-F1-08`'s oldest-end retrieval has no object store to retrieve from |
+| 19 | `ARCHITECTURE_KB` §3.2 — the trust boundary is a PROCESS boundary | **two transports.** `loopback` (stdlib HTTP to the GES port) is the default and the deployment configuration. `in-process`, installed only by `backend/pilot_transport.py`, puts the broker inside the api process so the pilot is operable from one command and the `ux` suite can drive a real approval without a server it is forbidden to start | **With the pilot transport running the boundary is a module boundary**: a prompt-injected tool in the api process could reach `ges.executor` by `import` alone. It is refused under `CONCLAVE_ENV=production`, it is one named file outside the `app` package, and the interface cannot tell the two transports apart — but **nothing in the `ux` suite exercises the loopback transport**, and `backend/pilot.py` is a configuration a reader could mistake for the deployment. Both say so in their own first paragraph. **NARROWED, NOT CLOSED, at pass 4d.** Gate 8 established that the architecture suite's only boundary check (a static regex over `backend/app/`) and the security suite's three subprocess scenarios (which test the *credential* boundary, and which `pilot_transport` never triggers because it deliberately does not set `CONCLAVE_PROCESS_ROLE`) **would both have passed with the boundary gone entirely**. The deployment topology now has one executing witness: `test_ARCH_04_the_deployment_topology_is_two_processes_talking_over_a_socket` starts `ges/run.py` as a real child process on an ephemeral port, asserts it is a different pid holding the credential while the test process (role `api`) is refused that credential, and drives a real broker decision through `LoopbackHttp` — stdlib HTTP over a TCP socket, no `TestClient` — plus a companion asserting an untokened caller gets 401 across that socket. The fixture reaps the child in a `finally` and **fails loudly rather than skipping** if GES does not bind. **THE RESIDUAL THAT KEEPS THIS OPEN:** no suite can witness that an api-process module cannot `import ges.executor`, because a suite runs in one interpreter with both packages on one `sys.path`. That property is still held only by the static check and by the fact that a deployed api process does not have the `ges` package on disk. For `solution-architect` at gate 10 |
+| 20 | `ARCHITECTURE_KB` §3.1 — Journal Import files in an object store | the produced file is held **in memory** for the life of the api process; the workflow store records its group id, content hash and line count | the artefact's *record* survives a restart; **the bytes do not**. A file downloaded before a restart and one downloaded after are not both available, and `AC-F1-08`'s oldest-end retrieval has no object store to retrieve from. **Pass 4d:** the functional suite no longer names `AC-F1-08` anywhere — the scenario that did was rescoped to `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`, whose docstring states the criterion is unsatisfied and why. **`AC-F1-08` is now covered by no suite**, which is the accurate reading |
 | 21 | `AC-F40-05`'s CUEC verification against a real Oracle tenant | an in-memory register whose default state is `never_verified` for every item, verified by `pilot.py` with a synthetic attestation | the **refusal** is real and tested (a fresh register exports nothing, and `expired` and `failed` are distinguished from `never_verified`); the **verification** in this build attests nothing, because there is no tenant to read. `deploy-agent` owns the real one |
 | 22 | `AC-F12-19`'s label set as the input to an accuracy claim | the label is written at disposition time and rendered on Monitors as counts | the labels are real, but the pilot has **one abstained item**, so the label set is too small to compute anything from. This is a data-volume bound, not a build gap, and it is stated because a screen showing "1 warranted" invites a conclusion the sample cannot support |
