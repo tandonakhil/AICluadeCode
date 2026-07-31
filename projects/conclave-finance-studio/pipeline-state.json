@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 9 \u2014 Verification",
+  "position": "Gate 7 \u2014 Code (loop-back from Verification)",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -107,8 +107,8 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "done",
-      "approval": "batch_authorized",
+      "status": "active",
+      "approval": "pending",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
@@ -118,23 +118,24 @@
     {
       "n": 8,
       "name": "Test",
-      "status": "done",
-      "approval": "batch_authorized",
+      "status": "pending",
+      "approval": "pending",
       "date": "2026-07-31",
       "participants": [
         "test-agent"
       ],
-      "note": "All 8 suites EXECUTED, 0 failures. Loop-back resolved: the A20 case-A evasion now has a red-team scenario asserting it REACHES a surface; 8 overclaiming names rescoped; AC-F1-08 claimed by nothing; the two-process topology has a real child-process witness; persona-dependent UX scenarios now fail when the persona switch fails."
+      "note": "Must re-run: evidence corpus is one code pass stale."
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "active",
-      "approval": "pending",
+      "status": "looped",
+      "approval": "request_changes",
       "date": "2026-07-31",
       "participants": [
         "verification-agent"
-      ]
+      ],
+      "note": "BLOCKED. 262 live criteria (spec says 261 -- arithmetic error, 186+77=263-1=262). 142 VERIFIED, 3 CONTRADICTED, 117 NOT VERIFIED of which 94 are in approved MVP1 scope and unevidenced. Four detector families never built: F26, F28, F9, F33 = 39 criteria. Evidence corpus predates the gate-8 loop-back."
     },
     {
       "n": 10,
@@ -180,6 +181,13 @@
       "date": "2026-07-31",
       "resolved": true,
       "reason": "Gate 8 found green scenarios asserting what the register says is false: AC-F1-08 satisfied by a self-written date, and 8 red-team scenarios named '...never reaches a surface however phrased' while a working evasion (evasive prose + treatment + substantiated ground) reaches a surface untested."
+    },
+    {
+      "from_gate": 9,
+      "to_gate": 7,
+      "date": "2026-07-31",
+      "resolved": false,
+      "reason": "94 in-scope criteria unevidenced, dominated by four detector families never built (F26 10, F28 10, F9 8, F33 11). Plus 3 contradictions where a green check claims more than the register permits."
     }
   ]
 }
