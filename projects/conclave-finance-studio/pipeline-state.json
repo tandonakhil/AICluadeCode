@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 7 \u2014 Code, pass 2 of a staged build",
+  "position": "Gate 8 \u2014 Test",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -107,19 +107,23 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
       ],
-      "note": "Pass 1 of a staged build: 6 commits, 300 unit tests + 71 suite scenarios green, 4 suites executing / 2 honestly empty (exit 3). ~30 AC IDs satisfied of 261. Eight architecture substitutions recorded in the deferred-substitution register; items 3 and 4 leave compliance obligations open."
+      "note": "4 passes, 28 commits. 1,217 unit tests + 305 suite scenarios green; all six SME suites executing. Pilot runs end to end: ask, refusal from GES, review, disposition the server refuses without a clearing period, two-authoriser override, balanced Journal Import export. 22 register entries; 3 closed, several narrowed. Trust boundary weakened to a module boundary in the pilot transport (entry 19) -- flagged for security-architect."
     },
     {
       "n": 8,
       "name": "Test",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-07-31",
+      "participants": [
+        "test-agent"
+      ]
     },
     {
       "n": 9,

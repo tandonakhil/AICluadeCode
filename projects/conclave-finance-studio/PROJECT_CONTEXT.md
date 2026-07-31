@@ -336,13 +336,70 @@ undecided.
      reader never meets the difference between "we looked and it failed" and
      "we have not looked long enough".
 
+- **2026-07-31 — Gate 7 Code pass 4 (MVP1 end to end): judgement calls made by
+  `code-agent`.**
+  1. **Overridability became a bundle field, and an identity rule may not
+     declare itself overridable at all — the compiler refuses the bundle that
+     tries.** Building `AC-F36-18`'s override control exposed that no notion of
+     "override-eligible" existed: every rule denial was overridable, so the
+     authorship closure was waivable by anyone holding a reason code. Value
+     ceilings and blast-radius caps are eligible; an *unevaluable* check is not,
+     because nobody knows what they would be waiving. A new rule
+     `quant.approval_value_ceiling` governs the human approving, distinct from
+     the ceiling on the agent proposing, and it made `Approvable.abs_value` a
+     constructor requirement: a limit cannot be applied to an amount nobody
+     declared, and "denied: the check could not be evaluated" is a much worse
+     answer to an approver than a request that was never built.
+  2. **A denial is HTTP 200 on `/ges/decide` and HTTP 403 on `/ges/query`**, and
+     the asymmetry is deliberate. A refused query has no result and must not
+     read as zero rows; a denied action HAS a result — a recorded,
+     decision-ID-bearing answer the interface is required to display — and an
+     error status would make it indistinguishable at the transport layer from
+     an unreachable broker.
+  3. **The pre-flight eligibility hint stays carried on the item.** Asking the
+     broker to decide an approval nobody has requested would write a decision
+     record for a non-event, which is exactly `AC-F36-06`'s trap. The hint is
+     advisory and says so; the decision happens at submit and is the only thing
+     that permits anything.
+  4. **`backend/pilot_transport.py` is a DECLARED WEAKENING and is outside the
+     `app` package.** It puts the broker in the api process so the pilot is
+     operable and the `ux` suite can drive a real approval without a server it
+     is forbidden to start. In that configuration the trust boundary is a
+     module boundary. It is one named file rather than a lazy import, so the
+     architecture suite's "the api package never imports the ges package" check
+     keeps working unweakened.
+  5. **Form bodies are parsed with the standard library, not `request.form()`.**
+     `python-multipart` is not a dependency and adding one to read four text
+     fields would be a poor trade — but the real consequence is that **this
+     surface now structurally accepts no file upload**, so "upload an
+     uncertified spreadsheet and have an agent act on it" cannot be added by
+     writing a form.
+  6. **The reachability tests now DRIVE the controls.** Link-following cannot
+     reach a screen that only exists as the result of an action, and "it would
+     render if you posted the form" is the claim that check exists to refuse. A
+     companion test asserts those components are *not* reachable by navigation,
+     so the driving traversal cannot be deleted without something failing.
+  7. **A pilot persona switch exists** (staff accountant / controller). It is
+     not authentication and is refused in production. It is there because the
+     claim it demonstrates — that a staff accountant's approval is denied by the
+     BROKER, not hidden by the interface — is one a reader must be able to
+     exercise.
+  8. **Governance screens render "this could not be read" rather than a zero**
+     when GES is unreachable, and a test cuts the transport to prove it. A zero
+     on a control surface is a claim, and no claim was obtained.
+  9. **The `ux` harness was dropping POST bodies.** Harmless while every write
+     endpoint returned 501 regardless of input; silent the moment the write path
+     read form fields, because a click on a submit button arrived as an empty
+     submission. Every earlier UX POST scenario was weaker than it read.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
 
-**Passes 1, 2a, 2b, 2c and 3 complete** (21 commits in `dev/`, **1,105 unit
-tests + 244 suite scenarios**, all green. The `ux` suite now **executes with
-148 browser scenarios**; only `industry` still exits 3).
+**Passes 1, 2a, 2b, 2c, 3 and 4 complete** (28 commits in `dev/`, **1,217 unit
+tests + 305 suite scenarios**, all green. **All six suites now execute**;
+`industry` moved off exit 3 at pass 4 because two of the five things its README
+named — the Journal Import contract and the CUEC register — are now built).
 
 Built in pass 1: the two-process repo skeleton and the GES credential trust
 boundary; the certified query registry and its single execution operation; the
@@ -381,18 +438,34 @@ closed rejection list, required clearing period), the **evidential dossier**
 on supersession) and **Readiness** (P1–P5 individually, label source adjacent
 to the figure).
 
-Not yet built and absent rather than stubbed: export (F40) as a file, POAR, the
-version registry (F2), identity and lineage (F5), and six of the nine screens —
-**Monitors, Dispositions, Catalogue, Inventory, Audit, Refusals** (register
-entry 16).
+Built in pass 4 — **MVP1 end to end**: `POST /ges/decide`, `/ges/override`,
+`/ges/bundle`, `/ges/datasets`, `/ges/run/precheck`, `/ges/refusals`,
+`/ges/inventory`, `/ges/monitors`, `/ges/cuec` and `POST /ges/export/journal`;
+override-eligibility as a bundle field with identity rules refused at compile
+time; the write path (dispositions, structured rejections, approvals under a
+broker decision id, the F12 capture, `AC-F12-19`'s warrant label); the Journal
+Import file with our identifiers in `REFERENCE21`–`25`; the CUEC register;
+`AC-F38-10`'s exploration tier with the marker rendered by the page shell; and
+the six remaining screens — **Dispositions, Catalogue, Monitors, Inventory,
+Audit, Refusals**. The `industry` suite executes for the first time.
+
+**Not built and absent rather than stubbed**: point-of-action revalidation, the
+close clock (`AC-F38-11`), the F12 probe-injection programme (`AC-F41-08`), nine
+of the eleven evaluator primitives, and F17 direct posting.
 
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
-Eight places where the build could not match `ARCHITECTURE_KB` as written.
-`code-agent` disclosed all eight rather than letting them pass. **None may be
+Places where the build could not match `ARCHITECTURE_KB` as written.
+`code-agent` disclosed every one rather than letting it pass. **None may be
 closed by a later gate without either being built or being granted an explicit
 human exception.** Gate 9 audits against this table, not against the commit
 messages.
+
+**Twenty-two entries as of pass 4. Entries 8, 10, 13, 14 and 16 are CLOSED.
+Entries 1–5, 7 and 9 stand exactly as recorded at pass 1 and 2c; entries 3 and 4
+are still the two that cannot quietly become "MVP1 ready".** The section below
+runs in pass order: the pass-1 eight, then the pass-2c additions, then what each
+later pass closed, narrowed or opened.
 
 | # | Spec | Built instead | Unmet criterion / consequence |
 |---|---|---|---|
@@ -425,6 +498,15 @@ serves is in that set and that all 36 `data-testid`s the component library
 declares are rendered somewhere in it — a component defined, imported and
 mounted nowhere fails the second. The `ux` suite reports green on 148 executing
 browser scenarios.
+
+**Extended at pass 4.** The traversal now also **drives the controls** —
+resolve, refuse, reject, approve, override, export — because link-following
+cannot reach a screen that only exists as the result of an action, and a
+component that appears only after a POST would otherwise have been "mounted
+nowhere" with nothing failing. A companion test asserts those six components are
+NOT reachable by navigation, so the driving traversal cannot be deleted without
+something failing. The `ux` suite is now **186 browser scenarios** and all six
+suites execute.
 
 ### Register entries added at pass 2c
 
@@ -465,3 +547,29 @@ its guarantee and its one-host bound.
 | 16 | The nine screens of `FUNCTIONAL_SPEC` §23 | six built (Ask, Exceptions, Review, Dossier, Proposal, Readiness); **Monitors, Dispositions, Catalogue, Inventory, Audit and Refusals are not built** | **UNMET: `AC-F41-07`, `AC-F41-19`, `AC-F12-10`, `AC-F36-19`, `AC-F32-09`, `AC-F32-10`, `AC-F38-01`, `AC-F38-12`, `AC-F38-13`, `AC-F38-16`, `AC-F5-07`, `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-01`, `AC-REFUSAL-13`.** The navigation deliberately lists only built screens: a dead nav link in an evidence product reads as a missing control rather than as unbuilt work |
 | 17 | The gate-5 approved palette, pixel for pixel | four tokens changed | dark `risk-1`/`risk-2` (luminance ordinal), light `risk-1-bg` (AA by 0.004), light `ink-3` (AA on `surface-2`/`-3`), dark `.btn.primary` label. Each implements `UX_KB` §3.2's stated intent, but they are changes to an approved design and `ui-ux-designer` should confirm them |
 | 18 | `AC-F41-08` — a probe indistinguishable from a genuine proposal before disposition | UX-11 asserts **no probe marker exists anywhere in the DOM** | **necessary, not sufficient.** The F12 probe-injection programme is not built, so there is no probe in any queue to be indistinguishable from one. The scenario must be rewritten against a real probe when injection lands; the test and the suite README both say so |
+
+### Entries CLOSED at pass 4
+
+| # | Was | Now |
+|---|---|---|
+| 13 | The UI as a client of the broker — no `/ges/decide` route, so broker facts were *carried on the item* and displayed, never fetched | **CLOSED.** `POST /ges/decide` exists and every terminal control on the surface goes through it: the approval, the override, and — via `/ges/run/precheck` and `POST /ges/export/journal` — the run precondition and the export. The two AST-level tests still hold (`app/ui/` imports nothing from `ges`, and compares no approver against an author or invoker), so the UI still provably does not *compute* any of it; it now *obtains* it. **One thing is deliberately still carried**: the pre-flight eligibility hint `AC-F41-20` requires at queue entry, because asking the broker to decide an approval nobody requested would write a decision record for a non-event (`AC-F36-06`). That is correct rather than residual, and the screen says the hint is advisory |
+| 14 | The write path — 501 in the deferred grammar on every endpoint | **CLOSED.** `AC-F35-01`…`-08` persistence, `AC-F41-11`, `AC-F41-06`'s server-side refusal, `AC-F40-03`, `AC-F32-01`'s save failure and `AC-F12-01`…`-03` capture are all satisfied and tested against the STORE rather than the confirmation message. `AC-F32-01` is enforced by a NOT NULL column checked inside the transaction; every scenario posts directly with no browser, including exactly what a user who deleted the `required` attribute would post, and `close_item` has no `force`/`skip_validation`/`admin` parameter so "at every permission level" holds because there is nothing to send |
+| 16 | Six of the nine screens not built; fifteen observable-UI criteria unmet | **CLOSED.** Dispositions, Catalogue, Monitors, Inventory, Audit and Refusals are built, in the navigation, and each of the fifteen criteria is asserted on the screen it names, in the state it names, reached from the entry point |
+
+### Entries NARROWED but not closed at pass 4
+
+| # | Residual after pass 4 |
+|---|---|
+| 6 | `CloseClock` still absent. **`AC-F38-11` remains unmet** and `chrome.provenance()` still says so at the site |
+| 11 | `AC-F12-20`'s three surfaces: the **screen** leg (pass 3) and the **export** leg now exist — an export file is produced and its content hash is recorded. The precision figure itself is still not rendered *inside a dossier*, so one of the three surfaces remains unread |
+| 15 | The findings are still fixture literals and every screen still carries the pilot strip. What changed is that the **actions** are no longer simulated: the approvals, denials, overrides, dispositions and export in this build are real records produced by the real components |
+| 18 | Unchanged in substance and **strengthened in evidence**: UX-11 now checks structural markers across all sixteen screens, asserts that the capture schema carries `is_probe`/`probe_response_correct` while **no module on the render path reads either**, and asserts the injected-probe count really is zero — so a green UX-11 cannot be misread as a discharged `AC-F41-08`, and that last scenario fails the moment injection lands |
+
+### Entries OPENED at pass 4
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 19 | `ARCHITECTURE_KB` §3.2 — the trust boundary is a PROCESS boundary | **two transports.** `loopback` (stdlib HTTP to the GES port) is the default and the deployment configuration. `in-process`, installed only by `backend/pilot_transport.py`, puts the broker inside the api process so the pilot is operable from one command and the `ux` suite can drive a real approval without a server it is forbidden to start | **With the pilot transport running the boundary is a module boundary**: a prompt-injected tool in the api process could reach `ges.executor` by `import` alone. It is refused under `CONCLAVE_ENV=production`, it is one named file outside the `app` package, and the interface cannot tell the two transports apart — but **nothing in the `ux` suite exercises the loopback transport**, and `backend/pilot.py` is a configuration a reader could mistake for the deployment. Both say so in their own first paragraph |
+| 20 | `ARCHITECTURE_KB` §3.1 — Journal Import files in an object store | the produced file is held **in memory** for the life of the api process; the workflow store records its group id, content hash and line count | the artefact's *record* survives a restart; **the bytes do not**. A file downloaded before a restart and one downloaded after are not both available, and `AC-F1-08`'s oldest-end retrieval has no object store to retrieve from |
+| 21 | `AC-F40-05`'s CUEC verification against a real Oracle tenant | an in-memory register whose default state is `never_verified` for every item, verified by `pilot.py` with a synthetic attestation | the **refusal** is real and tested (a fresh register exports nothing, and `expired` and `failed` are distinguished from `never_verified`); the **verification** in this build attests nothing, because there is no tenant to read. `deploy-agent` owns the real one |
+| 22 | `AC-F12-19`'s label set as the input to an accuracy claim | the label is written at disposition time and rendered on Monitors as counts | the labels are real, but the pilot has **one abstained item**, so the label set is too small to compute anything from. This is a data-volume bound, not a build gap, and it is stated because a screen showing "1 warranted" invites a conclusion the sample cannot support |
