@@ -73,9 +73,21 @@ multi-user · remote/public exposure · historical trend charts · notifications
 
 ---
 
+### F12 — Staged intake form at `/intake` (built 2026-07-30)
+Gate 1's form, in the console, as a 8-stage wizard rather than one long page.
+Stages gate on their required question: **A5.1 (surfaces)** and **A7.2 (worst
+plausible harm)** block progress until answered — blocking at the stage
+boundary, not at submit, is the difference between a question being *answered*
+and merely being *displayed*.
+
+**Client-side only.** `AC-X-03` keeps every route read-only, and that holds
+here deliberately: a local console that can create projects on disk is a far
+larger surface than one that reports, and it would invert the platform's shape.
+The form collects, validates, and hands back markdown to paste.
+
 ## In Development
 
-_(none yet — awaiting gate 3 approval)_
+_(none)_
 
 ## Ready for Release
 
