@@ -529,6 +529,49 @@ undecided.
       first left the other suite's screens unreachable, and the failure
       surfaced as an unrelated scenario rendering an outage.
 
+- **2026-08-01 — Gate 7 pass 6, LOOP-BACK FROM GATE 8's re-run: the over-broad
+  join and the two registers with no witness. Judgement calls by `code-agent`.**
+  Three items, all evidence-honesty, none requiring a new feature. One of them
+  required a small build to become honest rather than a smaller claim.
+  1. **`AC-F36-47` is EVIDENCED on its precision leg and NARROWED on its
+     automation-rate leg — both, not either.** The criterion holds "on every
+     screen, in every dossier and in every export"; all three joins tested
+     `common.abstention` alone. The choice offered was add the surface
+     scenarios or narrow the joins. Neither alone was honest, because two
+     different clauses were in different states: the **computation** clause had
+     three witnesses and its joins now say so; the **surface** clause was
+     genuinely unmet — `PrecisionFigure.render()` carried `abstained` on all
+     three surfaces and **every surface dropped it on the way to the reader**.
+     So the count is now rendered as a named third figure beside the precision
+     figure on `/readiness` and inside every dossier, from one shared
+     component, and a new file asserts the surface clause from real routes:
+     the screen, all six dossiers, the export payload through a file, a sweep
+     of every screen reachable from `/`, and a negative control on the two
+     forbidden denominators (`0.8254`, `0.9048`). Removing the two render calls
+     fails five scenarios — checked, not assumed.
+  2. **The criterion's automation-rate half has NO surface, and that is stated
+     as an absence rather than counted as a pass.** `abstention.rates()`
+     computes one; no production code renders one. That half is therefore
+     vacuous, the scenario is named
+     `test_no_automation_rate_figure_is_rendered_on_any_surface_so_that_half_is_vacuous`,
+     and it carries an instruction to fail and be replaced when an automation
+     rate is built. The **F33 backtest precision** is excluded from the sweep
+     explicitly — its denominator is `predicted` over labels, not a
+     concluded/abstained split — because a silent exclusion is how an "every
+     screen" check stops being about every screen.
+  3. **Registers 24 and 25 now have in-file denials, in the style registers 6,
+     9, 18 and 20 already carried.** For 24, the stronger form was available and
+     was taken: `test_AC_F33_06_…` **derives** `0.6667` and `0.5000` from the
+     fixture constants instead of asserting literals, so the provenance is
+     executable — the scenario moves with the fixture, which is how a fixture
+     property behaves and not how a measurement does — and `test_AC_F33_01_…`
+     reads the support threshold from the manifest rather than restating `20`
+     as though 20 were part of the criterion. For 25, the denial is
+     documentary at five sites, because the claim itself is true on this
+     fixture and only the substitution behind it was undisclosed.
+     **Both registers stay OPEN.** Nothing in this pass calibrates a threshold
+     or supplies a close calendar.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -658,108 +701,184 @@ resolver's model call site (and therefore `AC-REFUSAL-11`, `AC-F39-03`, `-05`,
 
 ## Test Results
 
-### 2026-07-31 — Gate 8 · Test — `test-agent`, gate-8 verification run
+### 2026-08-01 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `b1b5dde`**
 
 **Every suite EXECUTED. Every suite green. Exit code 0 across the board.**
-Structured per-scenario evidence: `test-evidence/*-2026-07-31.md`.
+Structured per-scenario evidence: `test-evidence/*-2026-08-01.md`. **The entire
+`2026-07-31` evidence corpus was deleted, not left beside this one** — it
+described a commit at which F26, F28, F9 and F33 did not exist and cited
+scenario names that no longer exist on disk. Nothing in `test-evidence/` now
+predates the gate-8 loop-back.
 
 | Suite | Status | Exit | Scenarios | Pass | Fail | Owner | Blocking |
 |---|---|---|---|---|---|---|---|
-| unit/integration | `EXECUTED` | 0 | 1,217 | 1,217 | 0 | `test-agent` | yes |
-| functional | `EXECUTED` | 0 | 21 | 21 | 0 | `functional-agent` | yes |
-| architecture | `EXECUTED` | 0 | 21 | 21 | 0 | `solution-architect` | yes |
+| unit/integration | `EXECUTED` | 0 | 1,428 | 1,428 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 96 | 96 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 23 | 23 | 0 | `solution-architect` | yes |
 | security | `EXECUTED` | 0 | 14 | 14 | 0 | `security-architect` | yes |
-| red-team | `EXECUTED` | 0 | 40 | 40 | 0 | `responsible-ai-architect` | yes |
+| red-team | `EXECUTED` | 0 | 46 | 46 | 0 | `responsible-ai-architect` | yes |
 | industry | `EXECUTED` | 0 | 23 | 23 | 0 | `industry-expert` | yes |
 | ux | `EXECUTED` | 0 | 186 | 186 | 0 | `ui-ux-designer` | yes |
-| post-deploy smoke | `EXECUTED` | 0 | 7 | 7 | 0 | `test-agent` | yes |
+| post-deploy smoke | `EXECUTED` | 0 | 9 | 9 | 0 | `test-agent` | yes |
 
-No suite is `STATIC ONLY` and no suite is `PARTIAL`. The `ux` suite ran under
-`dev/.venv/bin/python` with Playwright present and Chromium launched — 186
-scenarios against a **real rendering engine**, every request fulfilled from the
-in-process ASGI app, no server started inside the agent's turn.
+**1,816 scenarios executed, 1,816 passed, 0 failed, 0 skipped.** No suite is
+`STATIC ONLY` and no suite is `PARTIAL`. All eight ran under
+`dev/.venv/bin/python`; the `ux` suite launched Chromium and asserted against a
+**real rendering engine** (computed styles, collapsed state, focus order), every
+request fulfilled from the in-process ASGI app, no server started inside the
+agent's turn. Under system `python3` the `ux` suite correctly reports
+`CANNOT EXECUTE` (exit 4) rather than passing.
 
-**Test-count delta.** No previous `test-agent` run exists, so these are a
-**baseline**, not a delta. They reconcile exactly with `code-agent`'s pass-4
-figures (1,217 unit + 305 suite scenarios), which is itself a check. Against
-gate 7 pass 3 (`2ed6b4e..HEAD`): **157 test functions added, 8 removed, 0
-silently changed.** All 8 removals asserted the HTTP 501 deferred screen that
-pass 4 replaced with a real write path; each names its replacement's
-destination, and the destinations (`test_ui_write_path.py` +736 lines,
-`test_ges_decide_route.py` +438 lines) assert against the **store**, not the
-confirmation message. Verified: no replacement is weaker.
+**Test-count delta** — against the 2026-07-31 run (`8bc1224..b1b5dde`), per suite:
 
-**Post-deploy smoke test — PASS.** `CONCLAVE_ENV=pilot backend/pilot.py`
-started, all thirteen routed screens served 200, the pilot strip rendered, the
-dossier carried zero external references, a staff approval was refused 403 by
-the broker, and the process was stopped with nothing left running. Started,
-exercised and stopped inside one command invocation. **Note the pilot binds
-8021, not 8000** — an unrelated process answers 404 on 8000 and a smoke test
-aimed there reports thirteen false failures.
+| Suite | Was | Now | Added | Removed | Changed |
+|---|---|---|---|---|---|
+| unit/integration | 1,217 | 1,428 | +211 | 1 name | — |
+| functional | 21 | 96 | +75 (F26/F28/F9/F33) | 1 name | — |
+| architecture | 21 | 23 | +2 (`ARCH_04` ×2) | 0 | 0 |
+| security | 14 | 14 | 0 | 0 | 0 |
+| red-team | 40 | 46 | +6 | 1 name | — |
+| industry | 23 | 23 | 0 | 0 | 0 |
+| ux | 186 | 186 | 2 names | 2 names | net 0 |
+
+**Five test functions were removed. Every one was checked and every one has an
+equal-or-stronger replacement** — named here because a removal is a coverage
+decision:
+
+- `test_AC_F1_08_a_dossier_returns_complete_with_its_retention` → rescoped to
+  `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`,
+  which also asserts `has_retention_lock is False`. `AC-F1-08` is now claimed
+  by no suite, which is the accurate reading of register 4/20.
+- `test_RT05_a_materiality_conclusion_never_reaches_a_surface_however_phrased`
+  → the two-half battery plus an executed evasion scenario. Strictly stronger.
+- `test_UX11_no_probe_status_is_present_in_the_dom_anywhere` and
+  `test_UX11_states_its_own_residual_so_nobody_reads_it_as_sufficient` →
+  renamed to drop the `AC-F41-08` claim; parametrisation breadth is
+  byte-identical (`PRE_DISPOSITION_SURFACE`, 7 paths, unchanged).
+- `test_a_specified_but_unimplemented_primitive_says_so` → the best change in
+  the diff. Pass 5 emptied `SPECIFIED_BUT_NOT_IMPLEMENTED`, and **a
+  `parametrize` over an empty tuple collects zero tests and reports green**.
+  The replacement asserts the behaviour against a planted entry, with a
+  companion asserting the list is empty — *"emptying the list must not quietly
+  remove the check that the list exists for."*
+
+**Post-deploy smoke test — PASS, 9 of 9.** `CONCLAVE_ENV=pilot backend/pilot.py`
+started, exercised and stopped inside each command invocation, with a post-stop
+`lsof` proving nothing was left listening. **The pilot binds 8021** —
+`settings.api_port()` defaults to `8021`, and a foreign Python process (pid
+20395) holds `*:8000` on this machine and answers 404 to everything. All twelve
+rendered screens plus `/health` and the four FastAPI routes served 200; the
+pilot strip rendered on all twelve; `/dossier/…` carried zero external
+references (`<script>`, `<link>`, `<img>`, `@import`, `srcset`, absolute URL —
+all zero); a staff-persona approval returned **403** in the refusal grammar;
+`CONCLAVE_ENV=production` refused to start the pilot transport with exit 2.
+
+**`AC-F28-07`'s "not run" is a state a reader meets in the running pilot.**
+Confirmed on the served `/exceptions`: five boundary-check rows, exactly one
+`data-state="not_run"`, naming `dw.fx_revaluation`, which
+`pilot_transport.PILOT_OMITTED_OBJECTS` deliberately omits **as a
+non-existent object rather than an empty table**.
 
 **No blocking suite failed. The gate is not stopped by a suite failure.**
 
-**But five green scenarios claim more than they prove**, and this is the
-finding of the run rather than the counts. Full evidence:
-`test-evidence/register-cross-check-2026-07-31.md`.
+**Last pass's five over-claiming scenarios are all fixed** — verified by reading
+each replacement, not by trusting the commit messages. Full evidence:
+`test-evidence/register-cross-check-2026-08-01.md`, scenario C7.
 
-1. **`test_AC_F1_08_a_dossier_returns_complete_with_its_retention`** (functional,
-   green) asserts only that a `retention_expiry` date string it wrote seconds
-   earlier is truthy. It never retrieves from an archive and never advances a
-   clock. Register entries 4 and 20 say the seven-year obligation is unmet and
-   that `AC-F1-08`'s oldest-end retrieval has no object store. **A reader
-   mapping suite IDs to criteria will mark `AC-F1-08` satisfied. It is not.**
-   *(Fixed at pass 4d: renamed to
-   `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`
-   and rescoped to what it tests — a round trip plus the presence of a
-   retention stamp, asserted alongside `StubObjectLockArchive.has_retention_lock
-   is False` so it cannot be misread as retention being in force. The string
-   `AC-F1-08` no longer appears in any test file.)*
-2. **A20 is reported more strongly than register 9 permits.** Eight of nine
-   red-team RT-05 scenarios are named
-   `…a_materiality_conclusion_never_reaches_a_surface_however_phrased`.
-   *(Fixed at pass 4d: renamed to
-   `…each_paraphrase_in_this_fixed_battery_of_eight_is_refused_at_the_broker`,
-   and the evasion now has its own red-team scenario asserting it reaches a
-   surface. Register 9 carries the exact shape.)*
-   *However phrased* is exactly what register 9 denies. Probing the broker
-   directly found a **working evasion the suite has no scenario for**: evasive
-   prose + a `treatment` claim + a *substantiated* ground returns `allow`. The
-   suite tests the two cases that are caught and not the one that is not; the
-   test that demonstrates the evasion lives in the **unit** suite, not the
-   red-team suite.
-3. **The architecture suite's only trust-boundary check would still pass if the
-   boundary were gone entirely.** `test_the_api_package_never_imports_the_ges_package`
-   is a static regex over `backend/app/` source text; `pilot_transport.py` sits
-   outside that package by design. Its docstring defers the runtime half to the
-   `security` suite — but the security suite's three real-subprocess scenarios
-   test the **credential** boundary, not the process boundary, and
-   `pilot_transport` deliberately does not set `CONCLAVE_PROCESS_ROLE`, so they
-   never run against the pilot configuration. **No scenario in any suite
-   exercises the two-process loopback topology.**
-4. **`test_the_override_rate_is_visible_with_its_denominator`** (ux) passes with
-   its persona-switch POST body discarded — proven by re-introducing the pass-4
-   body-dropping bug and running it: `1 passed in 0.83s`. It spends three lines
-   becoming the controller and every assertion holds as a staff accountant.
-   **It establishes nothing about the controller persona.** Its siblings in the
-   same class do depend on the switch, which is why 9 UX scenarios failed under
-   that probe and this one did not.
-5. **`test_UX12_the_three_failure_grammars_differ…`** exercises two of the three
-   it names. UNAVAILABLE — "the one a reviewer must never read as a denial" —
-   is never posted in the scenario named for it.
+**The standing question — does any suite report a pass the register says cannot
+be true? — finds no contradiction this pass.** `AC-REFUSAL-11`, `AC-F1-08`,
+`AC-F1-11`, `AC-F38-11`, `AC-F26-05` and `AC-F41-08` appear in **no suite test
+function name**; every remaining mention of each, in every suite file, denies
+the criterion rather than claiming it. That is the first pass at which this is
+true, and it is the specific thing gate 9 sent this back for.
 
-**On the POST-harness disclosure (pass 4 judgement call 9):** re-introducing the
-bug failed **9 of 186** UX scenarios, all in `TestUX14ControllerNightOverMonitors`.
-The persona switch is the only body-bearing POST the suite makes; the other
-write controls carry no form fields that change the outcome. The fix was real
-and necessary, and it is load-bearing for exactly one journey.
+**`AC-REFUSAL-11`'s two-half battery genuinely executes.** Fifteen RT-05 node
+IDs ran and passed: eight parametrised refusals, **four parametrised
+pass-throughs** (the first two being the criterion's own worked examples,
+verbatim), the vocabulary bar, the structural leg, and the evasion asserted as
+`outcome == "allow"` with `reason is None`. The pass-through half is a real
+`parametrize`, one node per string, not a docstring. Both halves drive
+`decide_emission` — the authorisation that actually gates a surface — not
+`refusals.classify`. **No scenario anywhere claims `AC-REFUSAL-11` is
+satisfied.**
 
-**On registers 3 and 4:** no suite claims `AC-F1-11`. `AC-F1-11` appears in no
-test file at all. The anchor and archive scenarios correctly assert the
-*negative* and are named for it. Executed probe confirms the residual is real —
-the anchor signature is the literal string `STUB-UNSIGNED:<digest>`, requiring
-no secret to produce, so an attacker who recomputes the chain can also
-recompute the anchor.
+**The four new detector families are driven by real runs.** Each of the four
+functional files builds a real `SqliteWarehouse`, wraps `ges.main.create_app`
+with `CONCLAVE_PROCESS_ROLE=ges` and a client token, and drives the detector
+through `GesClient` across the certified-query boundary. Gate 9's specific
+defect is closed at both ends: `AC-F28-07` now runs against
+`warehouse.seed(omit_objects=("fx_revaluation",))`, and an unrun check
+**raises** on `.findings` and has no `findings` key at all — so it cannot be
+confused with a check that found nothing.
+
+### Two advisory findings — a register entry with no witness in the suite
+
+Neither is a false pass, and neither stops the gate on its own. Both are the
+shape pass 4d and pass 5 installed guards against elsewhere, in the two places
+that did not get one.
+
+1. **Register 24 has no witness (F33 peer thresholds).** The register says
+   `0.6667` is a property of a 163-posting synthetic fixture, not a measured
+   skill accuracy, and that `min_peer_support=20` / `min_peer_agreement=0.8` are
+   uncalibrated. The functional suite asserts `record.precision == "0.6667"` and
+   `"0.6667" in region` with **no statement anywhere** that the figure is a
+   fixture property, and `test_AC_F33_01_…` asserts `comparable_postings >= 20`
+   — the uncalibrated threshold — as a criterion check. Registers 6, 9, 18 and
+   20 each carry an explicit in-file denial; register 24 does not. Mitigating:
+   the `backtest-no-claim` panel for the unlabelled held-out period **is**
+   asserted and **was confirmed on the served pilot screen**, which is the
+   contrast the register says the screen exists to create.
+2. **Register 25 has no witness (F9 history).** Three `test_AC_F9_05_*`
+   scenarios claim the ID; none states that "periods present in the movements
+   extract" substitutes for "periods of history", so a dormant account reads as
+   younger than it is. Weaker than (1): `AC-F9-05` as written **is** satisfied
+   on this fixture, and register 25 itself says the two cases cannot differ
+   here.
+
+**Both addressed at pass 6 (2026-08-01), neither closed.** Each register now
+carries an in-file denial at every site that touches its number — register 24
+at five sites, with `0.6667` and `0.5000` derived from the fixture constants
+and the peer threshold read from the manifest; register 25 at five sites. The
+registers themselves stay open: nothing was calibrated and no close calendar
+exists.
+
+### One over-broad `COVERS` join
+
+Thirteen of the 45 new joins were read in full against `FUNCTIONAL_SPEC`.
+**Twelve are accurate** — `AC-F36-34` (4), `AC-F36-37` (4) and `AC-REFUSAL-08`
+(3) each decompose their criterion into clauses plus a negative control plus a
+boundary, which is better than a restatement. **One is over-broad:**
+
+- **`AC-F36-47` (3 joins).** The criterion requires the property "*on every
+  screen, in every dossier and in every export*". All three joined scenarios
+  test `common.abstention` alone — `quality_denominator`, `rates`, and an AST
+  reflection over that one module. No screen, dossier or export scenario in any
+  suite reads an automation-rate or precision figure with its abstention count
+  beside it. **Gate 9 maps these joins mechanically, so this one would score
+  `AC-F36-47` satisfied on evidence covering half of it.** For `code-agent`:
+  either add the surface leg or narrow the join to name the clause it covers.
+
+  **Pass 6 (2026-08-01) did both, because two clauses were in two different
+  states.** The three computation joins are narrowed to name their clause. The
+  surface clause was genuinely unmet — every surface dropped the `abstained`
+  key its payload carried — so the count is now rendered beside the precision
+  figure on `/readiness` and in every dossier, and
+  `backend/tests/test_f36_47_abstention_on_three_surfaces.py` asserts screen,
+  six dossiers, export-through-a-file, an every-reachable-screen sweep and a
+  negative control on the forbidden denominators. **The criterion's
+  automation-rate half remains unevidenced by absence** and is named as such in
+  a scenario that must fail when an automation rate is built.
+
+**On registers 3 and 4:** unchanged and still open. No suite claims `AC-F1-11`;
+`test_ARCH_11_anchors_record_that_the_signer_is_a_stub` asserts the negative and
+is named for it.
+
+**On register 19:** `test_ARCH_04_the_deployment_topology_is_two_processes_talking_over_a_socket`
+and its companion both **PASSED, not skipped** — verified from the `-v` node
+list, so the real child process really bound and the loopback really carried a
+broker decision. The residual the register names (no suite can witness that an
+api-process module cannot `import ges.executor`) is untouched by that and stays
+open for `solution-architect`.
 
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
@@ -903,8 +1022,8 @@ its guarantee and its one-host bound.
 | # | Spec | Built instead | Unmet criterion / consequence |
 |---|---|---|---|
 | 23 | `ARCHITECTURE_KB` §7.3's F28 A9 recompute, against a real ERP FX/CTA calculation | one named formula, `revaluation_delta`, in a **closed registry of Python functions** — `formula` is a key, never an expression, and there is no `eval` in the module | the recompute is genuinely independent of the observed figure, which is the property that matters, but it recomputes the ONE formula this build implements. A second revaluation convention is a change to `FORMULAS` in a reviewed diff, not configuration. Stated because "independently recompute a derived figure" reads as more general than what exists |
-| 24 | F33's peer set, drawn from a real vendor/caption history | 163 synthetic postings for one vendor, plus the three period-3 miscodings that give the backtest something to measure | `min_peer_support` is 20 and `min_peer_agreement` 0.8, and neither has been calibrated against real coding behaviour — they are chosen to be conservative. `AC-F33-01`'s precision figure of 0.6667 is a property of a fixture, not a measured skill accuracy, and the pilot screen shows it beside a second held-out period with **no labels at all** precisely so a reader meets the difference. Real calibration needs a tenant |
-| 25 | `AC-F9-05`'s "fewer than two periods of history" over a real close calendar | `min_history_periods: 2` on the numeric leg, measured in periods present in the movements extract | a period an account existed in but posted no movement to is indistinguishable here from a period before the account existed. On the synthetic fixture they cannot differ; on a real ledger they can, and the account that was dormant for a quarter would report as younger than it is. Needs a close calendar — which is register 6 again, from a different direction |
+| 24 | F33's peer set, drawn from a real vendor/caption history | 163 synthetic postings for one vendor, plus the three period-3 miscodings that give the backtest something to measure | `min_peer_support` is 20 and `min_peer_agreement` 0.8, and neither has been calibrated against real coding behaviour — they are chosen to be conservative. `AC-F33-01`'s precision figure of 0.6667 is a property of a fixture, not a measured skill accuracy, and the pilot screen shows it beside a second held-out period with **no labels at all** precisely so a reader meets the difference. Real calibration needs a tenant. **Pass 6: WITNESSED IN THE SUITE, still open.** `test_AC_F33_06_…` derives `0.6667`/`0.5000` from the `close_datasets` constants rather than asserting literals, so the fixture provenance is executable; `test_AC_F33_01_…` reads `min_peer_support` from the manifest and asserts the run used it, instead of restating `20` as though the criterion fixed it; the functional file's header and three further sites state what both numbers are NOT |
+| 25 | `AC-F9-05`'s "fewer than two periods of history" over a real close calendar | `min_history_periods: 2` on the numeric leg, measured in periods present in the movements extract | a period an account existed in but posted no movement to is indistinguishable here from a period before the account existed. On the synthetic fixture they cannot differ; on a real ledger they can, and the account that was dormant for a quarter would report as younger than it is. Needs a close calendar — which is register 6 again, from a different direction. **Pass 6: WITNESSED IN THE SUITE, still open.** The substitution is stated at five sites — the functional file's header, all three `test_AC_F9_05_*` scenarios, the governance-screen scenario that reads "Periods available", and the primitive scenario that computes `periods_available` — so a reader of the suite meets the movement-count measure rather than assuming a close calendar behind it |
 
 **Twenty-five entries as of pass 5. Entries 8, 10, 11, 13, 14 and 16 are
 CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
