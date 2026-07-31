@@ -1,0 +1,86 @@
+{
+  "name": "conclave-finance-studio",
+  "template": "(pending plan-agent recommendation)",
+  "position": "In build \u2014 gate 1 Intake",
+  "env": "dev, local",
+  "last_activity": "2026-07-30",
+  "served_url": null,
+  "notes": "Multi-agent system for finance accountants: pre-built close agents plus a builder for custom agents/teams. Three surfaces, write-back with per-action approval.",
+  "gates": [
+    {
+      "n": 1,
+      "name": "Intake",
+      "status": "active",
+      "approval": "awaiting",
+      "date": "2026-07-30",
+      "participants": [
+        "orchestrator"
+      ],
+      "artifacts": [
+        "INTAKE.md"
+      ],
+      "note": "Intake gathered one question per turn. A7.2 and A8.3 delegated to SMEs, recorded as answers not gaps."
+    },
+    {
+      "n": 2,
+      "name": "Team",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 3,
+      "name": "Plan",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 4,
+      "name": "Functional",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 5,
+      "name": "Experience",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 6,
+      "name": "Architecture",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 7,
+      "name": "Code",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 8,
+      "name": "Test",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 9,
+      "name": "Verify",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 10,
+      "name": "Review",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 11,
+      "name": "Deploy",
+      "status": "pending",
+      "approval": "pending"
+    }
+  ],
+  "loop_backs": []
+}
