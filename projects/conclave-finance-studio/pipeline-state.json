@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
-  "template": "(pending plan-agent recommendation)",
-  "position": "In build \u2014 gate 1 Intake",
+  "template": "genai-chatbot (first slice only \u2014 plan-agent)",
+  "position": "Gate 1 complete \u2014 awaiting approval to open Team Composition",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -10,21 +10,26 @@
     {
       "n": 1,
       "name": "Intake",
-      "status": "active",
+      "status": "done",
       "approval": "awaiting",
       "date": "2026-07-30",
       "participants": [
-        "orchestrator"
+        "orchestrator",
+        "functional-agent",
+        "industry-expert",
+        "plan-agent"
       ],
       "artifacts": [
-        "INTAKE.md"
+        "INTAKE.md",
+        "knowledge/DOMAIN_KB.md",
+        "knowledge/INDUSTRY_KB.md"
       ],
-      "note": "Intake gathered one question per turn. A7.2 and A8.3 delegated to SMEs, recorded as answers not gaps."
+      "note": "A7.2 answered by both SMEs, independently converging. plan-agent recommends genai-chatbot for the first slice only."
     },
     {
       "n": 2,
       "name": "Team",
-      "status": "pending",
+      "status": "active",
       "approval": "pending"
     },
     {
