@@ -1,301 +1,337 @@
 # Plan — conclave-finance-studio
 
-**Gate 3 · Plan & Backlog.** Author: `plan-agent`. Date: 2026-07-31.
-**Status**: proposed — awaiting feature-by-feature human approval.
-Challenged next by `functional-agent` as devil's advocate.
+**Gate 3 · Plan & Backlog — RE-CUT.** Author: `plan-agent`. Date: 2026-07-31.
+**Status**: proposed under standing authorization (`batch_authorized`).
+**This document supersedes the previous `PLAN.md` in full.** The prior cut was
+invalidated by the scope correction: F6 (matching engine + statement ingestion),
+F7 (auto-certification rules), F8 (reconciling-item model) and F11
+(certification workspace) were Oracle Account Reconciliation Cloud, not this
+product.
 
-Inputs read in full: `INTAKE.md`, `PROJECT_CONTEXT.md` (Active Team +
-Decisions Log), `knowledge/DOMAIN_KB.md` (`functional-agent`),
-`knowledge/INDUSTRY_KB.md` (`industry-expert`), the three
-`templates/*/TEMPLATE_MANIFEST.md`, `pipeline-state.json`.
+Inputs read in full for this pass: `INTAKE.md` (including the scope correction
+and product direction at the foot), `PROJECT_CONTEXT.md` Decisions Log,
+`knowledge/DOMAIN_KB.md` (§6.2, §9, and §10 in full),
+`knowledge/INDUSTRY_KB.md` (§10–§16, obligations now A–S), and the superseded
+`PLAN.md`.
+
+**Write set for this pass**: `PLAN.md` only. `FEATURES.md`, `PROJECT_CONTEXT.md`
+and `pipeline-state.json` are untouched; the Decisions Log line is owed by the
+orchestrator after this gate, not written by me.
 
 ---
 
 ## 0 · Completeness check — binding decisions this plan was checked against
 
-Per contract, every binding decision recorded before this pass, and how this
-plan satisfies or conflicts with it.
+Every binding decision in the Decisions Log, and how this re-cut satisfies or
+conflicts with it. Three entries are new since the superseded plan and are
+marked **NEW**.
 
 | Binding decision | Source | How this plan satisfies it |
 |---|---|---|
-| **Product shape: BOTH** (pre-built agents *and* a builder) | Decisions Log, 2026-07-30 | Satisfied by sequence, not by simultaneity. The pre-built half ships first (F6 + spine). The builder half is F16–F18, explicitly `/enhance-project` work, not silently dropped. §6 says which half ships first and why. |
-| **Personas: all three** | Decisions Log, 2026-07-30 | **Partially — flagged as a conflict, not glossed.** The build-now set serves the staff accountant (F6) and the controller (F11, F12, F13). It does **not** serve the FP&A analyst; F21 (flux narrative) is the FP&A feature and I default it to later. See §7 · Conflict 1. |
-| **Write-back with per-action approval — "the defining decision"** | `INTAKE.md` §A-write; Decisions Log | The build-now set has **zero ledger write**, so per-action *posting* approval is not exercised at all in the MVP. It is neither implemented nor overturned. It stays live for gate 6, which is what both SMEs asked for. See §5. |
-| **A7.2 (worst harm) delegated to SMEs** | Decisions Log; `INTAKE.md` A7.2 | Answered by both KBs, converging. This plan's response is F9 + F10 + F14, and they are the features I refuse to trade away. See §4. |
-| **A8.3 (MVP slice) delegated to SMEs; `plan-agent` proposes** | `INTAKE.md` A8.3 | This document is the proposal. It is my call, made, not deferred back. |
-| **Three surfaces → `solution-architect` non-droppable, mandatory Impact Analysis on every enhancement** | `INTAKE.md` §A5 | Honoured. I do **not** unilaterally cut a surface; the mobile scope question is put to the human as decision **D2** in §8, with `industry-expert`'s recommendation attached. |
-| **`responsible-ai-architect` effectively non-droppable** | Decisions Log | Its gate-2/6 obligations are named in §9 (EU AI Act classification, per-composed-agent gate) and are not absorbed into any backlog item. |
-| **Full roster, 14 agents, nothing dropped. Test Policy: all suites blocking, no advisory exceptions** | `PROJECT_CONTEXT.md` Active Team | Reflected in §10 acceptance criteria: every criterion is written to be machine-checkable or evidence-backed, because none of them can pass advisorily. The `industry`/compliance suite does not exist yet (`INDUSTRY_KB.md` §8) and its creation is a gate-7 dependency, named in §10.5. |
-| **Approval-under-pressure (A3.2) is a design consequence, not a footnote** | `INTAKE.md` §A3.2, recorded risks | F11 and F12 are its direct response. F11 forbids "approve all" as a hard constraint (§5.3), not a UX preference. |
-| **Scope is very wide — the MVP slice is the mitigation** | `INTAKE.md` recorded risks | 12 build-now features: one agent, the control spine around it, one desktop surface. Eleven features deferred, all of them visible in §7. |
+| **NEW — SCOPE CORRECTION: the system is not the GL; do not imitate GL** | Decisions Log 2026-07-31 | Structural. No matching engine, no statement ingestion, no certification workspace, no auto-certification rules, no period-close mechanics, no balancing-enforcement, no chart-of-accounts control. The build sits on warehouse data, emits proposals, and hands execution to Oracle. F6/F7/F8/F11 are deleted, not renamed — see the supersession map in §7.0. |
+| **NEW — PRODUCT DIRECTION part 1: research-driven backlog** | Decisions Log 2026-07-31 | The backlog is derived from `DOMAIN_KB` §10.3's 22-activity inventory (A1–A22) and `INDUSTRY_KB` §11's 13-row automatability table, not from a reconciliation assumption. Every build-now feature names its A-number. |
+| **NEW — PRODUCT DIRECTION part 2: NL, skill-based interface, datasets selected, action under guardrails** | Decisions Log 2026-07-31 | F39 (certified semantic layer + NL skill invocation), F38 (dataset catalogue + coverage), F36 (guardrail engine + broker). Per `DOMAIN_KB` §10.6: the interface is natural language, **the product is the governance of what the language invokes** — so the NL layer is built as a parameteriser over certified queries, never an author of them. |
+| **NEW — MVP1 SCOPED TO ERP DATA ONLY** | Decisions Log 2026-07-31 | The three ERP-only-survivable differentiators are the build-now headline: omission detection (F29), resolution typing + evidence spine (F35/F32/F12/F1), cross-period surveillance (F9). Plus `DOMAIN_KB` §10.4c's post-hoc coding net (F33). §8 is a phase-2 section naming exactly what this deferred, so expansion is planned rather than remembered. |
+| **STANDING AUTHORIZATION to build MVP1; trust SME judgement; make assumptions** | Decisions Log 2026-07-31 | Calls made, not returned. Two assumptions are recorded in §9 as reversible. Exactly one item is escalated as genuinely undecidable without the human (§9.1). |
+| **Product shape: BOTH** (pre-built agents *and* a builder) | Decisions Log 2026-07-30 | Satisfied by sequence. Pre-built skills ship first; the authoring surface is F16, deferred and visible, gated on obligation F (author ≠ approver ≠ invoker) which `DOMAIN_KB` §10.8 says does not exist yet. Not silently dropped. |
+| **Personas: all three** | Decisions Log 2026-07-30 | **Improved, still partial — flagged not glossed.** Staff accountant: F41, F29, F33, F40. Controller: F9, F32, F12, F36 blast-radius caps, F1 export. FP&A: partially served for the first time — F39's NL inquiry over certified, provenance-stamped datasets is a real FP&A surface. Flux driver decomposition (F45) is still deferred. See §7.4 Conflict 1. |
+| **Write-back with per-action approval — "the defining decision"** | `INTAKE.md` §A-write | **Now exercised, not dodged.** MVP1 has one Tier 2 feature: F40, a fully-formed reclass journal in Journal Import shape, approved per action in-product (F41) and **exported for human posting — it does not post**. The two-key model (`INDUSTRY_KB` §15.3) is designed in from day one; direct triggering is behind the concrete promotion gate in §7.3. |
+| **A7.2 (worst harm) delegated to SMEs** | `INTAKE.md` A7.2 | Answered by `DOMAIN_KB` §6.2. This plan's response is F9 + F32 + F36's blast-radius caps, and those are the items I will not trade. See §4. |
+| **A8.3 (MVP slice) delegated to SMEs; `plan-agent` proposes** | `INTAKE.md` A8.3 | This document is the proposal, re-derived from scratch after the correction. |
+| **Three surfaces → `solution-architect` non-droppable, mandatory Impact Analysis** | `INTAKE.md` §A5 | Honoured. I do not cut a surface unilaterally: F23 (mobile read/monitor/notify) and F24 (mobile approval) are both on the list with my pre-selection and reasoning attached, for the human to overrule. |
+| **`responsible-ai-architect` effectively non-droppable** | Decisions Log | Its obligations are named in §10 and absorbed into no backlog item. It also now owns the `INDUSTRY_KB` §15.4 anti-recommendation: clearer AI explanations increase reviewer deference, so F41 must not be satisfied by prettier reasoning. |
+| **Full roster, 14 agents. Test Policy: all suites blocking, no advisory exceptions** | `PROJECT_CONTEXT.md` Active Team | §11's criteria are written to be machine-checkable or evidence-backed. Exit code `3` is not a pass. The criterion the previous plan could not pass has been removed and the removal is documented in §11.0. |
+| **Approval-under-pressure (A3.2)** | `INTAKE.md` §A3.2 | F41, and it is scoped per `INDUSTRY_KB` §15.4 as **volume reduction + override-rate monitoring + injected known-error probes**, not as legibility. "Approve all" does not exist at any permission level. |
+| **Scope is very wide — the MVP slice is the mitigation** | `INTAKE.md` recorded risks | 17 build-now features against a hard ceiling of 18, with six merges done specifically to get under it (§7.0). Everything else is visible and deferred. |
 
-No binding decision is contradicted by this plan. One is only partially served
-(personas), and that is raised as a decision, not buried.
+**Conflicts**: one, and it is partial — persona coverage (§7.4). No binding
+decision is contradicted.
 
 ---
 
 ## 1 · What I am proposing, in one paragraph
 
-**Build the evidence and control spine, and prove it on the one close activity
-that has deterministic ground truth.** The deliverable is not "a bank
-reconciliation agent." It is an audit-grade evidence layer — dossier store,
-version stamping, input provenance, agent lineage, cross-period monitoring, and
-a risk-graded certification surface — with an agent-prepared reconciliation for
-externally-verifiable accounts (bank, cash-in-transit) as the first thing that
-exercises it, end to end, with **zero ledger write**.
+**Build a governed resolution layer over Oracle ERP warehouse data, whose
+detection headline is what did *not* happen.** The deliverable is: a
+deterministic integrity floor that is always right and contains no AI; an
+omission detector built on a multi-period expectation model; cross-period
+surveillance; resolution typed R1–R6 with a forward disposition recorded from
+period 1 and tested next period; all of it invoked through a natural-language
+skill interface over certified datasets, enforced by a guardrail engine and an
+action broker, and evidenced in an append-only dossier. The one action-capable
+output in MVP1 is a reclass journal in Oracle Journal Import shape, approved per
+action in-product and **exported for a human to post**.
 
-`functional-agent` proposed the reconciliation slice and, correctly, warned
-against its own proposal: bank rec is the most commoditised activity in this
-domain and auto-matching has been solved for a decade (`DOMAIN_KB` §8). I take
-that warning as binding on **framing**, so I have inverted the emphasis. The
-reconciliation is the test harness. The spine is the product. That inversion is
-not cosmetic — it changes what gets built (F1–F5 and F9–F13 are the majority of
-the build-now set, not scaffolding around F6), it changes what gets measured
-(§10), and it is written here so that no later gate can quietly re-promote bank
-rec to the value proposition.
+### The constraint this plan is written against
 
-**Stated explicitly, per `DOMAIN_KB` §8's closing instruction:** bank and
-cash-in-transit reconciliation is a **proving ground, not the product**. It must
-not be positioned, marketed, or measured as the value proposition. If a later
-gate treats it as such, that is a loop-back trigger.
+Oracle Fusion **26B ships a GA Ledger Agent**: real-time anomaly scanning over
+balances and journals, configurable monitoring prompts, natural-language
+inquiry, GenAI variance narratives — bundled with the ERP the customer already
+owns (`INDUSTRY_KB` §10.1, `DOMAIN_KB` §10.6). Both SMEs reached the same
+conclusion independently: **if MVP1's headline is anomaly detection, MVP1 has no
+wedge, and it loses to a checkbox in a subscription the customer already pays
+for.**
+
+So the plan is aimed at the four things that survive an ERP-only, all-Oracle
+estate:
+
+| # | What survives | Why an incumbent cannot copy it from where it sits |
+|---|---|---|
+| 1 | **Omission detection** (`INDUSTRY_KB` §10.3) | The evidence of an absence is **not in the ledger**. A ledger-resident detector reasons over the population of records that exist. Source count is irrelevant to this claim, which is why the ERP-only decision does not damage it. **F29.** |
+| 2 | **Resolution typing + evidence spine** (`DOMAIN_KB` §10.2, §10.6(1)) | Every competitor terminates at a scored item in a queue. Nobody models **R2** (data-side fix) or **R5** (handoff) as first-class — and R2/R5 are the *majority* outcome across the inventory. **F35, F32, F12, F1.** |
+| 3 | **Cross-period surveillance** (`DOMAIN_KB` §6.2, §10.6(2)) | Invisible in-period by construction, which is why nobody sells it. It is also the only control that addresses the worst harm this system can cause. **F9.** |
+| 4 | **The post-hoc coding net** (`DOMAIN_KB` §10.4c) | Oracle's Payables Agent codes invoices pre-post, one document at a time, inside the transaction. We are the net that catches what it let through — post-hoc, ledger-wide, cross-entity, cross-period. Explicitly survives an all-Oracle estate. **F33.** |
+
+**Present-anomaly detection and NL inquiry are table stakes. They ship (F42, F39)
+and they are never the headline.** Every feature in §7 carries an explicit
+`WEDGE` / `FLOOR` / `TABLE STAKES` mark so this cannot quietly invert later. If a
+later gate positions this as "AI anomaly detection for your GL", that is a
+loop-back trigger.
 
 ---
 
-## 2 · Why this slice and not another
+## 2 · The three framing calls I am making
 
-| Candidate first slice | Verdict | Reason |
-|---|---|---|
-| Externally-verifiable reconciliation, zero write | **Chosen** | Hard external ground truth (`DOMAIN_KB` §2) → machine-checkable pass/fail at gate 8, which no other close activity offers. Blast radius zero. It is day 2, the volume day. Above all, it exercises the evidence machinery **in front of a real auditor before that machinery is what stands between an agent and the ledger** (`DOMAIN_KB` §8) — the cheapest possible way to discover the evidence package is unacceptable. |
-| Accrual estimation | Rejected for first slice | Top statistical cause of restatement (`DOMAIN_KB` §4), no in-period ground truth, and the `DOMAIN_KB` §6.2 self-justifying mechanism in its purest form. Do not make the first slice the one whose errors are undetectable for a year. Deferred as F22. |
-| Journal posting / write-back | Rejected for first slice | Write-back is the defining feature and should be the *second* thing proven. Prove the evidence chain first. Deferred as F17. |
-| The builder | Rejected for first slice | Until author-role SoD governance exists (`DOMAIN_KB` §7.1, `INDUSTRY_KB` §6), a builder is a machine for manufacturing un-inventoried AI systems inside ICFR scope. Deferred as F16–F18. |
-| Flux / variance narrative | Rejected for first slice, kept visible | Low risk, reaches the FP&A persona, genuinely painful. But it adds **no learning to the control spine** — it is read-only narrative with no evidence chain to test against an auditor — and it is commoditising fast (`INDUSTRY_KB` §7 B1). Deferred as F21. This is the deferral I hold with least confidence; see §7 · Conflict 1. |
-| Cross-source reconciliation (warehouse vantage) | Rejected for first slice, kept visible | `industry-expert`'s strongest differentiator (§2.3b) and structurally unavailable to ERP-embedded competitors. But it needs the spine (F1–F5) and the single-source rec (F6) working first. Deferred as F19, and it is the feature I would pull forward first after MVP. |
+**(a) The deterministic integrity layer is ranked first despite containing no
+AI** (`DOMAIN_KB` §10.5). A1 (warehouse-to-ERP fidelity) is the precondition for
+believing any other number the product emits; without it every downstream output
+is unfalsifiable. It is also unsold by every competitor, because they sit on the
+ERP and do not have the problem. **The most reliable component of this product
+contains no AI and the product should say so out loud.** F26 and F28 are
+therefore build-now and ranked above everything clever.
+
+**(b) "Balancing", read literally, is worthless and would be actively harmful.**
+Oracle will not post an unbalanced journal; a warehouse check of debits =
+credits reports a permanent, meaningless green, and *a control that can never
+fail trains its reviewer that the whole dashboard can never fail*
+(`DOMAIN_KB` §10.5). The real version is the **six boundary checks** the ERP does
+not police: A1 warehouse↔ERP, A6 subledger↔GL control account, A7 intercompany
+pair imbalance, A8 roll-forward continuity, A9 FX/CTA arithmetic, A10
+suspense/clearing residual. F26 covers A1 (+A2 staleness); F28 covers the other
+five.
+
+**(c) The interface is natural language; the product is the governance of what
+the language invokes** (`DOMAIN_KB` §10.6 verdict). Frontier models score
+**17–21% on Spider 2.0** against real enterprise schemas, and a finance user
+cannot distinguish a wrong join from a right one by looking at the answer.
+**No free-form SQL in MVP1**: F39 exposes a certified semantic/metric layer with
+versioned joins and measures, and NL *parameterises a certified query, never
+authors one*. This is a hard architectural line, not a phased ambition.
 
 ---
 
 ## 3 · Tier model and obligation gating — how to read the backlog
 
-**Tier**, per `INDUSTRY_KB` §6.2, is not a size estimate. It is a capability
-class, and an agent **cannot acquire Tier 2 by being built, only by being
-promoted**.
+- **Tier 1** — read / analyse / draft. Cannot lead to a posting.
+- **Tier 2** — **anything that can lead to a posting**, including producing an
+  export a human then posts. F40 is Tier 2 even though MVP1 has no direct
+  posting path; calling it Tier 1 because the last hop is manual would be
+  exactly the self-serving classification an auditor unwinds.
 
-- **Tier 1** — read / analyse / draft. No ledger write, no posting, no
-  reconciliation close-out into the system of record.
-- **Tier 2** — anything that can lead to a posting.
+**MVP1 contains exactly one Tier 2 feature (F40). Everything else is Tier 1.**
+Tier is a capability class: an agent cannot acquire Tier 2 by being built, only
+by being promoted (§7.3 promotion gate).
 
-**Every build-now feature in this plan is Tier 1. The MVP contains no Tier 2
-capability of any kind.**
+### 3.1 Obligations A–S — entry conditions, not backlog items
 
-### 3.1 The eleven obligations are entry conditions, not features
+`INDUSTRY_KB` §12.3 confirms **A–K all still bind** under the corrected scope;
+none is discharged by not owning the GL. **C is promoted to a build-now
+feature.** **L–S are new** (§13–§15).
 
-Obligations **A–K** (`INDUSTRY_KB` §4) are listed nowhere in the backlog as
-items to approve. They are conditions that gate features. But a correction to a
-common misreading, and it matters for scoping:
+| Obl. | In one line | Binds at | Gates |
+|---|---|---|---|
+| **A** | Approval record incl. the *rendered view* the human saw | Tier 1 | F1, F41, F12 |
+| **B** | Thresholds explicit, versioned, shown at approval — now absorbed as the guardrail *Quantitative* class | Tier 1 | F36, F41 |
+| **C** | Completeness/accuracy of inputs evidenced (IPE) — **promoted to a feature** | Tier 1 | F26, F38 |
+| **D** | Per-agent identity, least privilege, own log stream | Tier 1 | F5 |
+| **E** | Preparer/poster split; **the model never holds the Oracle credential** | Tier 1 (design) / Tier 2 (enforced) | F36, F40 |
+| **F** | Approver ≠ requester ≠ agent author ≠ invoker | Tier 2 hard; Tier 1 once F16 ships | F36, F40, F16 |
+| **G** | Append-only, tamper-evident, ≥7 yr, auditor-consumable export | Tier 1 | F1 |
+| **H** | A reversal is a new record — partly discharged by Oracle; we retain linkage | Tier 2 | F40 |
+| **I** | Immutable version tuple, **extended with dataset version + guardrail bundle hash** | Tier 1 | F2 |
+| **J** | Model/prompt **and guardrail-policy** change = ICFR change control | Tier 1 | F2, F36 |
+| **K** | Model deprecation tracked with a migration control | Tier 1 start | F2 |
+| **L** | Guardrail = declarative policy object: named owner, effective-date range, executable fixture proving firing *and* non-firing, membership of a versioned bundle. **Deny-by-default allowlist, never a prohibition list, never prompt text** | Tier 1 | F36 |
+| **M** | Enforcement at a single action/posting **broker** that holds the credentials. **The UI is never an enforcement point** | Tier 1 | F36, F40 |
+| **N** | Every action carries bundle hash + policy decision ID; operating effectiveness evidenced by a **scheduled negative-control suite**, not by logging non-events; new guardrails enter in shadow mode | Tier 1 | F36 |
+| **O** | Overrides first-class: dual-authorised, reason-coded from a closed list, time-boxed to one action, never standing, monitored as a rate | Tier 1 | F36, F41 |
+| **P** | **Blast-radius guardrails** — per-run count, per-period aggregate value, consecutive-period same-account repetition, footprint vs. account balance. Stateful, broker-enforced, non-disableable | Tier 1 | F36 |
+| **Q** | Datasets are governed catalogue objects with certification metadata; action-capable and assurance-emitting skills read **only** certified datasets on the skill's allowlist | Tier 1 | F38, F39 |
+| **R** | Every skill declares its expected population; every run computes and displays coverage; a partial run is **structurally incapable of emitting "no exceptions"** | Tier 1 | F38, F42 |
+| **S** | Postings enter Oracle only via a dedicated journal source + category with Oracle approval required, per-agent Oracle identity; the Oracle-side prerequisites are CUECs verified per tenant | Tier 2 | F40 |
 
-> **Not all eleven are write-only.** `INDUSTRY_KB` §4.1 is explicit that AI which
-> influences reconciliations is inside ICFR scope regardless of whether it
-> posts. A reconciliation prepared by an agent and certified by a human is an
-> **IT-dependent manual control**, which triggers IPE testing on the agent's
-> inputs. So a subset of the obligations binds the MVP even at Tier 1.
-
-| Obligation | Binds at | Gates which features |
-|---|---|---|
-| **A** — approval record is a first-class artefact incl. the *rendered view* | **Tier 1** | F1, F11, F12 |
-| **B** — thresholds/materiality explicit, configurable, versioned, shown at approval | **Tier 1** | F3, F6, F8, F11 |
-| **C** — completeness/accuracy of agent inputs evidenced (IPE) | **Tier 1** | F4, F6, F8 |
-| **D** — agent identity: named principal, own entitlements, own log stream | **Tier 1** | F5 |
-| **E** — preparer/poster split, distinct credentials | **Tier 2 only** | F17, F18 |
-| **F** — approver ≠ requester ≠ agent author/last-modifier | **Tier 2 hard; Tier 1 once F16 ships** | F16, F17, F18 |
-| **G** — append-only, tamper-evident store, ≥7yr, exportable without app access | **Tier 1** | F1, F5, F9, F13 |
-| **H** — a reversal is a new record, never a mutation | **Tier 2 only** | F17, F18 |
-| **I** — immutable version tuple {model, prompt, tool/config, corpus, params} | **Tier 1** | F1, F2, F9 |
-| **J** — model/prompt change goes through documented change control | **Tier 1** | F2 |
-| **K** — model deprecation is a tracked risk with a migration control | **Tier 2 entry condition; start at Tier 1** | F2, F17 |
-
-**Consequence for scoping, stated plainly:** A, B, C, D, G, I and J are
-**non-negotiable in the MVP**. That is why the build-now set is spine-heavy. It
-is not gold-plating; it is the entry price for having an agent touch a
-reconciliation at all.
+**Consequence for scoping:** A, C, D, G, I, J, L, M, N, O, P, Q, R are
+non-negotiable in MVP1 even though only one feature can lead to a posting. That
+is why the build-now set is spine-heavy. It is the entry price, not gold-plating
+— and `INDUSTRY_KB` §12.2 is explicit that **the read-only path is not outside
+ICFR either**: "we ran the analysis and found nothing" is a claim supplied to a
+monitoring control, so negative assurance is a regulated output.
 
 ---
 
-## 4 · The one thing that must survive scoping
+## 4 · The items that must survive scoping
 
-Both SMEs, briefed separately, converged independently:
+If the human cuts scope, cut F42, cut F28's FX leg, cut F33 before you touch
+these:
 
-> Per-action human approval is **structurally blind** to a systematic,
-> individually-immaterial, aggregate-material error, because no single approval
-> was wrong. The failure lives in the *sequence*, and there is no approval step
-> for a sequence. (`DOMAIN_KB` §6.2 / §7.2.4; `INDUSTRY_KB` §5.1 / §5.4.3.)
-
-`DOMAIN_KB` §7.2.4: *"If exactly one safety mechanism survives scoping, make it
-this one."* `INDUSTRY_KB` §5.4.3: *"the single highest-value control feature in
-the product."*
-
-**F9 (cross-period pattern monitor) and F10 (narrative-recurrence detector) are
-therefore the two features I will not trade.** If the human cuts scope, cut F13,
-cut F12, cut F7 — do not cut F9 or F10. I have kept F10 as a separate line item
-rather than folding it into F9 precisely so that it cannot be dropped as an
-"implementation detail" of F9: F9 detects a *numeric* pattern (same account,
-same direction, N periods, each sub-threshold), F10 detects a *textual* one (the
-agent restating its own prior-period explanation). `DOMAIN_KB` §6.2's mechanism
-needs both, and the textual one is the earlier signal.
-
-**F14 (fresh-eyes rotation) is the third leg and I have defaulted it to later.**
-I do this uneasily and I want the human to see the reasoning: `DOMAIN_KB` §6.2
-notes that the periodic arrival of a fresh pair of eyes is *the actual,
-undocumented control* that catches this class of error in a human-staffed team,
-and that this product removes it without anyone deciding to remove it. F9 and
-F10 **detect** the pattern; F14 **breaks** it. Detection before breaking is
-defensible, and F14 needs ≥2 periods of history to do anything, which the MVP
-will not have at launch. But this is a deferral the human may reasonably
-overrule, and it is the strongest candidate on the "later" list for pulling
-forward.
+1. **F32 — forward disposition.** The most retrofit-hostile item in the whole
+   backlog (`DOMAIN_KB` §10.7). The prediction must have been recorded in the
+   *prior* period for the test to exist at all. Ship without it and the control
+   cannot be added later without a year of dead time.
+2. **F12 — disposition capture.** *Not telemetry.* It is the **ground-truth
+   factory** (`DOMAIN_KB` §10.9(3)). Anomaly detection has no ground truth for
+   "is this an anomaly"; it has ground truth for "was it acted on", and that
+   label exists only if the product manufactures it. Ship late and the first
+   year of production generates no labels, and gate 8 for every phase-2 feature
+   has nothing to test against.
+3. **F9 — cross-period surveillance.** `DOMAIN_KB` §7.2.4: *"If exactly one
+   safety mechanism survives scoping, make it this one."* Per-action approval is
+   structurally blind to the §6.2 failure because no single approval was wrong.
+   Its two legs — numeric sub-threshold accumulation and **narrative
+   recurrence** — are both mandatory. `DOMAIN_KB` §9 warns the textual leg will
+   be dropped as an "implementation detail"; it is the earlier signal and it is
+   named here so it cannot be.
+4. **F36's blast-radius caps (obligation P).** `industry-expert` calls this the
+   single most valuable guardrail in the system, *precisely because an
+   incumbent's per-transaction rules engine cannot express it*. Every other
+   guardrail constrains an individual action; the worst case is an accumulation
+   of individually compliant ones.
 
 ---
 
 ## 5 · Key design decisions and their trade-offs
 
-### 5.1 Zero ledger write in the MVP — and what that does to the A-write decision
+### 5.1 Detection without consequence is a notification into a saturated budget
 
-`INTAKE.md` records per-action approval as "the defining decision." Neither SME
-overturned it; both said re-open it at Architecture (`DOMAIN_KB` §7.2;
-`INDUSTRY_KB` §5.4.4).
+`DOMAIN_KB` §9.3, carried forward unchanged. A detector needs a **state change**,
+not a signal: a trip must raise the account's risk grade, revoke auto-pass
+eligibility, and surface at the top of the review queue. That is resolution type
+**R6**, and it is why F35 (resolution typing) is build-now rather than a phase-2
+nicety. Escalating to a controller who has already certified five prior
+instances, in the close window, is not a control.
 
-This plan does not settle it, and is deliberately constructed so that it cannot
-be settled by accident. With zero write, the MVP exercises **certification of a
-reconciliation**, not **approval of a posting**. Those are different controls
-with different failure modes. Building the first is not a commitment to
-per-action approval on the second.
+### 5.2 Resolution is the product, and most resolutions are not postings
 
-**Trade-off, stated honestly:** deferring write means the MVP does not
-demonstrate the product's defining capability, and a demo of "we prepared a bank
-rec and a human certified it" is not an impressive demo. I accept that cost. In
-exchange, the hardest architectural obligations — rollback semantics against an
-append-only ledger (`DOMAIN_KB` §5.5: reversal is the *only* correction
-primitive, there is no undo), preparer/poster credential split (obligation E),
-author-role SoD (obligation F) — are deferred without being dodged, and gate 6
-gets to make the A-write call with F9 and F10 already built and producing
-evidence, rather than in the abstract.
+`DOMAIN_KB` §10.2: **R2 (data-side fix) and R5 (handoff) are the majority
+outcome**, and no competitor models them as first-class. Binding on `code-agent`:
+if the architecture treats "posting" as the default terminal state of an
+anomaly, it mis-models the domain and produces a UI in which **the safe answer
+is harder to record than the risky one**. R1 carries a mandatory expiry date;
+R5 carries a named owner and a due date; R6 is a control-state change with an
+audit record.
 
-**What gate 6 must decide, informed by this build:** whether per-action approval
-stays as recorded, or is replaced by `DOMAIN_KB` §7.2's alternative — approve
-the policy cold (outside the close window, when attention exists), approve the
-exceptions hot. That alternative is F15 on the backlog, defaulted to later
-precisely because it is a gate-6 decision, not a gate-3 one.
+### 5.3 Every analysis object is a re-runnable, immutable-run object
 
-### 5.2 A reconciliation is a re-runnable versioned object, not a one-shot task
+From `DOMAIN_KB` §1: late-arriving upstream data invalidates downstream work —
+rework, not addition. Any design that models an analysis as a task with a
+completion state will be wrong in practice. A run is immutable; a new run
+supersedes and never overwrites; an approval attaches to a *specific run* and a
+superseding run invalidates it loudly. Design constraint, not a backlog item.
 
-Binding on `code-agent`, from `DOMAIN_KB` §1: late-arriving upstream data
-invalidates downstream work — a late AP batch on day 3 invalidates the accrual
-from day 2, the rec certified on day 2, and the flux narrative from day 3. That
-is rework, not addition. **Any design that models a reconciliation as a task
-with a completion state will be wrong in practice.**
+### 5.4 The review surface: the intuitive design is the wrong design
 
-Therefore: a reconciliation is an object with an ordered series of immutable
-**runs**. A new run supersedes but never overwrites a prior run. A certification
-attaches to a specific run, and a superseding run invalidates the certification
-and says so loudly. This is a design constraint recorded here rather than a
-backlog item, because it is a property of F6 and not separately approvable.
+`INDUSTRY_KB` §15.4's anti-recommendation, and it is binding on `ui-ux-designer`
+and `responsible-ai-architect` at gate 5: **clearer AI explanations make
+reviewers defer *more*, not less.** F41 therefore cannot be satisfied by "show
+the agent's reasoning nicely". The mechanisms that work are:
 
-### 5.3 Hard constraints on the certification surface
+- **volume reduction** — fewer items reaching a human at all;
+- **override / rejection-rate monitoring**, per agent, per user, per period,
+  read as evidence that a guardrail is miscalibrated rather than that users are
+  wrong;
+- **injected known-error probes** to keep attention live;
+- **prominence of the riskiest element**, not of the clearest narrative.
 
-From `INDUSTRY_KB` §5.4.2 and `DOMAIN_KB` §7.2, binding on `ui-ux-designer` at
-gate 5 and `code-agent` at gate 7:
+Hard constraints, unchanged from the superseded plan because the correction does
+not touch them: default state is not-approved; **"approve all" does not exist at
+any permission level**; rejection is structured; and the **rendered view** is
+stored, not merely the underlying data (obligation A). `DOMAIN_KB` §6.3: a
+perfect approval log that records who clicked but not what they were shown
+documents blame without documenting context, pointed at the most junior person
+in the chain.
 
-- The default state of any proposal is **not certified**. There is no
-  pre-checked path.
-- **"Approve all" / "certify all" must not exist.** Not as a power-user feature,
-  not behind a permission. If it exists it will be used at 11pm and it makes the
-  control cosmetic.
-- The riskiest element of a proposal is the most visually prominent element, not
-  a line in a rationale paragraph.
-- Rejection is structured (reason required, selectable-plus-freetext), and for
-  high-judgment items the required input must not be selectable from a list —
-  deliberate friction that should survive `ui-ux-designer`'s likely usability
-  objection (`DOMAIN_KB` §7.2.2).
-- What was **rendered** to the approver is stored, not just the underlying data
-  (obligation A). Otherwise you cannot later prove what the human saw.
+### 5.5 Dataset selection is a control failure, not user error
 
-`DOMAIN_KB` §7.2 also warns that better approval UI is not the answer to the
-attention-budget problem and that treating it as such will waste a design cycle.
-F11 is therefore scoped as a *risk-differentiation* surface — making unequal
-risks look unequal — not as a legibility improvement. F12 exists because the
-measurable defence is telemetry, not layout.
+`INDUSTRY_KB` §14 — and this is the framing correction I most want carried into
+architecture. A control whose effectiveness depends on the user not making a
+mistake the system freely permits is **deficient by design**.
 
-### 5.4 The audit trail must document context, not only blame
+- **Exploration tier** — free selection across the warehouse, uncertified
+  datasets selectable, carrying a persistent non-dismissable *"not certified —
+  cannot support a posting or a no-exceptions conclusion"* state. Most usage
+  lives here and should feel unconstrained.
+- **Action-capable tier** — the **skill declares** its dataset allowlist; the
+  user chooses among certified options within it. Free-form dataset assembly and
+  action capability never combine.
 
-`DOMAIN_KB` §6.3 makes a point no one else on the roster will: a perfect
-per-action approval log is also a perfect liability-allocation device pointed at
-the most junior person in the chain. If the system records *who approved* but
-not *what evidence they were shown and how long they had*, it documents blame
-without documenting context.
+**The failure that actually bites is under-selection**, because a scan over 70%
+of the population returns a result pixel-identical to a scan over 100%. So:
+coverage is computed against a declared expected population and displayed, a
+partial run is labelled partial in the output, the dossier *and* the export, and
+it is **structurally incapable of emitting "no exceptions"** — it can only say
+"no exceptions in the scanned population, which was 70%, missing X and Y". That
+distinction is the whole control and it is impossible to retrofit once users have
+learned to read the output format.
 
-F12 (review-precision telemetry) is therefore not a controller dashboard
-feature. It is the staff accountant's defence, and it should be framed that way
-to the user. It captures dwell time, which evidence was expanded, which
-exceptions were overridden, and approval speed relative to that individual's own
-baseline. It is simultaneously the evidence of *review precision* that
-`INDUSTRY_KB` §4.1 says auditors test for and that "a checkbox and a timestamp"
-fails.
+### 5.6 Warehouse lag is now a first-class product problem
 
-### 5.5 Warehouse lag is a design defect to resolve, not a latency inconvenience
+`DOMAIN_KB` §10.1 promotes §5.7: the warehouse is the *only* source now, not one
+of two. Every emitted number carries its provenance, extract timestamp and its
+**staleness relative to the close clock** — on its face, not in a tooltip. F26's
+A2 leg and F38 own this; full architectural resolution is a gate-6 obligation on
+`solution-architect`.
 
-`DOMAIN_KB` §5.7: an agent reasoning over yesterday's warehouse snapshot while
-the ledger changes hourly during close is a design defect. The MVP's zero-write
-posture reduces this from "defect" to "staleness that must be disclosed" — but
-F4 must record the as-of timestamp of every extract and surface it on the
-certification screen, and a certification against a stale extract must be
-visibly marked as such. Full resolution is a gate-6 obligation on
-`solution-architect`, not something F4 closes.
+### 5.7 Two-key posting, designed in from day one
 
-### 5.6 Positioning — what this is competing against
+`INDUSTRY_KB` §15. Our in-product approval is the **evidence-bearing** leg;
+Oracle's journal approval is the **system-of-record** leg and satisfies only
+that leg. The trap is explicit: Oracle's approval is a *customer configuration
+we do not own*, and in a tenant where AutoPost runs without approval enabled for
+our source, **our proposals post with no human leg in Oracle at all and we would
+not know**. Hence obligation S — a dedicated journal source and category,
+approval required on that source, verified per tenant as a CUEC at deployment and
+on configuration change. The dedicated source is also the blast-radius answer
+obtained on the customer's own ledger: every entry this system ever caused,
+enumerable in Oracle with one query.
 
-Recorded here so gate 9 does not rediscover it. `DOMAIN_KB` §7.3: a displacement
-pitch against BlackLine is dead for years, because the switching cost is not
-licence fees but re-baselining the SOX control narrative with the external
-auditor — a 6–12 month project no controller starts voluntarily. `INDUSTRY_KB`
-§2.1: BlackLine's April 2026 positioning is explicitly about closing AI's
-*governance and trust gap*, so any differentiation built on "our agents are
-smarter" competes where the incumbent has decided not to fight.
+### 5.8 What is refused, visibly
 
-Both SMEs independently point at the same opening: the **evidence layer**
-(`INDUSTRY_KB` §2.3a — the audit package falls out of the system for free) and
-the **long tail** (`DOMAIN_KB` §7.3 — the few hundred accounts every BlackLine
-implementation left as spreadsheets, which are disproportionately the judgmental
-accounts where the §6.2 failure lives). This plan builds toward the first (F1,
-F13) and defers the second (F20) while keeping it visible, because F20 is
-arguably the real product and my deferral of it is contestable.
+`DOMAIN_KB` §10.3: **A19–A22 are load-bearing refusals** — estimates/reserves/
+impairment (A19), materiality and SAB 99 conclusions (A20), certification and
+sign-off (A21), contentious cut-off and technical-accounting conclusions (A22).
+A product that automates A1–A18 and *visibly refuses* A19–A22 is one a
+controller can take to an audit committee.
+
+**Design consequence, binding on `ui-ux-designer` and `code-agent`:** these must
+appear in the product **as refusals**, not as absences. "Not built yet" and "will
+never be built" are the same blank screen to a user and opposite answers to an
+auditor. There is a refusal surface, and §11 tests for its presence — not merely
+for the absence of the capability.
 
 ---
 
 ## 6 · Template and structure
 
-### 6.1 Recommendation: `genai-chatbot`, **for the first slice only**
-
-This confirms the recommendation already recorded in `pipeline-state.json`.
+### 6.1 Recommendation: `genai-chatbot` — and the correction *strengthens* the fit
 
 | Template | Fit |
 |---|---|
-| **`genai-chatbot`** | **Chosen.** Gives FastAPI backend + Next.js/TypeScript/Tailwind/shadcn frontend, which is the shape the MVP needs: a tool-using LLM backend plus a required human-facing desktop web surface (F11, F12, F13). |
-| `agentic-workflow` | Rejected. Backend-only, and its manifest states `ui-ux-designer` and the Experience Design gate are **not applicable**. Given `INTAKE.md` A3.2 and §5.3 above, the certification surface *is a control*, not a presentation layer. A template that switches off the Experience gate is disqualifying here. |
-| `rag-knowledge-base` | Rejected. There is no document corpus to ground answers in. The ground truth is a warehouse and an external statement, not retrieval. (Note: if F16's builder later needs policy-document retrieval, that is an `/enhance-project` structural question, not a reason to pick it now.) |
+| **`genai-chatbot`** | **Chosen.** FastAPI backend + Next.js/TypeScript/Tailwind/shadcn frontend. The corrected product's primary surface is a natural-language skill interface with a tool-using LLM backend and a human review surface — which is closer to this template's shape than the withdrawn reconciliation workspace was. |
+| `agentic-workflow` | Rejected. Backend-only, and its manifest switches off `ui-ux-designer` and the Experience Design gate. Per `INTAKE.md` A3.2 and §5.4, the review surface **is a control**, and `INDUSTRY_KB` §15.4 makes its design counter-intuitive. A template that disables the Experience gate is disqualifying. |
+| `rag-knowledge-base` | Rejected. No document corpus grounds the answers; the ground truth is a warehouse and a certified metric layer, not retrieval. |
 
-**Two honest caveats on the fit:**
+**Three caveats on the fit, for `code-agent`:**
 
-1. The primary UI is **not a chat stream**. It is a review-and-certification
-   workspace. `code-agent` replaces the template's chat surface entirely; what
-   is being kept is the Next.js + shadcn + FastAPI scaffold and the streaming
-   plumbing, not the chat metaphor. The template's own smoke test
-   (`POST /chat` → non-empty stream) will need replacing with the acceptance
-   criteria in §10.
-2. **No template carries both halves of the product shape.** The builder
-   (F16–F18) is a governed authoring environment with versioning, an inventory
-   and a promotion workflow. Nothing in `templates/` models that. It is
-   explicitly `/enhance-project` work with its own template question at that
-   time — and per `INTAKE.md` §A5, a mandatory `solution-architect` Impact
-   Analysis.
+1. The chat metaphor is kept for *invocation* and discarded for *output*. A skill
+   run returns a structured exception set, a coverage statement and a dossier
+   reference — not a prose stream. The template's `POST /chat` smoke test is
+   replaced by §11's criteria.
+2. **The template has no notion of a policy broker.** `guardrails/` and
+   `broker/` are new top-level concerns and the broker is the only component
+   that holds an Oracle credential (obligation M).
+3. **No template models a governed authoring environment.** F16 (skill
+   authoring) is `/enhance-project` work with its own template question and a
+   mandatory `solution-architect` Impact Analysis per `INTAKE.md` §A5.
 
 ### 6.2 File and module structure for the build-now set
 
@@ -303,337 +339,535 @@ This confirms the recommendation already recorded in `pipeline-state.json`.
 backend/
   app/
     main.py                     # FastAPI app, routers, health
-    config.py                   # settings; threshold policy loading (F3)
-    evidence/                   # THE SPINE — obligations A, C, G, I
-      store.py                  # append-only dossier writer; no UPDATE path (F1)
-      dossier.py                # dossier schema: the 10 items of INDUSTRY_KB §4.3 (F1)
-      integrity.py              # hash chaining / tamper-evidence (F1, obligation G)
-      export.py                 # auditor export, consumable without app login (F13)
-    versioning/
-      registry.py               # model/prompt/tool/corpus version artefacts (F2)
-      stamp.py                  # immutable version tuple on every proposal (F2, obligation I)
-      changelog.py              # change-control record for prompt/model changes (F2, obligation J)
-    policy/
-      thresholds.py             # explicit, versioned materiality/tolerance objects (F3)
-      risk_rating.py            # per-account risk grade driving F11's presentation (F3)
-    provenance/
-      extract.py                # warehouse query capture, as-of stamping (F4)
-      ipe.py                    # tie-back of extract to ERP source (F4, obligation C)
-    identity/
-      principals.py             # one named principal per agent; no shared accounts (F5, obligation D)
-      inventory.py              # auto-inventory, non-bypassable, exportable (F5)
-      lineage.py                # blast-radius query: everything an agent version touched (F5)
-    agents/
-      recon/
-        graph.py                # the reconciliation agent's tool-using graph (F6)
-        matching.py             # deterministic matching against external statement (F6)
-        items.py                # reconciling items; citation REQUIRED (F8)
-        run.py                  # the immutable-run model of §5.2 (F6)
-    monitors/
-      cross_period.py           # numeric recurrence, aggregate/iron-curtain view (F9)
-      narrative_recurrence.py   # textual self-restatement detection (F10)
-    telemetry/
-      review_precision.py       # dwell, expansions, overrides, speed-vs-baseline (F12)
+    config.py                   # settings; bundle loading (F36)
+    catalogue/                  # F38 — obligations C, Q, R
+      datasets.py               # certified dataset objects: lineage, as-of, row count, hash, tie-out, owner, version
+      population.py             # declared expected population per skill
+      coverage.py               # computed coverage; the partial-run flag that blocks negative assurance
+    semantic/                   # F39 — obligation Q; NO free-form SQL exists here
+      metrics.py                # certified, versioned measures and joins
+      resolver.py               # NL -> selection + parameters over certified queries ONLY
+      inquiry.py                # NL inquiry (TABLE STAKES leg)
+    integrity/                  # F26, F28 — band D. MUST contain no model call (asserted at test)
+      fidelity.py               # A1 warehouse vs ERP, by balance / segment / period
+      staleness.py              # A2 feed completeness, refresh age vs close clock
+      boundaries.py             # A6 subledger<->GL, A7 IC pair imbalance, A8 roll-forward, A9 FX arithmetic, A10 residual
+    guardrails/                 # F36 — obligations L, N, O, P, B, J
+      policy.py                 # declarative policy object: owner, effective dates, fixture refs
+      bundle.py                 # hash-addressed immutable bundle; the versioned unit
+      classes/                  # scope, capability, quantitative, temporal, identity_sod, blast_radius
+      blast_radius.py           # STATEFUL caps across a run and across periods
+      override.py               # dual-auth, closed-list reason codes, time-boxed, counted
+      fixtures/                 # negative-control suite: firing AND non-firing case per rule
+    broker/                     # F36/F40 — obligation M, E. The ONLY holder of credentials
+      decide.py                 # evaluates bundle, emits decision ID, stamps bundle hash
+      actions.py                # deny-by-default capability allowlist
+    evidence/                   # F1 — obligations A, G, I
+      store.py                  # append-only writer; NO update/delete path
+      dossier.py                # dossier schema incl. dataset version, bundle hash, coverage, rendered view
+      integrity.py              # hash chaining / tamper-evidence
+      export.py                 # auditor export, consumable without application login
+    versioning/                 # F2 — obligations I, J, K
+      registry.py, stamp.py, changelog.py
+    identity/                   # F5 — obligation D
+      principals.py, inventory.py, lineage.py
+    resolution/                 # F35, F32 — the wedge
+      types.py                  # R1..R6 as first-class outcomes; R1 expiry, R5 owner+due date, R6 state change
+      disposition.py            # forward disposition: expected clearing period REQUIRED to save
+      verification.py           # next-period test of the prior period's prediction
+    detectors/
+      base.py                   # every detector takes a declared population object, never a table name
+      omission/                 # F29 — THE WEDGE
+        expectation.py          # multi-period recurrence/expectation model
+        missing_entry.py        # A5 recurring accrual/allocation/amortisation that did not run
+        unreversed.py           # scheduled reversal that did not reverse
+        stopped_feed.py         # feed stopped -> entry silently stopped
+        one_sided_ic.py         # A7 counterparty side never posted
+      crossperiod/              # F9
+        accumulation.py         # numeric sub-threshold recurrence; iron-curtain aggregate
+        narrative.py            # textual self-restatement detection
+      coding/                   # F33 — the §10.4c post-hoc net
+        detect.py               # cost centre + within-caption natural account, single LE, single period
+        backtest.py             # historical reclass journals as labels; §10.4b bias label MANDATORY
+      anomaly/                  # F42 — TABLE STAKES, over certified datasets only
+    telemetry/                  # F12 — the ground-truth factory, not telemetry
+      disposition_capture.py    # what a human actually did (R1-R6), dwell, evidence expanded, overrides
+    export/
+      journal_import.py         # F40 — Oracle Journal Import shape; export only in MVP1
+      cuec.py                   # obligation S tenant prerequisite checklist + verification record
+    refusal/
+      registry.py               # A19-A22 declared refusals, surfaced as refusals (§5.8)
     api/
-      reconciliations.py, certifications.py, monitors.py, dossiers.py, inventory.py
+      skills.py, runs.py, exceptions.py, dispositions.py, dossiers.py, catalogue.py, inventory.py
 frontend/
   app/
-    reconciliations/            # work queue, risk-graded (F11)
-    reconciliations/[id]/       # the certification surface; renders + captures view (F11, obligation A)
-    monitors/                   # cross-period escalations, controller-facing (F9, F10)
-    inventory/                  # agent inventory + lineage explorer (F5)
-    audit/                      # dossier browse + export (F13)
+    ask/                        # F39 — NL skill invocation + dataset selection with live coverage meter
+    exceptions/                 # risk-graded queue (F41)
+    review/[id]/                # F41 approval surface; renders + captures the rendered view
+    dispositions/               # F35/F32 — open items, expected clearing periods, missed predictions
+    catalogue/                  # F38 — certification status, tie-out result, staleness
+    monitors/                   # F9 cross-period escalations, controller-facing
+    inventory/                  # F5 agent inventory + lineage explorer
+    audit/                      # F1 dossier browse + export
   components/
-    certification/              # no bulk-certify component exists, by construction (§5.3)
-    evidence/                   # citation rendering; uncited residual styled as exception (F8)
-    risk/                       # risk-grade prominence primitives (F11)
+    review/                     # NO bulk-approve component exists, by construction (§5.4)
+    coverage/                   # partial-run banner; "no exceptions" is unrenderable below full coverage
+    refusal/                    # A19-A22 refusal cards (§5.8)
 tests/
   suites/                       # per-suite run.sh; exit codes 0/1/3/4 per manifest
     functional/ ux/ security/ industry/ responsible-ai/ ...
 ```
 
-**Two structural rules binding on `code-agent`:**
+**Five structural rules binding on `code-agent`:**
 
-- `evidence/store.py` exposes **no update or delete path**. Not a private one,
-  not an admin one. `INDUSTRY_KB` §4.3 is explicit that the audit trail cannot
-  be a table an admin can `UPDATE`. Where the operational database and the
-  evidence store share infrastructure at gate 6, the separation is enforced at
-  the storage layer, not by convention.
-- No shared service account across agents (obligation D). `identity/principals.py`
-  is the only place credentials are resolved.
+- `evidence/store.py` exposes **no update or delete path** — not a private one,
+  not an admin one. Where the operational database and the evidence store share
+  infrastructure, separation is enforced at the storage layer, not by convention.
+- **The model never holds an Oracle credential.** `broker/` is the only place a
+  credential is resolved. If the model can reach Oracle directly, every guardrail
+  is advisory regardless of how it is written (obligation M).
+- **`integrity/` contains no model call.** Using an LLM for a checkable
+  arithmetic answer is a defect: it makes a falsifiable answer unfalsifiable
+  (`DOMAIN_KB` §10.2 band D). Asserted by test, not by review.
+- **No SQL string is ever constructed from model output.** `semantic/resolver.py`
+  returns a certified-query identifier plus bound parameters, and nothing else.
+- **Every detector takes a declared population object, never a table name.** This
+  is the phase-2 compatibility seam: adding a non-ERP source in phase 2 must not
+  be a detector rewrite (§8).
 
 ---
 
-## 7 · Proposed backlog — 25 features, each individually approvable
-### (13 build-now, 12 later — plus three explicitly refused, listed for the record)
+## 7 · Backlog — 17 build-now, 16 deferred, 5 refused. Every item individually approvable.
 
 **How to read this.** Every feature is its own approval. The **Default** column
-is my recommendation as a *pre-selection*, not a decision — the human selects
-feature by feature. Nothing has been filtered out: deferred and
-recommend-reject items are all here, with reasoning, so they can be pulled
-forward. **Tier** per §3. **Gated by** lists the obligations from §3.1 that must
-be satisfied for that feature to be built at all.
+is a *pre-selection*, not a decision. Nothing has been filtered out: deferred and
+recommend-reject items are all here with their reasoning attached so they can be
+pulled forward. **Tier** per §3 (1 = read/draft; 2 = can lead to a posting).
+**Gated by** lists the obligations from §3.1 that must be satisfied for the
+feature to be built at all.
 
-### 7.1 Build now — the control spine (default: ON)
+**Mark**, so the commodity is visible at a glance:
 
-| ID | Feature | Tier | Gated by | Default | Reasoning |
-|---|---|---|---|---|---|
-| **F1** | **Evidence dossier store** — append-only, tamper-evident, ≥7yr, one dossier per agent proposal carrying all ten items of `INDUSTRY_KB` §4.3 | 1 | A, C, G, I | **BUILD NOW** | This is the product. `INDUSTRY_KB` §2.3a says the concrete artefact an auditor needs is still promised rather than shipped by incumbents — everything else in the MVP exists to fill this. |
-| **F2** | **Version registry and proposal stamp** — model, prompt, tool/config and corpus as independently versioned artefacts; every proposal stamped with the immutable tuple; prompt/model changes produce a change record | 1 | I, J, K | **BUILD NOW** | `INDUSTRY_KB` §4.4 calls this the single most likely source of a gate-6 surprise. Cheap now, near-impossible to retrofit onto dossiers already written. |
-| **F3** | **Threshold and materiality policy object** — explicit, configurable, versioned, and displayed at certification time | 1 | B | **BUILD NOW** | Obligation B: a threshold living implicitly inside a prompt is untestable and the control fails. Auditors test *against stated thresholds*. |
-| **F4** | **Warehouse extract provenance / IPE record** — every query, as-of timestamp and source extract recorded and tied back to the ERP source | 1 | C | **BUILD NOW** | Obligation C is IPE support and `INDUSTRY_KB` §4.1 calls it the most commonly under-scoped consequence. Also the honest surface for the warehouse-lag defect (`DOMAIN_KB` §5.7, §5.5 above). |
-| **F5** | **Agent identity, inventory and lineage explorer** — every agent a named principal with its own entitlements and log stream; auto-inventoried; every artefact any agent version ever touched enumerable | 1 | D, G | **BUILD NOW** | The inventory is the auditor's first request (`INDUSTRY_KB` §6.2.3). Lineage is the blast-radius answer — and an unanswerable blast-radius question converts a contained error into a scope-wide material weakness (`INDUSTRY_KB` §5.4.5). |
+- **WEDGE** — differentiated; survives Oracle 26B and an all-Oracle ERP-only estate.
+- **FLOOR** — the credibility floor or a control obligation. Not a differentiator,
+  not optional. Ranked first anyway.
+- **NET** — differentiated only in the specific §10.4c sense (post-hoc,
+  ledger-wide, cross-period). Not to be sold as anomaly detection.
+- **TABLE STAKES** — ship it, never lead with it.
 
-### 7.2 Build now — the proving-ground agent (default: ON)
+### 7.0 Supersession map — what happened to the old IDs
 
-| ID | Feature | Tier | Gated by | Default | Reasoning |
-|---|---|---|---|---|---|
-| **F6** | **Externally-verifiable reconciliation agent** — bank and cash-in-transit; ingests warehouse GL balance + external statement, matches, itemises, assembles support, stops at *ready for certification*. **Zero ledger write.** | 1 | A, B, C, G, I | **BUILD NOW** | Deterministic ground truth means gate 8 gets real pass/fail criteria instead of judgment about whether output "looks right" (`DOMAIN_KB` §2, §8). Proving ground, **not the product** (§1). |
-| **F7** | **Auto-certification eligibility rules** — zero-balance / no-activity / within-tolerance accounts certified in aggregate by stated rule, not individually | 1 | B, A | **BUILD NOW** | The control model auditors already accept (`DOMAIN_KB` §2). Without it, F11 spreads fixed attention evenly across items that do not deserve equal treatment — which `DOMAIN_KB` §7.2 argues is *worse than the status quo*. This is the cheapest defence against the attention-budget problem. |
-| **F8** | **Citation-required reconciling items** — every reconciling item must cite a source transaction; an uncited residual **cannot** be classified as a reconciling item, only as an unexplained difference | 1 | B, C | **BUILD NOW** | This is the code-level defence against `DOMAIN_KB` §6.2. The line between "reconciling item with an explanation" and "plug with a story" is exactly the line an LLM is least equipped to hold — so remove the LLM's ability to cross it by making citation a schema requirement rather than a quality expectation. |
+| Old | Status |
+|---|---|
+| F6 matching engine + statement ingestion | **DELETED** — Oracle ARCS. Bank/custodian statements do not arrive in an ERP-sourced warehouse at all (`DOMAIN_KB` §10.1) |
+| F7 auto-certification eligibility | **DELETED** — Oracle ARCS |
+| F8 reconciling-item data model | **DELETED** as written; its §9.1(a) forward-disposition idea survives and is promoted to **F32** |
+| F11 certification workspace | **DELETED** — certification is A21, a load-bearing refusal (§5.8). Its review-surface constraints survive in **F41** |
+| F1, F2, F5, F9, F12 | **Retained**, same IDs, re-scoped (F9 absorbs old F10; F12 promoted from telemetry to ground-truth factory) |
+| F3 threshold policy | **Absorbed** into F36 as the guardrail *Quantitative* class (obligation B) |
+| F4 extract provenance | **Absorbed** into F38's certified dataset catalogue |
+| F13 auditor export | **Absorbed** into F1 (same obligation G artefact) |
+| F10 narrative recurrence | **Absorbed** into F9 as a mandatory second leg, named so it cannot be dropped |
+| F15 policy-cold/exceptions-hot | **Absorbed** into F36 — a guardrail bundle *is* policy approved cold |
 
-### 7.3 Build now — cross-period safety (default: ON, and not tradeable)
+Six merges were made specifically to get under the 18-feature ceiling. Each is
+named above so nothing was lost silently.
 
-| ID | Feature | Tier | Gated by | Default | Reasoning |
-|---|---|---|---|---|---|
-| **F9** | **Cross-period pattern monitor** — detects same agent / same account / same direction recurring below threshold across N periods; escalates on the **aggregate**, presented in iron-curtain terms | 1 | G, I | **BUILD NOW — do not cut** | Both SMEs, independently: the one safety mechanism that must survive scoping (`DOMAIN_KB` §7.2.4; `INDUSTRY_KB` §5.4.3). Per-action approval is blind to this by construction. Also `INDUSTRY_KB` has not seen an incumbent ship it convincingly — it is the safety feature *and* the differentiator. |
-| **F10** | **Narrative-recurrence detector** — flags when an agent's current-period explanation is substantially a restatement of its own prior-period explanation | 1 | G, I | **BUILD NOW — do not cut** | The precise mechanism of `DOMAIN_KB` §6.2: prior-period treatment is legitimate evidence, so the agent's narrative gets *stronger* every month while the underlying error grows. Textual recurrence is the earlier signal than numeric drift. Listed separately from F9 so it cannot be dropped as an implementation detail. |
+### 7.1 Build now — deterministic integrity floor (band D, contains no AI)
 
-### 7.4 Build now — the certification surface, desktop web (default: ON)
+| ID | Feature | Tier | Gated by | Mark | Default | Reasoning |
+|---|---|---|---|---|---|---|
+| **F26** | **Warehouse-to-ERP fidelity + feed staleness** (A1, A2) — does the warehouse equal the ledger by balance, segment and period; missing batches, partial loads, refresh age vs the close clock | 1 | C, Q | **FLOOR** | **BUILD NOW — rank 1** | The precondition for believing any other number the product emits; without it every downstream output is unfalsifiable. Hard arithmetic ground truth, zero blast radius, and unsold by every competitor because they sit on the ERP and do not have the problem (`DOMAIN_KB` §10.5(1)). Ranked first **despite containing no AI**, deliberately. |
+| **F28** | **The five remaining boundary checks** (A6 subledger↔GL control account, A7 intercompany pair imbalance, A8 roll-forward continuity, A9 FX/CTA arithmetic, A10 suspense/clearing residual balance) | 1 | C, Q, R | **FLOOR** | **BUILD NOW** | This is what "balancing" actually means (§2b). All five are boundaries the ERP does not police and all are visible only from the warehouse. A8 in particular catches a closed period having moved and is three lines of SQL that almost nobody runs. Composition of A10 is *not* claimed here — that needs F12's labels. |
 
-| ID | Feature | Tier | Gated by | Default | Reasoning |
-|---|---|---|---|---|---|
-| **F11** | **Risk-graded certification workspace (desktop web)** — default not-certified; riskiest element most prominent; **no "certify all" anywhere**; structured reject-with-reason; the rendered view is captured as evidence | 1 | A, B | **BUILD NOW** | `INTAKE.md` A3.2 made this a design consequence at intake. Scoped as risk *differentiation*, not legibility — `DOMAIN_KB` §7.2 warns that treating it as a layout problem wastes a design cycle. |
-| **F12** | **Review-precision telemetry** — dwell time, evidence expanded, exceptions overridden, speed vs. the individual's own baseline; visible to controller and internal audit | 1 | A | **BUILD NOW** | Two jobs at once: the evidence of *precision* auditors test for (`INDUSTRY_KB` §4.1), and the staff accountant's defence — it records what they were shown, not only what they clicked (`DOMAIN_KB` §6.3). |
-| **F13** | **Auditor export package** — dossiers exportable in a form an auditor consumes **without an application login** | 1 | G | **BUILD NOW** | Obligation G's last clause: auditors want an extract, not a login. And per `DOMAIN_KB` §8, the whole point of the cheap slice is to put the evidence package in front of a real auditor early — you cannot do that without this. |
+### 7.2 Build now — the wedge
 
-**Build-now total: 13 features.** One agent, the spine around it, one surface.
+| ID | Feature | Tier | Gated by | Mark | Default | Reasoning |
+|---|---|---|---|---|---|---|
+| **F29** | **Omission detector family** (A5 +) — recurring accrual/allocation/amortisation that did not run; scheduled reversal that did not reverse; entry that silently stopped when its feed stopped; one-sided intercompany. Built on a shared multi-period expectation model | 1 | C, Q, R, G, I | **WEDGE — the headline** | **BUILD NOW** | `INDUSTRY_KB` §10.3: *the product detects what did not happen.* Evidence of an absence is not in the ledger, so a ledger-resident agent structurally cannot see it — and **source count is irrelevant to this claim**, which is why the ERP-only decision leaves it intact. ERP history alone supplies the expectation model. Omission is a real misstatement and is invisible to every detector that looks at what posted. |
+| **F9** | **Cross-period surveillance — two mandatory legs**: (i) numeric sub-threshold accumulation, same account/direction across N periods, escalated on the **iron-curtain aggregate**; (ii) **narrative recurrence** — the agent restating its own prior-period explanation | 1 | G, I | **WEDGE** | **BUILD NOW — do not cut** | `DOMAIN_KB` §6.2/§7.2.4 and §10.6(2): invisible in-period by construction, which is why no incumbent sells it; and it is the only control addressing the worst harm this system can cause. Leg (ii) is named explicitly because `DOMAIN_KB` §9 predicts it will otherwise be dropped as an implementation detail — it is the *earlier* signal. |
+| **F35** | **Resolution typing R1–R6 as first-class outcomes** — R1 accepted+explained **with a mandatory expiry**, R2 data-side fix, R3 reclass, R4 correcting/accrual journal, R5 handoff with named owner + due date, R6 control-state change | 1 | A, G, I | **WEDGE** | **BUILD NOW** | `DOMAIN_KB` §10.2: **R2 and R5 are the majority outcome and nobody models them as first-class.** Every competitor terminates at a flagged item in a queue. If posting is the default terminal state, the UI makes the safe answer harder to record than the risky one. R6 is also §5.1's answer to detection-without-consequence. |
+| **F32** | **Forward disposition** — every disposition records an expected clearing period; the next period tests the prediction against reality; a miss raises the account's risk grade and revokes auto-pass eligibility (R6) | 1 | A, G, I | **WEDGE** | **BUILD NOW — most retrofit-hostile item in the backlog** | `DOMAIN_KB` §9.1(a)/§10.7: converts an unfalsifiable narrative into a falsifiable one, and it is **impossible to retrofit** — the prediction must have been recorded in the prior period. Ship without it and the control cannot exist for a year. A disposition without an expected clearing period must be *unsaveable*, not merely discouraged. |
+| **F12** | **Disposition & review-precision capture** — for every flagged item: what the human actually did (R1–R6), how long they spent, what evidence they expanded, what they overrode | 1 | A, G | **WEDGE — enabler** | **BUILD NOW — promoted** | `DOMAIN_KB` §10.9(3): **this is not telemetry, it is the ground-truth factory.** Detection has no ground truth for "is this an anomaly"; it has ground truth for "was it acted on", and that label exists only if we manufacture it. Every phase-2 accuracy claim and every phase-2 gate-8 suite is unfalsifiable without it. It is simultaneously the staff accountant's defence (`DOMAIN_KB` §6.3): it records what they were shown, not only what they clicked. |
 
-### 7.5 Later — default OFF, all visible, all pullable-forward
+### 7.3 Build now — governance, guardrails and the one action
 
-| ID | Feature | Tier | Gated by | Default | Reasoning |
-|---|---|---|---|---|---|
-| **F14** | **Fresh-eyes rotation control** — periodic forced re-derivation of an aged residual from source, without prior-period context in the agent's window | 1 | G, I | **LATER** — *my least confident deferral* | It restores the undocumented human control this product removes (`DOMAIN_KB` §6.2). F9/F10 *detect* the pattern; F14 *breaks* it. Deferred only because it needs ≥2 periods of history to act and the MVP launches with none. Pull it forward if you disagree — I would not argue hard. |
-| **F15** | **Policy-cold / exceptions-hot approval model** — pre-approve rules and thresholds outside the close window; see only exceptions inside it | 1 | B, A | **LATER — gate 6** | This is the alternative to per-action approval (`DOMAIN_KB` §7.2.1). Building it now would pre-empt a decision `INTAKE.md` records as the human's defining one. It belongs to gate 6, informed by F9's output. Listed so it is not forgotten. |
-| **F16** | **Tier 1 builder** — accountants compose read/draft-only agents freely; no write capability of any kind | 1 | F, D, G, I, J | **LATER** | `industry-expert` §6.3 recommends exactly this shape, and it is the second half of the BOTH product decision. Deferred because it requires author-role SoD (obligation F), definition versioning and a non-bypassable inventory to be *already working* — which is what F2 and F5 build. First `/enhance-project`. |
-| **F17** | **Pre-built, vendor-change-controlled Tier 2 posting agents** — a small set of ledger-writing agents inside the vendor's own change control | **2** | **all A–K**, esp. E, F, H, K | **LATER** | The write-back half — the defining feature of the product, and the *second* thing to prove, not the first (`DOMAIN_KB` §8). Entry conditions are the full eleven obligations plus a gate-6 resolution of the A-write question and of `DOMAIN_KB` §5.5 rollback semantics. |
-| **F18** | **User-promoted Tier 2** — promotion workflow granting a user-built agent write capability: named owner, documented scope, thresholds, independent reviewer ≠ author, recorded approval, version stamp | **2** | **all A–K** | **LATER** | `industry-expert` §6.3 explicitly defers this. Its value is that promotion *is* the change-control record whose absence would be the audit finding — but it cannot exist before F16 and F17. |
-| **F19** | **Cross-source reconciliation using the warehouse vantage** — differences originating *between* systems (CRM ↔ billing ↔ ERP), which ERP-embedded agents structurally cannot see | 1 | A, B, C, G, I | **LATER — first to pull forward** | The most-cited 2026 practitioner complaint and a structural advantage from `INTAKE.md` A6.1 that BlackLine cannot easily match (`INDUSTRY_KB` §2.3b). Deferred only because it needs the spine and single-source rec working first. This is the feature I would build immediately after MVP. |
-| **F20** | **Long-tail account onboarding** — bring the few hundred entity-specific accounts your close platform never templated onto the same evidence spine | 1 | A, B, C, G, I | **LATER** — *and my deferral here is contestable* | `DOMAIN_KB` §7.3 opening (1): lands in the gap between the platform and the spreadsheet, needs no displacement and no control re-baselining. It is arguably the actual commercial wedge, not F6. I defer it only because it is unbounded in shape until the spine exists. Worth arguing about. |
-| **F21** | **Flux / variance narrative agent** — driver attribution with cited source rows, read-only | 1 | C, I | **LATER** | Reaches the FP&A persona — the one the MVP does not serve (§7 Conflict 1) — with zero ledger risk. Deferred because it adds no learning to the control spine and is commoditising fast (`INDUSTRY_KB` §7 B1). Pull forward if persona coverage matters more than spine depth. |
-| **F22** | **Accrual proposal agent** — with explicit uncertainty and mandatory evidence citation | 1 (proposal) → 2 (if posting) | A–K if it ever posts; A, B, C, G, I as Tier 1 | **LATER — recommend not before F9 + F17** | Highest close-window pain and the strongest commercial pull, *and* the top statistical cause of restatement (`DOMAIN_KB` §4), with no in-period ground truth. It is `DOMAIN_KB` §6.2 in its purest form. Only viable once F1, F9, F10 and F11 are proven. Shown here because the pull toward it will be strong and it should be resisted deliberately, not by omission. |
-| **F23** | **Native mobile: read / monitor / notify only** — close status, monitor escalations, notifications. No approval, no certification. | 1 | A, G | **LATER** — *see decision D2* | Genuinely useful for the controller persona and the honest use of the third surface. Deferred to keep MVP scope at one surface, not because the surface is wrong. |
-| **F24** | **Approving or certifying from native mobile** | 1 (→2 later) | A, B | **RECOMMEND REJECT — see D2** | `industry-expert` §7 C2: mobile is the worst possible surface for an evidence-of-review control under time pressure — small screen, low scrutiny, exactly the 11pm scenario. A control argument, not a cost argument. Shown, not filtered, because it is your decision to overrule. |
-| **F25** | **Standing PBC / audit-request responder** — answers recurring auditor requests directly over the dossier store | 1 | G | **LATER** | Turns F1/F13 into recurring visible value *between* closes, in the "Post" row `INDUSTRY_KB` §3 calls the unglamorous gap. Genuinely good; simply not needed to prove anything the MVP must prove. |
+| ID | Feature | Tier | Gated by | Mark | Default | Reasoning |
+|---|---|---|---|---|---|---|
+| **F36** | **Guardrail engine + action broker** — six classes (scope, capability, quantitative, temporal, identity/SoD, blast radius); **deny-by-default capability allowlist**; hash-addressed immutable **bundle** as the versioned unit; bundle hash + decision ID on every action; shadow/audit mode for new rules; sanctioned override path; **scheduled negative-control fixture suite**; **stateful blast-radius caps** | 1 | B, E, F, J, L, M, N, O, P | **WEDGE (blast radius) + FLOOR** | **BUILD NOW** | This is what "under guardrails" actually requires (`INDUSTRY_KB` §13). Enforced at the broker, **never the UI** — a guardrail in the approval screen is bypassed by the API, by a scheduled run, and by the next surface we add, and A5.1 gives us three surfaces. The model never holds the Oracle credential. Blast-radius caps are the one guardrail an incumbent's per-transaction rules engine cannot express. Operating effectiveness is evidenced by the negative-control suite, **not** by logging non-events. |
+| **F38** | **Certified dataset catalogue + coverage** — governed dataset objects (source lineage, as-of, refresh status, row count, content hash, ERP tie-out result, certifying owner, version); per-skill **declared expected population**; computed, displayed coverage; partial runs labelled everywhere and **structurally incapable of emitting "no exceptions"** | 1 | C, Q, R | **FLOOR** | **BUILD NOW** | `INDUSTRY_KB` §14: dataset selection is a **control failure, not user error**, and under-selection is the one that bites because a 70% scan looks pixel-identical to a 100% scan. Also discharges obligation C (promoted) and absorbs old F4's provenance record. Cheap now, impossible to retrofit once users have learned to read the output format. |
+| **F39** | **Certified semantic/metric layer + NL skill interface** — versioned joins and measures; natural language **selects and parameterises a certified query, never authors one**; dataset selection with a live coverage meter; NL inquiry over the same layer | 1 | Q, R, I | **FLOOR** (the certified layer) + **TABLE STAKES** (the NL inquiry leg) | **BUILD NOW** | The human's Part 2 surface. **No free-form SQL in MVP1**: frontier models score 17–21% on Spider 2.0 against real enterprise schemas, and a finance user cannot tell a wrong join from a right one by looking at the answer (`DOMAIN_KB` §10.8). The NL layer is the interface; the governance of what it invokes is the product. |
+| **F41** | **Risk-graded review & approval surface (desktop web)** — default not-approved; **no "approve all" at any permission level**; riskiest element most prominent; structured reject; **rendered view captured as evidence**; override-rate and dwell surfaced to the controller; injected known-error probes | 1 | A, B, F, O | **FLOOR** | **BUILD NOW** | `INTAKE.md` A3.2's 11pm problem. Scoped per `INDUSTRY_KB` §15.4's anti-recommendation — **volume reduction and override-rate monitoring, not prettier reasoning**, because clearer AI explanations make reviewers defer *more* (§5.4). This is the leg of the two-key model that we own and that Oracle's journal screen cannot supply. |
+| **F1** | **Evidence dossier store + auditor export** — append-only, tamper-evident, ≥7 yr; one dossier per proposal carrying the version tuple, dataset version, guardrail bundle hash, decision ID, coverage statement and rendered view; exportable in a form an auditor consumes **without an application login** | 1 | A, C, G, I | **WEDGE** | **BUILD NOW** | With Oracle holding the ledger, **the dossier is the only artefact that explains why Oracle contains what it contains** (`INDUSTRY_KB` §10.4 rank 3). Absorbs old F13: the export is the same obligation-G artefact and splitting them invited dropping the half auditors actually use. |
+| **F2** | **Version registry and proposal stamp** — model, prompt, tool/config, corpus, **dataset version and guardrail bundle hash** as independently versioned artefacts; change record on every model/prompt/**policy** change | 1 | I, J, K | **FLOOR** | **BUILD NOW** | Cheap now, near-impossible to retrofit onto dossiers already written. A guardrail edit is a control change (obligation J), so the bundle diff *is* the change record. |
+| **F5** | **Agent identity, inventory and lineage** — each agent a named principal with its own entitlements and log stream; auto-inventoried; every artefact any agent version ever touched enumerable | 1 | D, G | **FLOOR** | **BUILD NOW** | The inventory is the auditor's first request; lineage is the blast-radius answer, and an unanswerable blast-radius question converts a contained error into a scope-wide material weakness. Pairs with obligation S's dedicated Oracle journal source, which gives the same answer on the customer's own ledger. |
+| **F40** | **Reclass proposal → Oracle Journal Import export** — a fully-formed journal in Journal Import shape, per-action approved in-product, **exported for a human to post; MVP1 does not post**. Includes the dedicated journal source/category design and the per-tenant CUEC verification checklist | **2** | A, B, E, F, H, L–P, **S** | **FLOOR** (this is how value lands) | **BUILD NOW** | `DOMAIN_KB` §10.7: not because writing is wrong — the human is explicit that we trigger postings — but because of the wholesale property: an agent with a wrong mapping does not err once, it errs **400 times in ninety seconds** through exactly this path. **Concrete promotion gate, so this is a step and not a hedge:** direct triggering of R3 postings is enabled once F12 shows one full closed period at **≥95% precision on accepted reclass proposals**, with a per-batch line cap and **batch-level, not line-level, approval** (400 individual approvals is not a control). |
 
-### Explicitly refused (shown for completeness, not proposed)
+### 7.4 Build now — the post-hoc coding net, and table stakes
 
-These appear in `INDUSTRY_KB` §7 Tier C and I am not putting them forward as
-features at all. Listed so the record shows they were considered and why they
-are absent.
+| ID | Feature | Tier | Gated by | Mark | Default | Reasoning |
+|---|---|---|---|---|---|---|
+| **F33** | **GL coding anomaly detection + reclass backtest evidence** (A11) — scoped to **cost-centre and within-caption natural-account reclasses, single legal entity, single period**. Legal-entity/IC and opex/capex **excluded**; cut-off **detect-only**. Backtested against historical reclass journals on a held-out period | 1 | C, Q, R, I, B | **NET (§10.4c)** — *not* a wedge on its own | **BUILD NOW** | The only feature in the inventory whose accuracy can be **measured before shipping** (`DOMAIN_KB` §10.4b), and its resolution R3 is the safest posting that exists. It survives an all-Oracle estate as the **post-hoc, ledger-wide net that catches what Oracle's pre-post Payables Agent let through** — a different job from single-document classification. **Mandatory caveat in the test-evidence schema, not a footnote:** reclass journals record only the errors someone *caught*, so recall is blind to the `DOMAIN_KB` §6.2 class and must be reported as *"recall against caught errors"*. Excluded sub-types have tax/transfer-pricing and restatement-grade blast radius (§10.4a) and stay out until precision is measured. |
+| **F42** | **Present-anomaly detection over certified datasets** — balance-movement and journal outliers | 1 | Q, R, I | **TABLE STAKES** | **BUILD NOW — and this is the first thing I would cut** | Users expect it and its absence reads as a gap, so it ships. It is **bundled inside Oracle 26B**, so it is never the headline, never in a deck, and never a claim (`INDUSTRY_KB` §10.2). Scoped to the smallest credible version, over certified datasets only, subject to obligation R. If scope bites, cut this before anything in §7.1–§7.3. |
 
-- **Auto-post below a threshold / "autonomous close."** Contradicts `INTAKE.md`
-  §A-write and nobody credible runs it (`INDUSTRY_KB` §2.2).
-- **Agent-reviews-agent as a substitute for human approval.** Fails the
-  fraud-deterrence leg of SoD (`INDUSTRY_KB` §4.2 problem 2). An agent may
-  contribute to accuracy review; it may never be the only reviewer of anything
-  that posts.
-- **Natural-language ad-hoc ledger querying as a headline feature.** Oracle and
-  everyone else has it; not a purchase driver (`INDUSTRY_KB` §7 C4).
+**Build-now total: 17.** Ceiling was 18. The previous cut was 13 features and
+`functional-agent` estimated it at 9–12 months — this set is larger in count but
+has lost the matching engine, statement ingestion and certification workspace,
+which were the three heaviest items in it.
 
-### Conflict 1 — persona coverage (raised, not resolved)
+### 7.5 Deferred — default OFF, all visible, all pullable-forward
 
-The Decisions Log binds all three personas as primary. The build-now set serves
-**two**: the staff accountant (F6, F8, F11, F12) and the controller (F5, F9,
-F10, F12, F13). **The FP&A analyst is not served by the MVP.** Their feature is
-F21, defaulted to later.
+| ID | Feature | Tier | Gated by | Mark | Default | Reasoning |
+|---|---|---|---|---|---|---|
+| **F43** | **Unposted / incomplete accounting detector** (A3) — SLA entries left in Draft, unaccounted transactions, untransferred batches | 1 | C, Q | FLOOR | **LATER** | Deterministic and cheap. Deferred purely on the count ceiling: it is a *known* gap, loudly visible at close already, so it is the lowest-value deterministic check. Cheapest item to pull forward. |
+| **F44** | **Accrual completeness / unrecorded-liability search** (A13) — subsequent disbursements, received-not-invoiced, open PO receipts | 1 | C, Q, R, I | WEDGE-adjacent | **LATER — phase 2 rank 1** | High value and completeness errors are the top restatement category. Deferred because its resolution is R4 (numbers change), its ground truth is retrospective, and it needs F12's labels first. |
+| **F45** | **Flux detection + driver decomposition** (A14) — which accounts moved and which transactions/segments explain the move **arithmetically**. Read-only, no narrative | 1 | C, Q, R | FLOOR | **LATER** | Deterministic and genuinely useful, and it is the FP&A persona's feature (§7.6). Deferred over F29/F9; it is the item to pull forward if persona coverage matters more to you than depth. |
+| **F14** | **Fresh-eyes re-derivation** — periodic forced re-derivation of an aged item **by a different derivation path** | 1 | G, I | WEDGE | **LATER** | F9 *detects* the §6.2 pattern; this *breaks* it. `DOMAIN_KB` §9.2 is emphatic: re-deriving with the same model and prompt and a suppressed context is **the same eyes with amnesia**, and its agreement gets filed as corroboration — strictly worse evidence than one opinion. Needs a different model, a deterministic check, or a human. Needs ≥2 periods of history, which MVP1 will not have at launch. |
+| **F16** | **Skill authoring (Tier 1 only)** — users compose read/draft-only skills; no action capability of any kind | 1 | D, F, G, I, J, L, Q | — | **LATER — first `/enhance-project`** | The second half of the BOTH product decision, not dropped. Gated on **author ≠ approver ≠ invoker**, which `DOMAIN_KB` §10.8 states does not exist yet. Whoever defines a skill's dataset scope and thresholds is an *author* with more effective control than either preparer or approver. |
+| **F17** | **Direct triggering of R3 postings into Oracle** | **2** | all A–S | — | **LATER — behind the §7.3 promotion gate** | Not a hedge: the gate is numeric and stated (≥95% precision over one closed period, per-batch line cap, batch-level approval). |
+| **F18** | **User-promoted Tier 2** — promotion workflow granting a user-authored skill action capability | **2** | all A–S | — | **LATER** | Promotion *is* the change-control record whose absence would be the audit finding. Cannot exist before F16 and F17. |
+| **F20** | **Long-tail onboarding** — the few hundred entity-specific accounts no close platform templated, onto the same spine | 1 | A, C, F, G, I, Q | WEDGE | **LATER** — *my most contestable deferral* | `DOMAIN_KB` §7.3 opening (1): lands in the gap between the platform and the spreadsheet, needs no displacement and no SOX re-baselining. `DOMAIN_KB` §9.5 correctly identifies it as F16 under another name, so it inherits obligation F. Worth arguing about. |
+| **F22** | **Accrual / estimate proposal** (A19-adjacent) | 1 → 2 | all A–S if it posts | — | **LATER — recommend not before F12 labels + F17** | Strongest commercial pull *and* the top statistical cause of restatement, with no in-period ground truth. It is `DOMAIN_KB` §6.2 in its purest form. Listed because the pull toward it will be strong and it should be resisted deliberately, not by omission. Note the boundary: proposing an accrual is not A19 (booking an estimate); the line must be re-drawn explicitly when this is picked up. |
+| **F23** | **Native mobile: read / monitor / notify only** | 1 | A, G | — | **LATER** | The honest use of the third surface for the controller. Deferred to keep MVP1 at one surface — not because the surface is wrong. |
+| **F24** | **Approving from native mobile** | 1 (→2) | A, B, F, O | — | **RECOMMEND REJECT** | Mobile is the lowest-scrutiny approval surface that exists and A3.2's 11pm scenario is exactly where it would be used. A control argument, not a cost one. Shown, not filtered — yours to overrule. |
+| **F25** | **Standing PBC / audit-request responder** over the dossier store | 1 | G | WEDGE-adjacent | **LATER** | Falls out of F1 nearly for free (`INDUSTRY_KB` §11 row 13) and creates visible value *between* closes. Not needed to prove anything MVP1 must prove. |
+| **F46** | **Flux narrative drafting** (A15) | 1 | C, I | TABLE STAKES | **RECOMMEND REJECT for MVP1** | `DOMAIN_KB` §9.4: the second-most-dangerous item on any list it appears on. Band G, no ground truth, and its product becomes *management's stated explanation of results* in the close pack and audit-committee deck. Low ledger risk, **high representation risk**. Also shipped in Oracle 26B. |
+| **F47** | **Duplicate / near-duplicate detection** (A4) | 1 | Q, R | TABLE STAKES | **RECOMMEND REJECT** | Owned by the ERP, the recovery-audit industry and every AP vendor, with a **30–50% false-positive rate** — spending the scarce attention budget on the least differentiated thing we could ship. |
+| **F48** | **Journal-entry risk scoring** (A12) | 1 | Q, R, I | TABLE STAKES | **RECOMMEND REJECT** | MindBridge's product, aimed at a **different buyer** (internal/external audit, not the controller's close team) and a different moment. Weakest ground truth in the L band. Building it walks into their product with their buyer. |
+| **F49** | **Close task / checklist orchestration** (A17) | 1 | — | TABLE STAKES | **RECOMMEND REJECT** | FloQast's core product. Choosing a fight over the one part of close that is already solved. |
 
-I did this deliberately — F21 teaches the control spine nothing — but it is a
-partial departure from a binding decision and it is the human's to accept or
-overrule. The remedy, if you want three-persona coverage in the MVP, is to
-switch F21 to build-now, at the cost of a second agent's worth of scope. I do
-not recommend it; I do flag it.
+### 7.6 Load-bearing refusals — A19–A22
 
----
+These are **not** unbuilt backlog items. They are a stated design property, and
+per §5.8 they appear in the product **as refusals**, with §11 testing for the
+presence of the refusal rather than the absence of the capability. *"Not built
+yet" and "will never be built" are the same screen to a user and opposite
+answers to an auditor.*
 
-## 8 · Decisions I am putting to the human at this gate
+| A# | Refused | Why |
+|---|---|---|
+| **A19** | Estimates, reserves, allowances, impairment, valuation | Top restatement cause; no in-period ground truth; the purest form of the §6.2 mechanism |
+| **A20** | Materiality / SAB 99 / iron-curtain conclusions | An agent that concludes "immaterial" has automated the decision that suppresses its own errors |
+| **A21** | Certification and sign-off | The signature *is* the control; automating it removes the thing being evidenced |
+| **A22** | Contentious cut-off and technical-accounting conclusions | No ground truth. May be *supported* by F44/F45 output, never concluded |
 
-### D1 · Public vs. private target customer — **open question, I am not answering it**
+Also refused outright, carried forward: **auto-post below a threshold /
+"autonomous close"** (contradicts §A-write); **agent-reviews-agent as a
+substitute for human approval** (fails the fraud-deterrence leg of SoD); and
+**free-form NL-to-SQL over arbitrary datasets** (§2c).
 
-`INDUSTRY_KB` §8 flags this as a human decision and it is the one I most need
-answered.
+### 7.7 Conflict 1 — persona coverage (raised, not resolved)
 
-**§404(b) external auditor attestation on ICFR applies only to public filers**
-(and not to all of them — non-accelerated filers are exempt). It determines how
-hard the entire §4 compliance surface bites:
+The Decisions Log binds all three personas as primary. This cut serves the staff
+accountant (F41, F29, F33, F40) and the controller (F9, F32, F12, F36, F1) fully,
+and the FP&A analyst **partially for the first time** — F39's NL inquiry over
+certified, provenance-stamped datasets is a genuine FP&A surface, which the
+superseded plan did not have. Full FP&A coverage needs F45 (flux driver
+decomposition), which I default to later.
 
-- **Public accelerated filer** — an external auditor independently tests and
-  opines on the controls this system participates in. The evidence layer is not
-  a nice-to-have; it is tested annually by someone with no incentive to be
-  generous, and the `DOMAIN_KB` §6.2 scenario ends in an Item 9A disclosure.
-  This makes F1, F2, F13 unambiguously correct as MVP scope, and it makes F13's
-  "consumable without an app login" a hard requirement rather than a
-  convenience.
-- **Private or non-accelerated** — management still asserts on controls, but no
-  §404(b) attestation. The compliance floor is materially lower, the buyer's
-  urgency is lower, and a lighter evidence layer would be commercially
-  defensible. Some of the spine could arguably be traded for reach.
-
-**This changes the recommended MVP.** If the answer is "private," a reasonable
-person would cut some of F1–F5 and add F19 or F21 instead. I have built the
-backlog on the **public-filer assumption**, because that is the harder floor and
-because `INDUSTRY_KB` §4.1 states there is no "pilot outside SOX" path once
-A-write is in play. If that assumption is wrong, say so now and I will re-cut
-the split rather than have gate 6 discover it.
-
-Note also (`INDUSTRY_KB` §4.4): restatements are concentrated in smaller,
-non-accelerated filers — so "private/small" is the lower *compliance* floor but
-not the lower *risk* floor.
-
-### D2 · The mobile surface — narrow it, or keep all three?
-
-`industry-expert` §7 C2 recommends: **native mobile is read / monitor / notify
-only; approval and certification happen on desktop web.** This is a control
-argument — mobile is the lowest-scrutiny approval surface that exists, and
-shipping it early ships the theatre before the control (`DOMAIN_KB` §8).
-
-`INTAKE.md` A5 records three surfaces as binding, so this is yours to decide,
-not mine to cut. Three options:
-
-1. **Adopt the recommendation** — F23 (read/monitor/notify) later, F24 (mobile
-   approval) rejected. *My default.*
-2. **Keep mobile approval on the roadmap** — F24 moves from reject to later,
-   with a gate-6 obligation on `responsible-ai-architect` and `ui-ux-designer`
-   to show how evidence-of-review precision survives a phone screen.
-3. **Reduce to two surfaces** — desktop web + mobile web only. Note this would
-   change the `INTAKE.md` A5 consequence and should be recorded as an amendment
-   if chosen; `solution-architect` remains non-droppable either way.
-
-Whatever is chosen, it affects gate 5 (Experience Design) directly and should be
-settled here rather than there.
+That is still a partial departure from a binding decision. The remedy, if you
+want it closed now, is to switch **F45** to build-now — *not* F46, which is the
+dangerous one wearing the same clothes.
 
 ---
 
-## 9 · Obligations this plan hands forward
+## 8 · Phase 2 — what the ERP-only decision defers
+
+Named here so expansion is planned rather than remembered. Each item states the
+seam MVP1 must leave open, because the point of writing this now is that phase 2
+must not be a rewrite.
+
+| # | Deferred by the ERP-only decision | Seam MVP1 must leave open |
+|---|---|---|
+| **P1** | **Cross-source omission detection** — cut-off items sitting in a source system that never reached the ERP; a subledger that closed with a source population smaller than operational activity implies | F29's expectation model keys on an **expected event**, not on a GL table. `detectors/base.py` takes a declared population object, never a table name (§6.2 rule 5) |
+| **P2** | **Non-ERP expectation inputs** — procurement, contracts, HR, operational volumes as evidence of what *should* have posted. `DOMAIN_KB` §10.6(3) calls this the scope no single ERP module sees | F38's catalogue is source-agnostic: a certified dataset carries lineage and tie-out status, not an assumption that its source is Oracle |
+| **P3** | **The cross-system seam as headline positioning** (`INDUSTRY_KB` §10.4 rank 4) | Nothing in MVP1's copy or UI may claim single-source coverage as completeness. Obligation R's coverage statement is the mechanism |
+| **P4** | **Heterogeneous / post-acquisition / multi-ERP estates** — `DOMAIN_KB` §10.6's targeting instruction names this as the strongest market condition | The broker abstracts the ERP; a second ERP is a second broker adapter and a second CUEC checklist, not a detector change |
+| **P5** | **Warehouse-vs-ERP fidelity as a *differentiator*** | It stays in MVP1 as F26, the credibility floor. The claim is deferred, the capability is not |
+| **P6** | **A10 residual *composition*** (as opposed to balance) — §6.2's home address | Needs F12's labels. F28 ships the balance leg only; the composition leg is a phase-2 detector over the same boundary object |
+| **P7** | **Bank / custodian statements** | Structurally out of reach from an ERP-sourced warehouse and out of scope regardless (`DOMAIN_KB` §10.1). If a treasury source appears in phase 2 it enters as a certified dataset — **still not a matching engine** |
+| **P8** | **A7 intercompany *cause* diagnosis** | MVP1 ships the imbalance number (F28) and the one-sided case (F29). Cause has no ground truth and waits for labels |
+
+**Deployment prerequisite created by this, for `solution-architect` and
+go-to-market:** `INDUSTRY_KB` §10.4 flags that a one-source Oracle replica
+warehouse is the weakest case. MVP1 is deliberately built to survive it via the
+four items in §1 — but the presence of non-Oracle sources is a **qualification
+question for any pilot customer**, belonging in deployment prerequisites rather
+than being discovered in implementation.
+
+---
+
+## 9 · Calls made under standing authorization, and the one escalation
+
+The human authorized MVP1 and asked that SME judgement be trusted. So the calls
+below are **made**, not returned. Each is recorded here so it is reviewable
+after the fact, and each states what would reverse it.
+
+### 9.1 The one genuine escalation — public vs. private filer
+
+**This is the only item I cannot decide, because it is a fact about the customer
+rather than a judgement.** `INDUSTRY_KB` §15.5 carries it too, and it has been
+open since gate 1.
+
+§404(b) external auditor attestation on ICFR applies only to public filers, and
+not to all of them. It determines how hard the whole obligation surface bites.
+**I have built on the public-filer assumption**, because it is the harder floor
+and because there is no "pilot outside SOX" path once postings are in play. If
+the target is private or non-accelerated, a reasonable person would trade some
+of F1/F2/F5 for reach — likely F45 and F44 pulled forward.
+
+Note the asymmetry, so "private" is not misread as "safer": restatements are
+concentrated in smaller, non-accelerated filers. Private is the lower
+*compliance* floor, not the lower *risk* floor.
+
+**No build decision is blocked on this.** It changes the deferred/build-now
+split at the margin, not the spine.
+
+### 9.2 Calls I have made (assumptions, reversible)
+
+| # | Call | Basis | What would reverse it |
+|---|---|---|---|
+| **A1** | **MVP1 exports rather than posts.** One Tier 2 feature, terminating in a Journal Import file | `DOMAIN_KB` §10.7's wholesale-error argument, with a numeric promotion gate so it is a step and not a hedge | F12 showing ≥95% precision over one closed period → F17 |
+| **A2** | **One surface: desktop web.** F23 mobile read/monitor/notify deferred; F24 mobile approval recommend-reject | Mobile is the lowest-scrutiny approval surface and A3.2 describes exactly when it would be used. `INTAKE.md` A5's three surfaces are honoured as a roadmap, not cut | Human overrules F23/F24 defaults — both are on the list for exactly that purpose |
+| **A3** | **Coding detection scoped to cost-centre and within-caption natural account, single LE, single period** | Excluded sub-types carry tax/transfer-pricing and restatement-grade blast radius (`DOMAIN_KB` §10.4a) | Measured precision from F33's backtest |
+| **A4** | **Cut-off is detect-only**, not proposal-generating | It is a real misstatement class and structurally the same query shape, but its resolution is a period-move, not a reclass | Same as A3 |
+| **A5** | **Present-anomaly detection ships but is marked as the first thing to cut** | `INDUSTRY_KB` §10.2: bundled inside Oracle 26B, close to zero willingness to pay | Nothing — it ships either way; only its priority is at stake |
+| **A6** | **Six merges to hit the ≤18 ceiling** (§7.0) | The 13-feature previous cut was estimated at 9–12 months before guardrails existed | Human un-merges any of them; each is named so that is possible |
+| **A7** | **The A19–A22 refusals are a shipped surface, not an absence** | `DOMAIN_KB` §10.3: a product that visibly refuses them is one a controller can take to an audit committee | Not reversible in my view; raise it if you disagree |
+
+### 9.3 Decisions handed to gate 6, not settled here
+
+- **Per-action vs. policy-cold/exceptions-hot approval.** Both SMEs asked for
+  this to be re-opened at Architecture. F36's bundle model *is* policy approved
+  cold, so MVP1 builds the mechanism without pre-empting the decision about what
+  reaches a human hot.
+- **Warehouse-lag resolution** (`DOMAIN_KB` §5.7, promoted to a first-class
+  product problem by §10.1). MVP1 discloses staleness on the face of every
+  number; the architecture must resolve it.
+- **Whether the operational store and the evidence store share infrastructure**,
+  and how the no-update guarantee is enforced at the storage layer.
+
+---
+
+## 10 · Obligations this plan hands forward
 
 Recorded so they are not rediscovered. None are absorbed into backlog items.
 
 | Owed by | Gate | What |
 |---|---|---|
-| `responsible-ai-architect` | 2/6 | Written EU AI Act classification assessment. Note `INDUSTRY_KB` §4.5: the *not-high-risk* conclusion is itself a document that must exist before service, not an informal view. Plus a per-composed-agent classification gate once F16 ships. |
-| `security-architect` | 6 | Whether the warehouse holds personal data (payroll, commission, expense) → GDPR and model-provider transfer analysis. Owns obligations A–K per the Active Team roster. |
-| `solution-architect` | 6 | WORM/immutable audit store selection and ≥7-year retention design (obligation G). Model-deprecation migration control (obligation K). **Resolution of the warehouse-lag defect** (`DOMAIN_KB` §5.7). Mandatory Impact Analysis per `INTAKE.md` A5. |
-| Gate 6 | 6 | **Re-open the per-action approval decision**, per both SMEs. F15 is the alternative on the table. |
-| `industry-expert` + `test-agent` | 7 | The industry/compliance test suite **does not exist yet** (`INDUSTRY_KB` §8). Scenarios derive from obligations A–K and `DOMAIN_KB` §6.2. Test Policy is all-suites-blocking, so this suite must exist and return `0`, not `3`. |
-| `ui-ux-designer` | 5 | F11's hard constraints (§5.3), including the deliberate friction that this agent is expected to object to. Per standing preference, gate 5 requires a **rendered mockup**, not spec text. |
+| `responsible-ai-architect` | 2/6 | Written EU AI Act classification assessment — the *not-high-risk* conclusion is itself a document that must exist before service, not an informal view. **Plus**: own the `INDUSTRY_KB` §15.4 anti-recommendation as a design constraint — clearer explanations increase reviewer deference, so F41 must be judged on override rate and volume, not on explanation quality. Per-composed-skill classification gate once F16 ships. |
+| `security-architect` | 6 | Whether the warehouse holds personal data (payroll, commission, expense) → GDPR and model-provider transfer analysis. Owns obligations A–S. **New**: the broker is the sole credential holder (M) and the model must be unable to reach Oracle — this is a security boundary, not a code convention. |
+| `solution-architect` | 6 | WORM/immutable store selection and ≥7-year retention (G). Model-deprecation migration control (K). **Resolution of the warehouse-lag problem** (`DOMAIN_KB` §5.7/§10.1, now first-class). Enforcement topology for M across three surfaces. Mandatory Impact Analysis per `INTAKE.md` A5. |
+| `solution-architect` + deploy | 6/9 | **CUEC verification per tenant** (obligation S): Oracle journal approval enabled for our dedicated source and category, AutoPost unable to post it unapproved, ETL completeness, source extract integrity. Verified at deployment **and on tenant configuration change** — a CUEC relied on but never checked is a finding waiting for the first audit. |
+| Gate 6 | 6 | Re-open the per-action approval question (§9.3). |
+| `industry-expert` + `test-agent` | 7 | The industry/compliance suite **does not exist yet**. Scenarios derive from obligations A–S and `DOMAIN_KB` §6.2. All suites blocking, so it must exist and return `0`, not `3`. |
+| `functional-agent` | 3 | Devil's-advocate pass on this re-cut. I expect the sharpest challenges on F42's inclusion, on whether 17 is genuinely under the ceiling or 18 wearing a merge-shaped disguise, and on my deferral of F20. |
+| `ui-ux-designer` | 5 | F41's hard constraints (§5.4), the coverage meter and partial-run banner (§5.5), and the A19–A22 refusal surface (§5.8). Per standing preference, gate 5 requires a **rendered mockup**, not spec text. |
+| `synthetic-data-agent` | 7 | Fixture generation for §11 — a 12-period seeded §6.2 sequence, an 11-period recurrence with a period-12 omission, a held-out reclass-journal period, and a population with a known 70% coverage gap. |
 
 ---
 
-## 10 · Acceptance criteria for the Test gate
+## 11 · Acceptance criteria for the Test gate
 
-All suites blocking; no advisory exceptions (`PROJECT_CONTEXT.md` Active Team).
-Exit code `3` (no scenarios defined) is **not a pass**.
+All suites blocking; no advisory exceptions. Exit code `3` (no scenarios
+defined) is **not a pass**.
 
-### 10.1 Reconciliation correctness — machine-checkable
+### 11.0 Criteria deliberately removed as unpassable
 
-1. Given a synthetic GL balance and a synthetic external statement with a known
-   set of differences, F6 identifies **exactly** that set — no false positives,
-   no omissions.
-2. Where the account ties exactly, F6 reports *ties* and raises no reconciling
-   item.
-3. Where a difference exists that F6 cannot attribute to a source transaction,
-   it is emitted as an **unexplained difference**, never as a reconciling item
-   (F8). *A test that produces a fluent explanation for an uncitable residual is
-   a failure, not a pass.*
-4. A superseding run invalidates any certification attached to the prior run and
-   the invalidation is visible (§5.2).
+Stated first, because a criterion the build cannot pass turns a blocking suite
+into a permanently red one, which is how blocking suites become advisory in
+practice.
 
-### 10.2 Evidence spine
+- **Removed — the superseded plan's criterion 9**: *"every proposal records the
+  warehouse objects read and the as-of timestamp, **with a tie-back to ERP
+  source**."* In a zero-write build with no ERP-side extract, there was nothing
+  to tie back **to**; the assertion had no achievable implementation. It is
+  replaced by **C4** below, which is passable because F26 makes the ERP control
+  extract a certified dataset in its own right, so the tie-out has two real
+  sides.
+- **Retained and re-stated — the evidential-reproducibility trap.** No criterion
+  asserts that re-running a proposal yields an identical output. That claim is
+  not achievable with a stochastic model and must never be encoded as a passing
+  test. The assertion is **reconstruction and explanation from stored
+  artefacts** (E5).
+- **Not asserted anywhere — recall against *all* coding errors.** Only recall
+  against reclass-journal-caught errors is measurable (D2), and the suite fails
+  if the evidence schema presents it as anything else.
+- **Not asserted anywhere — "the agent is right."** For band-G output there is
+  no ground truth; MVP1 ships no band-G feature, and that is by design (§7.5
+  F46).
 
-5. Every proposal has a dossier containing all ten items of `INDUSTRY_KB` §4.3.
-   A missing item fails the suite.
-6. The evidence store exposes no update or delete path. An attempted mutation
-   fails and is itself recorded.
-7. Tamper-evidence: a modified stored dossier is detectable.
-8. Every proposal carries a complete version tuple {model, prompt, tool/config,
-   corpus, params} (obligation I). An unstamped proposal fails.
-9. Every proposal records the warehouse objects read and the as-of timestamp,
-   with a tie-back to ERP source (obligation C).
-10. **Evidential, not re-execution, reproducibility** (`INDUSTRY_KB` §4.4): the
-    test asserts that a past decision can be *reconstructed and explained* from
-    stored artefacts. It must **not** assert that re-running yields an identical
-    output — that claim is not achievable and must not be encoded as a passing
-    test.
-11. F13's export is parseable and complete **without application access**.
+### 11.A Deterministic integrity — machine-checkable, hard ground truth
 
-### 10.3 Cross-period safety — the criteria that matter most
+1. Given a warehouse fixture seeded with a known set of divergences from an ERP
+   control extract, **F26 reports exactly that set** by balance, segment and
+   period — no false positives, no omissions.
+2. Given a fixture with a missing load batch and one with a stale refresh,
+   **F26's A2 leg flags both**, and the staleness is expressed relative to the
+   close clock, not as an absolute timestamp alone.
+3. F28's five boundary checks each detect their seeded break (subledger↔GL
+   control account, IC pair imbalance, roll-forward discontinuity, double-applied
+   FX revaluation, suspense residual above policy).
+4. **`integrity/` executes no model call.** Asserted at runtime by an
+   instrumented harness, not by source inspection.
+5. **A boundary check that cannot fail is a defect.** Each of the six checks has
+   a fixture that makes it fail; a check with no failing fixture fails the suite
+   (§2b — a control that can never fail trains its reviewer that the dashboard
+   can never fail).
 
-12. Given a seeded twelve-period sequence reproducing `DOMAIN_KB` §6.2 — same
-    account, same direction, each period individually below threshold — **F9
-    escalates**, and does so before period twelve. The period at which it
-    escalates is recorded as a headline result.
-13. Given a sequence where each period's explanation is a restatement of the
-    prior period's, **F10 flags it**, independent of whether F9's numeric
-    threshold has tripped.
-14. F9's escalation presents the **aggregate** (iron-curtain) figure, not the
-    period delta.
-15. F5's lineage query enumerates every artefact a given agent version touched,
-    completely. Blast-radius completeness is asserted, not sampled.
+### 11.B Coverage and negative assurance — obligation R
 
-### 10.4 Certification surface
+6. Every skill declares an expected population, and a run without one **cannot
+   start**.
+7. Given a dataset selection covering 70% of a declared population, the run
+   reports coverage = 70% and **cannot emit a "no exceptions" conclusion** in
+   any surface. Asserted three ways: the UI, the dossier, and the export.
+8. The clean-run output over 70% coverage is **textually distinguishable** from
+   the clean-run output over 100% coverage, and names what was missing. A test
+   that finds them identical is a failure — this is the exact under-selection
+   failure the criterion exists to catch.
+9. An action-capable or assurance-emitting skill offered an **uncertified**
+   dataset refuses, and the refusal is recorded as a control event.
+10. Every emitted number carries provenance, dataset version and staleness on
+    its face — asserted in the rendered surface, not only in the payload.
 
-16. **No "certify all" / "approve all" affordance exists anywhere in the UI, at
-    any permission level.** Asserted by rendered-UI test, not by source
-    inspection.
-17. Default state of every uncertified proposal is not-certified; no pre-checked
-    control exists.
-18. The rendered view presented to the certifier is captured and retrievable,
-    and matches what was displayed (obligation A).
-19. The applicable threshold is visible on screen at certification time
-    (obligation B).
-20. Rejection cannot be completed without a structured reason.
-21. F12 records dwell time, evidence expansions and overrides for every
-    certification event.
+### 11.C Guardrails and negative control — obligations L–P
 
-### 10.5 Scope guards — criteria that assert absence
+11. Every action carries the **guardrail bundle hash** and a **policy decision
+    ID**. An action lacking either fails the suite.
+12. **Negative-control suite**: every rule in the live bundle has both a firing
+    and a non-firing fixture, and the suite runs **against the live bundle**.
+    A rule with a missing fixture fails the suite. There is **no criterion that
+    logs non-events** (obligation N — the negative-log trap is explicitly not
+    built).
+13. **Blast-radius caps trip**: per-run proposal count, per-period aggregate
+    value, and the third consecutive same-account same-direction proposal
+    escalating. Asserted as a state change, not a warning.
+14. Blast-radius caps are **non-disableable by a user**, including an
+    administrator.
+15. **The UI is not an enforcement point**: a direct API call bypassing the
+    front end is denied by the broker with the same decision record.
+16. **The model holds no Oracle credential.** No credential is resolvable from
+    any module outside `broker/`. Asserted by static and runtime checks.
+17. An override requires **dual authorisation**, a reason code from a **closed
+    list**, and is **time-boxed to a single action**. A standing exemption cannot
+    be created. Override rate is computed per agent, per user, per period.
+18. A new guardrail can be introduced in **shadow mode**, logging what it would
+    have blocked without blocking.
+19. **No free-form SQL execution path exists.** A model-authored SQL string is
+    unexecutable by construction; asserted by attempting it.
 
-22. **No code path writes to Oracle or to any ledger.** No posting credential
-    exists in the build. This is asserted, not assumed.
-23. No Tier 2 capability exists in the build.
-24. The `industry` compliance suite exists and returns `0`. Scenarios derive
-    from obligations A–K and `DOMAIN_KB` §6.2 (owed by `industry-expert` +
-    `test-agent`, §9).
+### 11.D Detection — the wedge
 
-### 10.6 Success metric — with the warning attached
+20. **Omission**: given a fixture where a recurring entry ran in periods 1–11 and
+    is absent in period 12, **F29 detects it**. Same for an unreversed scheduled
+    reversal, a stopped feed, and a one-sided intercompany posting.
+21. **The discriminating test**: on the same period-12 omission fixture,
+    **F42 (present-anomaly detection) does not detect it and F29 does.** This is
+    the criterion that proves the wedge is real rather than asserted, and it is
+    the single most important test in this suite.
+22. **Coding**: F33 backtested against historical reclass journals on a held-out
+    period reports precision and recall — and the evidence schema **labels
+    recall as "against reclass-journal-caught errors only"**. A schema that omits
+    the label **fails the suite**, per `DOMAIN_KB` §10.4b. This is a schema
+    assertion, not a footnote.
+23. **Coding scope guard**: F33 emits no proposal touching a legal-entity/IC
+    segment or crossing a statement caption (opex/capex), and cut-off findings
+    are emitted as detections with no proposal attached.
+
+### 11.E Cross-period safety and evidence spine
+
+24. Given a seeded twelve-period §6.2 sequence — same account, same direction,
+    each period below threshold — **F9 escalates before period twelve**, and the
+    period at which it escalates is recorded as a headline result.
+25. Given a sequence where each period's explanation restates the prior
+    period's, **F9's narrative leg flags it independently of whether the numeric
+    leg has tripped.**
+26. F9's escalation presents the **iron-curtain aggregate**, not the period
+    delta.
+27. **Forward disposition**: a disposition without an expected clearing period
+    **cannot be saved**. Asserted as a hard failure, not a validation warning.
+28. The next period's verification job runs automatically and, on a missed
+    prediction, produces an **R6 state change** — risk grade raised and auto-pass
+    eligibility revoked — not a notification.
+29. **Evidential reconstruction**: a past decision can be reconstructed and
+    explained from stored artefacts alone (version tuple, dataset version, bundle
+    hash, decision ID, coverage statement, rendered view). Re-execution identity
+    is **not** asserted (§11.0).
+30. The evidence store exposes no update or delete path; an attempted mutation
+    fails **and is itself recorded**. A modified stored dossier is detectable.
+31. F1's export is parseable and complete **without application access**.
+32. F5's lineage query enumerates every artefact a given agent version touched,
+    **completely** — asserted, not sampled.
+
+### 11.F Review surface and disposition capture
+
+33. **No "approve all" affordance exists anywhere, at any permission level.**
+    Asserted by rendered-UI test, not source inspection.
+34. Default state of every proposal is not-approved; no pre-checked control
+    exists.
+35. The **rendered view** shown to the approver is captured, retrievable, and
+    matches what was displayed.
+36. The applicable threshold and the guardrail bundle version are visible on
+    screen at approval time.
+37. Rejection cannot complete without a structured reason.
+38. **F12 records a resolution type (R1–R6) for every closed item**, plus dwell,
+    evidence expanded and overrides. An item closed without a resolution type
+    fails the suite — this is the ground-truth factory and an unlabelled outcome
+    is a lost label.
+39. An **injected known-error probe** is detectable in F12's output: the suite
+    asserts the probe was presented and that the reviewer's response to it was
+    recorded.
+
+### 11.G Scope guards — criteria that assert absence and refusal
+
+40. **No code path posts to Oracle in MVP1.** F40 produces a file. No posting
+    credential exists in the build. Asserted, not assumed.
+41. No Tier 2 capability beyond F40's export exists.
+42. **A19–A22 are present as refusals, not absences** — the refusal surface
+    exists, names each, and states that it is a design property rather than a
+    roadmap gap (§5.8). A build where they are merely missing **fails**.
+43. The `industry` compliance suite exists and returns `0`. Scenarios derive
+    from obligations **A–S** and `DOMAIN_KB` §6.2.
+
+### 11.H Success metrics — with the warning attached
 
 `DOMAIN_KB` §6.5: *"an agent that is consistently right de-skills the team that
-supervises it… Any success metric proposed at gate 3 that measures only
-close-cycle time reduction will show this failure as a win."*
+supervises it… Any success metric that measures only close-cycle time reduction
+will show this failure as a win."*
 
-Taking that instruction directly, the MVP's success metrics are:
-
-- **Primary — evidence acceptance.** An external auditor (or a
-  controller-proxy) reviews an F13 export for one reconciliation and states
-  whether it is sufficient. This is the whole point of the slice.
-- **Secondary — detection.** F9/F10 escalate the seeded §6.2 sequence, early.
-- **Reported as a positive, per `INDUSTRY_KB` §5.4.1 — abstention rate.** How
-  often the agent declines to explain rather than producing a plausible
-  narrative. Higher is better, and it must be reported alongside accuracy so
-  that accuracy alone cannot be optimised.
+- **Primary — omission catches.** Count and materiality of items F29 found that
+  no present-anomaly detector could have found. This is the product's claim and
+  it must be the number reported.
+- **Primary — evidence acceptance.** An external auditor or controller-proxy
+  reviews one F1 export end to end and states whether it is sufficient.
+- **Secondary — forward-disposition hit rate.** What proportion of predicted
+  clearing periods were correct. This is the product's own falsifiability
+  measure and it should be published internally even when it is bad.
+- **Secondary — coverage.** Median run coverage against declared population.
+  A product whose runs are habitually partial is emitting weaker assurance than
+  users think.
+- **Reported as a positive — abstention rate.** How often a skill declines
+  rather than producing a plausible answer. Must be reported alongside accuracy
+  so accuracy alone cannot be optimised.
+- **Monitored as a control signal — override rate**, per agent, per user, per
+  period. A rising override rate is read as a miscalibrated guardrail first and
+  as user error second.
 - **Explicitly NOT a headline metric — close-cycle time reduction.** It may be
-  measured. It must not be the metric the project is judged on, for exactly the
-  reason above.
+  measured. It must not be what the project is judged on.
 
 ---
 
-## 11 · What happens after this gate
+## 12 · What happens after this gate
 
-1. `functional-agent` challenges this proposal as devil's advocate (`INTAKE.md`
-   A8.3). I expect the sharpest challenges on: my deferral of F20 (long-tail),
-   my deferral of F14 (fresh-eyes), and whether 13 build-now features is
-   genuinely narrow or is the wide scope `INTAKE.md` warned about wearing a
-   spine-shaped disguise.
-2. The human approves feature by feature and answers **D1** and **D2**.
-3. Only then: `FEATURES.md` is written with the approved split, and a one-line
+1. `functional-agent` challenges this re-cut as devil's advocate. Expected
+   pressure points: F42's inclusion at all; whether 17 features with six merges
+   is genuinely under the ceiling; the F20 deferral; and whether F40 should exist
+   in MVP1 at all rather than shipping detection-and-disposition only.
+2. `industry-expert` checks the obligation gating in §3.1 against A–S.
+3. The human selects **feature by feature** — the defaults in §7 are
+   pre-selections, and the deferred and recommend-reject rows are on the list
+   precisely so they can be pulled forward.
+4. Only then: `FEATURES.md` is written with the approved split and a one-line
    summary is appended to `PROJECT_CONTEXT.md`'s Decisions Log. **Neither has
-   been written by this pass.**
+   been written by this pass**, and `PROJECT_CONTEXT.md` has not been modified.

@@ -142,12 +142,6 @@
       "id": "F11",
       "name": "Auto-refresh",
       "status": "backlog"
-    },
-    {
-      "id": "F12",
-      "name": "Staged intake form at /intake",
-      "status": "built",
-      "note": "Client-side only \u2014 AC-X-03 keeps every route read-only."
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 3 \u2014 backlog re-cut after scope correction",
+  "position": "Gate 5 \u2014 Experience Design",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -44,27 +44,42 @@
     {
       "n": 3,
       "name": "Plan",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "plan-agent",
         "industry-expert",
         "functional-agent"
       ],
-      "note": "plan-agent proposed 25 features (13 build-now). functional-agent challenged: shape approved, \u00a710/F4/F8/F20 not. Human electing changes one at a time."
+      "note": "Re-cut after scope correction. 17 build-now via 6 named merges. Every row marked WEDGE/FLOOR/NET/TABLE STAKES. 7 reversible assumptions in \u00a79.2.",
+      "artifacts": [
+        "PLAN.md"
+      ]
     },
     {
       "n": 4,
       "name": "Functional",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized",
+      "date": "2026-07-31",
+      "participants": [
+        "functional-design-agent"
+      ],
+      "artifacts": [
+        "knowledge/FUNCTIONAL_SPEC.md"
+      ],
+      "note": "186 AC IDs across 18 features. Two ambiguities found and resolved by the orchestrator: refusal surface given ID F50; F42's cut-marking withdrawn because criterion 21 needs it as the negative control."
     },
     {
       "n": 5,
       "name": "Experience",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-07-31",
+      "participants": [
+        "ui-ux-designer"
+      ]
     },
     {
       "n": 6,
@@ -109,7 +124,7 @@
       "from_gate": 3,
       "to_gate": 3,
       "reason": "functional-agent devil's-advocate pass found six required changes before the backlog can go to approval \u2014 chiefly that criterion 9 (F4 ERP tie-back) is the only blocking acceptance criterion the build as scoped cannot pass, and that F8 does not defeat the self-justification mechanism it was written for",
-      "resolved": false,
+      "resolved": true,
       "origin": "gate"
     },
     {
@@ -117,7 +132,7 @@
       "from_gate": 3,
       "to_gate": 3,
       "reason": "SCOPE CORRECTION (human): the system sits on top of Oracle ERP Cloud data in a warehouse and must not imitate the GL. F6/F7/F8/F11 were rebuilding Oracle ARCS. Backlog re-cut around anomaly detection/resolution plus a natural-language dataset-selection interface with guardrails.",
-      "resolved": false,
+      "resolved": true,
       "origin": "human"
     }
   ]

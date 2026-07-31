@@ -112,6 +112,28 @@ undecided.
   **Standing instruction**: continue making assumptions, take SME judgement, and
   loop to MVP1 without returning for per-gate approval.
 
+- **2026-07-31 — Gate 4 ambiguity 1 resolved: the refusal surface gets a feature
+  ID, F50.** `functional-design-agent` found it binding (backend module,
+  frontend directory, test criterion §11.G-42, seven AC IDs) but with no feature
+  row and no approval line. Making it "a cross-cutting property the 17
+  collectively carry" means nobody owns it, and an unowned surface is what gets
+  cut in week ten. Build-now count → **18**, exactly at the ceiling. A19–A22 are
+  load-bearing *refusals*: "not built yet" and "will never be built" are the
+  same screen to a user and opposite answers to an auditor.
+- **2026-07-31 — Gate 4 ambiguity 2 resolved: F42's cut-marking is withdrawn.**
+  `PLAN.md` §7.4 marked F42 "the first thing I would cut", but §11 criterion 21
+  — the test that proves the wedge is real rather than asserted — requires F42
+  as the **negative** side of a paired comparison. Cutting F42 removes the
+  ability to demonstrate the wedge at all. F42 is re-marked **TABLE STAKES,
+  not cuttable while criterion 21 stands**. If a later gate wants F42 gone it
+  must first say how the wedge gets demonstrated without it.
+- **2026-07-31 — Gate 4 closed, `batch_authorized`.** 186 acceptance criteria
+  across 18 features. Every UI-bearing feature carries at least one
+  observable-UI criterion; F2 and F12 have exactly one each and the narrowness
+  is flagged rather than hidden. §12 carries a standing exclusion: **no
+  criterion asserts explanation quality and none may be added**, per
+  `INDUSTRY_KB` §15.4 — clearer AI explanations make reviewers defer *more*.
+
 ## Current Status
 
-Gate 3 · Plan & Backlog — re-cutting after the scope correction. SMEs researching Part 1 (automatable close activities) and the guardrail model.
+Gate 5 · Experience Design — designing the natural-language skill interface against 186 acceptance criteria.
