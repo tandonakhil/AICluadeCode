@@ -1181,7 +1181,8 @@ file rather than a search.
 > **Pass-1 figures. Superseded as a file total by §27.11** — pass 2 issued 77
 > further criteria and retired `AC-F12-08`. The per-feature rows below remain the
 > record of what pass 1 issued and are not restated; §27.11 carries the pass-2
-> additions and the current file total of **262 issued, 261 live**.
+> additions and the current file total of **263 issued, 262 live**
+> (arithmetic corrected at the gate-9 loop-back; see §27.11).
 
 ### 22.1 Criteria per feature
 
@@ -1386,7 +1387,8 @@ reading I state, and I have not resolved either.
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
 | 2026-07-31 | 1.0.0 | Initial specification. 17 build-now features from `PLAN.md` §7 plus the A19–A22 refusal surface. 186 criteria issued (`AC-F26-01` … `AC-F42-08`, `AC-F32-01` … `-10`, `AC-REFUSAL-01` … `-07`). No IDs retired. | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 4 human approval pending |
-| 2026-07-31 | 1.1.0 | **Pass 2 — gate-4 loop-back after gate 6.** 77 criteria issued in §27 for requirements the three architects added that no criterion covered; `AC-F12-08` retired and replaced by `AC-F12-10`. Total 262 issued, 261 live. | `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 gate-6 rulings 1–6; `ARCHITECTURE_KB` §18.1/§18.3/§19; `SECURITY_KB` §10.1; `RESPONSIBLE_AI_KB` §§1–6 |
+| 2026-07-31 | 1.1.0 | **Pass 2 — gate-4 loop-back after gate 6.** 77 criteria issued in §27 for requirements the three architects added that no criterion covered; `AC-F12-08` retired and replaced by `AC-F12-10`. Total 263 issued, 262 live (recorded as 262/261 at the time; the addition was wrong, no ID changed -- corrected at the gate-9 loop-back, see 27.11). | `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 gate-6 rulings 1–6; `ARCHITECTURE_KB` §18.1/§18.3/§19; `SECURITY_KB` §10.1; `RESPONSIBLE_AI_KB` §§1–6 |
+| 2026-07-31 | 1.1.1 | **PATCH — arithmetic only.** §27.11 read "262 issued, 261 live (186 + 77 − 1)"; 186 + 77 = 263, so the file holds **263 issued, 262 live**. Found by `verification-agent` at gate 9, whose per-feature enumeration gave 262 and disagreed with the stated total. **No acceptance criterion was added, removed or renumbered** — two figures in one sentence were wrong. The corrected figures are carried through §21's cross-reference and the 1.1.0 row above. | Gate-9 loop-back to gate 7, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 |
 
 ---
 
@@ -1924,8 +1926,16 @@ already exists; the build-now count is unchanged. IDs continue F50's existing
 | F50 — refusal surface | 6 | `AC-REFUSAL-08` … `-13` | `AC-REFUSAL-13` |
 
 **Pass 2: 77 criteria issued, 1 retired (`AC-F12-08`).**
-**File total: 262 issued, 261 live** (186 + 77 − 1). Build-now feature count
+**File total: 263 issued, 262 live** (186 + 77 − 1). Build-now feature count
 unchanged at 18; no feature added, removed, deferred or re-cut.
+
+> **Arithmetic corrected 2026-07-31 at the gate-9 loop-back.** This paragraph
+> read "262 issued, 261 live (186 + 77 − 1)". 186 + 77 = 263, so 263 issued
+> and 262 live. `verification-agent` found it by enumerating the criteria per
+> feature and getting 262; the per-feature enumeration is the authority and it
+> agrees with the arithmetic once the arithmetic is done correctly.
+> **No ID was renumbered, added or removed** — the two figures in that one
+> sentence were wrong and nothing else was.
 
 **Observable-UI position after this pass.** Every UI-bearing feature still carries
 at least one observable-UI criterion, and three features gained one where the new

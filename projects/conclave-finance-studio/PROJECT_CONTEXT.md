@@ -430,12 +430,114 @@ undecided.
      effect, which makes the whole controller class sensitive to it rather than
      only the scenarios that happened to read `aria-current`.
 
+- **2026-07-31 — Gate 7 pass 5, LOOP-BACK FROM GATE 9: the four missing detector
+  families, and three green checks that claimed more than the register permits.
+  Judgement calls by `code-agent`.** Gate 9 blocked on 94 in-scope unevidenced
+  criteria, 39 of them belonging to four detector families that were never
+  built. All four are now built, all **eleven** `ARCHITECTURE_KB` §7.3 evaluator
+  primitives exist, and `SPECIFIED_BUT_NOT_IMPLEMENTED` is empty.
+  1. **The seam applies to our own identifiers.** Nine populations and twelve
+     certified queries were first cut named after the tables they read
+     (`boundary.fx_revaluation`, `pop.intercompany_pairs`). The physical-object
+     denylist correctly refused them, and rather than exempt them they were
+     renamed before anything depended on them: a query named after its table
+     teaches a detector where its data lives by convention even though no field
+     says so. A test asserts `close_datasets.TABLES` is a subset of the
+     denylist, so a thirteenth object added without one fails the build.
+  2. **`AC-F26-06` is two facts and the code now distinguishes them.** A
+     resolver query that ERRORS means the dataset is unavailable — the leg
+     reports `not_run` and names the missing dataset from the catalogue GES
+     publishes. A resolver that RUNS and returns nothing means nobody declared
+     anything to check — the run is refused, and naming a dataset there would
+     point at one that is present and empty.
+  3. **An unrun check RAISES when asked for its findings.** `[]` is the same
+     object a check that found nothing produces, and `coverage()` returns
+     `None` rather than `0`. This is the whole content of `AC-F26-06` and
+     `AC-F28-07` and it is held by the shape rather than by a caller's care.
+  4. **The five F28 checks are a CONSTANT the runner iterates**, not a list it
+     accumulates from whatever returned something. A comprehension over "the
+     checks that produced output" is the one-line change that breaks
+     `AC-F28-06` and `-07` at once, so the shape makes it impossible.
+  5. **F28 does NOT use the all-clear vocabulary its own criteria use.**
+     `app/conclusion/lint.py` gives `conclusion/render.py` a monopoly on the
+     three all-clear phrases across `app/`, `ges/` and `common/`, and that
+     monopoly is worth more than matching a criterion's wording. An all-clear
+     is a statement about a POPULATION produced by the conclusion type from a
+     coverage set; an A6 status line over 24 members is not one, and the
+     fastest way for it to start reading like one is to borrow the words. The
+     three states are `failed` / `no_finding` / `not_run`.
+  6. **The pilot warehouse deliberately OMITS one object.** `AC-F28-07`'s
+     "not run" is the state a reviewer most needs to recognise, and a pilot in
+     which every dataset is present never shows it. It is an object that does
+     not exist, not an empty table: an empty table answers with zero rows, and
+     a check concluding from zero rows that it found nothing is the failure
+     convention C2 forbids.
+  7. **F9's narrative leg is a peer, structurally.** Its own primitive, its own
+     manifest, its own fixtures, its own escalation rows, its own
+     control-state change — because `DOMAIN_KB` §9 predicts it gets dropped as
+     an implementation detail and `ARCHITECTURE_KB` §7.3 says making it
+     first-class is the reason it cannot be. A test asserts a numeric leg that
+     could not run does not suppress the narrative one.
+  8. **F9's escalation period and aggregate come from different parts of the
+     run.** The period is where the run first reached the count — the earliest
+     moment it was knowable, which is what `AC-F9-01` asks to display. The
+     aggregate is over the whole run to date, because `AC-F9-02`'s figure is
+     the one a human acts on; reporting it as at the escalation period would
+     understate what is owed by two thirds on the pilot's own fixture.
+  9. **`AC-F9-04` is applied and READ BACK.** Both legs call
+     `DispositionStore.escalate_account` — the same path F32's missed
+     prediction uses — and Monitors renders the risk grade fetched out of the
+     store. An escalation reporting what it intended to write is a
+     notification wearing a control's clothes.
+  10. **F33's classification order is fixed and is the thing most worth
+      testing.** A posting that crosses a caption also has a different natural
+      account from its peers, so testing cost centre first would emit a reclass
+      proposal across a caption boundary — exactly what `AC-F33-04` forbids —
+      while every cost-centre test still passed. `proposal` is a field that is
+      present or ABSENT, never one with a `blocked` flag: the two shapes differ
+      in whether forgetting to check a flag produces a posting.
+  11. **F33's backtest bias label is enforced in the CONSTRUCTOR and its
+      CLAUSES are checked, not its presence.** A paraphrase drifts, and the
+      paraphrase that drops "only" is the one that gets written. Its three
+      refusals are separate TYPES rather than null fields: `BacktestCouldNotRun`
+      (`AC-F33-11`), `NoLabelsAvailable` (`AC-F33-09`), and a constructor that
+      rejects `label_count=0` because a record whose denominator is zero is
+      still a figure.
+  12. **Two floats were reaching a content-hashed dossier.** Peer agreement and
+      narrative similarity were Python floats; `common.canonical` refuses
+      floats outright because a hash over a binary float is not reproducible
+      across platforms. Found by writing the `AC-F33-08` dossier scenario. Both
+      are `Decimal` now and both primitives assert their whole output
+      canonicalises.
+  13. **`AC-REFUSAL-11` stays NOT VERIFIED, and extending the battery produced
+      the evidence for that rather than against it.** Going from eight
+      paraphrases to twelve found that **four are not refused, and two of the
+      four are the criterion's own worked examples.** They are not deleted and
+      the shape matcher is not extended: `RESPONSIBLE_AI_KB` §4.1 rules that
+      out as an arms race against paraphrase, and it would also concede that
+      the criterion is met by whatever the matcher happens to catch this week.
+      The battery is now two executed halves, eight refused and four asserted
+      as pass-throughs. No scenario in any suite names the ID.
+  14. **`AC-F41-08` stops being claimed.** Gate 9's phrasing was exact: it
+      passed by asserting that no probe marker exists and the injected-probe
+      count is zero — a criterion satisfied by the absence of the thing it is
+      about. The UX-11 group says so in its header, no scenario name carries
+      the ID, and the zero-count assertion carries an instruction to rewrite
+      the group rather than relax it when injection lands.
+  15. **The suite transport is bound ONCE.** Two autouse session fixtures each
+      installing and uninstalling the pilot transport meant whichever finished
+      first left the other suite's screens unreachable, and the failure
+      surfaced as an unrelated scenario rendering an outage.
+
 ## Current Status
 
-Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
+Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
+(261 until the gate-9 loop-back: `FUNCTIONAL_SPEC` §27.11's arithmetic said
+"262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
+spec at v1.1.1; **no ID was renumbered, added or removed**.)
 
-**Passes 1, 2a, 2b, 2c, 3 and 4 complete** (28 commits in `dev/`, **1,217 unit
-tests + 305 suite scenarios**, all green. **All six suites now execute**;
+**Passes 1, 2a, 2b, 2c, 3, 4 and 5 complete** (36 commits in `dev/`, **1,428
+unit tests + 388 suite scenarios**, all green. **All six suites execute**;
 `industry` moved off exit 3 at pass 4 because two of the five things its README
 named — the Journal Import contract and the CUEC register — are now built).
 
@@ -495,9 +597,64 @@ against 1,522 before, **+3 added, 0 removed, 4 renamed or rescoped**. Every
 suite still exits 0. The point of the pass was that three of those scenarios
 now assert *more* and one criterion is now claimed by *nothing*.
 
+**Pass 5 — the gate-9 loop-back. Test-count delta against pass 4d:**
+
+| Suite | Before | After | Delta |
+|---|---|---|---|
+| unit/integration | 1,217 | **1,428** | **+211** |
+| functional | 21 | **96** | **+75** |
+| red-team | 41 | **46** | **+5** |
+| architecture | 23 | 23 | — |
+| security | 14 | 14 | — |
+| industry | 23 | 23 | — |
+| ux | 186 | 186 | — |
+| **total collected** | 1,525 | **1,816** | **+291** |
+
+**0 tests removed.** Five existing scenarios were changed and every one now
+asserts strictly more:
+* the two boundary-check scenarios (one unit, one `ux`) had their "not run"
+  count corrected from 2 to 1 — because the two were dictionary literals and
+  the one is a real check over a dataset that is really absent — and both now
+  additionally assert the missing dataset is **named**, which neither did;
+* `AC-F9-08`'s Monitors scenario now asserts escalation period **4**, the
+  number the primitive computed, where it asserted the calendar string
+  "2026-06" that somebody typed;
+* `AC-F33-07`'s screen scenario now asserts the label is byte-identical to
+  `f33.backtest.RECALL_BIAS_LABEL` rather than containing a phrase;
+* the A20 red-team battery went from eight strings to twelve — and split,
+  because four of the twelve are not refused.
+
+**45 scenario docstrings gained an explicit `COVERS AC-…` line**, so gate 9's
+criterion-to-test join stops being an inference. Criteria with no covering
+scenario were left alone.
+
+**Pass 5 — the gate-9 loop-back. The four detector families gate 9 found
+never built are built**, in one commit each, plus the three contradictions and
+the two reporting fixes.
+
+| Family | Built | AC IDs now evidenced | Still not |
+|---|---|---|---|
+| **F26** warehouse-to-ERP fidelity | `identity_tieout`, `freshness`; two manifests; a two-leg run; the Exceptions region | `AC-F26-01`…`-04`, `-06`…`-10` | `AC-F26-05` (no close clock, register 6) |
+| **F28** the five boundary checks | `pair_imbalance`, `continuity`, `arithmetic_recompute`, `residual_threshold`; `identity_tieout` bound a second time for A6; five manifests; `BoundaryRun` | `AC-F28-01`…`-10`, all ten | — |
+| **F9** cross-period surveillance | `accumulation`, `text_recurrence`; two manifests; both legs; the R6 control-state change; the Monitors regions | `AC-F9-01`…`-09`, all nine | — |
+| **F33** coding anomaly + backtest | `peer_coding_divergence`; the backtest evidence schema; the Exceptions region | `AC-F33-01`…`-12`, all twelve | — |
+
+**All eleven `ARCHITECTURE_KB` §7.3 evaluator primitives now exist.**
+`SPECIFIED_BUT_NOT_IMPLEMENTED` is empty — and is KEPT, empty, because a
+manifest naming a specified-but-unbuilt primitive must still fail compilation
+*saying so*. A `parametrize` over an empty tuple collects zero tests and
+reports green, so that behaviour is now asserted against a planted entry
+instead.
+
+**Two of gate 9's three contradictions were capabilities that do not exist and
+are now stated as unmet rather than claimed**; the third was a missing build
+and is built. See Decisions Log items 13–15.
+
 **Not built and absent rather than stubbed**: point-of-action revalidation, the
-close clock (`AC-F38-11`), the F12 probe-injection programme (`AC-F41-08`), nine
-of the eleven evaluator primitives, and F17 direct posting.
+close clock (`AC-F38-11`, and therefore `AC-F26-05`), the F12 probe-injection
+programme (`AC-F41-08`), F17 direct posting, and the F39 natural-language
+resolver's model call site (and therefore `AC-REFUSAL-11`, `AC-F39-03`, `-05`,
+`-06`, `-08`).
 
 ## Test Results
 
@@ -724,3 +881,31 @@ its guarantee and its one-host bound.
 | 20 | `ARCHITECTURE_KB` §3.1 — Journal Import files in an object store | the produced file is held **in memory** for the life of the api process; the workflow store records its group id, content hash and line count | the artefact's *record* survives a restart; **the bytes do not**. A file downloaded before a restart and one downloaded after are not both available, and `AC-F1-08`'s oldest-end retrieval has no object store to retrieve from. **Pass 4d:** the functional suite no longer names `AC-F1-08` anywhere — the scenario that did was rescoped to `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`, whose docstring states the criterion is unsatisfied and why. **`AC-F1-08` is now covered by no suite**, which is the accurate reading |
 | 21 | `AC-F40-05`'s CUEC verification against a real Oracle tenant | an in-memory register whose default state is `never_verified` for every item, verified by `pilot.py` with a synthetic attestation | the **refusal** is real and tested (a fresh register exports nothing, and `expired` and `failed` are distinguished from `never_verified`); the **verification** in this build attests nothing, because there is no tenant to read. `deploy-agent` owns the real one |
 | 22 | `AC-F12-19`'s label set as the input to an accuracy claim | the label is written at disposition time and rendered on Monitors as counts | the labels are real, but the pilot has **one abstained item**, so the label set is too small to compute anything from. This is a data-volume bound, not a build gap, and it is stated because a screen showing "1 warranted" invites a conclusion the sample cannot support |
+
+
+### Entries CLOSED at pass 5 (the gate-9 loop-back)
+
+| # | Was | Now |
+|---|---|---|
+| 11 | `AC-F12-20`'s three surfaces: the screen leg (pass 3) and the export leg (pass 4) existed; the precision figure was still not rendered **inside a dossier**, so one of the three surfaces was unread while the ID was reported satisfied — which gate 9 called a contradiction | **CLOSED.** `components.precision_figure_in_dossier` renders on `/dossier/{id}` from the same `PrecisionFigure.render()` the screen and the export read, with `surface` as its only difference. Twelve scenarios cover all three surfaces, including one asserting the dossier still carries no `<script>`, `<link>`, `<img>`, `@import`, `url()` or `srcset` after the addition — an exhibit that gained a stylesheet link would stop opening from a file, offline, in seven years |
+
+### Entries NARROWED but not closed at pass 5
+
+| # | Residual after pass 5 |
+|---|---|
+| 6 | `CloseClock` still absent, and it is now the reason **two** criteria are unmet rather than one. `AC-F38-11` stands as before. `AC-F26-05` joins it: the `freshness` primitive emits an explicit `close_clock_absent` note on **every** run naming the unmet criterion and this register entry, the run summary reports `close_clock_available = False`, and the Exceptions screen renders the note. An absolute refresh timestamp under a close-relative name would satisfy a reader while failing the criterion, so none is produced. **No suite claims `AC-F26-05`** |
+| 9 | Unchanged in substance and **materially strengthened in evidence**. Extending the A20 paraphrase battery from eight to twelve, to meet `AC-REFUSAL-11`'s minimum of ten, found that **four of the twelve are not refused — and two of the four are paraphrases the criterion itself offers as worked examples** ("is $180K worth worrying about for a company this size?", "is this normal for this account?"). The four are asserted as pass-throughs in the red-team suite rather than deleted, and the shape matcher was NOT extended (`RESPONSIBLE_AI_KB` §4.1 rules that out as an arms race against paraphrase). One string also left the original eight: "Below the threshold we use here" contains a word the criterion's Given clause excludes. **`AC-REFUSAL-11` is NOT VERIFIED and no scenario in any suite names it** |
+| 15 | The findings of **F26, F28, F9 and F33 are no longer fixture literals**: those four regions render real detector runs over the certified-query boundary against the synthetic warehouse, and the pilot GES app is given a seeded warehouse for it. The residual is narrower and unchanged in kind — the six items in `state._build_items` (the cross-period item, the omission, the coding item, the present anomaly, the abstention and the fidelity row) are still literals, and every screen still carries the pilot strip |
+| 18 | Unchanged in substance; **the reporting is what changed, and it is now honest**. Gate 9 found `AC-F41-08` passing by asserting that no probe marker exists and the injected-probe count is zero — a criterion satisfied by the absence of the thing it is about. The UX-11 group now states that in its section header, **no scenario name carries the ID**, and every remaining mention of it in that file explicitly denies the criterion. The zero-count assertion carries an instruction to rewrite the group rather than relax the assertion when injection lands. `AC-F41-08` is NOT VERIFIED |
+
+### Entries OPENED at pass 5
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 23 | `ARCHITECTURE_KB` §7.3's F28 A9 recompute, against a real ERP FX/CTA calculation | one named formula, `revaluation_delta`, in a **closed registry of Python functions** — `formula` is a key, never an expression, and there is no `eval` in the module | the recompute is genuinely independent of the observed figure, which is the property that matters, but it recomputes the ONE formula this build implements. A second revaluation convention is a change to `FORMULAS` in a reviewed diff, not configuration. Stated because "independently recompute a derived figure" reads as more general than what exists |
+| 24 | F33's peer set, drawn from a real vendor/caption history | 163 synthetic postings for one vendor, plus the three period-3 miscodings that give the backtest something to measure | `min_peer_support` is 20 and `min_peer_agreement` 0.8, and neither has been calibrated against real coding behaviour — they are chosen to be conservative. `AC-F33-01`'s precision figure of 0.6667 is a property of a fixture, not a measured skill accuracy, and the pilot screen shows it beside a second held-out period with **no labels at all** precisely so a reader meets the difference. Real calibration needs a tenant |
+| 25 | `AC-F9-05`'s "fewer than two periods of history" over a real close calendar | `min_history_periods: 2` on the numeric leg, measured in periods present in the movements extract | a period an account existed in but posted no movement to is indistinguishable here from a period before the account existed. On the synthetic fixture they cannot differ; on a real ledger they can, and the account that was dormant for a quarter would report as younger than it is. Needs a close calendar — which is register 6 again, from a different direction |
+
+**Twenty-five entries as of pass 5. Entries 8, 10, 11, 13, 14 and 16 are
+CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
+4 are still the two that cannot quietly become "MVP1 ready".**

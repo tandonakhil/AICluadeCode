@@ -3,7 +3,7 @@
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
   "position": "Gate 7 \u2014 Code (loop-back from Verification)",
   "env": "dev, local",
-  "last_activity": "2026-07-30",
+  "last_activity": "2026-07-31",
   "served_url": null,
   "notes": "Sits ON TOP of Oracle ERP Cloud data in a warehouse. Detects and resolves close anomalies; triggers postings into ERP. Does NOT imitate GL. Surface is a natural-language, dataset-selection agent interface with guardrails.",
   "gates": [
@@ -113,7 +113,7 @@
       "participants": [
         "code-agent"
       ],
-      "note": "4 passes, 28 commits. 1,217 unit tests + 305 suite scenarios green; all six SME suites executing. Pilot runs end to end: ask, refusal from GES, review, disposition the server refuses without a clearing period, two-authoriser override, balanced Journal Import export. 22 register entries; 3 closed, several narrowed. Trust boundary weakened to a module boundary in the pilot transport (entry 19) -- flagged for security-architect."
+      "note": "5 passes, 36 commits. 1,428 unit tests + 388 suite scenarios green; all six SME suites executing. Pass 5 is the gate-9 loop-back: the four detector families that were never built (F26, F28, F9, F33) are built, all eleven ARCHITECTURE_KB 7.3 evaluator primitives now exist, and the three contradictions are resolved -- AC-F12-20's dossier leg built, AC-F41-08 and AC-REFUSAL-11 stated as NOT VERIFIED with no scenario claiming either. 41 AC IDs newly evidenced; 5 remain unmet for named missing capabilities. 25 register entries; 6 closed, 4 narrowed, 3 opened."
     },
     {
       "n": 8,
@@ -186,8 +186,9 @@
       "from_gate": 9,
       "to_gate": 7,
       "date": "2026-07-31",
-      "resolved": false,
-      "reason": "94 in-scope criteria unevidenced, dominated by four detector families never built (F26 10, F28 10, F9 8, F33 11). Plus 3 contradictions where a green check claims more than the register permits."
+      "resolved": true,
+      "reason": "94 in-scope criteria unevidenced, dominated by four detector families never built (F26 10, F28 10, F9 8, F33 11). Plus 3 contradictions where a green check claims more than the register permits.",
+      "resolution": "Pass 5: F26, F28, F9 and F33 built with 41 AC IDs newly evidenced. AC-F26-05 left NOT VERIFIED (no close clock, register 6). AC-F41-08 and AC-REFUSAL-11 left NOT VERIFIED with the reason recorded and no scenario naming either. AC-F12-20's dossier leg built, closing register 11. FUNCTIONAL_SPEC 27.11 arithmetic corrected to 263 issued / 262 live at v1.1.1, no ID renumbered."
     }
   ]
 }
