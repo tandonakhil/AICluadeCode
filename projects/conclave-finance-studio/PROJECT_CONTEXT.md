@@ -572,6 +572,80 @@ undecided.
      **Both registers stay OPEN.** Nothing in this pass calibrates a threshold
      or supplies a close calendar.
 
+- **2026-08-01 — Gate 7 pass 7, LOOP-BACK FROM GATE 9's RE-AUDIT: the 52
+  in-scope, unevidenced, undisclosed criteria. Judgement calls by
+  `code-agent`.** Gate 9's framing was adopted as binding: §27.14 issued no IDs
+  for the genuinely out-of-scope material, so **every ID in the file is in
+  scope by construction** and "out of scope" was not available as an answer to
+  any of the 52. Six commits, five of them real builds rather than reporting
+  fixes.
+  1. **The emission gate had never been wired to anything.** `decide_emission`
+     was built at pass 2c and called by no production module, so §27.4's
+     load-bearing criterion had no join — correctly. `POST /ges/emit` now
+     exists, `app/emission/gate.py` filters every surface-bound item through
+     it, and the gate is a **filter, not a decorator**: `admit()` returns a new
+     list, so a denied finding is not something a screen has to remember not to
+     render. The pilot plants one emission that fails a real check, because an
+     absence check over an empty candidate set passes for the wrong reason.
+  2. **`AC-F2-08`'s control did not exist, and building it broke 34 tests —
+     which is the evidence it is real.** The version tuple was a literal on the
+     Audit screen and was the input to nothing. `check_closure_input` now runs
+     BEFORE the identity rules in `Broker.decide`, so there is no path in which
+     an eligibility is computed over a partial input set and then discarded,
+     and `eligible_approvers` returns the EMPTY SET rather than a partial one.
+     Nine existing scenarios now supply a complete stamp, each with a note
+     saying why they would otherwise pass for the wrong reason.
+  3. **F29's other three sub-types are NOT `expectation_gap`, and the pass-1
+     manifest header claiming they were is now corrected.** It was tried first.
+     A reversal is owed because a journal said so, not because reversals
+     usually happen, and a history-based expectation misses a first-ever one
+     entirely. `obligation_gap` is a twelfth primitive, declared in
+     `UNSPECIFIED_BUT_BUILT` so `ARCHITECTURE_KB` §7.3's list stays its own and
+     an undeclared primitive cannot arrive unnoticed. Where the
+     configuration-not-code bound DOES hold it holds in its strongest form:
+     three detectors, one primitive, one certified statement, one bound
+     parameter between them.
+  4. **The routing budget was enforced by nobody**, and its display claimed a
+     controller had raised a cap nobody had asked. It is enforced at the
+     broker on a new `routing.raise_cap` capability — not a local role test,
+     because `AC-F41-17` needs a DECISION ID and a minted one would sit in the
+     ledger looking like a broker decision. `user.s.haddad` deliberately holds
+     `approve.proposal` and not the raise, so "an approver may" and "a
+     controller may" are distinguishable on this fixture. The pilot cap is 3,
+     for the reason the pilot warehouse omits one object: at 12 the pilot never
+     reaches its cap and the at-cap state is one no reader meets.
+  5. **`AC-F1-07` and `AC-F1-10` are held by the SHAPE.** `export.build()`
+     returns a whole export or raises, so there is no partial value for a route
+     to write to disk, and the active-content check runs before an Export
+     exists, so there is no object to inspect and then decide about. The
+     hardest clause is `AC-F1-04`'s last one — no field renders only as an
+     in-application reference — which a parseable, complete-looking file of
+     identifiers fails while satisfying every other word.
+  6. **`AC-F1-13`'s second clause is the one a shared table could not fail.**
+     The scenario empties the application's own control-event log completely
+     and reads the separate destination afterwards. What is real is the
+     behavioural separation; what is not is the infrastructural one, and
+     **register 26 says so** — a green suite here is not evidence that one
+     compromised credential cannot reach both.
+  7. **Two suite conventions forced two renames and both were right.** `clean`
+     is one of the three all-clear phrases `conclusion/render.py` monopolises;
+     `statement` is a parameter name the architecture suite refuses anywhere in
+     `app/` or `ges/`. Neither exception was taken.
+  8. **A session-scoped `GES_CLIENT_TOKEN` fixes an order-dependent failure
+     that had just been introduced.** Function-scoped `monkeypatch` UNSETS the
+     variable on teardown while the session's cached `GesClient` holds the old
+     value, so the next screen fetched renders an outage and which scenario
+     fails depends on collection order. Setting it once at session scope makes
+     every nested patch a patch to the same value.
+  9. **Three register entries opened, and one register correction accepted.**
+     26 (the audit domain's infrastructural bound), 27 (`AC-F36-48` runs
+     against a synthetic period where the criterion says real close data — the
+     register-24/25-class substitution gate 9 identified), 28 (`AC-F40-17`/
+     `-18`'s export-time CUEC probe does not exist, and this build authorises
+     on exactly the stored pass state the criterion says must not authorise).
+     On `AC-REFUSAL-13`: register 16 was **right** and the evidence was
+     missing; three named checks now carry the ID.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -579,7 +653,29 @@ Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
 "262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
 spec at v1.1.1; **no ID was renumbered, added or removed**.)
 
-**Passes 1, 2a, 2b, 2c, 3, 4, 5 and 6 complete** (39 commits in `dev/`, **1,439
+**Pass 7 — the gate-9 RE-AUDIT loop-back. Test-count delta against pass 6:**
+
+| Suite | Before | After | Delta |
+|---|---|---|---|
+| unit/integration | 1,428 | **1,583** | **+155** |
+| functional | 96 | **214** | **+118** |
+| red-team | 46 | 46 | — |
+| architecture | 23 | 23 | — |
+| security | 14 | 14 | — |
+| industry | 23 | 23 | — |
+| ux | 186 | 186 | — |
+| **total collected** | 1,816 | **2,089** | **+273** |
+
+**0 tests removed.** Fourteen existing scenarios were CHANGED and none was
+weakened: eleven now supply a complete version stamp (with a note saying they
+would otherwise pass for the wrong reason — the SoD input-set check denies
+before the identity and ceiling rules), one asserts the routing raiser's
+PRINCIPAL ID rather than the word "controller", one primes the pilot close
+before cutting the transport because the findings themselves are now
+downstream of the emission gate, and three `AC-F36-48` scenarios gained
+register-27's in-file denial.
+
+**Passes 1, 2a, 2b, 2c, 3, 4, 5, 6 and 7 complete** (39 commits in `dev/`, **1,439
 unit tests + 388 suite scenarios**, all green. Pass 6's delta: **+11 unit
 scenarios** (`AC-F36-47`'s surface clause), **0 suite scenarios** — the
 register-24/25 work changed what existing scenarios say and what they read
@@ -1028,6 +1124,23 @@ its guarantee and its one-host bound.
 | 24 | F33's peer set, drawn from a real vendor/caption history | 163 synthetic postings for one vendor, plus the three period-3 miscodings that give the backtest something to measure | `min_peer_support` is 20 and `min_peer_agreement` 0.8, and neither has been calibrated against real coding behaviour — they are chosen to be conservative. `AC-F33-01`'s precision figure of 0.6667 is a property of a fixture, not a measured skill accuracy, and the pilot screen shows it beside a second held-out period with **no labels at all** precisely so a reader meets the difference. Real calibration needs a tenant. **Pass 6: WITNESSED IN THE SUITE, still open.** `test_AC_F33_06_…` derives `0.6667`/`0.5000` from the `close_datasets` constants rather than asserting literals, so the fixture provenance is executable; `test_AC_F33_01_…` reads `min_peer_support` from the manifest and asserts the run used it, instead of restating `20` as though the criterion fixed it; the functional file's header and three further sites state what both numbers are NOT |
 | 25 | `AC-F9-05`'s "fewer than two periods of history" over a real close calendar | `min_history_periods: 2` on the numeric leg, measured in periods present in the movements extract | a period an account existed in but posted no movement to is indistinguishable here from a period before the account existed. On the synthetic fixture they cannot differ; on a real ledger they can, and the account that was dormant for a quarter would report as younger than it is. Needs a close calendar — which is register 6 again, from a different direction. **Pass 6: WITNESSED IN THE SUITE, still open.** The substitution is stated at five sites — the functional file's header, all three `test_AC_F9_05_*` scenarios, the governance-screen scenario that reads "Periods available", and the primitive scenario that computes `periods_available` — so a reader of the suite meets the movement-count measure rather than assuming a close calendar behind it |
 
-**Twenty-five entries as of pass 5. Entries 8, 10, 11, 13, 14 and 16 are
+### Entries OPENED at pass 7 (the gate-9 re-audit loop-back)
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 26 | Gate-6 ruling 1 — the evidence infrastructure is a SEPARATE trust domain, so one compromised credential does not reach both the state and the evidence of what changed it | `app/evidence/audit_domain.py`: a distinct SQLite store with `BEFORE UPDATE`/`BEFORE DELETE` triggers, written through an interface that has no delete, no purge and no retention setter | the **behavioural** separation is real and is the half `AC-F1-13`'s second clause tests: the application's own control-event log is emptied completely and every record is still retrievable from the destination, which a shared table could not fail. The **infrastructural** separation is NOT real — this is a second file in the same process on the same host, not a different account with a different credential in a different trust domain. Register 2's SQLite bound again, from a third direction. **A green functional suite is not evidence that one compromised credential cannot reach both**, and `AC-F1-13`/`-14` are VERIFIED only on the behaviour, not on the infrastructure |
+| 27 | `AC-F36-48` — "a closed period over **real close data** in which a skill emitted zero abstentions" | the abstention band check runs against the pilot's SYNTHETIC period, whose abstention count is a property of six fixture items rather than of a skill's behaviour on real close data | the *computation* — band, red control finding, the above-band usefulness finding routed to the skill owner — is real and its boundary cases are testable. What the criterion asks for and this build cannot supply is the **input**: a period of real close data. On this fixture "zero abstentions" is achieved by removing a fixture item, not by a skill declining to decline. **Gate 9 was right that this is a register-24/25-class fixture substitution with no register entry.** It has one now. Real evidence needs a tenant, which is registers 21 and 24 again from a fourth direction |
+| 28 | `AC-F40-17`/`-18` — an **export-time** CUEC probe that detects Oracle-side configuration drift since deployment and refuses the export | nothing. The CUEC register's stored pass state is read at export time and a `never_verified`/`expired`/`failed` state refuses the export, but **no probe re-reads the tenant's configuration**, so drift after a recorded pass is undetected | **`AC-F40-17` and `AC-F40-18` are NOT satisfied and no suite claims them.** The criterion's whole point is that the stored pass state does NOT authorise the export, and this build authorises on exactly that. Closing it needs an Oracle tenant to probe — register 21's residual. Recorded rather than approximated: a probe that re-read our own register and reported no drift would be a check that cannot fail |
+
+**Twenty-eight entries as of pass 7. Entries 8, 10, 11, 13, 14 and 16 are
 CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
 4 are still the two that cannot quietly become "MVP1 ready".**
+
+**On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
+claiming closure with no covering check is the same defect class as an
+over-broad join. The entry was accurate — A23, A24 and A25 *are* each visible
+by name on the Refusals screen with their grounds — and the evidence was
+missing. Three named checks now carry the ID
+(`tests/suites/functional/test_unclaimed_criteria.py`), covering the three
+clauses separately: the seven A-numbers by name, the ground and by-design
+wording beside each, and reachability from `/`.
