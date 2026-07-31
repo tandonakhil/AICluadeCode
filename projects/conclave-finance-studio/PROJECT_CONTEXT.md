@@ -216,6 +216,85 @@ undecided.
   individually and **never assert readiness on precision alone**. The inverted
   gate can no longer be used silently, which was the actual risk.
 
+- **2026-07-31 — Gate 7 Code pass 1: judgement calls made by `code-agent`.**
+  Recorded here because the plan did not settle them and they are reviewable
+  after the fact rather than inferrable from the diff.
+  1. **Three architecture components could not be built as specified and are
+     SUBSTITUTED, each flagged in code at its site**: mTLS on loopback →
+     a shared client token plus a 127.0.0.1 bind (no CA or cert material in
+     this environment); PostgreSQL `evidence_db` with a role holding no
+     `UPDATE`/`DELETE` grant → a separate SQLite database with `BEFORE UPDATE`
+     / `BEFORE DELETE` triggers that `RAISE(ABORT)` (no Postgres available).
+     The Oracle-sourced warehouse → SQLite over the synthetic fixture, which
+     also means `SECURITY_KB` §2.4's per-skill database grants have no
+     analogue and are **not built**.
+  2. **Anchor signing and the Object-Lock archive are stubs with real
+     interfaces**, and are deliberately loud: they report `is_stub`, mark
+     every artefact they produce, and **refuse to be constructed when
+     `CONCLAVE_ENV=production`**. The archive reports
+     `has_retention_lock = False` rather than faking protection it lacks.
+  3. **`FullPopulationConclusion`'s private constructor is a lint-backed
+     convention, not a language guarantee** — Python has no private
+     constructors. The *variant* constraint (`no_exceptions` exists on one
+     type and is absent, not `False`, on the others) IS type-level and
+     unbypassable. Both residual holes have a test demonstrating exactly what
+     they do.
+  4. **Nine of the eleven evaluator primitives are ABSENT, not stubbed.** A
+     manifest naming one fails compilation saying "not implemented in this
+     build". A stub primitive would be a check that cannot fail.
+  5. **Certified query manifests carry a tri-state column classification**
+     (`true`/`false`/`unclassified`); a *missing* key fails the build, so
+     "unclassified" is a declaration made, never one omitted. Entitlements are
+     **derived** from the classification rather than hand-declared.
+  6. **The `ux` and `industry` suites exit `3`, not `0`** — no UI and no
+     F40/CUEC/POAR/close-clock exist to test. Each carries a README naming
+     what must exist first.
+
 ## Current Status
 
-Gate 7 · Code — building MVP1 in staged passes against 261 acceptance criteria.
+Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
+
+**Pass 1 complete** (6 commits in `dev/`, 300 unit tests + 71 suite scenarios,
+all green). Built: the two-process repo skeleton and the GES credential trust
+boundary; the certified query registry and its single execution operation; the
+append-only hash-chained dossier store; coverage as a closed sum type; the F29
+omission detector, the F42 negative half and the paired wedge comparison; the
+twelve-period fixture with the planted omission. Not yet built and absent
+rather than stubbed: the guardrail broker (F36), export (F40), POAR, the
+review/render surface (F41), resolution and disposition (F35/F32), the version
+registry (F2), identity and lineage (F5), the refusal registry (F50), and the
+entire front end.
+
+## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
+
+Eight places where the build could not match `ARCHITECTURE_KB` as written.
+`code-agent` disclosed all eight rather than letting them pass. **None may be
+closed by a later gate without either being built or being granted an explicit
+human exception.** Gate 9 audits against this table, not against the commit
+messages.
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 1 | §8.1 mTLS on loopback | shared client token + 127.0.0.1 bind | weaker; must be reversed before any non-single-host deployment |
+| 2 | §9.1 Postgres role, no `UPDATE`/`DELETE` grant | SQLite `BEFORE UPDATE`/`BEFORE DELETE` triggers | bypassable by `DROP TRIGGER`; **a row trigger does not fire for a statement matching zero rows** — a grant refuses it regardless. §23.4's `SERIALIZABLE` transaction has no SQLite equivalent and is not built |
+| 3 | §9.2 KMS-signed Ed25519 anchors | labelled digest | **`AC-F1-11` NOT satisfied** — chain recomputation by an attacker is undetected. Key rotation across seven years unsolved (`SECURITY_KB` §4.5) |
+| 4 | §9.3 Object-Lock compliance-mode archive | `has_retention_lock = False` | **seven-year immutability obligation NOT met** |
+| 5 | `SECURITY_KB` §2.4 per-skill database grants | none | the independent second layer below the application does not exist |
+| 6 | §5.3 `CloseClock` | none | **`AC-F38-11` unmet** — figures carry dataset/registry provenance but no close-clock staleness |
+| 7 | §6.1 `sql_file` against an Oracle-sourced warehouse | SQLite | statements real and bound-parameter-only, but **dialect fidelity untested** |
+| 8 | §9.4 server-rendered evidential region | none (no UI) | `AC-F41-04` and gate 5's strengthened `AC-F41-03` untestable today |
+
+**Items 3 and 4 are the ones that cannot quietly become "MVP1 ready."** They are
+the evidentiary guarantees the product's compliance story rests on, and a
+labelled digest with `has_retention_lock = False` reads as satisfying them to
+anyone who does not open this table. They are prototype stubs with the interface
+real and the stub visible — which was the instruction — but the obligation is
+open, not discharged.
+
+**One declared exception to "no function anywhere accepts SQL text"**, enforced
+by a reflective test across `app/`, `ges/` and `common/`: `SqliteWarehouse.fetch`,
+the driver boundary, which receives the committed statement from the compiled
+registry and from nowhere else.
+
+**No reachability tests exist because no UI component exists.** That Code-gate
+obligation is live and unmet; the `ux` suite exits 3 rather than reporting green.

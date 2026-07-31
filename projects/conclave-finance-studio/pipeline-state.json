@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 7 \u2014 Code (staged)",
+  "position": "Gate 7 \u2014 Code, pass 2 of a staged build",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -112,7 +112,8 @@
       "date": "2026-07-31",
       "participants": [
         "code-agent"
-      ]
+      ],
+      "note": "Pass 1 of a staged build: 6 commits, 300 unit tests + 71 suite scenarios green, 4 suites executing / 2 honestly empty (exit 3). ~30 AC IDs satisfied of 261. Eight architecture substitutions recorded in the deferred-substitution register; items 3 and 4 leave compliance obligations open."
     },
     {
       "n": 8,
