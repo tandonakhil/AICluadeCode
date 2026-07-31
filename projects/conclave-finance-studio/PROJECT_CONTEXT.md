@@ -579,8 +579,11 @@ Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
 "262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
 spec at v1.1.1; **no ID was renumbered, added or removed**.)
 
-**Passes 1, 2a, 2b, 2c, 3, 4 and 5 complete** (36 commits in `dev/`, **1,428
-unit tests + 388 suite scenarios**, all green. **All six suites execute**;
+**Passes 1, 2a, 2b, 2c, 3, 4, 5 and 6 complete** (39 commits in `dev/`, **1,439
+unit tests + 388 suite scenarios**, all green. Pass 6's delta: **+11 unit
+scenarios** (`AC-F36-47`'s surface clause), **0 suite scenarios** — the
+register-24/25 work changed what existing scenarios say and what they read
+their numbers from, not how many there are. **All six suites execute**;
 `industry` moved off exit 3 at pass 4 because two of the five things its README
 named — the Journal Import contract and the CUEC register — are now built).
 
