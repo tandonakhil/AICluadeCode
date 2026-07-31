@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 7 \u2014 Code (loop-back from Verification)",
+  "position": "Gate 8 \u2014 Test (re-run on fresh code)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": null,
@@ -107,18 +107,18 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
       ],
-      "note": "5 passes, 36 commits. 1,428 unit tests + 388 suite scenarios green; all six SME suites executing. Pass 5 is the gate-9 loop-back: the four detector families that were never built (F26, F28, F9, F33) are built, all eleven ARCHITECTURE_KB 7.3 evaluator primitives now exist, and the three contradictions are resolved -- AC-F12-20's dossier leg built, AC-F41-08 and AC-REFUSAL-11 stated as NOT VERIFIED with no scenario claiming either. 41 AC IDs newly evidenced; 5 remain unmet for named missing capabilities. 25 register entries; 6 closed, 4 narrowed, 3 opened."
+      "note": "Pass 5 closed the gate-9 loop-back: four missing detector families built (F26, F28, F9, F33), 41 criteria newly evidenced, 1,428 unit + 388 suite scenarios green."
     },
     {
       "n": 8,
       "name": "Test",
-      "status": "pending",
+      "status": "active",
       "approval": "pending",
       "date": "2026-07-31",
       "participants": [
