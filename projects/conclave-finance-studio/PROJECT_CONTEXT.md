@@ -290,12 +290,59 @@ undecided.
      have one, so an abstention was not in fact recordable as anything other
      than a denial with a special reason string.
 
+- **2026-07-31 — Gate 7 Code pass 3 (the UI): judgement calls made by `code-agent`.**
+  1. **STACK: server-rendered HTML from the existing FastAPI `api` process, not
+     the template's Next.js front end.** `PLAN.md` §6.2 chose `genai-chatbot`,
+     whose front end is Next.js/TypeScript/Tailwind. Four reasons for the
+     departure, recorded so a later gate can overturn it on argument:
+     (a) `ARCHITECTURE_KB` §9.4 requires a **server-rendered, style-inlined**
+     evidential region and `AC-F41-04` requires the retained rendered view to
+     reproduce what the approver saw — server-rendered makes the response and
+     the retained artefact the same bytes, where a client-rendered app makes
+     them a render and a re-render; (b) `UX_KB` §5.4 forbids the three things a
+     client runtime buys (hover-only facts, lazy loads, live refresh), and a
+     build with no `<script>` satisfies that by construction rather than by
+     review; (c) no screen in `FUNCTIONAL_SPEC` §23 has client-side state worth
+     a runtime, and the one thing that would need it — bulk selection — is
+     forbidden; (d) it adds no runtime dependency. **Playwright is added as a
+     dev dependency**, which `templates/genai-chatbot/TEMPLATE_MANIFEST.md`
+     already specifies.
+  2. **Four palette tokens deviate from the gate-5 approved mockup**, each
+     found by running the browser suite and each flagged in code at its site:
+     the dark risk ramp was non-monotonic in luminance (step 2 darker than step
+     1, so the ordinal broke in greyscale — the exact print condition `UX_KB`
+     §3.2 is about); light `risk-1-bg` failed AA by 0.004; light `ink-3` failed
+     AA on `surface-2`/`surface-3` where most small text sits; the dark primary
+     button was white-on-light-blue at 2.52:1. These implement `UX_KB` §3.2's
+     stated intent rather than departing from it, but they are pixel changes to
+     an approved design and are recorded as such.
+  3. **"There is no green" is enforced, not conventional.** `tokens.py` converts
+     every declared colour to HSL and refuses the green hue band at import of
+     `chrome.py`. A green token is an ImportError. The band reaches into teal
+     (175°) because the failure mode is a colour that *reads* as success.
+  4. **Abstained items are absent from the findings queue**, not merely styled
+     differently inside it. A distinct pill inside a list of findings is still
+     a row in a list of findings. They keep their own region and are still
+     routed (`AC-F36-50`).
+  5. **The write path refuses rather than pretending.** `POST /review/{id}/resolve`,
+     `/reject` and `/proposal/{id}/approve` return **501 in the deferred
+     grammar** naming what is missing. There is no `/ges/decide` HTTP route, so
+     there is nothing for the api process to ask; a route that recorded an
+     approval locally would be the interface deciding what only the broker may
+     decide. The controls are real controls, and their terminal state is an
+     honest refusal.
+  6. **The pilot report moved to a three-closed-period window.** At two, every
+     readiness condition reports `not_yet_evaluable` for the same reason and a
+     reader never meets the difference between "we looked and it failed" and
+     "we have not looked long enough".
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against 261 acceptance criteria.
 
-**Passes 1, 2a, 2b and 2c complete** (14 commits in `dev/`, 782 unit tests +
-96 suite scenarios, all green; `ux` and `industry` suites exit 3).
+**Passes 1, 2a, 2b, 2c and 3 complete** (21 commits in `dev/`, **1,105 unit
+tests + 244 suite scenarios**, all green. The `ux` suite now **executes with
+148 browser scenarios**; only `industry` still exits 3).
 
 Built in pass 1: the two-process repo skeleton and the GES credential trust
 boundary; the certified query registry and its single execution operation; the
@@ -320,9 +367,24 @@ and their evidence schemas; the policy-cold auto-disposal path with
 third-consecutive-period escalation; F35 close preconditions and F32 forward
 disposition with its verification job.
 
-Not yet built and absent rather than stubbed: export (F40), POAR, the
-review/render surface (F41), the version registry (F2), identity and lineage
-(F5), and the entire front end.
+Built in pass 3 — **the desktop web surface (S1), end to end**: an escaping
+HTML kernel; the design tokens with `assert_no_green()` enforced at import; the
+inlined, script-free page shell; a 36-component library; and six routed screens
+— **Ask** (declared-population inversion, coverage strip, ambiguity fork),
+**Exceptions** (volume masthead, the wedge's two labels, five boundary checks
+with "not run" in risk colour, the auto-disposed row from the real policy-cold
+path, and four renderable coverage states), **Review** (risk → evidence →
+resolution → narrative-collapsed, no approve control, six resolution types,
+closed rejection list, required clearing period), the **evidential dossier**
+(shell off, style-inlined, no external reference of any kind), **Proposal**
+(the only approve control, terminating in an export file, approval path removed
+on supersession) and **Readiness** (P1–P5 individually, label source adjacent
+to the figure).
+
+Not yet built and absent rather than stubbed: export (F40) as a file, POAR, the
+version registry (F2), identity and lineage (F5), and six of the nine screens —
+**Monitors, Dispositions, Catalogue, Inventory, Audit, Refusals** (register
+entry 16).
 
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
@@ -355,8 +417,14 @@ by a reflective test across `app/`, `ges/` and `common/`: `SqliteWarehouse.fetch
 the driver boundary, which receives the committed statement from the compiled
 registry and from nowhere else.
 
-**No reachability tests exist because no UI component exists.** That Code-gate
-obligation is live and unmet; the `ux` suite exits 3 rather than reporting green.
+**~~No reachability tests exist because no UI component exists.~~** **CLOSED at
+pass 3.** Every screen is rendered through `TestClient(app)` against the object
+`backend/app/run.py` serves, and `reachable_urls()` walks from `/` following
+real links to eighteen URLs. Two tests then assert that every GET route the app
+serves is in that set and that all 36 `data-testid`s the component library
+declares are rendered somewhere in it — a component defined, imported and
+mounted nowhere fails the second. The `ux` suite reports green on 148 executing
+browser scenarios.
 
 ### Register entries added at pass 2c
 
@@ -372,3 +440,28 @@ recorded at pass 1. In particular, entry 2's residual is *narrowed but not
 closed*: the two new SQLite stores added here (`policy_cold`, `disposition`)
 use the same `BEGIN IMMEDIATE` single-writer mechanism, so they inherit both
 its guarantee and its one-host bound.
+
+### Entries CLOSED at pass 3
+
+| # | Was | Now |
+|---|---|---|
+| 8 | §9.4 server-rendered evidential region — none (no UI); `AC-F41-04` and gate 5's strengthened `AC-F41-03` untestable | **BUILT.** `/dossier/{id}` renders shell-off, style-inlined, with no `<link>`, `<img>`, `<script>`, `@import`, `url()` or `srcset` and no outbound link — it opens from a file, offline. `AC-F41-03`'s strengthened clause is checked in a real browser: the riskiest figure computes to 42px and no other element on the screen reaches it (next largest, 22px) |
+| 10 | `AC-F35-11` — auto-disposed finding visible on Exceptions, dossier reachable — NOT satisfied, no UI | **SATISFIED.** The row is visible in the queue, marked auto-disposed, names the disposing rule and the bundle hash, and links to a dossier the test follows. A separate test asserts the rule in the row is the rule `policy_cold.evaluate` actually fired |
+
+### Entries NARROWED but not closed at pass 3
+
+| # | Residual after pass 3 |
+|---|---|
+| 6 | `CloseClock` still absent. The screens render a `close_day` label carried on the run's binding, not a figure computed against a close calendar. **`AC-F38-11` remains unmet** and `chrome.provenance()` says so at the site |
+| 11 | `AC-F12-20`'s "on screen, in a dossier and in an export": the **screen leg now exists** and is tested. The precision figure is not rendered in the dossier and **no export file exists**, so two of the three surfaces are still unread |
+
+### Entries OPENED at pass 3
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 13 | The UI as a client of the broker over the trust boundary | broker facts (decision ID, bundle hash, threshold, approval eligibility) **carried on the item** as a payload in the shape the broker emits | there is **no `/ges/decide` HTTP route**, so no screen fetches a decision. Two AST-level tests prove `app/ui/` imports nothing from `ges` and compares no approver against an author or invoker — the UI provably does not *compute* these — but in this build `app/ui/state.py` *supplies* them. The display is faithful; the fetch does not happen |
+| 14 | The write path — record a resolution, submit a structured rejection, approve for export | **501, in the deferred grammar, naming what is missing** | **`AC-F35-01`…`-08` persistence, `AC-F41-11` (approval-persist failure), `AC-F41-06`'s server-side "does not complete", `AC-F40-03`, `AC-F32-01`'s save failure and `AC-F12-01`…`-03` capture are NOT satisfied.** The controls exist and are real; nothing behind them records |
+| 15 | Screens fed by a run from `run_harness` against GES | an in-memory **pilot close** (`app/ui/state.py`) over the synthetic fixture | coverage, the conclusion type, the resolution model, auto-disposal, the abstention and the precision/readiness objects are all produced by the **real** modules; the findings themselves are fixture literals. Every screen carries a non-dismissable **pilot strip** saying so in words |
+| 16 | The nine screens of `FUNCTIONAL_SPEC` §23 | six built (Ask, Exceptions, Review, Dossier, Proposal, Readiness); **Monitors, Dispositions, Catalogue, Inventory, Audit and Refusals are not built** | **UNMET: `AC-F41-07`, `AC-F41-19`, `AC-F12-10`, `AC-F36-19`, `AC-F32-09`, `AC-F32-10`, `AC-F38-01`, `AC-F38-12`, `AC-F38-13`, `AC-F38-16`, `AC-F5-07`, `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-01`, `AC-REFUSAL-13`.** The navigation deliberately lists only built screens: a dead nav link in an evidence product reads as a missing control rather than as unbuilt work |
+| 17 | The gate-5 approved palette, pixel for pixel | four tokens changed | dark `risk-1`/`risk-2` (luminance ordinal), light `risk-1-bg` (AA by 0.004), light `ink-3` (AA on `surface-2`/`-3`), dark `.btn.primary` label. Each implements `UX_KB` §3.2's stated intent, but they are changes to an approved design and `ui-ux-designer` should confirm them |
+| 18 | `AC-F41-08` — a probe indistinguishable from a genuine proposal before disposition | UX-11 asserts **no probe marker exists anywhere in the DOM** | **necessary, not sufficient.** The F12 probe-injection programme is not built, so there is no probe in any queue to be indistinguishable from one. The scenario must be rewritten against a real probe when injection lands; the test and the suite README both say so |
