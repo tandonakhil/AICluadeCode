@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 8 \u2014 Test (re-run on fresh code)",
+  "position": "Gate 9 \u2014 Verification (re-audit)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": null,
@@ -118,19 +118,19 @@
     {
       "n": 8,
       "name": "Test",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "test-agent"
       ],
-      "note": "Must re-run: evidence corpus is one code pass stale."
+      "note": "Re-run on fresh code: 1,816 scenarios, 0 failures, nothing STATIC ONLY. First run with NO contradiction against the register. Stale 07-31 evidence deleted, not left beside the new corpus."
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "looped",
-      "approval": "request_changes",
+      "status": "active",
+      "approval": "pending",
       "date": "2026-07-31",
       "participants": [
         "verification-agent"
