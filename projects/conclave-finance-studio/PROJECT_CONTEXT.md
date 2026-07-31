@@ -15,12 +15,33 @@ combine them into agentic teams for month-end close.
 
 ## Active Team
 
-_Not yet composed — gate 2._
+**Approved 2026-07-31 — full roster, 14 agents. Nothing dropped.**
 
-Two constraints already binding, from Intake:
-- `solution-architect` **non-droppable** (three surfaces)
-- `responsible-ai-architect` **effectively non-droppable** (owes the A7.2 harm
-  analysis, delegated to it at Intake)
+Core (8): `plan-agent`, `functional-design-agent`, `code-agent`, `test-agent`,
+`verification-agent`, `review-agent`, `deploy-agent`, `ui-ux-designer`.
+
+Optional, all retained, each with a named obligation that would otherwise go
+unowned:
+- `solution-architect` — **non-droppable by rule** (three surfaces); owes the
+  mandatory Impact Analysis on every change
+- `responsible-ai-architect` — **non-droppable in practice**; owes the A7.2
+  harm analysis delegated to it at Intake
+- `security-architect` — owns `industry-expert`'s eleven compliance
+  obligations (ICFR scope, IPE testing, 7-year WORM retention, SoD)
+- `functional-agent` — devil's advocate at Plan and Architecture; found the
+  self-justifying-reconciling-item mechanism and the builder's author-role SoD
+  defect
+- `industry-expert` — owns the compliance floor, which is the binding
+  constraint on this product
+- `synthetic-data-agent` — close agents cannot be tested on real ledger data
+
+**Test Policy: all suites blocking.** No advisory exceptions. Ledger write-back
+and ICFR scope make an advisory suite a hole in the control narrative.
+
+**Estimate at approval**: 5–8M tokens, from 2 comparable data points
+(`conclave-marketing` ~4.8M, `little-milestones` ~5.0M). Stated as a planning
+input, not a prediction; upper end uncertain because the MVP slice is
+undecided.
 
 ## Decisions Log
 

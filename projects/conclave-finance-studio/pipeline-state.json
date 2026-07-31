@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 1 complete \u2014 awaiting approval to open Team Composition",
+  "position": "Gate 3 \u2014 Plan & Backlog",
   "env": "dev, local",
   "last_activity": "2026-07-30",
   "served_url": null,
@@ -11,7 +11,7 @@
       "n": 1,
       "name": "Intake",
       "status": "done",
-      "approval": "awaiting",
+      "approval": "approved",
       "date": "2026-07-30",
       "participants": [
         "orchestrator",
@@ -29,14 +29,29 @@
     {
       "n": 2,
       "name": "Team",
-      "status": "active",
-      "approval": "pending"
+      "status": "done",
+      "approval": "approved",
+      "date": "2026-07-30",
+      "participants": [
+        "orchestrator",
+        "usage-monitor"
+      ],
+      "artifacts": [
+        "PROJECT_CONTEXT.md#active-team"
+      ],
+      "note": "Full roster, 14 agents. No optional SME dropped \u2014 none could be cut without leaving a named obligation unowned. All suites blocking."
     },
     {
       "n": 3,
       "name": "Plan",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-07-31",
+      "participants": [
+        "plan-agent",
+        "industry-expert",
+        "functional-agent"
+      ]
     },
     {
       "n": 4,
