@@ -51,7 +51,8 @@
         "plan-agent",
         "industry-expert",
         "functional-agent"
-      ]
+      ],
+      "note": "plan-agent proposed 25 features (13 build-now). functional-agent challenged: shape approved, \u00a710/F4/F8/F20 not. Human electing changes one at a time."
     },
     {
       "n": 4,
@@ -102,5 +103,14 @@
       "approval": "pending"
     }
   ],
-  "loop_backs": []
+  "loop_backs": [
+    {
+      "date": "2026-07-31",
+      "from_gate": 3,
+      "to_gate": 3,
+      "reason": "functional-agent devil's-advocate pass found six required changes before the backlog can go to approval \u2014 chiefly that criterion 9 (F4 ERP tie-back) is the only blocking acceptance criterion the build as scoped cannot pass, and that F8 does not defeat the self-justification mechanism it was written for",
+      "resolved": false,
+      "origin": "gate"
+    }
+  ]
 }

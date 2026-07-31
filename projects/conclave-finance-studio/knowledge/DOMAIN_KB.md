@@ -615,6 +615,94 @@ That distinction needs to be explicit in whatever gate 3 approves.
 
 ---
 
+## 9 · Devil's-advocate pass on `PLAN.md` (gate 3) — 2026-07-31
+
+Recorded because four of these findings are cheap now and impossible to retrofit,
+and two describe features that are actively harmful if built as currently
+worded. Advisory; `plan-agent` owns the gate.
+
+### 9.1 Citation is not substantiation (F8)
+
+A reconciling item makes **two** claims: (1) *these transactions constitute the
+difference*, and (2) *they are of a nature requiring no adjustment*. F8 as
+written forces evidence for (1) only. All of §6.2's risk lives in (2). An agent
+facing a $180K clearing residual can cite 47 real, resolvable in-transit
+transactions summing to $180K while 12 of them are a duplicated intercompany
+posting that will never clear. Every citation is genuine; the classification is
+wrong. Worse, the citation is a **legibility signal** to the reviewer that the
+item has support — so F8 can raise reviewer confidence without raising item
+quality, which is §6.1's danger, not its remedy.
+
+F8 also creates a gaming gradient: the cheapest route to a citation is to attach
+the nearest real transactions of roughly the right size and direction. That is
+exactly how a plug becomes a story. Citation-as-schema specifies the *format* in
+which the §2 line is crossed; it does not remove the ability to cross it.
+
+**Three strengthenings, all cheap at F8 time, none retrofittable:**
+
+- **(a) Forward disposition.** Every reconciling item carries an expected
+  clearing period, and next period the system tests the prediction against
+  reality. This converts an unfalsifiable narrative into a falsifiable one and
+  gives F9/F10 a hard signal instead of a statistical one. Impossible to
+  retrofit — the prediction must have been recorded in the prior period.
+- **(b) Coverage arithmetic.** Cited transactions must *sum* to the item, with
+  residual-after-citation surfaced. "Must cite a source transaction" (singular,
+  no sum test) passes partial citation, which is the common real failure.
+- **(c) Assertion typing.** Timing / error-pending-correction /
+  permanent-difference, with "timing" carrying a clear-by date that ages. Without
+  this, the aging control auditors already run (§3: 30-day ceiling, survival past
+  year-end is a finding) cannot be run against agent output at all.
+
+### 9.2 F14 built naively is worse than not building it
+
+Re-deriving a residual with the **same model and same prompt**, context
+suppressed, is not fresh eyes — it is the same eyes with amnesia. Correlated
+failure is the default. The likely outcome is agreement, and that agreement gets
+filed as corroboration: the dossier now contains two independent-looking
+confirmations of the same error, which is strictly worse evidence than one.
+Fresh eyes requires a **different derivation path** — different model, a
+deterministic non-LLM check, or a human. Recorded now, while F14 is still on the
+later list, because the naive implementation is the obvious one.
+
+### 9.3 Detection without consequence is a notification into a saturated budget
+
+F9/F10 escalate to the controller — in the close window, to the person who has
+already personally certified the prior five instances. Acting on the escalation
+means conceding those certifications were wrong. There is a self-consistency
+bias on the **human** side mirroring the agent's, and §7.2's attention-budget
+argument applies unchanged to alerts. The detector needs a **state change**, not
+a signal: a trip should raise the account's risk grade (F3), remove
+auto-certification eligibility (F7), and surface the disposition-miss at the top
+of the certification screen (F11). No new feature — wiring between components
+already in the build-now set.
+
+### 9.4 Flux narrative (F21) is the second-most-dangerous item on the list
+
+It is currently characterised as the safe, low-risk, third-persona win. It is
+not. Flux is **documented-explanation-only** output (§2: lowest agent
+suitability, highest risk) with no ground truth at all, assembled across joins
+the reviewer cannot replicate, and its product becomes *management's stated
+explanation of results* in the close pack and the audit-committee deck. Low
+**ledger** risk, high **representation** risk. The "pull forward if persona
+coverage matters" framing invites someone to pull it forward as the easy win.
+
+### 9.5 F20 is the builder, narrowly scoped
+
+"Long-tail onboarding" = defining a reconciliation against an arbitrary source
+without engineering work. That is F16 under another name, and whoever defines its
+matching rules and thresholds is an **author** in the §7.1 sense. F20 is
+therefore gated by obligation F (author ≠ approver), which `PLAN.md` lists for
+F16 and omits for F20. Deferring F20 is right, but for this reason — not because
+it is "unbounded in shape," which is a reason anyone can defeat by writing a
+spec.
+
+**Consequence for F6, at gate-3 cost:** build the reconciliation *type* as a
+configuration object (source bindings, matching rules, thresholds as data), not
+as code. If F6 hardcodes bank and cash-in-transit, F20 is a rewrite; if it does
+not, F20 is an onboarding surface over a working engine.
+
+---
+
 ## Sources
 
 - [Month-End Close in Oracle Cloud ERP — Traust](https://traust.com/blog/month-end-close-in-oracle-cloud-erp/)
