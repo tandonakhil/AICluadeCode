@@ -786,6 +786,73 @@ undecided.
      happened, not paths, and rewriting five history entries is a call for the
      orchestrator rather than one to make inside a hygiene item.
 
+- **2026-07-31 — Gate 7 pass 12, SCOPE-RULING BATCH B: the probe programme and
+  the F39 resolver. Judgement calls by `code-agent` the plan did not fully
+  specify.**
+  1. **A probe's correct answer is a SET of responses, and a structured
+     rejection is one of them.** The plan said the probe is a known-error item
+     and the capture records whether the reviewer was right; it did not say
+     what "right" is. Scoring only the resolution type would have marked the
+     sharpest possible response to a manufactured error — *the evidence does
+     not support this finding* — as a miss, which trains exactly the deference
+     the programme exists to measure. `ProbeSpec.correct_responses` therefore
+     holds both `R2` and a rejection on `evidence_insufficient`, and the stored
+     separator is a pipe rather than a comma because rejection labels contain
+     commas.
+  2. **The probe is injected BEFORE the emission gate, not after it.** A
+     manufactured item that took a different route into the queue than a
+     genuine one is distinguishable by that route, and `AC-F41-08` is about
+     there being no such difference. A probe the gate withholds is simply not
+     in the queue.
+  3. **`AC-F1-04` and `AC-F12-16` are reconciled rather than traded off.** The
+     export must contain every dossier for the period; a probe must appear in
+     no export. Both hold only because the completeness statement now names how
+     many manufactured items it excluded — an export that dropped rows silently
+     while claiming completeness would be worse than either failure alone.
+  4. **The probe's risk tier and resolution set were chosen to MATCH a genuine
+     item's.** Not cosmetic: those two properties set a class name and a field
+     set in the rendered DOM, they differ legitimately between genuine
+     findings, and the indistinguishability comparison is only meaningful with
+     them controlled for. A scenario asserts the comparator is a fair one, so a
+     future change to either item's tier fails there with the reason rather
+     than in the indistinguishability check with an uninterpretable diff.
+  5. **The pilot's injection SEED is chosen; the rate is not.** Seven items and
+     a 2–8% band yield no probe about seven times in ten. Recorded as register
+     32 with the consequence stated: nobody may read the pilot's probe count as
+     evidence about the rate.
+  6. **`OUTCOME_UNRESOLVED` is renamed `OUTCOME_PASSED_TRIAGE`.** Its value was
+     `not_resolvable_in_this_release`, which asserted no resolver existed. One
+     does, so the name would be false, and the honest cost of building the
+     resolver is that triage no longer gets to say it.
+  7. **The resolver holds NO refusal check of its own.** The ordering condition
+     is enforced by call order in `ges.main` alone. A second copy would be a
+     second thing to get wrong, and the copy is the one that eventually
+     matters. A functional scenario probes five refusal-shaped requests that
+     each name a subject the resolver CAN map, so the order is proved rather
+     than read off the source.
+  8. **Coverage where no member resolver exists is UNKNOWN, never complete.**
+     Four of the populations have a certified member-resolver query and the
+     rest do not. Reporting the rest as fully covered would be the single most
+     dangerous rounding in the product; register 33 records it.
+  9. **The A20 re-run against the resolving path found something worse than
+     expected, and it is recorded as a finding rather than smoothed.** The
+     brief anticipated that an evading paraphrase which used to hit a decline
+     would now hit an answer, and it does. What was NOT anticipated:
+     **eleven of the twelve RT05 paraphrases are not refused at the request
+     surface at all**, including all eight the emission broker refuses under
+     A20 — the two matchers have always been different sets over different
+     objects, and that asymmetry stopped being harmless the moment there was
+     something downstream to evade into. `RT05_AT_THE_REQUEST_SURFACE` commits
+     the map so either matcher changing fails it. `AC-REFUSAL-11` is claimed
+     nowhere.
+ 10. **The UX suite now restores the run tier after every scenario.** The leak
+     had been mopped up by accident: the last UX-11 scenario called
+     `state.reset()` for its own reasons, which incidentally put the tier back
+     after `/ask?tier=exploration`. Rewriting that scenario against a real
+     probe took the mop-up with it and a later journey scenario started
+     failing. Restoring the tier explicitly is the fix; relying on another
+     scenario's side effect was never one.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -916,7 +983,7 @@ the two reporting fixes.
 
 | Family | Built | AC IDs now evidenced | Still not |
 |---|---|---|---|
-| **F26** warehouse-to-ERP fidelity | `identity_tieout`, `freshness`; two manifests; a two-leg run; the Exceptions region | `AC-F26-01`…`-04`, `-06`…`-10` | `AC-F26-05` (no close clock, register 6) |
+| **F26** warehouse-to-ERP fidelity | `identity_tieout`, `freshness`; two manifests; a two-leg run; the Exceptions region | `AC-F26-01`…`-10` (`-05` from pass 11, against the declared close calendar) | — |
 | **F28** the five boundary checks | `pair_imbalance`, `continuity`, `arithmetic_recompute`, `residual_threshold`; `identity_tieout` bound a second time for A6; five manifests; `BoundaryRun` | `AC-F28-01`…`-10`, all ten | — |
 | **F9** cross-period surveillance | `accumulation`, `text_recurrence`; two manifests; both legs; the R6 control-state change; the Monitors regions | `AC-F9-01`…`-09`, all nine | — |
 | **F33** coding anomaly + backtest | `peer_coding_divergence`; the backtest evidence schema; the Exceptions region | `AC-F33-01`…`-12`, all twelve | — |
@@ -947,12 +1014,44 @@ is resolved on read rather than written back.
 are now stated as unmet rather than claimed**; the third was a missing build
 and is built. See Decisions Log items 13–15.
 
-**Not built and absent rather than stubbed**: point-of-action revalidation, the
-close clock (`AC-F38-11`, and therefore `AC-F26-05`), the F12 probe-injection
-programme (`AC-F41-08` and, from the capture side, `AC-F12-05`), F17 direct
-posting, and the F39 natural-language
-resolver's model call site (and therefore `AC-REFUSAL-11`, `AC-F39-03`, `-05`,
-`-06`, `-08`).
+**Not built and absent rather than stubbed** — *as this read before the scope
+ruling's two batches; struck through in substance by passes 11 and 12 and kept
+here so the sequence is legible*: point-of-action revalidation, the close clock
+(`AC-F38-11`, and therefore `AC-F26-05`), the F12 probe-injection programme
+(`AC-F41-08` and, from the capture side, `AC-F12-05`), F17 direct posting, and
+the F39 natural-language resolver's model call site (and therefore
+`AC-REFUSAL-11`, `AC-F39-03`, `-05`, `-06`, `-08`).
+
+**Pass 11 (batch A) built** the export-time CUEC fail-closed path
+(`AC-F40-18`), the close clock (`AC-F26-05`, `AC-F38-11`) and point-of-action
+revalidation (`AC-F40-12`…`-16`).
+
+**Pass 12 (batch B) built the two large clusters, and this is what remains
+absent afterwards:**
+
+* **The probe-injection programme is built**, with its full non-attributability
+  set in the same commit — `AC-F12-11` … `-18`, and `AC-F41-08` and
+  `AC-F12-05` claimable for the first time. Register 18 closes. The probe flag
+  is store-level and `ReviewItem` has no field for it, so the agent runtime and
+  every pre-disposition payload are identical for a probe and a genuine item by
+  construction rather than by omission. What is NOT claimed: anything about
+  explanation quality — §12's standing exclusion holds and probes measure
+  attention, which is the alternative `INDUSTRY_KB` §15.4 names.
+* **The F39 resolver call site is built** — `AC-F39-03`, `-05`, `-06`, `-08`,
+  which were all passing vacuously because every request declined. Natural
+  language selects and parameterises over thirteen committed manifests and
+  never authors a query. What is NOT built and is not claimed: a **model** call
+  site. Intent selection is pattern matching against a committed table, so a
+  request outside its vocabulary is unmappable — the safe direction.
+* **`AC-REFUSAL-11` remains phase 2 and the resolver made its exposure larger,
+  not smaller.** Register 9 is narrowed with the measurement: eleven of the
+  twelve RT05 paraphrases are not refused at the *request* surface, and a
+  crafted evading paraphrase that names a mapped subject now reaches an answer
+  where it previously reached a decline.
+
+**Still absent after pass 12**: `AC-F40-17` (CUEC drift detection),
+`AC-F1-08` (object-lock retention), `AC-F1-11` (KMS-signed anchors),
+`AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
 
@@ -1310,8 +1409,48 @@ its guarantee and its one-host bound.
 |---|---|
 | 18 | **`AC-F12-05` joins `AC-F41-08` under this entry.** They are one absent programme seen from two sides: `-08` asks that an injected probe be indistinguishable from a genuine proposal; `-05` asks that the capture record identify the item as a probe, record the reviewer's response and whether it was correct, **and** that the probe not be distinguishable before disposition. With no probe injected, `-05`'s first two clauses have no capture record to be checked against and its third is reached only by the absence of the thing it is about — the identical shape `-08` was descoped from claim for at pass 5. Gate 9 found the live contradiction: `tests/suites/ux/test_ux_flow.py` carried a join reading "`AC-F12-05` is served by this" in a docstring whose next paragraph explained why it is not. The join is now narrowed to the third clause with the denial **inside the join string**, so a by-ID mapper cannot score it satisfied. **`AC-F12-05` is NOT VERIFIED**, and no scenario in any suite names the bare ID |
 
-**Thirty entries as of pass 8. Entries 8, 10, 11, 13, 14 and 16 are
-CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
+### Entries CLOSED at pass 11 (scope-ruling batch A)
+
+| # | Was | Now |
+|---|---|---|
+| 6 | `ARCHITECTURE_KB` §5.3's `CloseClock` did not exist, and it was the reason **two** criteria were unmet: `AC-F26-05` (staleness relative to the close clock) and `AC-F38-11` (every emitted figure carries that staleness on its face). Both were treated as tenant-dependent | **CLOSED.** `plan-agent`'s ruling corrected the premise, and the correction is what made it buildable in an afternoon: **a close calendar is a declaration, not a tenant artefact** — a list of period-end dates and close-day checkpoints per ledger. `common/close_calendar.py` declares two (the twelve-period fixture's fiscal year and the pilot close), versioned and referenced by ref from the manifests that use them. `AC-F26-05`: the A2 leg emits a `close_clock_relative` note whose sentence names the cut-off and the distance from it, and the F26 fixture exercises both "one close day behind" and "zero close days behind". `AC-F38-11`: the staleness renders in the **page shell's provenance strip**, so every screen the application serves carries it beside the dataset version and the data as-of — including the chrome-off evidential view, where a figure is read years later by somebody who cannot go and look. Nothing reads a wall clock: the figure is arithmetic over declared checkpoints, so two readers of one run agree. **The absence path is retained and separately covered** — a ledger with no declared calendar still emits `close_clock_absent` naming the unmet criterion, which is the state every tenant is in before somebody writes their calendar down |
+| 25 | `AC-F9-05`'s "periods of history" was measured in periods present in the movements extract, so an account dormant for a quarter read as **younger than it is** — and a young account is excluded from the cross-period view, in F9, one of the four must-survive items. Witnessed in the suite at pass 6, still open | **CLOSED**, by register 6's closure from the other side. With a calendar declared, history is the span of declared periods from the account's first observed movement to the target period, dormant periods included. `accumulation` reports **both** numbers on every insufficient-history note — the periods the account posted in and the periods of history it was judged on — and names the measure in force (`history_measure`), which the Monitors screen renders. The fallback measure survives for a ledger with no calendar and carries the old denial verbatim on every note it produces, so a reader of a fallback note still meets register 25's wording. Boundary scenarios both ways: a dormant account is now evaluable; an account whose first movement is the target period is still too young |
+
+### Entry OPENED at pass 11 (scope-ruling batch A)
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 31 | `ARCHITECTURE_KB` §5.4's point-of-action revalidation as `AC-F40-12`/`-13` word it: a balance that has moved **in Oracle**, a period that is not `Open` **in Oracle**, read at the moment of action | the recheck runs at export time against the **ERP control extract** — the certified dataset F26 established, narrowed to the proposal's account combinations, with Oracle's period status and newest-journal timestamp entering as extract-borne columns | **The criteria are satisfied and the counterparty is weaker than their wording.** What is real: the comparison, the tolerance (declared, inclusive, stated on the record), and four refusals that actually stop a file existing — a moved balance, a journal newer than the pinned watermark, a period that is not open, and a recheck that could not run. What is NOT true: that this reads Oracle at the moment of action. **MVP1 must not claim it does.** The mitigation is that every revalidation record and every revalidation refusal NAMES the extract and its as-of and carries `counterparty_is_live_oracle_read: False` — so a reader of the record meets the substitution without opening this table, which a record saying only "revalidated at 14:32" would not. Same class as register 7. Closing it needs a live Oracle read at the point of action, which is register 21's tenant again |
+
+### Entry NARROWED at pass 11 (scope-ruling batch A)
+
+| # | Change |
+|---|---|
+| 3 | **Unchanged in substance; the disclosure now reaches the artefact it was missing from.** The anchor is still a labelled digest and `AC-F1-11` is still unmet. What changed: the stub's status travels into the **auditor export payload and file** (`evidence_integrity.anchor`), not only into the register, the anchor rows and the Audit screen. `AC-F1-04` makes that file the artefact an auditor consumes with no application login, so the one reader who cannot go and look was the one reader not being told. The wording is the ruling's permitted claim exactly: tamper-**detection** against accidental modification and against a party who does not recompute the chain; **not** tamper-evidence against a party holding application-level write access |
+| 4 | **Unchanged and still open; `AC-F1-08` still unmet.** The ruling's new MVP1 requirement is built: wherever a retention date is rendered, the absence of retention enforcement renders **adjacent to it** — inside the same region, from one home (`app/evidence/retention.py`), on the dossier header, on the auditor-export manifest, and inside the export file's payload. A walk from `/` asserts that every screen carrying the date carries the denial. The permitted claim is the ruling's: append-only within the running system, hash-chained, with a retention **stamp** — and "seven-year immutable retention" appears in this build only inside the sentence that says it is not met |
+| 28 | **`AC-F40-18` is built and this entry no longer covers it.** The entry was recorded as one gap covering both export-time CUEC criteria; `plan-agent`'s scope ruling separated them, and it was right to. `-18`'s Given — *a CUEC probe cannot execute* — is this build's **permanent** state, so it is fully evidenceable here, and until pass 11 the build did the criterion's explicitly forbidden thing: it authorised the export on the stored pass state. `ges/cuec_probe.py` now runs at export time, returns `cannot_execute` for every item (there is no tenant to read), and **refuses the export independently of the register** — a tenant with all five controls recorded `passed`, in date, still exports nothing. The default probe on every GES app is the one that cannot execute, so omission refuses. Pilot operability is preserved the way register 21 already does it: a **declared synthetic attestation**, one named file (`backend/ges/synthetic_cuec_attestation.json`), installed explicitly by `pilot.py` and the two suite harnesses, refused under `CONCLAVE_ENV=production`, and carried as `authorised_on = synthetic_attestation` in the export payload and on the export screen's face. `synthetic_attestation` is a **separate status from `no_drift`**, and a unit scenario fails the moment they are collapsed. **`AC-F40-17` STAYS OPEN under this entry**: no drift detection exists, nothing in this build can return `drift_detected`, no suite claims the ID, and every join string that mentions it carries the denial inside it |
+
+### Entries CLOSED at pass 12 (scope-ruling batch B)
+
+| # | Was | Now |
+|---|---|---|
+| 18 | The F12 probe-**injection** programme did not exist, so `AC-F41-08` and `AC-F12-05` were both being reported satisfied by checks asserting that no probe marker exists and that the injected-probe count is zero — a criterion satisfied by the absence of the thing it is about. The entry's standing instruction was to **rewrite the UX-11 group against a real probe when injection landed, never to relax it** | **CLOSED.** `app/f12/probes.py` manufactures known-error items, plans injection at a rate drawn inside the disclosed band, and registers them in a store the queue item knows nothing about. UX-11 is rewritten as the entry instructed: indistinguishability is now a comparison between **two rendered items** — same `data-testid` set, same attribute names, same class names, with the comparator matched on the two properties that legitimately differ between genuine findings (risk tier and allowed resolution set) — plus a queue-row shape check and a vocabulary check over the probe's own regions. `AC-F41-08` and `AC-F12-05` are **both now claimable and claimed**: `-05`'s first two clauses are evidenced against a capture row written by disposing of a real probe through the real control, and its third by the comparison above rather than by an absence |
+
+### Entries OPENED at pass 12 (scope-ruling batch B)
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 32 | Probe injection at a rate drawn from the disclosed band, over a queue of the size a real nightly queue is — where a 2–8% band produces probes naturally | the planner is exactly that (a rate drawn per queue, a Bernoulli draw per item, the rate discarded), but the **pilot's demonstration queue is seven items**, where that band yields no probe about seven times in ten. `PILOT_INJECTION_SEED` is therefore **chosen** so the demonstration queue receives one | **No criterion is unmet.** What is chosen is the seed, not the rate: `plan_injection` draws from the band and a run under any other seed is a legitimate run of the same planner, asserted by a scenario that measures the realised rate over 50,000 draws and requires it inside the band, and by one that requires the per-queue count to VARY. The consequence is narrower and real: **the pilot's probe count is effectively fixed**, so nobody may read "one probe in this queue" as evidence about the rate. Closing it needs a queue of realistic size, which needs a tenant — register 21 again |
+| 33 | `AC-F39-05`'s coverage over the declared population, for **every** certified query the resolver can select | coverage is a set difference over member keys, computed via the population's **certified member resolver** — which exists for four of the populations (`pop.recurring_accruals`, `pop.monitored_accounts`, `pop.period_journals`, `pop.postings_under_coding_review`) and not for the rest | **`AC-F39-05` is satisfied**, and it is satisfied on a query whose population HAS a resolver, over a warehouse in which the population is genuinely non-empty and the answer genuinely returns nothing — a zero over a zero would have been vacuous in the other direction. Where no member resolver exists the answer says coverage is **UNKNOWN, not complete**, which is convention C2 in its coverage form and is the most dangerous rounding in the product if it is ever softened. Closing it needs a member-resolver query per population, which is a manifest each, not a capability |
+
+### Entry NARROWED at pass 12 (scope-ruling batch B)
+
+| # | Change |
+|---|---|
+| 9 | **The A20 residual is WIDER after the F39 resolver, and the widening is the finding.** Register 9 recorded that A20 holds absolutely where an emission carries a disposition on a size-shaped ground and heuristically in free prose. What narrowed it was that *there was nothing downstream to evade into* — all three triage outcomes were declines, so a request slipping past every request pattern still produced no answer. **That is no longer true.** Re-running the RT05 battery against the resolving path found that **eleven of the twelve paraphrases are not refused at the REQUEST surface**, including all eight the emission broker refuses: the request matcher and the emission matcher are different sets over different objects, which was harmless while every request declined. A crafted paraphrase that evades every A20 request pattern and names a mapped subject now reaches an **answer with real rows**. `RT05_AT_THE_REQUEST_SURFACE` records what each of the twelve reaches so a change to either matcher fails the map, and `test_RT05_a_paraphrase_that_evades_A20_now_reaches_an_ANSWER` asserts the new pass-through directly. Bounded, and the bound is asserted too: what it reaches is **rows and a coverage statement** — no disposition, no recommendation, no characterisation of a difference as small — and the structural leg is unweakened. **`AC-REFUSAL-11` stays phase 2, is claimed nowhere, and the resolver does not unlock it** |
+
+**Thirty-three entries as of pass 12. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
+are CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
 4 are still the two that cannot quietly become "MVP1 ready".**
 
 **On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
