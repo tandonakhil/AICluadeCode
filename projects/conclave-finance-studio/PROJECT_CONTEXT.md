@@ -853,6 +853,101 @@ undecided.
      failing. Restoring the tier explicitly is the fix; relying on another
      scenario's side effect was never one.
 
+- **2026-07-31 — Gate 7 pass 13, LOOP-BACK FROM GATE 8: the smoke failure, the
+  second state leak, and two guarantees that were described rather than held.
+  Judgement calls by `code-agent`.** Four commits, one per finding. Three of
+  the four were things this build *claimed* and did not do; none needed a new
+  feature; all four now have a check that fails when the fix is removed.
+  1. **A persisted warehouse is MIGRATED, and the migration is a rebuild.**
+     `seed()` created every object with `CREATE TABLE IF NOT EXISTS`, so a
+     warehouse file written by an earlier build was never migrated —
+     `var/warehouse.sqlite3` predated register 31's POAR work and the export
+     path returned 403 `revalidation_could_not_run`, "no such column:
+     period_status", on the pilot as found. It rebuilds rather than `ALTER
+     TABLE ... ADD COLUMN`: this is derived fixture data, and a NULL column
+     bolted onto rows that predate it produces a warehouse that ANSWERS rather
+     than one that refuses, which is worse than the failure it replaces. It
+     rebuilds **all** declared objects rather than the stale ones, because
+     dropping one and then hitting the row-count idempotence guard leaves the
+     recreated table empty — the same defect one layer down. The declared
+     schema is read back out of SQLite's own parser rather than restated as a
+     second column list, since a second list is the thing that would be wrong.
+  2. **An object declared ABSENT but present is a gap too**, and this is not
+     pedantry: the pilot omits `fx_revaluation` so `AC-F28-07`'s "not run"
+     state is reachable, and a persisted file from an earlier full seed
+     silently puts it back — the state a reviewer most needs to recognise
+     disappears with nothing failing. Extra tables and extra columns are NOT
+     gaps: a customer's warehouse legitimately carries more than we read, and
+     a check that refused it would refuse every real deployment.
+  3. **The runtime path gets a CHECK, not a migration.** `schema_gaps()` /
+     `assert_schema_current()` are public because in a deployment the
+     warehouse is the customer's and we connect read-only. What a deployment
+     can do is say so up front naming the warehouse, rather than let a missing
+     column surface three screens later as a refused export naming a column.
+  4. **`seed()` may not return leaving a warehouse the queries cannot read**,
+     asserted on both exits. The whole suite was structurally blind to this
+     because every warehouse in every fixture is built fresh under `tmp_path`;
+     `ARCH-05` now drives the pilot's own `seeded_dev_warehouse()` bootstrap at
+     the persisted default path and executes `poar.export_basis@1` through the
+     real execution route.
+  5. **The viewer session is restored by CONSTRUCTION, and the declared set
+     lives in production code.** Gate 8's permutation run found the persona
+     leaking out of `TestUX14ControllerNightOverMonitors`, and the dangerous
+     part is that the staff-accountant scenario still passed **three of its
+     four assertions** as a controller — only the denial reason differed.
+     Pass 12's `_restore_run_tier` restored ONE NAMED ATTRIBUTE and was blind
+     to the persona beside it, which is why the fix is a declared set
+     (`app.ui.state.VIEWER_SESSION_ATTRS`) restored by one autouse fixture in
+     each conftest, not a second named fixture. Not `reset()`: rebuilding the
+     pilot close would restore the persona as a *side effect* of rebuilding
+     everything, which is the accidental mop-up being replaced.
+  6. **The invariant the generic restore rests on is asserted from the AST.**
+     The only public attributes of `PilotState` assigned outside `__init__`
+     are `persona` and `tier`; an undeclared third fails
+     `test_ui_state_session.py` on the day it is written rather than on the day
+     a suite is run in a different order. Both existing leaks were found by
+     accident — one when an unrelated scenario was rewritten, one when gate 8
+     reversed the collection order — and neither was found by a check.
+  7. **The leaking scenario asserts its own subject first.** It now fails on
+     "I am not a staff accountant" rather than on a denial reason, which is
+     the difference between a scenario that breaks and one that changes
+     subject. Both legs are kept: the source fix means no scenario has to
+     remember, the assertion means this one cannot be wrong about who it is.
+  8. **An export that states nothing about its own evidence cannot be
+     constructed.** Gate 8 disproved the "no default is a structural
+     guarantee" claim twice: restoring `integrity = {}` left all 2,602
+     scenarios passing, and `Export(..., integrity={})` constructed cleanly
+     with its JSON naming neither `AC-F1-11` nor `AC-F1-08`. Required is not
+     validated, because `{}` is a value. Made real rather than stopped being
+     described, and the requirement is on **content**: where the residual is
+     declared — the anchor is a stub, retention is not enforced — the
+     disclosure must name its unmet criterion, because `AC-F1-04`'s reader has
+     no application login and a section saying only `is_stub: true` tells them
+     nothing. The rule is satisfiable in the other direction too, so the day
+     register 3 or 4 closes it is updated rather than deleted. **Registers 3
+     and 4 are unchanged and still open**: this makes the disclosure
+     unremovable, it does not sign an anchor or lock an archive.
+  9. **An unknown run tier is refused, not ignored** (advisory A2, carried).
+     `select_tier` ignored unknown values under a docstring claiming a
+     fallback to certified; from a fresh process the typo rendered `certified`
+     because that was the initial value, and after `?tier=exploration` it
+     rendered exploration. Neither silent reading is safe — the stricter tier
+     runs something the caller did not ask for, the current one runs something
+     somebody else asked for — so the request is refused with a 400 naming the
+     value, the same shape as the unknown-persona refusal.
+  10. **NOT FIXED, and stated rather than left for the next permutation run.**
+      Every suite is order-clean in isolation (all seven reversed; `ux` and
+      `functional` additionally under three shuffle seeds each), which is the
+      permutation gate 8 ran. **A whole-tree shuffle that interleaves
+      `backend/tests` with `tests/suites` is NOT clean** — three failures at
+      one seed, one at another. It is a **wider class than the viewer session**
+      (the pilot's accumulated dispositions, workflow records and probe queue,
+      not persona or tier) and it **reproduces at `9d819c1` with different
+      scenarios failing**, so it predates this pass. It is recorded here
+      because it is the same family and the honest reading of "restored by
+      construction" is that it now covers the viewer session and not the
+      pilot's mutable stores.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -1054,6 +1149,210 @@ absent afterwards:**
 `AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
+
+### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `9d819c1`** (parent repo @ `331353a`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,602 of 2,602 scenarios
+passed, zero skipped.** The post-deploy smoke is **12 of 13**, with one FAIL.
+Structured per-scenario evidence: `test-evidence/*-2026-07-31.md`. **The entire
+`f56ab9f` corpus was deleted, not left beside this one** — it described a commit
+at which the probe-injection programme, the close clock, POAR,
+supersession-by-data, the export-time CUEC probe and the F39 resolver call site
+did not exist. Exactly one date is present in `test-evidence/`, and every file
+names both commits it describes.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 1,941 | 1,941 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 354 | 354 | 0 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,602** | **2,602** | **0** | **0** | | |
+| post-deploy smoke | `EXECUTED` | — | 13 | 12 | **1** | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. The per-suite counts
+reconcile exactly against the full run: 1,941 + 661 = 2,602, the headline figure.
+All seven ran under `dev/.venv/bin/python`; the `ux` suite launched Chromium and
+asserted against a **real rendering engine**, every request fulfilled from the
+in-process ASGI app. No server was started inside this agent's turn by any suite;
+the pilot was started, exercised and stopped inside single command invocations
+for the smoke, and port 8021 was verified clear at the end of each.
+
+**Test-count delta.** Previous counts were **re-derived** by checking `f56ab9f`
+out into a git worktree and collecting there, not trusted from the prior table —
+they reconcile exactly at 2,223.
+
+| Suite | Was (`f56ab9f`) | Now (`9d819c1`) | Added | Removed |
+|---|---|---|---|---|
+| unit/integration | 1,663 | 1,941 | +283 | **5** |
+| functional | 268 | 354 | +87 | **1** |
+| architecture | 23 | 23 | 0 | 0 |
+| security | 14 | 14 | 0 | 0 |
+| red-team | 46 | 61 | +15 | 0 |
+| industry | 23 | 23 | 0 | 0 |
+| ux | 186 | 186 | **+25** | **25** |
+| **total** | **2,223** | **2,602** | **+410** | **31** |
+
+**Thirty-one node IDs were removed, and the `ux` line is the one to read.** Its
+total is unchanged at 186 while **25 were replaced** — exactly the shape a
+pass/fail total hides. This is register 18's instructed rewrite and it is a
+strengthening, verified by mutation rather than accepted on the commit message:
+the removed set is the old UX-11 group that asserted *no probe marker exists*
+and *the injected-probe count is zero*; the added set drives a **real injected
+probe**. The other six removals are the close-clock absence scenarios that
+register 6's closure made false (`test_the_staleness_leg_states_that_it_cannot_express_close_relative_staleness`,
+`test_the_missing_batch_and_the_absent_close_clock_are_both_on_the_screen`,
+`test_the_staleness_leg_declares_that_it_has_no_close_clock_to_measure_against`),
+`test_the_probe_zeroes_are_labelled_as_no_probe_not_as_no_error` (superseded by
+injection), `test_a_request_that_trips_neither_is_neither_refused_nor_answered`
+(superseded by the resolver — that request now answers), and
+`TestItReproducesWhatWasDisplayed::test_the_retention_expiry_is_stated`
+(superseded by the register-4 adjacency requirement). Each removal is a
+consequence of a ruling, not a coverage decision taken quietly.
+
+**The eight scrutiny questions — answered, six by mutation testing.** Full
+evidence in `test-evidence/register-cross-check-2026-07-31.md`.
+
+1. **The A20 widened exposure holds up, and the map is load-bearing.** Three
+   mutations, all killed. Widening the request matcher (adding `\bnegligible\b`)
+   fails 2 scenarios including `assert 7 == 8` on the count; narrowing it
+   (removing the `small|trivial ... to|enough` pattern) fails the one string it
+   does catch; drifting the **emission** matcher (removing `in the noise`) fails
+   the fixed battery of eight. `AC-REFUSAL-11` appears in **zero** of the 2,602
+   scenario names; all nine textual mentions deny it. The bound is asserted as
+   well as the widening — the answer carries rows and a coverage statement and
+   none of `no adjustment`, `leave`, `immaterial`, `recommend`, with
+   `figure is None`. **Confirmed on the served pilot**, not only under
+   `TestClient`.
+2. **`AC-F41-08` and `AC-F12-05` are now honestly claimed.** Planting a
+   probe-only element carrying *no probe vocabulary* (`class_="qa-sample"`) is
+   caught by the structural comparison and correctly missed by the vocabulary
+   check — which is why the structural leg had to exist. **The "comparator is a
+   fair one" scenario does what its name says**: breaking the probe's
+   `allowed_resolution_types` fails *that* scenario first, at the intended line,
+   rather than surfacing as an uninterpretable class-name diff. This is the
+   criterion mis-evidenced twice; it is now a real comparison between two
+   rendered items, with a non-vacuity guard asserted before any claim.
+   `-05`'s first two clauses rest on a capture row written by disposing of a
+   real probe through the real control, with **both** the correct and the
+   incorrect outcome exercised plus a genuine-item control.
+3. **Nothing claims what the open registers deny.** Register 32 is honoured
+   precisely: the seed is used at one call site, the rate is drawn and discarded,
+   the band claim rests on **50,000 draws** and a variance scenario, and **no
+   scenario anywhere divides the pilot's probe count by its queue size**.
+   Register 31's `counterparty_is_live_oracle_read: False` is on the record and
+   on both refusal paths. Register 33's UNKNOWN-not-complete is asserted, and its
+   positive leg is non-vacuous in the other direction (`declared > 0`,
+   `row_count == 0`). Registers 6 and 25 having closed, `AC-F26-05` and
+   `AC-F38-11` are now claimed — three and five scenarios — where previously no
+   suite claimed either. Previous pass's advisory A1 is **closed**:
+   `AC-F36-48`'s two joins now carry the denial inside the join string.
+4. **`export.build`'s `integrity` has no default — and that is the only thing
+   holding it.** Two findings. Restoring the default (`integrity = {}`) and
+   running **all 2,602** scenarios produces **2,602 passed** — the mutation
+   survives, so no executing scenario witnesses the no-default property and it
+   can be regressed silently. And an export stating nothing about either residual
+   **can** be constructed: `Export(..., integrity={})` builds cleanly and its
+   JSON contains neither `AC-F1-11` nor `AC-F1-08`. Required is not validated.
+   Mitigating: the **shipped** path is covered end to end over the served bytes,
+   and the smoke confirms it on the pilot — so nothing is reporting a false pass
+   today. Advisory, for `code-agent`.
+5. **`synthetic_attestation` does not collapse into `no_drift`.** Setting them
+   equal fails **4 scenarios across two suites**, and the one that fires first is
+   named exactly for the property
+   (`test_a_synthetic_attestation_is_not_reported_as_no_drift`).
+6. **The standing question finds no contradiction — third consecutive pass.**
+   `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17` and `AC-F36-48` appear in
+   **zero** of the 2,602 scenario names, and every textual mention is a denial.
+7. **The tier restore is real — and a second leak of the same class is being
+   relied on. See FINDING F2.**
+8. **No empty `parametrize` and no vacuous pass among the newly-claimed IDs.**
+   **104** parametrised functions (up from 92), zero contributing no node ID. Of
+   the 341 newly-added scenarios mapped onto the 36 IDs they claim, exactly one
+   ID came back evidenced only by negative assertions — `AC-F36-18` — and it is a
+   cross-reference in another scenario's docstring, not a claim. The
+   absence-shaped criteria that surfaced (`AC-F12-13`/`-14`/`-15`/`-17`) are
+   criteria that *ask* for absence, and each is non-vacuous now that a probe
+   exists to leak.
+
+**FINDING F1 — the smoke test FAILED on the pilot as found, and no suite could
+have seen it.** Driving the real export path over HTTP against the pilot's
+persisted warehouse returned **403**, `data-reason="revalidation_could_not_run"`,
+visible reason *"the point-of-action revalidation could not run (no such column:
+period_status), so no file is produced"*. `ges/warehouse.py` declares
+`erp_control_extract.period_status`, `latest_journal_ts` and `extract_as_of`;
+`dev/var/warehouse.sqlite3` (mtime 19:08, before register 31's POAR work) had
+none of them, and `seed()` uses `CREATE TABLE IF NOT EXISTS`, so **a persisted
+warehouse is never migrated**. Every suite builds a fresh `tmp_path` warehouse
+and is structurally blind to it. Diagnosis confirmed by deleting the file and
+re-running the identical drive: `export http=200` with all four `AC-F40-18`
+disclosures present. The regenerated warehouse was left in place so the pilot is
+operable. **The fail-closed behaviour itself is correct** —
+`revalidation_could_not_run` is one of register 31's four real refusals and it
+did stop a file existing. The finding is the missing migration path, and that no
+suite can witness it. For `deploy-agent`.
+
+**FINDING F2 — a second cross-scenario state leak, the same class as the run
+tier, and it is currently masked by collection order.** Every suite was run with
+collection order **reversed**; `ux` was additionally run under two shuffle seeds.
+The 1,941-scenario unit/integration suite and five of the six SME suites are
+**order-clean**. The `ux` suite fails in all three permutations, always the same
+scenario:
+
+```
+FAILED tests/suites/ux/test_ux_journey.py::TestTheActionPathJourney::
+       test_a_staff_accountant_approving_is_denied_by_the_broker_and_records_nothing
+E       AssertionError: assert 'approval_value_above_ceiling' == 'not_in_capability_allowlist'
+```
+
+Reproduced **minimally in two scenarios**.
+`TestUX14ControllerNightOverMonitors._as_controller` POSTs `/pilot/viewing-as` to
+become the controller and **never restores the persona**, which is process state
+shared across `page` fixtures. In file order the staff-accountant class runs
+first, so the leak is masked — the identical accident `_restore_run_tier`'s own
+docstring describes, in the adjacent piece of state. **Why it matters beyond
+ordering**: run as a controller the scenario still passes three of its four
+assertions — the approval is still refused, `data-kind` is still `refused` — and
+only the *reason* differs. A scenario named "a staff accountant approving is
+denied" would have been silently establishing something about a controller. For
+`code-agent`: an autouse persona-restore fixture beside `_restore_run_tier`.
+
+**FINDING F3 — the headline "2,602, up from 2,223" is like-for-like, and the
+`ux` line inside it is not.** The totals are both full runs and the +379 net is
+real. But `ux` reads 186 → 186 with 25 scenarios replaced, and the 21 built
+criteria are carried by unit/integration (+283) and functional (+87) rather than
+by the browser suite. Recorded so a flat `ux` line is not read as "the rendered
+surface did not change" — it changed more than any other suite this pass.
+
+### Advisories from this pass — none stops the gate
+
+| # | Advisory | For |
+|---|---|---|
+| A5 | **`export.build`'s no-default is unwitnessed** (scrutiny 4). Restoring the default passes all 2,602. Add a signature scenario, and validate rather than merely require — `integrity={}` constructs an export naming neither residual. | `code-agent` |
+| A6 | **The persona leak** (FINDING F2). An autouse restore fixture. | `code-agent` |
+| A7 | **The pilot warehouse has no migration path** (FINDING F1). `CREATE TABLE IF NOT EXISTS` over a persisted `var/warehouse.sqlite3`. | `deploy-agent` |
+| A2 | **Still open from the previous pass, and now measured.** `state.select_tier`'s first docstring line ("An unknown value falls back to CERTIFIED") is wrong: the method ignores unknown values entirely, so a typo leaves the **current** tier. From a fresh process a typo yields `certified` (safe); after `?tier=exploration`, a typo yields `exploration`. The second paragraph of the same docstring is correct. Behaviour is safe on first use and sticky thereafter. | `code-agent` |
+| A3 | **Still open.** `test_every_finding_carries_the_uncalibrated_threshold_denial` asserts over one finding, not every finding. | `code-agent` |
+| A4 | **Still open.** `test_a_dossier_round_trips_complete`'s version assertion is self-satisfying in isolation. | `code-agent` |
+| A1 | **CLOSED.** `AC-F36-48`'s two joins now read `COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48, WHICH IS ITSELF DENIED` — the denial is inside the join string, so a by-ID mapper cannot score it satisfied. | closed |
+
+**Process-lifecycle deviation, recorded rather than smoothed over — second
+consecutive pass.** `kill <pid>` (SIGTERM) did **not** reap the uvicorn listener
+on three of five pilot invocations. The post-stop `lsof` assertion caught it each
+time and the survivor was force-killed by port. Final state verified: nothing
+listening on 8021, nothing left running past this turn.
+
+**No automated suite failed. The post-deploy smoke — a blocking suite — recorded
+one FAIL (FINDING F1), so this gate stops for human decision.** The failure is a
+deployment-data defect with correct fail-closed behaviour behind it, and it has
+been diagnosed and remediated in place; the human may reasonably override with a
+recorded reason, or send A7 to `deploy-agent` first. F2 does not fail a suite as
+executed but is the same defect class the `ux` suite exists to catch.
+
+### Prior pass — retained as history
 
 ### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `f56ab9f`** (parent repo @ `8939ebb`)
 
