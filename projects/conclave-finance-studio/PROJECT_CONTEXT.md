@@ -890,117 +890,123 @@ resolver's model call site (and therefore `AC-REFUSAL-11`, `AC-F39-03`, `-05`,
 
 ## Test Results
 
-### 2026-08-01 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `b1b5dde`**
+### 2026-08-01 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `f56ab9f`** (parent repo @ `8939ebb`)
 
 **Every suite EXECUTED. Every suite green. Exit code 0 across the board.**
 Structured per-scenario evidence: `test-evidence/*-2026-08-01.md`. **The entire
-`2026-07-31` evidence corpus was deleted, not left beside this one** — it
-described a commit at which F26, F28, F9 and F33 did not exist and cited
-scenario names that no longer exist on disk. Nothing in `test-evidence/` now
-predates the gate-8 loop-back.
+`b1b5dde` corpus was overwritten and deleted, not left beside this one** — it
+described a commit at which `decide_emission`, the F2 version registry, the F42
+journal leg and the dossier v2 schema did not exist. Exactly one date is present
+in `test-evidence/`, and every file names the commit it describes.
 
 | Suite | Status | Exit | Scenarios | Pass | Fail | Owner | Blocking |
 |---|---|---|---|---|---|---|---|
-| unit/integration | `EXECUTED` | 0 | 1,428 | 1,428 | 0 | `test-agent` | yes |
-| functional | `EXECUTED` | 0 | 96 | 96 | 0 | `functional-agent` | yes |
+| unit/integration | `EXECUTED` | 0 | 1,663 | 1,663 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 268 | 268 | 0 | `functional-agent` | yes |
 | architecture | `EXECUTED` | 0 | 23 | 23 | 0 | `solution-architect` | yes |
 | security | `EXECUTED` | 0 | 14 | 14 | 0 | `security-architect` | yes |
 | red-team | `EXECUTED` | 0 | 46 | 46 | 0 | `responsible-ai-architect` | yes |
 | industry | `EXECUTED` | 0 | 23 | 23 | 0 | `industry-expert` | yes |
 | ux | `EXECUTED` | 0 | 186 | 186 | 0 | `ui-ux-designer` | yes |
-| post-deploy smoke | `EXECUTED` | 0 | 9 | 9 | 0 | `test-agent` | yes |
+| post-deploy smoke | `EXECUTED` | 0 | 11 | 11 | 0 | `test-agent` | yes |
 
-**1,816 scenarios executed, 1,816 passed, 0 failed, 0 skipped.** No suite is
-`STATIC ONLY` and no suite is `PARTIAL`. All eight ran under
-`dev/.venv/bin/python`; the `ux` suite launched Chromium and asserted against a
-**real rendering engine** (computed styles, collapsed state, focus order), every
-request fulfilled from the in-process ASGI app, no server started inside the
-agent's turn. Under system `python3` the `ux` suite correctly reports
-`CANNOT EXECUTE` (exit 4) rather than passing.
+**2,223 automated scenarios executed, 2,223 passed, 0 failed, 0 skipped**, plus
+11 smoke scenarios. No suite is `STATIC ONLY` and no suite is `PARTIAL`. The
+per-suite counts reconcile exactly against the full run: 1,663 + 560 = 2,223.
+All eight ran under `dev/.venv/bin/python`; the `ux` suite launched Chromium and
+asserted against a **real rendering engine**, every request fulfilled from the
+in-process ASGI app, no server started inside the agent's turn.
 
-**Test-count delta** — against the 2026-07-31 run (`8bc1224..b1b5dde`), per suite:
+**Test-count delta.** The previous counts were **re-derived** by checking out
+`b1b5dde` into a git worktree and collecting there, not trusted from the table
+above — they reconcile exactly.
 
-| Suite | Was | Now | Added | Removed | Changed |
+| Suite | Was (`b1b5dde`) | Now (`f56ab9f`) | Added | Removed | Changed body |
 |---|---|---|---|---|---|
-| unit/integration | 1,217 | 1,428 | +211 | 1 name | — |
-| functional | 21 | 96 | +75 (F26/F28/F9/F33) | 1 name | — |
-| architecture | 21 | 23 | +2 (`ARCH_04` ×2) | 0 | 0 |
-| security | 14 | 14 | 0 | 0 | 0 |
-| red-team | 40 | 46 | +6 | 1 name | — |
-| industry | 23 | 23 | 0 | 0 | 0 |
-| ux | 186 | 186 | 2 names | 2 names | net 0 |
+| unit/integration | 1,428 | 1,663 | +235 | **0** | 24 |
+| functional | 96 | 268 | +172 | **0** | 5 |
+| architecture | 23 | 23 | 0 | **0** | 1 |
+| security | 14 | 14 | 0 | **0** | 0 |
+| red-team | 46 | 46 | 0 | **0** | 2 |
+| industry | 23 | 23 | 0 | **0** | 0 |
+| ux | 186 | 186 | 0 | **0** | 1 |
+| **total** | **1,816** | **2,223** | **+407** | **0** | **35** |
 
-**Five test functions were removed. Every one was checked and every one has an
-equal-or-stronger replacement** — named here because a removal is a coverage
-decision:
+**Zero test functions were removed this pass** — the first pass at which that is
+true. 324 new unique function names; 35 changed bodies, **none with a net loss
+of assertions** (three gained one).
 
-- `test_AC_F1_08_a_dossier_returns_complete_with_its_retention` → rescoped to
-  `test_a_just_written_dossier_reads_back_complete_and_carries_a_retention_stamp`,
-  which also asserts `has_retention_lock is False`. `AC-F1-08` is now claimed
-  by no suite, which is the accurate reading of register 4/20.
-- `test_RT05_a_materiality_conclusion_never_reaches_a_surface_however_phrased`
-  → the two-half battery plus an executed evasion scenario. Strictly stronger.
-- `test_UX11_no_probe_status_is_present_in_the_dom_anywhere` and
-  `test_UX11_states_its_own_residual_so_nobody_reads_it_as_sufficient` →
-  renamed to drop the `AC-F41-08` claim; parametrisation breadth is
-  byte-identical (`PRE_DISPOSITION_SURFACE`, 7 paths, unchanged).
-- `test_a_specified_but_unimplemented_primitive_says_so` → the best change in
-  the diff. Pass 5 emptied `SPECIFIED_BUT_NOT_IMPLEMENTED`, and **a
-  `parametrize` over an empty tuple collects zero tests and reports green**.
-  The replacement asserts the behaviour against a planted entry, with a
-  companion asserting the list is empty — *"emptying the list must not quietly
-  remove the check that the list exists for."*
+**FINDING F1 — the headline "2,223, up from 1,428" is not like-for-like.**
+1,428 was the *unit/integration suite alone* at `b1b5dde`; the full run there was
+**1,816**. 2,223 is the *full run* now. The like-for-like figures are
+unit/integration **1,428 → 1,663 (+235)** and total **1,816 → 2,223 (+407)**.
+The growth is real either way; recorded so a +795 headline does not compound.
 
-**Post-deploy smoke test — PASS, 9 of 9.** `CONCLAVE_ENV=pilot backend/pilot.py`
-started, exercised and stopped inside each command invocation, with a post-stop
-`lsof` proving nothing was left listening. **The pilot binds 8021** —
-`settings.api_port()` defaults to `8021`, and a foreign Python process (pid
-20395) holds `*:8000` on this machine and answers 404 to everything. All twelve
-rendered screens plus `/health` and the four FastAPI routes served 200; the
-pilot strip rendered on all twelve; `/dossier/…` carried zero external
-references (`<script>`, `<link>`, `<img>`, `@import`, `srcset`, absolute URL —
-all zero); a staff-persona approval returned **403** in the refusal grammar;
-`CONCLAVE_ENV=production` refused to start the pilot transport with exit 2.
+**The seven scrutiny questions — all answered, four by mutation testing.** Full
+evidence in `test-evidence/register-cross-check-2026-08-01.md`.
 
-**`AC-F28-07`'s "not run" is a state a reader meets in the running pilot.**
-Confirmed on the served `/exceptions`: five boundary-check rows, exactly one
-`data-state="not_run"`, naming `dw.fx_revaluation`, which
-`pilot_transport.PILOT_OMITTED_OBJECTS` deliberately omits **as a
-non-existent object rather than an empty table**.
+1. **`AC-F2-08`'s 34 broken tests were strengthened, not routed around.** The
+   control has no bypass parameter. Disabling `check_closure_input` fails **21
+   tests**, so it is load-bearing. The shared fixture builds a stamp through the
+   real `versions.stamp_for` with the **fetched** bundle hash, and each adopting
+   scenario "supplies the first layer's input and withholds only what it is
+   testing". An AST assertion-count diff over all 35 changed tests found **zero
+   with a net loss**.
+2. **The undeclared-primitive guard fires.** It is a set **equality**, not a
+   subset — planting a registered-but-undeclared primitive **killed the
+   mutation** and named the intruder. `obligation_gap` and
+   `journal_attribute_outlier` are properly declared.
+3. **`_read_v1` is genuinely exercised and no v1 record reports incomplete.**
+   v1's required-key list is untouched at 11 keys and is a strict subset of v2's
+   12. A genuine v1 record round-trips. Dropping the v1 reader **fails 2 tests**.
+4. **Both rewritten tests assert something real.**
+   `test_the_full_population_conclusion_uses_a_universal_quantifier` went from
+   one substring to a proportion **and** a count (1→2 assertions);
+   `test_a_dossier_round_trips_complete` widened from 11 keys to 12 and shed a
+   false `AC-F1-08` claim.
+5. **Registers 29 and 30 are honoured.** The uncalibrated-threshold denial is
+   written into every emitted `journal_attribute_outlier` finding, and a sweep
+   for any assertion claiming a measured likelihood, precision or false-positive
+   rate returned **nothing**. Register 29's no-metric-store denial is in
+   `SemanticElement` and a missing `semantics` key is a compile error.
+6. **The standing question finds no contradiction** — second consecutive pass.
+   All nine denied criteria (`AC-F1-08`, `-F1-11`, `-F38-11`, `-F26-05`,
+   `-F41-08`, `-REFUSAL-11`, `-F40-17`, `-F40-18`, `-F36-48`) appear in **zero**
+   of the 2,223 test function names.
+7. **No empty-`parametrize` instances remain.** All **92** parametrised
+   functions contribute at least one node ID.
+
+**Post-deploy smoke test — PASS, 11 of 11.** **The pilot binds 8021, not 8000**;
+the foreign process on 8000 answered **200** this run (it answered 404 last run)
+— either way nothing here was collected from it. All twelve screens served 200;
+`/dossier/…` carried **zero** external references on all eight constructs;
+`AC-F28-07`'s `not_run` state and register 6's `close_clock_absent` note both
+render on the served `/exceptions`. **The Ask box's GET query string now reaches
+the render** — `?tier=certified` serves 22,644 bytes and `?tier=exploration`
+24,432 — and no typo value can enter exploration. `POST /ask` on one of register
+9's known-unrefused paraphrases returned 200 with `Ask - not resolvable in this
+release`.
+
+**Process-lifecycle deviation, recorded rather than smoothed over.** On the
+second smoke invocation `kill $PID` did **not** reap the server; the uvicorn
+listener (pid 63637) survived and was still holding 8021 when the invocation
+returned. The **post-stop `lsof` assertion caught it**, and it was force-killed
+by port in the next command. Final state verified: nothing listening on 8021,
+nothing left running past the turn.
 
 **No blocking suite failed. The gate is not stopped by a suite failure.**
 
-**Last pass's five over-claiming scenarios are all fixed** — verified by reading
-each replacement, not by trusting the commit messages. Full evidence:
-`test-evidence/register-cross-check-2026-08-01.md`, scenario C7.
+### Advisories from this pass — none stops the gate
 
-**The standing question — does any suite report a pass the register says cannot
-be true? — finds no contradiction this pass.** `AC-REFUSAL-11`, `AC-F1-08`,
-`AC-F1-11`, `AC-F38-11`, `AC-F26-05` and `AC-F41-08` appear in **no suite test
-function name**; every remaining mention of each, in every suite file, denies
-the criterion rather than claiming it. That is the first pass at which this is
-true, and it is the specific thing gate 9 sent this back for.
+| # | Advisory | For |
+|---|---|---|
+| A1 | **`AC-F36-48` is the only denied criterion still carrying `COVERS` joins** (two). Both are correctly narrowed to a named clause under a register-27 header, so the prose is honest — but the bare ID is in the join string, and gate 9 maps joins by ID. Same shape as gate 8's `AC-F36-47` finding. Put the denial *inside* the join string. | `code-agent` |
+| A2 | `state.select_tier`'s docstring first line ("An unknown value falls back to CERTIFIED") contradicts both the code and its own next paragraph. Behaviour is safe; the line is wrong. | `code-agent` |
+| A3 | `test_every_finding_carries_the_uncalibrated_threshold_denial` asserts over one finding, not every finding. The module structure guarantees the property; the name promises a universal the test does not quantify over. | `code-agent` |
+| A4 | `test_a_dossier_round_trips_complete`'s version assertion is now self-satisfying in isolation (covered by two sibling tests). | `code-agent` |
+| D1 | **Date discrepancy.** This corpus is dated `2026-08-01`, continuing the convention of the previous entry, but the system clock and **every commit date in `dev/`** read `2026-07-31`. The corpus is one day ahead of the code it describes. Needs a human ruling before it compounds further. | orchestrator |
 
-**`AC-REFUSAL-11`'s two-half battery genuinely executes.** Fifteen RT-05 node
-IDs ran and passed: eight parametrised refusals, **four parametrised
-pass-throughs** (the first two being the criterion's own worked examples,
-verbatim), the vocabulary bar, the structural leg, and the evasion asserted as
-`outcome == "allow"` with `reason is None`. The pass-through half is a real
-`parametrize`, one node per string, not a docstring. Both halves drive
-`decide_emission` — the authorisation that actually gates a surface — not
-`refusals.classify`. **No scenario anywhere claims `AC-REFUSAL-11` is
-satisfied.**
-
-**The four new detector families are driven by real runs.** Each of the four
-functional files builds a real `SqliteWarehouse`, wraps `ges.main.create_app`
-with `CONCLAVE_PROCESS_ROLE=ges` and a client token, and drives the detector
-through `GesClient` across the certified-query boundary. Gate 9's specific
-defect is closed at both ends: `AC-F28-07` now runs against
-`warehouse.seed(omit_objects=("fx_revaluation",))`, and an unrun check
-**raises** on `.findings` and has no `findings` key at all — so it cannot be
-confused with a check that found nothing.
-
-### Two advisory findings — a register entry with no witness in the suite
+### Prior pass (`b1b5dde`) — two advisory findings, both since addressed
 
 Neither is a false pass, and neither stops the gate on its own. Both are the
 shape pass 4d and pass 5 installed guards against elsewhere, in the two places
@@ -1031,7 +1037,10 @@ and the peer threshold read from the manifest; register 25 at five sites. The
 registers themselves stay open: nothing was calibrated and no close calendar
 exists.
 
-### One over-broad `COVERS` join
+### Prior pass (`b1b5dde`) — one over-broad `COVERS` join, since resolved
+
+*Retained as history. The equivalent finding at `f56ab9f` is advisory A1
+(`AC-F36-48`), recorded in the table above.*
 
 Thirteen of the 45 new joins were read in full against `FUNCTIONAL_SPEC`.
 **Twelve are accurate** — `AC-F36-34` (4), `AC-F36-37` (4) and `AC-REFUSAL-08`
@@ -1241,3 +1250,12 @@ missing. Three named checks now carry the ID
 (`tests/suites/functional/test_unclaimed_criteria.py`), covering the three
 clauses separately: the seven A-numbers by name, the ground and by-design
 wording beside each, and reachability from `/`.
+
+> **Corpus date ruling (orchestrator, 2026-07-31).** `test-agent` flagged that
+> the evidence corpus was dated `2026-08-01` while the system clock and every
+> commit in `dev/` read `2026-07-31`. Ruled: the corpus is **2026-07-31**, the
+> date the runs actually happened. The earlier `2026-08-01` naming was wrong at
+> both gate-8 runs and is corrected here rather than carried for continuity — an
+> evidence file whose date disagrees with the commit it names is the same class
+> of defect as a stale corpus, and this project has already been blocked twice
+> for that.
