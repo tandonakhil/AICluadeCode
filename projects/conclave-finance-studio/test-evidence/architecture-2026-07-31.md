@@ -2,7 +2,7 @@
 
 **Project:** conclave-finance-studio  
 **Gate:** 8 · Test (re-run)  
-**Date:** 2026-08-01  
+**Date:** 2026-07-31  
 **Commit under test:** `dev` @ **`f56ab9f`** · parent repo @ **`8939ebb`**  
 **Owner:** `solution-architect`  
 **Blocking:** yes (no Test Policy exception is recorded for this project)  

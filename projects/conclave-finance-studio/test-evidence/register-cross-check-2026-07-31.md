@@ -2,7 +2,7 @@
 
 **Project:** conclave-finance-studio
 **Gate:** 8 · Test (re-run)
-**Date:** 2026-08-01
+**Date:** 2026-07-31
 **Commit under test:** `dev` @ **`f56ab9f`** · parent repo @ **`8939ebb`**
 **Previous run compared against:** `dev` @ `b1b5dde`
 **Owner:** `test-agent`
@@ -328,4 +328,4 @@ this is a reporting correction, not a defect, and it is recorded because a
 | A3 | `test_every_finding_carries_the_uncalibrated_threshold_denial` asserts over one finding, not every finding | `code-agent` |
 | A4 | `test_a_dossier_round_trips_complete`'s version assertion is now self-satisfying in isolation (covered elsewhere) | `code-agent` |
 | F1 | The headline test-count delta compares unit/integration-then against total-now | orchestrator / gate 9 |
-| D1 | Corpus date is `2026-08-01`; the system clock and every commit date read `2026-07-31` | orchestrator |
+| D1 | **RULED AND CLOSED at pass 10.** The corpus date is **`2026-07-31`** — the system clock and every `dev/` commit agree, and the filenames always did. The nine `test-evidence/*.md` headers that read `2026-08-01` now read `2026-07-31`, so header and filename match | closed — `code-agent`, pass 10 |

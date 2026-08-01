@@ -721,6 +721,71 @@ undecided.
       header). `obligation_gap` stays a declared twelfth primitive, unreverted,
       per the standing instruction.
 
+- **2026-07-31 — Gate 7 pass 10, THE THREE ITEMS GATE 9 LEFT WITH `code-agent`.
+  Judgement calls by `code-agent`.** Three commits. Twenty-six of gate 9's
+  twenty-nine NOT VERIFIED criteria need capabilities that do not exist and
+  went to `plan-agent` as a scope question; these three did not.
+  1. **`AC-F12-05` stops being claimed, and the denial travels with the ID.**
+     `tests/suites/ux/test_ux_flow.py:362` carried a join reading "`AC-F12-05`
+     is served by this" in a docstring whose **next paragraph** explained what
+     it does not establish. Identical shape to `AC-F41-08`, descoped at pass 5;
+     this ID was simply left behind. Narrowed to the criterion's third clause,
+     with the denial **inside the join string** in the manner `AC-F36-47` and
+     `AC-F36-48` are now fixed, so an ID-keyed scan cannot score it satisfied.
+     The scenario is kept — it holds for a queue containing probes as well as
+     one that does not, which is its whole value. Register 18 broadened to
+     cover both IDs.
+  2. **Supersession by DATA is BUILT — `AC-F41-14` and `AC-F41-15`.** Gate 9:
+     *"Nothing in the record says this capability was not built; it is simply
+     absent from every artefact except the criteria that require it."*
+     `ARCHITECTURE_KB` §18.1 had predicted exactly that outcome. `AC-F41-12`
+     covers a run superseded by a later RUN; the more common real case is a run
+     superseded by later DATA, and nothing in the build touched it.
+     `ges/supersession.py` implements §5.5's `run_dataset_binding` table and
+     the worker's index lookup; the enforcement is bundle rule
+     `scope.no_bound_dataset_superseded_by_later_data`, not override-eligible
+     because `AC-F41-14` demands `AC-F41-12`'s loud treatment rather than a
+     dismissible warning.
+  3. **The judgement call inside item 2, recorded because the plan did not
+     specify it.** `AC-F41-15`'s negative half is expressed **in the predicate**
+     as `!(bound_dataset_ids intersects datasets_superseded_since_binding)`
+     rather than as a precomputed boolean. Two consequences, both intended: a
+     watermark on a dataset the run never read cannot fire the rule *even if
+     the registry reported it*, and the rule's **non-firing fixture is that
+     exact case**, so every build verifies the negative half at compile time. A
+     build that blocked on any watermark movement would pass `-14`, fail `-15`,
+     and be switched off within a week of meeting a nightly warehouse.
+  4. **Both context fields are resolved server-side at `/ges/decide`** and any
+     caller-supplied value is discarded with a control event — the same
+     reasoning that keeps the principal out of the request body. They travel as
+     `resolved` rather than in `payload` and are therefore **not part of the
+     action digest**: the digest binds what the caller asked for, and folding
+     server state into it made an approved proposal stop matching its own
+     export the moment the warehouse moved. That was caught by four existing
+     export scenarios failing, and is recorded here because it is a real
+     constraint on anything else server-resolved later.
+  5. **The supersession worker is not a scheduled process in MVP1.**
+     `observe_watermark` is called by whatever observes the warehouse; in this
+     build that is the suites and the pilot launcher. The registry's default
+     state is EMPTY, which is `AC-F41-15`'s state — a deployment that has
+     recorded no binding is permissive, not unable to approve anything. Stated
+     rather than papered over: nothing here schedules the observation.
+  6. **The pilot binds `ds.gl_balances` and `ds.journal_lines` and deliberately
+     NOT `ds.subledger_ap`**, so `AC-F41-15` is demonstrable in the running
+     pilot rather than only argued — a catalogue dataset whose watermark can
+     move without touching this run's approval. The seed carries no
+     observation, so the pilot's default screen shows no notice at all.
+  7. **Corpus date ruling applied.** The nine `test-evidence/*.md` headers now
+     read `2026-07-31`, matching their filenames and every `dev/` commit;
+     `register-cross-check`'s advisory `D1` and this file's `D1` record the
+     ruling instead of the discrepancy; and the Test Results heading and the
+     `test-evidence/*-2026-08-01.md` path — which pointed at files that no
+     longer exist — are corrected. **Not changed, and flagged rather than done
+     unilaterally:** five decision-log and register lines above still carry
+     `2026-08-01` as the date of passes 6–8. They are prose about when work
+     happened, not paths, and rewriting five history entries is a call for the
+     orchestrator rather than one to make inside a hygiene item.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -884,16 +949,17 @@ and is built. See Decisions Log items 13–15.
 
 **Not built and absent rather than stubbed**: point-of-action revalidation, the
 close clock (`AC-F38-11`, and therefore `AC-F26-05`), the F12 probe-injection
-programme (`AC-F41-08`), F17 direct posting, and the F39 natural-language
+programme (`AC-F41-08` and, from the capture side, `AC-F12-05`), F17 direct
+posting, and the F39 natural-language
 resolver's model call site (and therefore `AC-REFUSAL-11`, `AC-F39-03`, `-05`,
 `-06`, `-08`).
 
 ## Test Results
 
-### 2026-08-01 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `f56ab9f`** (parent repo @ `8939ebb`)
+### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `f56ab9f`** (parent repo @ `8939ebb`)
 
 **Every suite EXECUTED. Every suite green. Exit code 0 across the board.**
-Structured per-scenario evidence: `test-evidence/*-2026-08-01.md`. **The entire
+Structured per-scenario evidence: `test-evidence/*-2026-07-31.md`. **The entire
 `b1b5dde` corpus was overwritten and deleted, not left beside this one** — it
 described a commit at which `decide_emission`, the F2 version registry, the F42
 journal leg and the dossier v2 schema did not exist. Exactly one date is present
@@ -943,7 +1009,7 @@ unit/integration **1,428 → 1,663 (+235)** and total **1,816 → 2,223 (+407)**
 The growth is real either way; recorded so a +795 headline does not compound.
 
 **The seven scrutiny questions — all answered, four by mutation testing.** Full
-evidence in `test-evidence/register-cross-check-2026-08-01.md`.
+evidence in `test-evidence/register-cross-check-2026-07-31.md`.
 
 1. **`AC-F2-08`'s 34 broken tests were strengthened, not routed around.** The
    control has no bypass parameter. Disabling `check_closure_input` fails **21
@@ -1004,7 +1070,7 @@ nothing left running past the turn.
 | A2 | `state.select_tier`'s docstring first line ("An unknown value falls back to CERTIFIED") contradicts both the code and its own next paragraph. Behaviour is safe; the line is wrong. | `code-agent` |
 | A3 | `test_every_finding_carries_the_uncalibrated_threshold_denial` asserts over one finding, not every finding. The module structure guarantees the property; the name promises a universal the test does not quantify over. | `code-agent` |
 | A4 | `test_a_dossier_round_trips_complete`'s version assertion is now self-satisfying in isolation (covered by two sibling tests). | `code-agent` |
-| D1 | **Date discrepancy.** This corpus is dated `2026-08-01`, continuing the convention of the previous entry, but the system clock and **every commit date in `dev/`** read `2026-07-31`. The corpus is one day ahead of the code it describes. Needs a human ruling before it compounds further. | orchestrator |
+| D1 | **Date discrepancy — RULED AND CLOSED at pass 10.** The corpus was dated `2026-08-01` while the system clock and **every commit date in `dev/`** read `2026-07-31`. Ruled `2026-07-31` (see the corpus date ruling below). The nine `test-evidence/*.md` headers and the two references in this file that still read `2026-08-01` now read `2026-07-31`; header, filename and commit date agree. | closed — `code-agent`, pass 10 |
 
 ### Prior pass (`b1b5dde`) — two advisory findings, both since addressed
 
@@ -1238,6 +1304,12 @@ its guarantee and its one-host bound.
 | 29 | A semantic layer in which certified **metrics and joins are artefacts in their own right, versioned independently of the queries that use them** — which is what `AC-F39-04`'s "the version of each certified metric and join used" presupposes | the versions are **declared on the certified query** (`semantics:`, required at compile time) and committed with it. `SemanticElement` in `ges/registry/loader.py` carries the in-file denial | `AC-F39-04` itself IS satisfied, on both surfaces, from a single source rather than a screen literal — the criterion asks that the versions be STATED, and they are, on the answer and in the dossier. What is substituted is **where they live**, and two consequences are real: (a) a metric version can only change when a query file changes, so "the metric moved and three queries still name the old version" is not a state this build can represent, which flatters it; (b) nothing cross-checks that two queries naming `posting_period_join@1.9` mean the same join — they do here because one person wrote both. Closing it needs a metric store, which is a phase-2 artefact |
 | 30 | A **calibrated** threshold for `journal_attribute_outlier` — an attribute count and a rarity ceiling derived from a measured false-positive rate on real close data | `min_attributes: 3` and `rarity_ceiling: 0.05`, DECLARED in the manifest. Every finding states the threshold in force, its inclusivity, the closed attribute set scored, and an explicit `threshold_calibration` denial | `AC-F42-02` asks that the journal and the attributes that made it an outlier be NAMED, which does not depend on calibration, so the criterion is satisfied and the check claims nothing more. What is NOT claimed: any measured likelihood, precision or false-positive rate for this detector. This is register 24's residual from a second direction — calibrating it needs real close data, which is register 21/24 again. The denial is at the module header AND on every emitted finding, so a reader of a finding meets it without reading the source |
 
+### Entry BROADENED at pass 10
+
+| # | Change |
+|---|---|
+| 18 | **`AC-F12-05` joins `AC-F41-08` under this entry.** They are one absent programme seen from two sides: `-08` asks that an injected probe be indistinguishable from a genuine proposal; `-05` asks that the capture record identify the item as a probe, record the reviewer's response and whether it was correct, **and** that the probe not be distinguishable before disposition. With no probe injected, `-05`'s first two clauses have no capture record to be checked against and its third is reached only by the absence of the thing it is about — the identical shape `-08` was descoped from claim for at pass 5. Gate 9 found the live contradiction: `tests/suites/ux/test_ux_flow.py` carried a join reading "`AC-F12-05` is served by this" in a docstring whose next paragraph explained why it is not. The join is now narrowed to the third clause with the denial **inside the join string**, so a by-ID mapper cannot score it satisfied. **`AC-F12-05` is NOT VERIFIED**, and no scenario in any suite names the bare ID |
+
 **Thirty entries as of pass 8. Entries 8, 10, 11, 13, 14 and 16 are
 CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
 4 are still the two that cannot quietly become "MVP1 ready".**
@@ -1259,3 +1331,78 @@ wording beside each, and reachability from `/`.
 > evidence file whose date disagrees with the commit it names is the same class
 > of defect as a stale corpus, and this project has already been blocked twice
 > for that.
+
+## Scope ruling — gate 9's 26 unbuildable criteria (plan-agent, 2026-07-31)
+
+Gate 9 blocked with 26 criteria whose capability does not exist, and ruled the
+scope question `plan-agent`'s. It ruled **21 into MVP1, 5 declared**. Accepted by
+the orchestrator without amendment. Arithmetic: 233 verified + 3 in flight + 21
+= **257 verified, 5 declared-not-verified, 262 total.**
+
+| Cluster | Ruling | Criteria |
+|---|---|---|
+| Point-of-action revalidation | **MVP1** — counterparty is the ERP control extract, which F26 already established | 5 |
+| Probe-injection programme | **MVP1** | 9 |
+| Close clock | **MVP1** — a close calendar is a *declaration*, not a tenant artefact | 2 |
+| F39 resolver call site | **MVP1** (4); `AC-REFUSAL-11` stays phase 2 | 4 |
+| Export-time CUEC | `AC-F40-18` **MVP1**; `AC-F40-17` phase 2 | 1 / 1 |
+| Supersession by data | **MVP1** | 2 |
+| KMS-signed anchors | **Phase 2** — dependency | 1 |
+| Object-Lock archive | **Phase 2** — dependency | 1 |
+| Real close data | **Phase 2** — dependency | 1 |
+
+### The two rulings that carried the most weight
+
+**The probe programme cannot be deferred, for a reason that is not about
+features.** It has *no dependency of any kind* — no tenant, no Oracle, no model —
+so "phase 2" here is a pure scope choice. And it is **retrospectively
+unrecoverable**: you cannot probe a period that has already closed, so a pilot
+run without injection produces a period of review activity from which nothing
+about reviewer attention can *ever* be recovered. Decisively: gate 6 overturned
+the promotion gate as inverted because precision on accepted proposals takes its
+labels from reviewer behaviour. P1/P5 were deferred because they presuppose F17.
+**Probes do not presuppose F17.** Ship without them and MVP1's only ground truth
+about review quality is the reviewer's own behaviour — the exact circularity gate
+6 ruled fatal. It ships *with* its full non-attributability set
+(`AC-F12-13`/`-14`/`-15`/`-17`), because a probe programme that can attribute a
+miss to a named person is a worse artefact than none.
+
+**`AC-F40-18` is a defect, not an absence.** The distinction: an absent
+capability that defaults **closed** is a limitation; one that defaults **open at
+the Tier-2 egress** is a defect. Today the build authorises the export on the
+stored pass state — `AC-F40-17`'s explicitly forbidden behaviour and
+`AC-F40-18`'s explicitly forbidden fallback. Its Given ("a CUEC probe cannot
+execute") is this build's permanent state, so it is fully evidenceable here.
+
+### Claim prohibitions attached to the five declared
+
+- **`AC-F1-08` / object lock** — MVP1 must **not** claim seven-year immutable
+  retention **anywhere**: not in the product, a pilot pack, a deck, or an
+  audit-committee artefact. It may claim append-only within the running system,
+  hash-chained, with a retention *stamp*. **New MVP1 requirement:** wherever a
+  retention date is rendered, the absence of enforcement renders adjacent to it —
+  a date reads as enforcement to every reader who has not opened the register,
+  and the reader who most needs to know is the controller taking an F1 export to
+  an audit committee.
+- **`AC-F1-11` / KMS** — may not claim tamper-evidence against a party holding
+  application-level write access. May claim tamper-*detection* against accidental
+  modification and against a party who does not recompute the chain.
+- **`AC-REFUSAL-11` / A20** — the only sentence the product may use: A20 holds
+  **absolutely** wherever an emission carries a disposition on a size-shaped
+  ground, and **heuristically** otherwise. The resolver does **not** unlock this
+  and makes the exposure *worse* — today an evading paraphrase reaches a decline;
+  afterwards it reaches an answer. Two hard conditions on the resolver: triage's
+  refusal check stays ahead of resolution unconditionally, and the A20 battery is
+  re-run against the resolving path with the evasion test updated to assert what
+  it now reaches.
+- **`AC-F36-48`** — may not claim the abstention band is calibrated, nor that any
+  pilot abstention rate is evidence about a skill.
+
+### The cost of cutting F39, stated as plan-agent required
+
+If the resolver is cut, what goes to the human is **not** "F39 partially
+deferred". It is: *MVP1 does not implement Part 2 of the product direction, and
+the FP&A persona — one of three the Decisions Log binds as primary — has no
+functioning surface.* `PLAN.md` §7.7's open persona conflict is **wider today
+than it disclosed**, because it claimed FP&A was served by F39's inquiry leg and
+that leg declines everything.
