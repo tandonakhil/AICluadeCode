@@ -646,6 +646,81 @@ undecided.
      On `AC-REFUSAL-13`: register 16 was **right** and the evidence was
      missing; three named checks now carry the ID.
 
+- **2026-08-01 — Gate 7 pass 8, THE LAST OF THE GATE-9 LOOP-BACK: the eleven
+  criteria pass 7 did not reach. Judgement calls by `code-agent`.** Four
+  commits. **Seven of the eleven were unbuilt rather than merely unevidenced**,
+  which is a higher proportion than pass 7's five in fifty-two and is the
+  expected shape: the ones left last were the ones with no join because there
+  was nothing to join to.
+  1. **The Ask screen's natural-language box was wired to nothing.** It rode on
+     a GET query string to `/exceptions`, which ignored it, so a user could
+     type "assess the impairment" and meet no guard at all —
+     `AC-REFUSAL-03`/`-05`/`-06`/`-12` were all unbuilt.
+     `ges/broker/request_triage.py` is a REQUEST classifier and is deliberately
+     not `refusals.classify`, which reads an emission: "Is our AR allowance
+     adequate?" contains no assertion, so the emission classifier sees an
+     ordinary finding and lets it through. The guard is at the broker, before
+     resolution, so a direct API call meets it.
+  2. **No answer path was invented.** All three triage outcomes are declines,
+     because the F39 resolver's model call site is still not built. The third
+     says so by name rather than substituting a nearest metric, which is A25's
+     failure mode exactly. `AC-F39-03`/`-05`/`-06`/`-08` remain unmet as
+     recorded.
+  3. **A refusal always beats a deferral**, unconditionally. A deferral trigger
+     that could pre-empt a refusal would be a route to a materiality conclusion
+     via a phrasing that also mentions a deferred capability. The cost is that
+     "certify that this intercompany reclass is correct" refuses rather than
+     defers, and that is the direction to be wrong in.
+  4. **The metric versions on the Ask screen were a hardcoded string** —
+     `recurring_entry_signature v2.4 - posting_period_join v1.9`, which no
+     registry could contradict — and the dossier carried none. `semantics:` is
+     now required on every certified query and a functional scenario walks
+     every file under `backend/app` asserting no version literal survives in
+     the analysis plane. Dossier payload **schema v2** rather than a key added
+     to v1's required list, because widening v1 retroactively would declare
+     every existing v1 record incomplete — the migration `ARCHITECTURE_KB`
+     §23.11 exists to refuse. `_read_v1` stays and is exercised.
+  5. **`AC-F42-05` could not be demonstrated on any fixture that existed.** On
+     the wedge world utilities is an outlier and bonus has too little history,
+     so an F42 run there is bounded and non-clean by construction. A criterion
+     about the exception-free full-coverage case needs a world where that case
+     occurs, so one was built and declared.
+  6. **A thirteenth primitive, and the reasoning was the same as the twelfth's.**
+     `journal_attribute_outlier` is not a parameterisation of
+     `distribution_outlier`: `AC-F42-02` requires the ATTRIBUTES that made a
+     journal an outlier to be named, and no parameterisation of a
+     distance-from-history computation produces that output shape. Magnitude is
+     deliberately NOT scored, so the two legs cannot double-report one anomaly.
+     Base rates come from the history only, so a period-end spree of twenty
+     identical unusual journals cannot make each look normal by the presence of
+     the other nineteen. Declared in `UNSPECIFIED_BUT_BUILT` beside
+     `obligation_gap`; both for `solution-architect` at gate 10.
+  7. **`AC-F40-10`'s tempting implementation was unreachable, which is the
+     point.** A `reversed: true` field on the dossier is a modification of an
+     evidence record, and this store has no update function and a trigger that
+     refuses one below the application. Children name their parent instead: a
+     reversal writes one new record, `dossier.read` resolves the linkage on
+     read, the original's content hash is unchanged and the period's chain
+     still verifies — which a write-back would have broken for every record
+     after it.
+  8. **`AC-F40-09` was behaviour with nothing saying so.** Nothing revokes an
+     approval and `build` raises rather than returning a partial file, so both
+     clauses already held; but a user shown "not exported" re-approves, and the
+     ledger acquires a second decision record for one act. The refusal now
+     states that the approval survives, and the suite's strongest assertion is
+     the retry against the same approval.
+  9. **The two-key statement had no date.** "Verified per tenant" with the date
+     absent is the most flattering possible reading of the CUEC residual, which
+     is a validity WINDOW — and a window with no start cannot be evaluated. The
+     OLDEST verification is stated, not the most recent.
+  10. **Two register entries opened.** 29 (metric and join versions are
+      declared on the certified query rather than in an independent metric
+      store — `AC-F39-04` is satisfied; where the versions LIVE is substituted)
+      and 30 (`journal_attribute_outlier`'s threshold is declared, not
+      calibrated, with the denial on every emitted finding as well as in the
+      header). `obligation_gap` stays a declared twelfth primitive, unreverted,
+      per the standing instruction.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -787,6 +862,21 @@ manifest naming a specified-but-unbuilt primitive must still fail compilation
 *saying so*. A `parametrize` over an empty tuple collects zero tests and
 reports green, so that behaviour is now asserted against a planted entry
 instead.
+
+**Plus two primitives outside the KB's eleven**, both declared in
+`UNSPECIFIED_BUT_BUILT` so the KB's list stays the KB's list, and both for
+`solution-architect` at gate 10: `obligation_gap` (pass 7, F29's other three
+sub-types) and `journal_attribute_outlier` (pass 8, `AC-F42-02` — F42's journal
+leg, over its own population `pop.period_journals@1`).
+
+**Pass 8 additions to the analysis plane's shape.** A natural-language REQUEST
+is now triaged at the broker before anything resolves it
+(`ges/broker/request_triage.py`, `POST /ges/ask`, `POST /ask`), with three
+outcomes and all three declines. Every certified query declares its metric and
+join versions (`semantics:`, required at compile time), which travel out of
+`/ges/query` with the rows and are stamped in a **v2 dossier payload**. A
+reversal is a record type of its own (`app/evidence/reversal.py`) whose linkage
+is resolved on read rather than written back.
 
 **Two of gate 9's three contradictions were capabilities that do not exist and
 are now stated as unmet rather than claimed**; the third was a missing build
@@ -1132,7 +1222,14 @@ its guarantee and its one-host bound.
 | 27 | `AC-F36-48` — "a closed period over **real close data** in which a skill emitted zero abstentions" | the abstention band check runs against the pilot's SYNTHETIC period, whose abstention count is a property of six fixture items rather than of a skill's behaviour on real close data | the *computation* — band, red control finding, the above-band usefulness finding routed to the skill owner — is real and its boundary cases are testable. What the criterion asks for and this build cannot supply is the **input**: a period of real close data. On this fixture "zero abstentions" is achieved by removing a fixture item, not by a skill declining to decline. **Gate 9 was right that this is a register-24/25-class fixture substitution with no register entry.** It has one now. Real evidence needs a tenant, which is registers 21 and 24 again from a fourth direction |
 | 28 | `AC-F40-17`/`-18` — an **export-time** CUEC probe that detects Oracle-side configuration drift since deployment and refuses the export | nothing. The CUEC register's stored pass state is read at export time and a `never_verified`/`expired`/`failed` state refuses the export, but **no probe re-reads the tenant's configuration**, so drift after a recorded pass is undetected | **`AC-F40-17` and `AC-F40-18` are NOT satisfied and no suite claims them.** The criterion's whole point is that the stored pass state does NOT authorise the export, and this build authorises on exactly that. Closing it needs an Oracle tenant to probe — register 21's residual. Recorded rather than approximated: a probe that re-read our own register and reported no drift would be a check that cannot fail |
 
-**Twenty-eight entries as of pass 7. Entries 8, 10, 11, 13, 14 and 16 are
+### Entries OPENED at pass 8 (the last of the gate-9 loop-back)
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 29 | A semantic layer in which certified **metrics and joins are artefacts in their own right, versioned independently of the queries that use them** — which is what `AC-F39-04`'s "the version of each certified metric and join used" presupposes | the versions are **declared on the certified query** (`semantics:`, required at compile time) and committed with it. `SemanticElement` in `ges/registry/loader.py` carries the in-file denial | `AC-F39-04` itself IS satisfied, on both surfaces, from a single source rather than a screen literal — the criterion asks that the versions be STATED, and they are, on the answer and in the dossier. What is substituted is **where they live**, and two consequences are real: (a) a metric version can only change when a query file changes, so "the metric moved and three queries still name the old version" is not a state this build can represent, which flatters it; (b) nothing cross-checks that two queries naming `posting_period_join@1.9` mean the same join — they do here because one person wrote both. Closing it needs a metric store, which is a phase-2 artefact |
+| 30 | A **calibrated** threshold for `journal_attribute_outlier` — an attribute count and a rarity ceiling derived from a measured false-positive rate on real close data | `min_attributes: 3` and `rarity_ceiling: 0.05`, DECLARED in the manifest. Every finding states the threshold in force, its inclusivity, the closed attribute set scored, and an explicit `threshold_calibration` denial | `AC-F42-02` asks that the journal and the attributes that made it an outlier be NAMED, which does not depend on calibration, so the criterion is satisfied and the check claims nothing more. What is NOT claimed: any measured likelihood, precision or false-positive rate for this detector. This is register 24's residual from a second direction — calibrating it needs real close data, which is register 21/24 again. The denial is at the module header AND on every emitted finding, so a reader of a finding meets it without reading the source |
+
+**Thirty entries as of pass 8. Entries 8, 10, 11, 13, 14 and 16 are
 CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
 4 are still the two that cannot quietly become "MVP1 ready".**
 
