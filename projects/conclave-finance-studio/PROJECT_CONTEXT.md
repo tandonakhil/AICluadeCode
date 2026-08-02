@@ -1016,12 +1016,147 @@ undecided.
      and it is recorded here so gate 8 and `deploy-agent` are not surprised by
      it. It is confined to the test process: no application path changed.
 
+- **2026-08-02 — Gate 7 pass 15: the last two in-scope undisclosed criteria.
+  Judgement calls by `code-agent`.** Four commits (`a1850a5`, `faf6117`,
+  `4e5ee47`, `75f5e27`). Gate 9's final audit left 255 VERIFIED, 5 DECLARED and
+  exactly two in-scope undisclosed; both were pre-existing and both are now
+  covered. **No register entry was opened** — every clause of both criteria
+  turned out to be evidenceable, which was not certain going in.
+  1. **`AC-F36-33`'s comparator was a comment, and is now a component.** The
+     criterion asserts that `restates_periods` is set by the comparator and is
+     unwritable from any agent path. Ownership was asserted at
+     `ges/broker/context_schema.py:98` and nowhere else, and all four G-RESTATE
+     scenarios *supplied* the field as an emitter-side keyword argument — the
+     exact state the criterion forbids. `RESPONSIBLE_AI_KB` RAI-ARCH-3 has
+     wanted this since pass 2c, which reported the field unwritable while the
+     thing that populates it was unbuilt. `ges/restatement.py` is now that
+     thing: prior-period narratives per account, Jaccard overlap of normalised
+     word sets over a configured threshold, strictly exceeded.
+  2. **Unwritable is enforced at three named paths, not documented at one.**
+     The pair are private slots behind read-only properties on
+     `EmissionRequest`, writable only through `apply_restatement`, which
+     demands a `RestatementVerdict` — a type minted in exactly one place, so a
+     dict of the right shape is refused. The constructor, attribute assignment
+     and the HTTP body each fail with a named refusal and each record a
+     `restatement_field_write_attempt` control event. **Refused rather than
+     silently overwritten**, which is where this departs from the
+     supersession-by-data precedent it otherwise copies: `/ges/decide`
+     discards a caller-supplied supersession state, and `AC-F36-33` says the
+     attempt *fails*. A caller quietly corrected is a caller that keeps trying.
+  3. **The comparator runs BEFORE the broker, and records only on an ALLOW.**
+     Before, so the value the predicates see is the comparator's and there is
+     no window in which the request carries anything else. Only on an allow,
+     because an agent that could seed the narrative history out of denied text
+     would control the baseline its next emission is measured against, and a
+     control whose reference set the subject writes is not a control.
+  4. **The four existing G-RESTATE scenarios were STRENGTHENED, not
+     rewritten around.** Each now derives its restatement state from the real
+     comparator instead of stating it, so the escalation scenario's count of 3
+     is an off-by-one the comparator can now fail. Two of them moved their
+     priors to non-adjacent periods so the escalation rule is not also firing
+     and the denial reason each asserts is unambiguously the rule it names.
+     **No scenario asserts less than it did.**
+  5. **`AC-F36-30`'s Then clause is covered by the FAILING case.** Its only
+     ID-bearing join scoped itself, in its own words, to "the precondition".
+     The criterion's requirement is that the suite *fails* when an emission
+     constraint lacks a fixture, so a check confirming it passes when
+     everything is present would not have covered it. Seven node ids added,
+     parametrised over both fixture directions — a constraint that can no
+     longer be shown NOT to fire is as unevidenced as one that can no longer
+     be shown to fire. A passing baseline is seeded and asserted passing first,
+     so the failure is the missing fixture rather than `AC-F36-24`'s
+     inconclusive first run.
+  6. **The live-bundle join is asserted, not assumed.** A fixture cannot be
+     removed from the bundle directory in force, so those scenarios work on a
+     copy; a scenario of its own asserts the copy compiles to the same bundle
+     hash. Without it, three scenarios could quietly have been testing a bundle
+     nobody uses. `bundle.yaml` itself was not touched, so no hash moved.
+  7. **The suites stopped writing to the developer's live decision ledger.**
+     `tests/suites/conftest.py`'s `ges_http` called `create_app` with no
+     `broker_factory` and fell through to `default_store_path()`;
+     `dev/var/broker_db.sqlite3` had reached 10 MB. It contradicted that
+     module's own docstrings in two places, it sat outside
+     `pilot_test_binding.rebuild()`'s reach — the one piece of GES-side state
+     the per-scenario restore could not touch — and it made a fresh clone and
+     a developer's machine two different starting states. Guarded by an
+     architecture-suite scenario that drives a real emission, reads the
+     decision back out of the suite's own store, and asserts the live ledger's
+     size is byte-identical across the request. **Verified to fail with the fix
+     reverted.** The existing 10 MB file is git-ignored local residue and was
+     left in place rather than deleted: it may contain a developer's own pilot
+     runs, and that is not `code-agent`'s call to discard.
+  8. **The AST guard's set of participating modules was itself an
+     enumeration.** Pass 14 item 3 established the classification guard;
+     `test_pilot_process_state.py`'s own docstring already said a wrong
+     `PROCESS_STATE_MODULES` would be invisible — "the two modules it names
+     would keep passing their own guard while a third accumulated freely
+     beside them". `app.ges_gateway` was that third module: the bound
+     transport, the per-principal client cache, seven named snapshot/restore
+     sites across both test trees, and no guard had ever scanned it.
+     **Split rather than widened**: `PROCESS_STATE_MODULES` is what `restore()`
+     DISCARDS, `EXTERNALLY_RESTORED_MODULES` is what is restored by rebinding
+     instead, and `GUARDED_MODULES` — the union — is what the classifier scans.
+     The gateway is deliberately not discarded, because resetting it between
+     scenarios would unbind the GES application every screen is reached
+     through; that half is asserted too, so moving it into the discarded set
+     cannot look like a tightening.
+  9. **What this pass did NOT do.** No register entry was opened or closed;
+     registers 3 and 4 stand. The five declared criteria (`AC-F1-08`,
+     `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`) are claimed
+     nowhere, and nothing here touches them. No guardrail moved to the UI, no
+     SQL-typed parameter was introduced, no dependency was installed, and
+     `prod/` was not touched.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
 (261 until the gate-9 loop-back: `FUNCTIONAL_SPEC` §27.11's arithmetic said
 "262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
 spec at v1.1.1; **no ID was renumbered, added or removed**.)
+
+**Pass 15 — the last two in-scope undisclosed criteria. Test-count delta
+against gate 8's final run at `fc197a6`:**
+
+| Suite | Before | After | Delta |
+|---|---|---|---|
+| unit/integration | 2,028 | **2,071** | **+43** |
+| functional | 354 | 354 | — |
+| architecture | 26 | **27** | **+1** |
+| security | 14 | 14 | — |
+| red-team | 61 | 61 | — |
+| industry | 23 | 23 | — |
+| ux | 186 | 186 | — |
+| **total collected** | 2,692 | **2,736** | **+44** |
+
+**0 tests removed.** The +43 in unit/integration is 32 new scenarios for
+`AC-F36-33` (`backend/tests/test_restatement_comparator.py`), 7 for
+`AC-F36-30` (`test_bundle_publication.py`) and 4 for the widened process-state
+guard. The +1 in `architecture` is the harness scenario that refuses a suite
+run writing to the developer's decision ledger. **Six scenarios were CHANGED
+and none was weakened**: the four G-RESTATE scenarios now derive their
+restatement state from the real comparator instead of supplying it — two of
+them additionally asserting the comparator's output before driving the broker —
+and two process-state scenarios now scan `GUARDED_MODULES` rather than
+`PROCESS_STATE_MODULES`, which is a strictly larger set.
+
+**Order independence re-verified at `75f5e27`.** All 2,736 pass under six
+orderings, with an out-of-tree uniform global Fisher–Yates plugin so the tree
+stayed clean. Fingerprints and same-file-adjacency counts recorded so the
+permutation used is evidence rather than a claim:
+
+| Ordering | Result | Wall | Same-file adjacencies | Order fingerprint |
+|---|---|---|---|---|
+| file order (control) | 2,736 pass, exit 0 | 169.1s | — | — |
+| `seed:1` | 2,736 pass, exit 0 | 197.9s | 37 | `8572b681d7cd5743` |
+| `seed:7` | 2,736 pass, exit 0 | 199.8s | 37 | `c100caa5cb0cf5d0` |
+| `seed:42` | 2,736 pass, exit 0 | 203.0s | 27 | `b0fb50e4f73141b9` |
+| `seed:20260731` | 2,736 pass, exit 0 | 207.7s | 38 | `d4791a479a9da2a5` |
+| `reverse` | 2,736 pass, exit 0 | 191.1s | 2,634 | `67a2c580ba09549a` |
+
+These are `code-agent`'s own permutations and are **not** `test-agent`'s: the
+fingerprints differ from the gate-8 table above, which is the point — an
+independent generator at gate 8 is what makes that run evidence rather than a
+repeat of this one.
 
 **Pass 7 — the gate-9 RE-AUDIT loop-back. Test-count delta against pass 6:**
 
