@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Ask — detect — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">6</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p8-ask-detect.html" class="navitem on" aria-current="page"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p1-close-staff.html">Close</a> &rsaquo; Ask</div>
+  <h1 class="pagehd">Ask &mdash; what should the agent do?</h1>
+  <div class="pagesub">
+    <b>Detect</b> &mdash; run a certified detection skill over a population. Selected.
+    &nbsp;|&nbsp; <a href="p7-inquiry.html"><b>Inquire</b></a> &mdash; ask what a number is
+    made of (FP&amp;A).
+    <br>Retained almost unchanged from the pilot &mdash; this screen was never the problem.
+    The one change is that it is <b>no longer the landing page</b>: two of three personas
+    never compose a run, and a doer does not begin the night by writing a query.
+  </div>
+
+  <div class="card" data-tier="certified">
+    <div class="lbl">Which tier is this run?</div>
+    <div><b>Certified</b> &mdash; only certified datasets, and this run may emit an assurance
+      conclusion and reach an action.</div>
+    <div style="margin-top:6px"><a href="#">Use the certified tier</a> &middot;
+      <a href="#">Use the exploration tier</a></div>
+    <div class="note">A run in the certified tier over an uncertified dataset is refused,
+      and the refusal names the dataset. The exploration tier is where such data may be
+      looked at at all.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Run over which dataset?</div>
+    <div class="kv"><a href="p11-catalogue.html">General ledger balances</a>
+      <span>certified, tie-out passed</span></div>
+    <div class="kv"><a href="p11-catalogue.html">Accounts payable subledger</a>
+      <span>certified, tie-out failed</span></div>
+    <div class="kv"><a href="p11-catalogue.html">Treasury bank feed &mdash; raw extract</a>
+      <span style="color:var(--risk-2);font-weight:660">NOT CERTIFIED</span></div>
+    <div class="note">Nothing here is hidden or disabled. A dataset that cannot support
+      this run is refused by the governed execution service when the run is submitted,
+      naming it &mdash; a greyed-out control would be this screen enforcing, which it never
+      does. <a href="p11-catalogue.html">Open the full catalogue &rarr;</a></div>
+  </div>
+
+  <div class="card">
+    <label><div class="lbl">Ask in natural language</div>
+      <textarea rows="3" style="width:100%;font:inherit;font-size:14px">Check whether any recurring accruals or amortisations that ran in the last twelve periods did not run in June.</textarea></label>
+    <div style="margin-top:8px"><button class="btn">Submit this request</button>
+      <span class="sub"> Every request is triaged at the governed execution service before
+        anything resolves it. A request for a refused conclusion is refused there, not
+        here.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="col"><div class="card">
+      <div class="lbl">Resolved to a certified query &mdash; required before the run can be submitted</div>
+      <div class="kv"><span class="k">Certified query</span><span class="v">omission.recurring_entry_absent</span></div>
+      <div class="kv"><span class="k">Version</span><span class="v">3.1.0</span></div>
+      <div class="kv"><span class="k">Skill</span><span class="v"><a href="p10-agent.html">Omission Detector &mdash; recurring entries</a></span></div>
+      <div class="kv"><span class="k">Bound parameters</span><span class="v">period=2026-06 &middot; lookback=12 &middot; min_recurrence=9</span></div>
+      <div class="kv"><span class="k">Certified metric</span><span class="v">journal_line_amount v1.0</span></div>
+      <div class="kv"><span class="k">Certified metric</span><span class="v">periods_present v1.0</span></div>
+      <div class="kv"><span class="k">Certified metric</span><span class="v">recurring_entry_signature v2.4</span></div>
+      <div class="kv"><span class="k">Certified join</span><span class="v">posting_period_join v1.9</span></div>
+      <div class="note">Natural language selects and parameterises a certified query; it
+        never authors one. There is no free-form SQL path and no parameter of type SQL.
+        The resolved name and the bound values are shown before submit is available, so
+        what is approved is the interpretation and not only the answer.</div>
+    </div></div>
+    <div class="col">
+      <div class="card">
+        <div class="lbl">Declared expected population &mdash; the skill states it, you close the gaps</div>
+        <div class="kv"><span class="k">11500 Bank Clearing &ndash; Operating</span><span>covered</span></div>
+        <div class="kv"><span class="k">13800 Intercompany Receivable</span><span>covered</span></div>
+        <div class="kv"><span class="k">16200 CWIP &ndash; Substation</span><span>covered</span></div>
+        <div class="kv"><span class="k">18300 Deferred Storm Restoration</span><span>covered</span></div>
+        <div class="kv"><span class="k">19900 Suspense</span><span>covered</span></div>
+        <div class="kv"><span class="k">21400 GR/IR Clearing</span><span>covered</span></div>
+        <div class="kv"><span class="k">54100 Transmission O&amp;M Expense</span><span>covered</span></div>
+        <div class="kv"><span class="k">29100 Intercompany Payable</span>
+          <span style="color:var(--risk-2);font-weight:660">NOT SELECTED</span></div>
+        <div class="kv"><span class="k">31200 FX Revaluation &mdash; Subledger</span>
+          <span style="color:var(--risk-2);font-weight:660">NOT SELECTED</span></div>
+        <div class="kv"><span class="k">31300 CTA &mdash; Subledger</span>
+          <span style="color:var(--risk-2);font-weight:660">NOT SELECTED</span></div>
+      </div>
+      <div class="card">
+        <div class="covstrip" role="img" aria-label="Population strip: 7 of 10 members scanned">
+          <div class="covseg scanned" style="flex:7">7 scanned</div>
+          <div class="covseg gap hatch" style="flex:1">29100 (1)</div>
+          <div class="covseg gap hatch" style="flex:1">31200 (1)</div>
+          <div class="covseg gap hatch" style="flex:1">31300 (1)</div>
+        </div>
+        <div class="covlegend"><span><b class="mono">70%</b> coverage of 10 declared members</span>
+          <span>3 segments unscanned, named above</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Two certified queries match this request equally well</div>
+    <div class="kv"><span>&#9711; anomaly.balance_movement_outlier v1.6 &mdash; balances that moved unusually in this period</span></div>
+    <div class="kv"><span>&#9711; crossperiod.subthreshold_accumulation v2.2 &mdash; same account, same direction, accumulating under threshold</span></div>
+    <div class="note">The system does not pick one silently. Both are named, you choose,
+      and the run cannot be submitted until you do.</div>
+  </div>
+
+  <div class="partial">
+    <b>Partial run &mdash; 70% coverage.</b> 7 of 10 declared members would be scanned. Not
+    scanned: 29100; 31200; 31300. This run cannot support a negative assurance conclusion
+    for 2026-06.
+    <span class="nodismiss">Non-dismissable. Reproduced verbatim in the dossier and the export.</span>
+  </div>
+
+  <div class="card">
+    <a class="btn primary" href="p9-run.html">Run over 7 members &mdash; partial, 70%</a>
+    <span class="sub"> The submit control states the coverage in its own label. There is no
+      unqualified Run.</span>
+  </div>
+</main>
+</div></body></html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Datasets — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">6</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub" style="color:var(--accent);font-weight:620">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p6-period-record.html">Period record</a> &rsaquo; Datasets</div>
+  <h1 class="pagehd">Certified dataset catalogue</h1>
+  <div class="pagesub">
+    <b>Demoted, not deleted.</b> In the pilot this was a top-level nav item that nobody
+    navigates to on purpose. Its real entry point is the dataset picker on
+    <a href="p8-ask-detect.html">Ask</a>, which already linked here, and now also every
+    dataset reference on every finding, run and dossier. It keeps a home under Evidence
+    because a controller does sometimes need the whole list.
+  </div>
+
+  <table class="t">
+    <tr><th>Dataset</th><th>Version</th><th>Certification</th><th>Tie-out</th><th>Staleness</th><th>Action-capable</th></tr>
+    <tr><td><b>General ledger balances</b><div class="desc">ds.gl_balances</div></td>
+      <td class="mono">vFIXTURE-2026.06.03-a</td><td><span class="pill">Certified</span></td>
+      <td>Passed</td><td class="stale">1 close day behind</td><td>Yes</td></tr>
+    <tr><td><b>Accounts payable subledger</b><div class="desc">ds.subledger_ap</div></td>
+      <td class="mono">v2026.06.02</td><td><span class="pill">Certified</span></td>
+      <td><b style="color:var(--risk-2)">Failed</b> &mdash; differs from GL control account by 18,450.00</td>
+      <td class="stale">1 close day behind</td><td>No</td></tr>
+    <tr><td><b>Treasury bank feed &mdash; raw extract</b><div class="desc">ds.treasury_bank_feed_raw</div></td>
+      <td class="mono">v2026.06.03</td>
+      <td><span class="pill unknown">Not certified</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>No &mdash; exploration tier only</td></tr>
+    <tr><td><b>FX revaluation inputs</b><div class="desc">dw.fx_revaluation</div></td>
+      <td class="mono">&mdash;</td>
+      <td><span class="pill unknown">Unavailable</span></td>
+      <td>&mdash;</td><td>&mdash;</td>
+      <td>No &mdash; this is why <a href="p9-run.html#m2">boundary check A9 could not run</a></td></tr>
+    <tr><td><b>Intercompany &mdash; NGH-CA-200</b><div class="desc">ds.ic_ngh_ca_200</div></td>
+      <td class="mono">v2026.06.03</td><td><span class="pill">Certified</span></td>
+      <td>Passed</td><td class="stale">1 close day behind</td>
+      <td>Yes &mdash; selecting it would resolve <a href="p3-item.html">abstention AB2</a></td></tr>
+  </table>
+
+  <div class="card">
+    <div class="lbl">Close-clock staleness, stated per dataset</div>
+    <div class="kv"><span class="k">Close calendar</span><span class="v">close.fy2026_ledger_1@1</span></div>
+    <div class="kv"><span class="k">Due by</span><span class="v">day-2 cut-off (warehouse refresh complete)</span></div>
+    <div class="kv"><span class="k">Refreshed</span><span class="v">03 Jul 2026 06:15 UTC</span></div>
+    <div class="kv"><span class="k">Close days behind</span><span class="v">1</span></div>
+    <div class="note">Refreshed after the day-2 cut-off, which it was due by, and before
+      the day-3 cut-off: the data is 1 close day behind. Rendered at 13px here and in the
+      context bar, per the typography floor &mdash; this is the qualifier that determines
+      whether any figure in the product may be relied on, and it was the smallest text on
+      every screen in the pilot.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Nothing is hidden and nothing is disabled</div>
+    <div class="refused">
+      An uncertified or tie-out-failed dataset is still listed, still selectable and still
+      submittable. The <b>guardrail broker</b> refuses the run and names the dataset in the
+      refusal. A greyed-out control here would be this screen enforcing, which it never
+      does.
+    </div>
+  </div>
+</main>
+</div></body></html>

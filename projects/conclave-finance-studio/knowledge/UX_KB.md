@@ -945,7 +945,99 @@ acceptance criterion is deleted** — every module moves to an object that owns
 it. Criteria of the form "X must be visible on screen Y" will need Y
 re-pointed, which is precisely the point: those criteria built the 3,483px page.
 
-## A2.7 · Not covered by this pass, stated rather than omitted
+## A2.7 · Visual pass — "Paper & Seal, at close" (2026-08-02, second turn)
+
+Human request: *"make it look slick UI with Apple theme, Conclave Branding and
+User experience for journey maps."*
+
+**Brand source of truth: `projects/conclave-marketing/dev/app/static/css/site.css`**,
+palette "Paper & Seal", human-approved 2026-07-19. Read directly, not from a
+summary — which mattered, see below. Tokens lifted verbatim into
+`design-review/redesign-2026-08-02/apple.css`.
+
+**The brand already carries this product's semantics**, which is the finding
+that made the pass easy: the marketing CSS defines `--gold` as *human
+decisions*, `--rust` as *the honest rejection*, and `--cream` as *artifact
+cards*. Those are precisely the meanings this product needs. Each is used for
+that and nothing else: gold appears on exactly two things (the Approve control
+and a forward prediction a person promised), rust on the severity ramp, cream
+on evidence sets and dossiers.
+
+### The green conflict — dropped entirely, and the brand loses nothing
+
+I was told the brand contains `#78c48a` and that the product's no-green rule
+wins. Both true, but the record is more specific and the resolution is cleaner
+than "substitute it":
+
+**The core Paper & Seal palette contains no green.** The only green in the
+marketing CSS is `--c-ship` (`#1E7A46` light / `#6FCF8F` dark), one of six
+*team-family accents* colour-coding agent families on the marketing `/who`
+page. **It is not a status colour and has never meant "passed" anywhere in the
+brand.** So it is dropped outright — there is no green token in `apple.css` in
+either theme, and nothing needed recolouring to replace it, because it carried
+no meaning this product uses. Verified by grep across the whole visual layer:
+the only occurrence of the word is the comment recording its absence. The
+conflict was an artefact of the summary, not of the brand.
+
+### Apple *pro-app*, not Apple marketing page
+
+The stated risk — a naive consumer treatment producing a beautiful page that
+holds six rows — is real for this content, which is dense, evidential and
+numeric. Reference points taken were Numbers, Xcode inspectors and Finder list
+view. What that meant concretely:
+
+- **Four colour families, one meaning each.** Rust = something is wrong (one
+  hue, three weights); gold = a human decision; teal = navigation and action;
+  slate = could not establish / refuse. Slate is the only cool hue in a warm
+  palette, so "unknown" is structurally other before it is read.
+- **Hairlines, not boxes** — `--hairline` is brand-reserved for rules that
+  never carry text. Cards only where a real container exists.
+- **A seven-size type scale** (12·13·15·17·21·28·40) against the pilot's
+  eleven-plus, and one 28px alignment grid.
+- **Density that reads as calm**: 14px row padding, hairline separation, 3px
+  severity rail. Six rows fit above the fold; forty would still scan.
+- **The serif has one job** — Georgia carries the product's own voice, on
+  refusals and abstentions only, because "this is not a statement that the
+  close is clean" is the system speaking about its own limits and that is a
+  different register from a data label.
+- **Light-on-warm-paper is the primary treatment**, not a light-theme
+  afterthought.
+
+### The typography ruling, built rather than proposed
+
+| Element | Pilot | Now |
+|---|---|---|
+| **Close-clock staleness value** | **10.5px — smallest text on every screen** | **15px semibold, rust** |
+| All reliability qualifiers | 10.5–11.5px | 15px |
+| Primary navigation | 10px computed | 15px |
+| Micro-labels / table headers | 10–10.5px | 12px (the floor) |
+| The risk figure | 42px | 40px |
+| **Qualifier-to-assertion ratio** | **4.0×** | **2.7×** |
+
+The ratio is the substance. A product whose claim is that it does not assert
+what it cannot substantiate cannot render the assertion four times the size of
+the substantiation.
+
+### Journey maps as designed artefacts
+
+`v2-journeys.html` — four maps on the brand's cream artifact ground, each with
+persona initial, role, the question in brand serif, trigger/stakes/frequency,
+a verdict pill, and two lanes (today / proposed) of connected step cards.
+Steps are clickable and navigate into the prototype. Dead ends render in the
+severity ramp; proposed steps in dashed teal.
+
+### Scope of the visual pass — stated, not glossed
+
+**Four screens carry the treatment** (`v2-close`, `v2-queue`, `v2-item`,
+`v2-approvals`) plus the journey maps. The other fifteen prototype screens
+remain on the first-pass stylesheet and should be read for structure, not
+finish. **Contrast is designed, not measured** — every brand pair used was
+already verified computationally at AA by the marketing site, but my two
+additions (the rust severity ramp, the slate family) have not been run through
+a checker. That is the UX suite's job at the Test gate and is not claimed here.
+No motion. Desktop only.
+
+## A2.8 · Not covered by this pass, stated rather than omitted
 
 - **`DesignSync` is still unavailable in the runtime** — same finding as §10.5
   at gate 5, re-confirmed 2026-08-02: it is not in this agent's tool grant and
@@ -1004,5 +1096,6 @@ _(no entries — no production usage)_
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-02 | 1.2.0 | MINOR — **A2.7, visual pass "Paper & Seal, at close".** Conclave brand (read from `conclave-marketing/dev/.../site.css`, not a summary) + Apple pro-app discipline, in a new `apple.css`. Records that the **brand's green is not a status colour** — it is one of six team-family accents on the marketing `/who` page — and is therefore **dropped entirely rather than substituted**, with the no-green rule intact. Applies the typography ruling as built fact: staleness 10.5px → 15px, nav 10px → 15px, qualifier-to-assertion ratio 4.0× → 2.7×. Journey maps redrawn as designed artefacts. Four screens restyled, fifteen not — disclosed. | Human request, 2026-08-02; approval pending |
 | 2026-08-02 | 1.1.0 | MINOR — **Part A2, navigation & journey redesign.** Parallel design thread requested by the human after using the running pilot. Adds: four end-to-end journey maps (J1–J4, two of them currently unwalkable and one unstartable); a four-item task-ordered IA replacing §4's eleven-item flat nav, with demotions for `/readiness`, `/inventory`, `/catalogue`, `/monitors`, `/my-probe-history` and dissolution of `/dispositions`; a verdict that none of the six binding constraints causes the unusability, with the "no Approve button" constraint's unbuilt positive half identified as the highest-value gap; a **FAIL** call on the 10px navigation / 10.5px provenance typography with a proposed floor criterion; and a gap list. §4 is superseded by A2.2 but retained for the record. Rendered clickable prototype at `design-review/redesign-2026-08-02/index.html`; gate-5 record untouched. `DesignSync` re-confirmed unavailable — no library push. | Human request, 2026-08-02; approval pending |
 | 2026-07-31 | 1.0.0 | Initial Experience Design pass. Visual language, IA and nine screens designed against all 186 acceptance criteria; rendered mockup at `design-review/index.html`. Four items escalated (§9), two assumptions recorded (§10.2, §10.3), one recorded requirement flagged as **not covered** (§10.4, multi-surface header vs desktop-only MVP1), one tooling gap recorded (§10.5, `DesignSync` unavailable). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 5 human review pending |

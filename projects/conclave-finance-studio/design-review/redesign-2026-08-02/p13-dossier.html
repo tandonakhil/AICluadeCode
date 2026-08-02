@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>DOS-2026-06-0412-02 — evidence dossier — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">6</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub" style="color:var(--accent);font-weight:620">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p6-period-record.html">Period record 2026-06</a> &rsaquo;
+    <a href="p9-run.html">RUN-2026-06-0412</a> &rsaquo; DOS-2026-06-0412-02</div>
+  <h1 class="pagehd">Evidence dossier DOS-2026-06-0412-02</h1>
+  <div class="pagesub">
+    Evidences <a href="p3-item.html"><b>18300 Deferred Storm Restoration Costs &mdash;
+    recurring amortisation did not post in 2026-06</b></a>.
+  </div>
+
+  <div class="confirm">
+    <div class="hd">The back-edge that did not exist</div>
+    In the pilot, <code>/dossier/DOS-…</code> has <b>zero outbound links</b> &mdash; not to
+    the finding it evidences, not to the run that produced it, not back to
+    <code>/audit</code> where it was reached from. A reader who opened a dossier to check
+    an assertion had no route back to the assertion. This header carries all four edges.
+    <div class="note">
+      <a href="p3-item.html">&larr; The finding this evidences</a> &middot;
+      <a href="p9-run.html">The run that produced it</a> &middot;
+      <a href="p10-agent.html">The agent that authored it</a> &middot;
+      <a href="p11-catalogue.html">The dataset it was computed over</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col"><div class="card">
+      <div class="lbl">Identity and chain</div>
+      <div class="kv"><span class="k">Dossier</span><span class="v">DOS-2026-06-0412-02</span></div>
+      <div class="kv"><span class="k">Decision</span><span class="v">DEC-8842-2026-06</span></div>
+      <div class="kv"><span class="k">Run</span><span class="v"><a href="p9-run.html">RUN-2026-06-0412</a></span></div>
+      <div class="kv"><span class="k">Sealed</span><span class="v">03 Jul 2026 18:42:11 UTC</span></div>
+      <div class="kv"><span class="k">Hash</span><span class="v">9f3a71c2&hellip;4e10</span></div>
+      <div class="kv"><span class="k">Prior hash</span><span class="v">c1d8ee45&hellip;9a72</span></div>
+      <div class="kv"><span class="k">Retention stamp</span><span class="v">2033-07-03</span></div>
+      <div class="refused" style="margin-top:8px">
+        <b>Immutable retention is not enforced in this build</b>, and this is not
+        tamper-evidence against a party holding application-level write access. It is
+        tamper-<i>detection</i> against accidental modification and against a party who
+        does not recompute the chain. Rendered adjacent to the retention date because a
+        date reads as enforcement.
+      </div>
+    </div></div>
+
+    <div class="col"><div class="card">
+      <div class="lbl">In force at the moment of the decision</div>
+      <div class="kv"><span class="k">Guardrail bundle</span><span class="v">v14 &ndash; 9f3a71c2</span></div>
+      <div class="kv"><span class="k">Threshold</span><span class="v">$150,000.00, inclusive</span></div>
+      <div class="kv"><span class="k">Agent</span><span class="v"><a href="p10-agent.html">omission-detector v3.1.0</a></span></div>
+      <div class="kv"><span class="k">Certified query</span><span class="v">omission.recurring_entry_absent v3.1.0</span></div>
+      <div class="kv"><span class="k">Metrics</span><span class="v">journal_line_amount@1.0, periods_present@1.0, recurring_entry_signature@2.4</span></div>
+      <div class="kv"><span class="k">Join</span><span class="v">posting_period_join@1.9</span></div>
+      <div class="kv"><span class="k">Dataset</span><span class="v"><a href="p11-catalogue.html">gl_balances vFIXTURE-2026.06.03-a</a></span></div>
+      <div class="kv"><span class="k">Data as of</span><span class="v">03 Jul 2026 06:15 UTC</span></div>
+      <div class="kv"><span class="k">Close-clock staleness</span><span class="v stale">1 close day behind</span></div>
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">The evidence, as sealed</div>
+    <table class="t">
+      <tr><th>Period</th><th>Posted</th><th class="n">Amount</th><th>Source journal</th></tr>
+      <tr><td>2026-03</td><td>yes</td><td class="n">412,500.00</td><td>RJ-AMRT-18300</td></tr>
+      <tr><td>2026-04</td><td>yes</td><td class="n">412,500.00</td><td>RJ-AMRT-18300</td></tr>
+      <tr><td>2026-05</td><td>yes</td><td class="n">412,500.00</td><td>RJ-AMRT-18300</td></tr>
+      <tr><td><b>2026-06</b></td><td><b style="color:var(--risk-2)">NO</b></td><td class="n">&mdash;</td><td>&mdash;</td></tr>
+    </table>
+  </div>
+
+  <div class="partial">
+    <b>Partial run &mdash; 70% coverage.</b> 7 of 10 declared members were scanned. Not
+    scanned: 29100; 31200; 31300. This run cannot support a negative assurance conclusion
+    for 2026-06.
+    <span class="nodismiss">Reproduced verbatim from the run. A dossier that dropped this
+      would be a stronger claim than the run it documents.</span>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Human acts recorded against this decision</div>
+    <table class="t">
+      <tr><th>When</th><th>Who</th><th>Act</th><th>Detail</th></tr>
+      <tr><td>03 Jul 21:02</td><td>user.a.reyes</td><td>Opened the finding</td><td>&mdash;</td></tr>
+      <tr><td>03 Jul 21:07</td><td>user.a.reyes</td><td>Narrative expanded?</td><td><b>No</b></td></tr>
+      <tr><td>03 Jul 21:09</td><td>user.a.reyes</td><td>Resolution recorded</td><td>R4 accrual correction proposed; clears by 2026-07</td></tr>
+      <tr><td>03 Jul 21:14</td><td>user.d.okafor</td><td>Approved</td><td><a href="p5b-export.html">joined the 2026-06 export set</a></td></tr>
+    </table>
+    <div class="note">&ldquo;Narrative expanded? No&rdquo; is only a meaningful row because
+      the narrative is collapsed by default. If it opened automatically this column would
+      read yes for every reviewer, every time, and carry nothing.</div>
+  </div>
+</main>
+</div></body></html>

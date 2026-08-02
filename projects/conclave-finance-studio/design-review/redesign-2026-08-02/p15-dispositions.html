@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Where /dispositions went — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue-after.html" class="navitem on" aria-current="page"><span>My queue</span><span class="cnt">5</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p1-close-staff.html">Close</a> &rsaquo;
+    <a href="p2-queue-after.html">My queue</a> &rsaquo; Predictions due back</div>
+  <h1 class="pagehd">Predictions and dispositions</h1>
+  <div class="pagesub">
+    <b>This page exists in the prototype so you can see what dissolving
+    <code>/dispositions</code> costs &mdash; which is nothing.</b> It is reached as a filter
+    on My queue, not as a nav item. In the pilot, <code>/dispositions</code> is a top-level
+    destination whose entire content is <b>one row</b> and which links nowhere.
+  </div>
+
+  <div class="card">
+    <div class="lbl">Where the content went &mdash; three destinations, each closer to the moment it matters</div>
+    <table class="t">
+      <tr><th>Content</th><th>New home</th><th>Why there</th></tr>
+      <tr><td>A prediction that has <b>come due and missed</b></td>
+        <td><a href="p1-close-staff.html">Close &mdash; the call-list</a></td>
+        <td>It is a task with a deadline. It belongs where you look for tasks on close day 1, not on a page you would have to remember to visit.</td></tr>
+      <tr><td>Predictions you have <b>made this period</b></td>
+        <td>A filter on <a href="p2-queue-after.html">My queue</a></td>
+        <td>It is a state of an item you already own. A separate screen made it feel like a separate object.</td></tr>
+      <tr><td>The <b>historical record</b> of predictions and outcomes</td>
+        <td><a href="p6-period-record.html#dueback">Period record</a></td>
+        <td>&ldquo;Did we keep our word last period?&rdquo; is a question about a period, and it is the strongest evidence the F32 control is worth anything.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Forward predictions recorded this period</div>
+    <table class="t">
+      <tr><th>Item</th><th>Account</th><th>Resolution</th><th>Expected to clear</th><th>Prediction state</th></tr>
+      <tr><td><a href="p3-item-saved.html">ITEM-18300-OM</a></td><td>18300 Deferred Storm Restoration</td>
+        <td>R4 accrual correction</td><td>2026-07</td><td><span class="pill">Armed &mdash; not yet due</span></td></tr>
+      <tr><td><a href="p3-item.html">ITEM-16200-RF@2026-05</a></td><td>16200 CWIP &ndash; Substation</td>
+        <td>R1 accepted and explained</td><td>2026-06</td>
+        <td><span class="pill r2">MISSED &mdash; unexplained</span></td></tr>
+    </table>
+    <div class="note">Every row carries an expected clearing period because the column is
+      NOT NULL. The prediction is recorded in the period the disposition is made, or the
+      control does not exist at all.</div>
+  </div>
+
+  <div class="riskband r2">
+    <div class="cap">A prediction you made has come due and did not clear</div>
+    <div class="big">$54,900.00</div>
+    <div class="what">16200 CWIP &ndash; Substation</div>
+    <div class="why">In 2026-05 you recorded R1 &mdash; accepted and explained &mdash; and
+      predicted this would clear by 2026-06. It did not clear, and no explanation has been
+      recorded. Until one is, this account&rsquo;s risk grade is raised, auto-pass is
+      revoked, and condition P2 on
+      <a href="p10-agent.html">crossperiod-surveillance</a> stays not met.</div>
+    <div class="facts">
+      <span>Predicted in<b>2026-05</b></span>
+      <span>Due<b>2026-06</b></span>
+      <span>Consequence<b>P2 blocked</b></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Explain the miss</div>
+    <div style="font-size:14px">Why did it not clear?
+      <span style="border-bottom:2px solid var(--line-2);padding:0 80px">&nbsp;</span></div>
+    <div style="margin-top:8px">New expected clearing period:
+      <span style="border-bottom:2px solid var(--line-2);padding:0 40px">&nbsp;</span></div>
+    <div style="margin-top:12px"><button class="btn primary">Record the explanation</button></div>
+    <div class="note">Never pre-filled: a defaulted prediction is a manufactured one. One
+      item &mdash; there is no control that disposes of more than one in a single action.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Rejections recorded this period</div>
+    <div class="refused">No item has been rejected in 2026-06.
+      <div class="note" style="margin-top:6px">Stated rather than shown as an empty table.
+        An empty table reads as a rendering failure; a sentence reads as a fact.</div></div>
+  </div>
+</main>
+</div></body></html>

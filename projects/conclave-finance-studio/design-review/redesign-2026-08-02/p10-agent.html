@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>crossperiod-surveillance — agent — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p4-close-controller.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">4</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub" style="color:var(--accent);font-weight:620">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p6-period-record.html">Period record</a> &rsaquo; Agents &rsaquo; crossperiod-surveillance</div>
+  <h1 class="pagehd">crossperiod-surveillance <span style="font-weight:400;color:var(--ink-3)">v2.2</span></h1>
+  <div class="pagesub">
+    <b>This page absorbs three pilot screens:</b> <code>/readiness</code> (which was a
+    top-level nav item hard-bound to <i>this one agent</i>, with no selector and no route
+    in, so the other agents&rsquo; readiness was unreachable by any means),
+    <code>/monitors</code>, and the agent half of <code>/inventory</code>. Monitoring an
+    agent and judging its readiness are the same question asked twice.
+  </div>
+
+  <div class="qtools">
+    <span>Agent</span>
+    <a class="chip on" href="#">crossperiod-surveillance</a>
+    <a class="chip" href="#">omission-detector</a>
+    <a class="chip" href="#">coding-detect</a>
+    <a class="chip" href="#">erp-fidelity</a>
+    <span style="margin-left:8px">&mdash; the selector the pilot has no equivalent of</span>
+  </div>
+
+  <div class="riskband r2">
+    <div class="cap">Promotion readiness as of period 202606</div>
+    <div class="what" style="font-size:24px">NOT ready for promotion</div>
+    <div class="why">4 of 5 conditions are not met or not yet evaluable:
+      P1 (not yet evaluable), P2 (not met), P4 (not yet evaluable), P5 (not yet evaluable).
+      Readiness is computed from these five conditions and from nothing else. It is never
+      asserted on a precision figure.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">The five conditions, stated individually</div>
+    <table class="t">
+      <tr><th>#</th><th>Condition</th><th>Evidence</th><th>State</th></tr>
+      <tr><td class="mono"><b>P1</b></td><td>Independent labels (blind re-performance sampling)</td>
+        <td>Deferred to phase 2: presupposes F17, which is not in MVP1. No evidence exists and none can be produced by this build.</td>
+        <td><span class="pill unknown">Not yet evaluable</span></td></tr>
+      <tr><td class="mono"><b>P2</b></td><td>Three closed periods with no unexplained F32 miss and no open F9 escalation</td>
+        <td>One F32 forward disposition missed in 2026-05 and not yet explained &mdash;
+          <a href="p15-dispositions.html">16200 CWIP &ndash; Substation</a>.</td>
+        <td><span class="pill r2">Not met</span></td></tr>
+      <tr><td class="mono"><b>P3</b></td><td>A demonstrated catch</td>
+        <td>Satisfied over the evidence window.</td>
+        <td><span class="pill">Met</span></td></tr>
+      <tr><td class="mono"><b>P4</b></td><td>Reviewer-side health</td>
+        <td>No evidence supplied.</td>
+        <td><span class="pill unknown">Not yet evaluable</span></td></tr>
+      <tr><td class="mono"><b>P5</b></td><td>Automatic Tier 2 demotion in force</td>
+        <td>Deferred to phase 2: presupposes F17, which is not in MVP1.</td>
+        <td><span class="pill unknown">Not yet evaluable</span></td></tr>
+    </table>
+    <div class="note">P2 is a live link to the exact prediction that blocks it. In the
+      pilot, P2's text names a miss the reader has no way to reach.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Precision &mdash; shown, and explicitly not the gate</div>
+    <div class="kv"><span class="k">Precision (over concluded items only)</span><span class="v">0.9123 (52 of 57)</span></div>
+    <div class="kv"><span class="k">Abstained &mdash; a third figure, not in the denominator</span>
+      <span class="v">6 items</span></div>
+    <div class="kv"><span class="k">Label source</span><span class="v">acceptance_derived</span></div>
+    <div class="refused">
+      <b>Why the precision figure is not the gate.</b> Labels come from reviewer
+      acceptance, so this measures agreement with the reviewer, not correctness, and rises
+      as reviewer scrutiny falls. The original gate promoted a skill at 95% precision on
+      accepted proposals; that gate is inverted &mdash; a reviewer who accepts everything
+      scores the skill at 100%, and the worse the deference, the faster the gate opens.
+      P1 (independent labels) and P5 (automatic demotion) are the mechanics that would fix
+      it, and both presuppose F17.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Monitors &mdash; the product marking its own homework</div>
+    <table class="t">
+      <tr><th>Monitor</th><th>Window</th><th>Reading</th><th>State</th></tr>
+      <tr><td>Queue miss rate against probe band</td><td>2026-04 &rarr; 2026-06</td>
+        <td>Within band</td><td><span class="pill">In control</span></td></tr>
+      <tr><td>Routed volume trend</td><td>12 periods</td><td>19 &rarr; 8 routed</td>
+        <td><span class="pill">In control</span></td></tr>
+      <tr><td>Abstention rate</td><td>2026-06</td><td>6 of 63</td>
+        <td><span class="pill unknown">Not calibrated &mdash; no claim made</span></td></tr>
+      <tr><td>Reviewer-side health (P4 input)</td><td>&mdash;</td>
+        <td><b>Could not be read</b></td><td><span class="pill unknown">Unknown</span></td></tr>
+    </table>
+    <div class="note">Governance rows render &ldquo;this could not be read&rdquo; rather than
+      a zero. A zero is a measurement; an unread monitor is not.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Runs by this agent this period</div>
+    <table class="t">
+      <tr><th>Run</th><th>Completed</th><th>Detections</th><th>Coverage</th><th>Dataset</th></tr>
+      <tr><td><a href="p9-run.html">RUN-2026-06-0412</a></td><td>03 Jul 18:42 UTC</td>
+        <td class="n">214</td><td>70% &mdash; partial</td>
+        <td><a href="p11-catalogue.html">gl_balances vFIXTURE-2026.06.03-a</a></td></tr>
+      <tr><td><a href="p9-run.html">RUN-2026-06-0398</a></td><td>02 Jul 06:20 UTC</td>
+        <td class="n">198</td><td>70% &mdash; partial</td>
+        <td><a href="p11-catalogue.html">gl_balances vFIXTURE-2026.06.02-a</a></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Principals this agent runs as</div>
+    <div class="kv"><span class="k">Agent principal</span><span class="v">agent.crossperiod-surveillance</span></div>
+    <div class="kv"><span class="k">May approve</span><span class="v">nothing &mdash; author &ne; approver is enforced at the broker</span></div>
+    <div class="kv"><span class="k">May post</span><span class="v">nothing &mdash; this system never posts</span></div>
+    <div class="kv"><span class="k">Datasets readable</span><span class="v">3 certified</span></div>
+    <div class="note">The inventory half of the pilot&rsquo;s <code>/inventory</code>, kept
+      as a property of the agent it describes.</div>
+  </div>
+</main>
+</div></body></html>

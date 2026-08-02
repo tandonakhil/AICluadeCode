@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Export set 2026-06 — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p4-close-controller.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
+  <a href="p5-approvals.html" class="navitem on" aria-current="page"><span>Approvals</span><span class="cnt">3</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p4-close-controller.html">Close</a> &rsaquo;
+    <a href="p5-approvals.html">Approvals</a> &rsaquo; Export set 2026-06</div>
+  <h1 class="pagehd">Export set &mdash; 2026-06</h1>
+
+  <div class="confirm">
+    <div class="hd">Approved. APR-2026-06-0034 joined the export set.</div>
+    54100 Transmission O&amp;M Expense, reclassification CC-4420 &rarr; CC-4180,
+    <span class="mono">$86,340.00</span>. Approved by D. Okafor, 03 Jul 2026 21:14 UTC.
+    Forward prediction &ldquo;clears by 2026-07&rdquo; is now armed.
+    <p style="margin-top:9px">
+      <a class="btn" href="p5-approvals.html">Back to approvals (3 left)</a>
+      <a class="btn" href="p13-dossier.html">Open the dossier for this decision</a>
+      <a class="btn" href="#">Undo &mdash; 4:58 remaining</a>
+    </p>
+    <div class="note">This is the step J2 could not reach in the pilot: the approved
+      resolution becoming an export line, with the connection visible.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">What is in the export &mdash; 4 lines</div>
+    <table class="t">
+      <tr><th>Item</th><th>Resolution</th><th class="n">Amount</th><th>Approved by</th><th>Posts?</th></tr>
+      <tr><td><a href="p3-item.html">54100 Transmission O&amp;M</a></td><td>R3 reclassification</td>
+        <td class="n">86,340.00</td><td>D. Okafor &mdash; just now</td><td><span class="pill r2">Yes</span></td></tr>
+      <tr><td><a href="p3-item.html">18300 Deferred Storm Restoration</a></td><td>R4 accrual correction</td>
+        <td class="n">412,500.00</td><td>D. Okafor</td><td><span class="pill r2">Yes</span></td></tr>
+      <tr><td><a href="p3-item.html">11500 Bank Clearing</a></td><td>R1 accepted and explained</td>
+        <td class="n">228,715.00</td><td>D. Okafor</td><td><span class="pill">No</span></td></tr>
+      <tr><td><a href="p3-item.html">19900 Suspense</a></td><td>R2 data-side fix</td>
+        <td class="n">1,204.06</td><td>D. Okafor</td><td><span class="pill">No</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="lbl">What is <i>not</i> in the export, and why &mdash; rendered at the same weight</div>
+    <table class="t">
+      <tr><th>Item</th><th>Why it is excluded</th><th>Is this an omission?</th></tr>
+      <tr><td>16200 CWIP &ndash; Substation</td>
+        <td>Forward prediction from 2026-05 was missed and is still unexplained.</td>
+        <td>No &mdash; withheld by a control</td></tr>
+      <tr><td>13800 Intercompany Receivable</td>
+        <td><b>Abstention.</b> The system declined to conclude; the counterparty leg is in a
+          dataset that was not selected. There is nothing to export.</td>
+        <td>No &mdash; and this is not a statement that nothing is wrong</td></tr>
+      <tr><td>29100 &middot; 31200 &middot; 31300</td>
+        <td>Never scanned. No conclusion, negative or otherwise, covers them.</td>
+        <td>No &mdash; nothing looked</td></tr>
+      <tr><td>Boundary check A9 &mdash; FX/CTA arithmetic</td>
+        <td>Could not run: dataset dw.fx_revaluation unavailable. Not run is not a pass.</td>
+        <td>No &mdash; and it carries no coverage figure</td></tr>
+    </table>
+    <div class="note">The exclusion table is the same size and weight as the inclusion
+      table, deliberately. An export that shows only what it contains invites the reader
+      to treat the rest as clean.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Coverage this export can speak for</div>
+    <div class="covstrip" role="img" aria-label="Population strip: 7 of 10 declared members scanned">
+      <div class="covseg scanned" style="flex:7">7 scanned</div>
+      <div class="covseg gap hatch" style="flex:1">29100</div>
+      <div class="covseg gap hatch" style="flex:1">31200</div>
+      <div class="covseg gap hatch" style="flex:1">31300</div>
+    </div>
+    <div class="covlegend"><span><b class="mono">70%</b> of 10 declared members</span>
+      <span>3 segments unscanned, named above</span></div>
+    <div class="partial">
+      <b>Partial &mdash; 70% coverage.</b> This export cannot support a negative assurance
+      conclusion for 2026-06.
+      <span class="nodismiss">Non-dismissable, and reproduced verbatim inside the export
+        file itself, not only on this screen.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Egress</div>
+    <div class="refused">
+      <b>This export cannot be authorised in this build.</b>
+      The CUEC probe cannot execute, so authorisation would fall back to stored pass state
+      &mdash; which is the explicitly forbidden fallback. Disclosed here, at the point of
+      egress, rather than discovered after download.
+      <div class="note" style="margin-top:8px">Retention stamp 2033-07-03.
+        <b style="color:var(--risk-2)">Immutable retention is not enforced in this
+        build.</b> The stamp is a date, not an enforcement, and renders adjacent to the
+        date because a date reads as enforcement to every reader who has not opened the
+        register &mdash; and the reader who most needs to know is the controller taking
+        this to an audit committee.</div>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn">Download the export &mdash; unauthorised, disclosed</button>
+      <a class="btn" href="p6-period-record.html">Open the 2026-06 period record</a>
+    </div>
+  </div>
+</main>
+</div></body></html>

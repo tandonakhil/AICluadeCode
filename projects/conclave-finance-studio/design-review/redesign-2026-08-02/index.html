@@ -15,14 +15,219 @@
     verbatim from the pilot&rsquo;s own stylesheet; nothing has been restyled.
   </div>
   <div class="qtools">
+    <a class="chip on" href="#visual" style="background:#8A5A17;border-color:#8A5A17;color:#FBF3E4">0 &middot; The visual pass &mdash; start here</a>
     <a class="chip on" href="#diagnosis">1 &middot; Diagnosis</a>
     <a class="chip on" href="#journeys">2 &middot; Journey maps</a>
     <a class="chip on" href="#ia">3 &middot; Information architecture</a>
-    <a class="chip on" href="#proto">4 &middot; Prototype</a>
-    <a class="chip on" href="#constraints">5 &middot; The six constraints</a>
-    <a class="chip on" href="#type">6 &middot; The typography call</a>
-    <a class="chip on" href="#gaps">7 &middot; Gap list</a>
+    <a class="chip on" href="#walk">4 &middot; Walk the four journeys</a>
+    <a class="chip on" href="#screens">5 &middot; Every screen</a>
+    <a class="chip on" href="#compose">6 &middot; The composition fix</a>
+    <a class="chip on" href="#beforeafter">7 &middot; Before / after</a>
+    <a class="chip on" href="#edges">8 &middot; The eight missing edges</a>
+    <a class="chip on" href="#dark">9 &middot; Dark theme</a>
+    <a class="chip on" href="#type">10 &middot; Typography, applied</a>
+    <a class="chip on" href="#constraints">11 &middot; The six constraints</a>
+    <a class="chip on" href="#gaps">12 &middot; Gap list &amp; the decision</a>
   </div>
+  <div class="verdict new" style="margin-top:14px">
+    <h3>Second pass &mdash; built out to decide from</h3>
+    You answered the IA question with <b>&ldquo;show me more first&rdquo;</b>. This page has
+    been extended, not replaced, so the URL you already have still works.
+    Added: <b>all four journeys walkable click by click</b> (including the two that cannot
+    be walked in the pilot at all), <b>every screen in the proposed IA</b> including the
+    ones being demoted so you can see what is lost, the <b>composition fix</b> made
+    concrete on the 3,483px offender, a <b>side-by-side against the real pilot</b>, the
+    <b>eight missing graph edges working</b>, <b>dark theme verified</b> rather than
+    assumed, and the <b>typography ruling applied</b> rather than proposed.
+    <b>19 screens, 0 broken links, 0 dead ends.</b>
+  </div>
+</div>
+
+<!-- ================= 0 VISUAL PASS ================= -->
+<div class="rvsec" id="visual" style="border-top:0;padding-top:6px">
+<h2 style="font-size:22px">0 &middot; The visual pass &mdash; &ldquo;Paper &amp; Seal, at close&rdquo;</h2>
+<p class="pagesub">Conclave brand, Apple pro-app discipline. The screens below are the
+three that decide it &mdash; the merged queue, the finding, and Approvals &mdash; plus the
+journey maps drawn as designed artefacts rather than developer diagrams.
+<b>Every one renders in both themes.</b> Everything from &sect;1 onward is the structural
+work these are built on; it is unchanged and still stands.</p>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>Where the brand came from</h3>
+    Read from <code>projects/conclave-marketing/dev/app/static/css/site.css</code>, not from
+    a summary. The live palette is <b>&ldquo;Paper &amp; Seal&rdquo;</b>, human-approved
+    2026-07-19, and it is richer than the token list I was handed:
+    <div class="card" style="margin-top:10px">
+      <div class="kv"><span class="k">Paper &mdash; page ground</span><span class="v">#F7F5F0 &middot; dark #161513</span></div>
+      <div class="kv"><span class="k">Ink</span><span class="v">#1D1C1A &middot; dark #EDEAE2</span></div>
+      <div class="kv"><span class="k">Teal &mdash; links and action</span><span class="v">#0B6B60 &middot; dark #3FC9B9</span></div>
+      <div class="kv"><span class="k">Gold &mdash; <b>human decisions</b></span><span class="v">#8A5A17 &middot; dark #E0A94E</span></div>
+      <div class="kv"><span class="k">Rust &mdash; <b>the honest rejection</b></span><span class="v">#A8432F &middot; dark #E07A5F</span></div>
+      <div class="kv"><span class="k">Cream &mdash; <b>artifact cards</b></span><span class="v">#FBF3E4 &middot; dark #242019</span></div>
+      <div class="kv"><span class="k">Hairline &mdash; rules only, never text</span><span class="v">#D8D4CA</span></div>
+      <div class="kv"><span class="k">Serif</span><span class="v">Georgia / Iowan Old Style</span></div>
+    </div>
+    <div class="note"><b>The brand already carries this product&rsquo;s meanings.</b> Gold
+    is defined in the marketing CSS as <i>human decisions</i>; rust as <i>the honest
+    rejection</i>; cream as <i>artifact cards</i>. Those are not decorations I am borrowing
+    &mdash; they are the exact semantics this product needs, and I have used them for
+    exactly those things and nothing else.</div>
+  </div>
+
+  <div class="verdict">
+    <h3>The green conflict &mdash; resolved by dropping it, and the brand loses nothing</h3>
+    <p>I was told the brand contains a green (<code>#78c48a</code>) and that the product
+    rule wins. Both true, but the record is more specific and it makes the resolution
+    cleaner:</p>
+    <p><b>The core Paper &amp; Seal palette has no green at all.</b> The only green in the
+    marketing CSS is <code>--c-ship</code> (<code>#1E7A46</code> light /
+    <code>#6FCF8F</code> dark) &mdash; one of <i>six</i> team-family accents that
+    colour-code agent families on the marketing <code>/who</code> page. It is not a status
+    colour. It has never meant &ldquo;passed&rdquo; anywhere in the brand.</p>
+    <p><b>So it is dropped entirely, not substituted.</b> There is no green token in
+    <code>apple.css</code> in either theme. Nothing had to be recoloured to replace it,
+    because it carried no meaning this product needs. Verified by grep across the whole
+    visual layer: the only occurrence of the word is the comment explaining its absence.</p>
+    <div class="note">Stated explicitly, as instructed, rather than handled quietly. The
+    thing worth noticing is that the brand and the product rule were never actually in
+    conflict &mdash; the conflict was an artefact of the summary.</div>
+  </div>
+</div>
+
+<div class="verdict keep">
+  <h3>Pro-app, not marketing page &mdash; the discipline I actually applied</h3>
+  <div class="two" style="margin-top:8px">
+    <div>
+      <p><b>Colour only where it carries meaning.</b> Four families, one meaning each:
+      <b>rust</b> = something is wrong (one hue, three weights &mdash; elevated, high,
+      blast radius); <b>gold</b> = a human decision or a human&rsquo;s forward promise;
+      <b>teal</b> = navigation and action; <b>slate</b> = we could not establish it, or we
+      refuse to. Slate is deliberately the only cool hue in a warm palette, so
+      &ldquo;unknown&rdquo; is structurally other before it is read.</p>
+      <p><b>Hairlines instead of boxes.</b> Tables and lists are separated by 1px rules on
+      <code>--hairline</code>, which the brand explicitly reserves for decorative rules
+      that never carry text. Cards appear only where a real container exists.</p>
+      <p><b>One visible alignment grid</b> at 28px, held by the context bar, the page head,
+      every list row and every panel.</p>
+    </div>
+    <div>
+      <p><b>A real type scale, seven sizes, nothing else:</b> 12 · 13 · 15 · 17 · 21 · 28 ·
+      40. The pilot used at least eleven sizes including 10, 10.5, 11.5, 12.5, 13.5 and
+      14.5.</p>
+      <p><b>Density that reads as calm, not sparse.</b> This was the real risk in the
+      brief: a naive Apple consumer treatment produces a beautiful page that holds six
+      rows. The queue rows are 14px vertical padding with hairline separation and a 3px
+      severity rail &mdash; Finder list view, not a marketing hero. Six rows fit above the
+      fold with the coverage strip; forty would still scan.</p>
+      <p><b>The serif has one job.</b> Georgia carries the product&rsquo;s own voice
+      &mdash; refusals and abstentions only. &ldquo;This is not a statement that the close
+      is clean&rdquo; is set in serif because it is the system speaking about its own
+      limits, and that is a different register from a data label.</p>
+    </div>
+  </div>
+</div>
+
+<div class="verdict new">
+  <h3>The typography inversion, fixed rather than made prettier</h3>
+  <p>You flagged the risk that a slick redesign keeps the inversion. Here is the measured
+  before and after. The pilot rendered <b>close-clock staleness &mdash; the qualifier that
+  determines whether any other figure on the screen may be relied on &mdash; at 10.5px,
+  the smallest text on every screen</b>, while the risk figure ran at 42px.</p>
+  <table class="t">
+    <tr><th>Element</th><th class="n">Pilot</th><th class="n">This pass</th><th>Change</th></tr>
+    <tr><td><b>Close-clock staleness value</b></td><td class="n" style="color:var(--risk-2)"><b>10.5px</b></td>
+      <td class="n"><b>15px, semibold, rust</b></td><td>No longer the smallest text on any screen &mdash; it is now larger than every label around it</td></tr>
+    <tr><td>Coverage / tier / certification qualifiers</td><td class="n" style="color:var(--risk-2)">10.5&ndash;11.5px</td>
+      <td class="n">15px</td><td>All reliability qualifiers share one floor</td></tr>
+    <tr><td>Primary navigation</td><td class="n" style="color:var(--risk-2)">10px computed</td>
+      <td class="n">15px</td><td>+50%</td></tr>
+    <tr><td>Table headers / micro-labels</td><td class="n">10&ndash;10.5px</td><td class="n">12px</td>
+      <td>The floor, and they never carry a qualifier</td></tr>
+    <tr><td>Body and table cells</td><td class="n">13px</td><td class="n">15px</td><td></td></tr>
+    <tr><td>The risk figure</td><td class="n">42px</td><td class="n">40px</td>
+      <td>Still dominant, but the qualifier-to-assertion ratio falls from <b>4.0&times; to 2.7&times;</b></td></tr>
+  </table>
+  <div class="note">The ratio is the point. The product&rsquo;s whole claim is that it does
+  not assert what it cannot substantiate; rendering the assertion four times the size of
+  the substantiation states the opposite in the one language a tired reader processes
+  without deciding to. This is the ruling I made last pass, now built rather than
+  proposed.</div>
+</div>
+
+<h3 style="margin-top:30px;font-size:17px">The journey maps, as designed artefacts</h3>
+<p class="pagesub">Persona, trigger, stakes, every step, where it stops today, what changes.
+On the brand&rsquo;s cream artifact ground, with the question set in the brand serif.
+Steps are clickable &mdash; they navigate into the prototype.</p>
+<div class="frame">
+  <div class="fhd"><b>Journey maps &mdash; all four, both themes</b>
+    <span><a href="v2-journeys.html" target="_blank">Open full screen &rarr;</a> &middot;
+    <a href="v2-journeys.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="v2-journeys.html" height="1500" title="Journey maps"></iframe>
+</div>
+
+<h3 style="margin-top:30px;font-size:17px">The three screens that decide it</h3>
+<div class="frame">
+  <div class="fhd"><b>My queue</b> &mdash; the merged work surface. Compare against the six blue hyperlinks in &sect;7.
+    <span><a href="v2-queue.html" target="_blank">Open &rarr;</a> &middot;
+    <a href="v2-queue.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="v2-queue.html" height="1250" title="Queue, visual pass"></iframe>
+</div>
+<div class="frame">
+  <div class="fhd"><b>The finding</b> &mdash; evidence on cream artifact ground; gold on the forward promise; the eligible/ineligible split at full contrast.
+    <span><a href="v2-item.html" target="_blank">Open &rarr;</a> &middot;
+    <a href="v2-item.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="v2-item.html" height="1500" title="Finding, visual pass"></iframe>
+</div>
+<div class="frame">
+  <div class="fhd"><b>Approvals</b> &mdash; the deliberate act, in the brand&rsquo;s own colour for human decisions.
+    <span><a href="v2-approvals.html" target="_blank">Open &rarr;</a> &middot;
+    <a href="v2-approvals.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="v2-approvals.html" height="1500" title="Approvals, visual pass"></iframe>
+</div>
+<div class="frame">
+  <div class="fhd"><b>Close overview</b> &mdash; the call-list, and the refusal in the brand serif.
+    <span><a href="v2-close.html" target="_blank">Open &rarr;</a> &middot;
+    <a href="v2-close.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="v2-close.html" height="1100" title="Close, visual pass"></iframe>
+</div>
+
+<h3 style="margin-top:30px;font-size:17px">Both themes, side by side</h3>
+<div class="two">
+  <div class="frame"><div class="fhd"><b>Queue &mdash; light on warm paper</b></div>
+    <iframe src="v2-queue.html" height="620" title="Queue light"></iframe></div>
+  <div class="frame"><div class="fhd"><b>Queue &mdash; dark</b></div>
+    <iframe src="v2-queue.html?theme=dark" height="620" title="Queue dark"></iframe></div>
+</div>
+<div class="two" style="margin-top:16px">
+  <div class="frame"><div class="fhd"><b>Approvals &mdash; light</b> gold decision block</div>
+    <iframe src="v2-approvals.html?_=1#" height="620" title="Approvals light"></iframe></div>
+  <div class="frame"><div class="fhd"><b>Approvals &mdash; dark</b></div>
+    <iframe src="v2-approvals.html?theme=dark" height="620" title="Approvals dark"></iframe></div>
+</div>
+<div class="note"><b>Light on warm paper is the primary treatment</b>, not a light-theme
+afterthought. <code>#F7F5F0</code> is calmer at 11pm than the near-white the pilot uses and
+markedly calmer than a near-black, and it is Conclave&rsquo;s own ground. Dark is the same
+tokens from the brand&rsquo;s dark block, verbatim.</div>
+
+<div class="verdict">
+  <h3>What this visual pass does not yet cover &mdash; stated, not glossed</h3>
+  <ul style="margin:8px 0 0 18px;font-size:13.5px;line-height:1.6">
+    <li><b>Four screens are restyled, not nineteen.</b> Close, queue, finding and approvals
+      carry the Paper &amp; Seal treatment. The remaining fifteen (&sect;5 onward) are still
+      on the first-pass stylesheet. That was deliberate on your steer &mdash; a few that
+      look right beats a complete set of plain ones &mdash; but it means
+      <b>&sect;&sect;5&ndash;9 look like the old pass and should be read for structure, not
+      for finish</b>.</li>
+    <li><b>Contrast is designed, not measured.</b> Every pair I used is a brand pair the
+      marketing site already verified computationally at AA in both themes. My additions
+      &mdash; the rust severity ramp and the slate family &mdash; are designed against the
+      same grounds but have <b>not</b> been run through a checker. That is the UX suite's
+      job at the Test gate and I am not claiming it here.</li>
+    <li><b>No motion.</b> The brand has a <code>motion.css</code>; nothing here animates.</li>
+    <li><b>Desktop only</b>, per MVP1.</li>
+  </ul>
+</div>
 </div>
 
 <!-- ================= 1 DIAGNOSIS ================= -->
@@ -329,14 +534,334 @@ Primary navigation goes from eleven flat items to four task-ordered ones.</p>
 </div></div>
 </div>
 
-<!-- ================= 4 PROTOTYPE ================= -->
+<!-- ================= 4 WALKTHROUGHS ================= -->
+<div class="rvsec" id="walk">
+<h2 style="font-size:20px">4 &middot; Walk the four journeys &mdash; click by click</h2>
+<p class="pagesub">Each ribbon below is a real click path through the prototype. Start at
+step 1 and keep clicking; the prototype navigates like the product would. Steps marked
+with a dashed blue border <b>do not exist in the pilot in any form</b>.
+Append <code>?theme=dark</code> to any step to walk the whole journey in dark theme &mdash;
+the setting follows you from click to click.</p>
+
+<div class="card">
+  <div class="lbl">J1 &mdash; staff accountant &middot; omission detected &rarr; investigate &rarr; resolve &rarr; it leaves my queue</div>
+  <div class="walk">
+    <a href="p1-close-staff.html" class="new"><b>Step 1 &mdash; new</b>Close cockpit<br><span class="sub">&ldquo;6 routed to you&rdquo;</span></a>
+    <a href="p2-queue.html"><b>Step 2</b>My queue, 6 items<br><span class="sub">columns, sort, filters</span></a>
+    <a href="p3-item.html"><b>Step 3</b>The finding<br><span class="sub">h1 names the object</span></a>
+    <a href="p3-item.html#"><b>Step 4</b>Choose R4, set the forward disposition</a>
+    <a href="p3-item-saved.html" class="new"><b>Step 5 &mdash; new</b>Resolution recorded<br><span class="sub">confirmation + undo</span></a>
+    <a href="p2-queue-after.html" class="new"><b>Step 6 &mdash; new</b>Queue of 5<br><span class="sub">struck, badge moved</span></a>
+  </div>
+  <div class="note">The pilot walks steps 1&ndash;4 badly and then stops dead: no
+    confirmation, no removal, no badge change, no route to the record it just created.
+    Steps 5 and 6 are the smallest build on the gap list and the one the staff accountant
+    feels six times a night.</div>
+</div>
+
+<div class="card">
+  <div class="lbl">J2 &mdash; controller &middot; approve a reclass &rarr; it becomes an export &nbsp;
+    <span class="pill r2">Cannot be walked at all in the pilot</span></div>
+  <div class="walk">
+    <a href="p4-close-controller.html" class="new"><b>Step 1 &mdash; new</b>Close, controller<br><span class="sub">&ldquo;4 awaiting your approval&rdquo;</span></a>
+    <a href="p5-approvals.html" class="new"><b>Step 2 &mdash; new</b>Approvals queue<br><span class="sub">posts-to-ledger first</span></a>
+    <a href="p5a-approval-detail.html" class="new"><b>Step 3 &mdash; new</b>Approval detail<br><span class="sub">the only Approve control</span></a>
+    <a href="p5b-export.html" class="new"><b>Step 4 &mdash; new</b>Approved &rarr; export set<br><span class="sub">and what is excluded</span></a>
+    <a href="p13-dossier.html"><b>Step 5</b>The dossier it produced</a>
+  </div>
+  <div class="note">Every step here is net-new. The constraint &ldquo;no Approve button on
+    the Review queue&rdquo; is still honoured absolutely &mdash; there is no Approve control
+    on <a href="p2-queue.html">My queue</a> or on <a href="p3-item.html">the finding</a>.
+    It exists on exactly one screen, reached deliberately, and it is typed rather than
+    clicked.</div>
+</div>
+
+<div class="card">
+  <div class="lbl">J3 &mdash; controller &middot; was last period&rsquo;s close clean? &nbsp;
+    <span class="pill r2">Cannot even be started in the pilot</span></div>
+  <div class="walk">
+    <a href="p4-close-controller.html"><b>Step 1</b>Close, controller</a>
+    <a href="p6-period-record.html" class="new"><b>Step 2 &mdash; new</b>Period record 2026-05<br><span class="sub">period selector in the context bar</span></a>
+    <a href="p6-period-record.html#dueback" class="new"><b>Step 3 &mdash; new</b>Did we keep our word?<br><span class="sub">predictions that came due</span></a>
+    <a href="p15-dispositions.html"><b>Step 4</b>The one that missed</a>
+    <a href="p10-agent.html"><b>Step 5</b>Why it blocks P2</a>
+    <a href="p5b-export.html"><b>Step 6</b>Take it to an auditor</a>
+  </div>
+  <div class="note">Step 2 leads with the refusal: <i>&ldquo;This is a record of what was
+    examined and what was concluded. It is not a statement that the period was
+    clean.&rdquo;</i> A20 and A21 rendered at the exact moment a user asks for the thing the
+    product refuses &mdash; a far stronger place for them than a page nobody visits.
+    Step 5 is the payoff of the whole F32 control: a missed prediction is what stops an
+    agent being promoted.</div>
+</div>
+
+<div class="card">
+  <div class="lbl">J4 &mdash; FP&amp;A analyst &middot; why did Transmission O&amp;M move $86k? &nbsp;
+    <span class="pill unknown">Pending a scope ruling &mdash; prototyped, not claimed</span></div>
+  <div class="walk">
+    <a href="p7-inquiry.html" class="new"><b>Step 1 &mdash; new</b>Ask &rarr; Inquire<br><span class="sub">third persona in the switch</span></a>
+    <a href="p7-inquiry.html#" class="new"><b>Step 2 &mdash; new</b>The substantiable half<br><span class="sub">decomposition to the posting</span></a>
+    <a href="p12-refusals.html"><b>Step 3</b>Meet A22<br><span class="sub">&lsquo;why&rsquo; is where this stops</span></a>
+    <a href="p3-item.html"><b>Step 4</b>The open finding on 54100</a>
+    <a href="p5a-approval-detail.html"><b>Step 5</b>The reclass someone proposed on the same 14 postings</a>
+  </div>
+  <div class="note"><b>This journey depends on a scope decision that is not mine to
+    make.</b> It is prototyped rather than omitted because you cannot rule on an FP&amp;A
+    surface you have not seen. If the ruling is &ldquo;out&rdquo;, delete these five steps;
+    nothing else in the redesign depends on them. If it is &ldquo;in&rdquo;, this is the
+    only shape it can take without breaching A19 or A22.</div>
+</div>
+</div>
+
+<!-- ================= 5 EVERY SCREEN ================= -->
+<div class="rvsec" id="screens">
+<h2 style="font-size:20px">5 &middot; Every screen in the proposed IA &mdash; including what is demoted</h2>
+<p class="pagesub">Nineteen screens. The demoted and dissolved ones are shown too, in
+slate, so you can see <b>what is lost as well as what is gained</b> &mdash; the answer is
+that nothing is lost, only relocated.</p>
+
+<div class="lbl" style="margin-top:16px">Primary &mdash; the four nav items</div>
+<div class="grid">
+  <a class="gcard new" href="p1-close-staff.html"><div class="gt">Close &mdash; staff</div>
+    <div class="gr">/close</div><div class="gd">NEW. Default landing. Per-persona call-list; every row is a task with a destination.</div></a>
+  <a class="gcard new" href="p4-close-controller.html"><div class="gt">Close &mdash; controller</div>
+    <div class="gr">/close</div><div class="gd">Same screen, same components, different call-list. Approvals and things that could not run come first.</div></a>
+  <a class="gcard" href="p2-queue.html"><div class="gt">My queue</div>
+    <div class="gr">/queue</div><div class="gd">Merges the work half of /exceptions with all of /review. Columns, sort, filters, saved views.</div></a>
+  <a class="gcard new" href="p2-queue-after.html"><div class="gt">My queue &mdash; after resolving</div>
+    <div class="gr">/queue</div><div class="gd">NEW state. Item struck, badge moved 6&rarr;5, undo live.</div></a>
+  <a class="gcard" href="p3-item.html"><div class="gt">Finding detail</div>
+    <div class="gr">/queue/18300</div><div class="gd">Retained. h1 names the object; breadcrumb, prev/next; provenance fields are now links.</div></a>
+  <a class="gcard new" href="p3-item-saved.html"><div class="gt">Resolution recorded</div>
+    <div class="gr">/queue/18300</div><div class="gd">NEW. The confirmation the pilot has no equivalent of. Seven outbound edges.</div></a>
+  <a class="gcard new" href="p5-approvals.html"><div class="gt">Approvals queue</div>
+    <div class="gr">/approvals</div><div class="gd">NEW. The deliberate act finally given a home.</div></a>
+  <a class="gcard new" href="p5a-approval-detail.html"><div class="gt">Approval detail</div>
+    <div class="gr">/approvals/54100</div><div class="gd">NEW. The only Approve control in the product. Typed, not clicked. One item.</div></a>
+  <a class="gcard new" href="p5b-export.html"><div class="gt">Export set</div>
+    <div class="gr">/approvals/export</div><div class="gd">NEW. What is in it, what is excluded and why, at equal weight.</div></a>
+  <a class="gcard" href="p8-ask-detect.html"><div class="gt">Ask &mdash; Detect</div>
+    <div class="gr">/ask</div><div class="gd">Retained almost unchanged. One change: it is no longer the landing page for anyone.</div></a>
+  <a class="gcard new" href="p7-inquiry.html"><div class="gt">Ask &mdash; Inquire</div>
+    <div class="gr">/ask?mode=inquire</div><div class="gd">NET-NEW SCOPE. The FP&amp;A persona's only possible surface. Pending a ruling.</div></a>
+</div>
+
+<div class="lbl" style="margin-top:20px">Evidence &mdash; a section, not a screen</div>
+<div class="grid">
+  <a class="gcard new" href="p6-period-record.html"><div class="gt">Period record</div>
+    <div class="gr">/period/2026-05</div><div class="gd">NEW. The retrospective surface. Leads with the A20/A21 refusal.</div></a>
+  <a class="gcard new" href="p9-run.html"><div class="gt">Run report</div>
+    <div class="gr">/evidence/run/RUN-…-0412</div><div class="gd">NEW HOME for the six analytical modules currently bolted onto /exceptions.</div></a>
+  <a class="gcard new" href="p10-agent.html"><div class="gt">Agent</div>
+    <div class="gr">/evidence/agents/…</div><div class="gd">NEW. Absorbs /readiness, /monitors and the agent half of /inventory, with a selector.</div></a>
+  <a class="gcard" href="p13-dossier.html"><div class="gt">Evidence dossier</div>
+    <div class="gr">/evidence/dossier/…</div><div class="gd">Retained, with the four back-edges it never had.</div></a>
+</div>
+
+<div class="lbl" style="margin-top:20px">Demoted, dissolved or relocated &mdash; shown so you can judge the loss</div>
+<div class="grid">
+  <a class="gcard demoted" href="p11-catalogue.html"><div class="gt">Datasets (was /catalogue)</div>
+    <div class="gr">Evidence &rsaquo; Datasets</div><div class="gd">DEMOTED off primary nav. Real entry point is the Ask dataset picker, which already linked here. Nothing removed.</div></a>
+  <a class="gcard demoted" href="p12-refusals.html"><div class="gt">What we refuse to do</div>
+    <div class="gr">Evidence &rsaquo; Refusals</div><div class="gd">KEPT in global nav per the gate-5 argument. Now every refusal links to a live example of itself.</div></a>
+  <a class="gcard demoted" href="p14-probe-history.html"><div class="gt">My probe history</div>
+    <div class="gr">Identity menu</div><div class="gd">MOVED out of primary nav. A product that refuses per-person scoring (A24) should not advertise a scoreboard beside the work.</div></a>
+  <a class="gcard demoted" href="p15-dispositions.html"><div class="gt">Dispositions</div>
+    <div class="gr">A filter on My queue</div><div class="gd">DISSOLVED into three destinations, each closer to the moment it matters. Shown here so you can see the cost, which is nothing.</div></a>
+</div>
+<div class="note"><b>/inventory and /monitors have no card of their own</b> because they are
+fully absorbed by the <a href="p10-agent.html">agent page</a> &mdash; monitoring an agent
+and judging its readiness are the same question asked twice, and an inventory is something
+you arrive at from a thing, not something you navigate to.</div>
+</div>
+
+<!-- ================= 6 COMPOSITION ================= -->
+<div class="rvsec" id="compose">
+<h2 style="font-size:20px">6 &middot; The composition fix, made concrete on the worst offender</h2>
+<p class="pagesub">The finding I said matters more than the navigation:
+<code>/exceptions</code> is not a queue, it is a run report with a queue accidentally
+embedded in it. Splitting them makes both usable. <b>Nothing is cut</b> &mdash; every one
+of the six modules is present in full on the run report.</p>
+
+<table class="t">
+  <tr><th>Module on today&rsquo;s <code>/exceptions</code></th><th>Approx. height</th><th>Whose question is it?</th><th>New home</th></tr>
+  <tr><td><b>The work queue &mdash; 6 rows</b></td><td class="n">250px</td>
+    <td><b>Mine, tonight</b></td><td><a href="p2-queue.html">My queue &mdash; where it is the page</a></td></tr>
+  <tr><td>Abstentions</td><td class="n">190px</td><td>Mine, tonight</td>
+    <td><a href="p2-queue.html#abstentions">My queue, structurally apart</a></td></tr>
+  <tr><td>Warehouse-to-ERP fidelity (F26)</td><td class="n">640px</td><td>The run&rsquo;s</td>
+    <td><a href="p9-run.html#m1">Run report &sect;1</a></td></tr>
+  <tr><td>Five boundary checks</td><td class="n">560px</td><td>The run&rsquo;s</td>
+    <td><a href="p9-run.html#m2">Run report &sect;2</a></td></tr>
+  <tr><td>Coding anomalies (F33)</td><td class="n">490px</td><td>The run&rsquo;s</td>
+    <td><a href="p9-run.html#m3">Run report &sect;3</a></td></tr>
+  <tr><td>Backtest evidence</td><td class="n">380px</td><td>The <i>model&rsquo;s</i></td>
+    <td><a href="p9-run.html#m4">Run report &sect;4</a> &mdash; and repeated on <a href="p5a-approval-detail.html">the approval screen</a>, which is where a human takes responsibility for the model&rsquo;s output</td></tr>
+  <tr><td>A second held-out period, for contrast</td><td class="n">180px</td><td>The model&rsquo;s</td>
+    <td><a href="p9-run.html#m5">Run report &sect;5</a></td></tr>
+  <tr><td colspan="4"><b>Total 3,483px, of which the accountant&rsquo;s actual work is ~250px &mdash; about 7%.</b></td></tr>
+</table>
+
+<div class="verdict new">
+  <h3>Why this is not just tidying</h3>
+  The six relocated modules are all <b>true, useful and required by criteria</b>. That is
+  exactly why concatenation happened: no single one of them is wrong to show. What is wrong
+  is showing them <i>to a person whose job right now is to work six items</i>, above the
+  fold of the thing they came for. Giving the run an object of its own is what makes the
+  criteria satisfiable without stacking &mdash; and it creates the run&rarr;finding and
+  finding&rarr;run edges that do not exist today as a side effect.
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>My queue &mdash; when the queue is the page</b>
+    <a href="p2-queue.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p2-queue.html" height="1100" title="My queue"></iframe>
+</div>
+<div class="frame">
+  <div class="fhd"><b>Run report &mdash; the six modules, in full, on the object that owns them</b>
+    <a href="p9-run.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p9-run.html" height="1400" title="Run report"></iframe>
+</div>
+</div>
+
+<!-- ================= 7 BEFORE / AFTER ================= -->
+<div class="rvsec" id="beforeafter">
+<h2 style="font-size:20px">7 &middot; Before and after, on the two worst screens</h2>
+<p class="pagesub"><b>&ldquo;Before&rdquo; is not a mock-up of the pilot &mdash; it is the
+pilot.</b> Those are the actual rendered captures from <code>test-agent</code>&rsquo;s UX
+suite run at 1440px on 2026-08-02, the same build the human opened. Scroll the left panes.</p>
+
+<div class="cmp">
+  <div class="before">
+    <div class="chd"><b>BEFORE &mdash; the real <code>/review</code></b>
+      The controller&rsquo;s primary work surface, as it renders today</div>
+    <div class="shot scroll"><img src="../../test-evidence/ux-review-desktop-1440-2026-08-02.png"
+      alt="The pilot's /review screen: a 300px probe essay above a bulleted list of six blue hyperlinks"></div>
+    <div class="cft">A ~300px essay on the probe programme, then <b>six blue hyperlinks in a
+      bulleted list</b>. No risk. No amount. No age. No state. No sort. No filter. No
+      columns. Two items append the words &ldquo;not approvable by you&rdquo; with no
+      indication of what <i>is</i> actionable. The rest of the viewport is empty.</div>
+  </div>
+  <div class="after">
+    <div class="chd"><b>AFTER &mdash; My queue</b> Same six items, same design system</div>
+    <div class="shot"><iframe src="p2-queue.html" title="Proposed queue"></iframe></div>
+    <div class="cft">Seven columns, risk-banded left bars, sorted by risk then amount,
+      filter chips including &ldquo;predictions due back&rdquo;. Abstentions structurally
+      apart below, never folded in. The probe essay is a collapsed disclosure at the foot
+      &mdash; read once, then it stays shut. <a href="p2-queue.html" target="_blank">Open full &rarr;</a></div>
+  </div>
+</div>
+
+<div class="cmp">
+  <div class="before">
+    <div class="chd"><b>BEFORE &mdash; the real <code>/exceptions</code></b>
+      3,483px tall; scroll it and count how far the work is from the top</div>
+    <div class="shot scroll"><img src="../../test-evidence/ux-exceptions-desktop-1440-2026-08-02.png"
+      alt="The pilot's /exceptions screen: 3,483px stacking seven unrelated analytical modules"></div>
+    <div class="cft">Four banners, then a six-row queue, then fidelity, then boundary
+      checks, then coding anomalies, then backtest evidence, then a second held-out period.
+      <b>Seven unrelated modules on one page.</b> The union of every acceptance criterion
+      that named this screen.</div>
+  </div>
+  <div class="after">
+    <div class="chd"><b>AFTER &mdash; split in two</b> Queue on the left of this comparison,
+      run report here</div>
+    <div class="shot"><iframe src="p9-run.html" title="Proposed run report"></iframe></div>
+    <div class="cft">The six analytical modules, in full, on the run object that owns them
+      &mdash; reachable from Close, from the queue, and from every finding&rsquo;s
+      provenance block. <a href="p9-run.html" target="_blank">Open full &rarr;</a></div>
+  </div>
+</div>
+</div>
+
+<!-- ================= 8 EDGES ================= -->
+<div class="rvsec" id="edges">
+<h2 style="font-size:20px">8 &middot; The eight missing graph edges, working</h2>
+<p class="pagesub">In the pilot, eight of twelve screens have <b>zero</b> outbound links
+other than the global nav, and a finding cannot reach the run, agent or dataset behind it.
+Click any row to traverse the edge in the prototype.</p>
+
+<div class="card">
+  <div class="edge"><a href="p3-item.html">Finding</a><span class="ar">&rarr;</span>
+    <a href="p9-run.html">The run that produced it</a><span class="st">was dead text</span></div>
+  <div class="edge"><a href="p3-item.html">Finding</a><span class="ar">&rarr;</span>
+    <a href="p10-agent.html">The agent that authored it</a><span class="st">was dead text</span></div>
+  <div class="edge"><a href="p3-item.html">Finding</a><span class="ar">&rarr;</span>
+    <a href="p11-catalogue.html">The dataset it was computed over</a><span class="st">was dead text</span></div>
+  <div class="edge"><a href="p13-dossier.html">Dossier</a><span class="ar">&rarr;</span>
+    <a href="p3-item.html">The finding it evidences</a><span class="st">no links at all</span></div>
+  <div class="edge"><a href="p3-item-saved.html">Resolution</a><span class="ar">&rarr;</span>
+    <a href="p5-approvals.html">The approval it created</a><span class="st">did not exist</span></div>
+  <div class="edge"><a href="p5b-export.html">Approval</a><span class="ar">&rarr;</span>
+    <a href="p5b-export.html">The export line it became</a><span class="st">did not exist</span></div>
+  <div class="edge"><a href="p15-dispositions.html">Forward prediction</a><span class="ar">&rarr;</span>
+    <a href="p10-agent.html">The readiness condition it blocks</a><span class="st">unreachable</span></div>
+  <div class="edge"><a href="p6-period-record.html">Period</a><span class="ar">&rarr;</span>
+    <a href="p9-run.html">Its runs, dossiers and agents</a><span class="st">no period object</span></div>
+  <div class="note" style="margin-top:12px"><b>Measured across the prototype:</b> every one
+    of the 19 screens carries between 13 and 26 outbound links, and a link check finds
+    <b>0 broken references and 0 dead-end screens</b>. The equivalent count for eight of
+    the pilot&rsquo;s twelve screens is zero.</div>
+</div>
+</div>
+
+<!-- ================= 9 DARK ================= -->
+<div class="rvsec" id="dark">
+<h2 style="font-size:20px">9 &middot; Dark theme &mdash; verified, not assumed</h2>
+<p class="pagesub">Last pass I disclosed the prototype was light-only and that dark was
+expected to work but unverified. It is now rendered. The
+<code>[data-theme=dark]</code> token block is <b>copied verbatim from the running
+pilot</b> &mdash; not re-derived &mdash; so this is the product&rsquo;s own dark palette.
+Append <code>?theme=dark</code> to any prototype URL; the setting follows every click.</p>
+
+<div class="two">
+  <div class="frame"><div class="fhd"><b>Close cockpit &mdash; dark</b>
+    <a href="p1-close-staff.html?theme=dark" target="_blank">Open &rarr;</a></div>
+    <iframe src="p1-close-staff.html?theme=dark" height="760" title="Close cockpit, dark"></iframe></div>
+  <div class="frame"><div class="fhd"><b>My queue &mdash; dark</b>
+    <a href="p2-queue.html?theme=dark" target="_blank">Open &rarr;</a></div>
+    <iframe src="p2-queue.html?theme=dark" height="760" title="Queue, dark"></iframe></div>
+</div>
+<div class="two" style="margin-top:16px">
+  <div class="frame"><div class="fhd"><b>Finding detail &mdash; dark</b> risk band, coverage strip, abstention grammar
+    <a href="p3-item.html?theme=dark" target="_blank">Open &rarr;</a></div>
+    <iframe src="p3-item.html?theme=dark" height="820" title="Finding, dark"></iframe></div>
+  <div class="frame"><div class="fhd"><b>Approval detail &mdash; dark</b> the inverted primary button
+    <a href="p5a-approval-detail.html?theme=dark" target="_blank">Open &rarr;</a></div>
+    <iframe src="p5a-approval-detail.html?theme=dark" height="820" title="Approval, dark"></iframe></div>
+</div>
+
+<div class="card">
+  <div class="lbl">What I checked in dark, and what I found</div>
+  <table class="t">
+    <tr><th>Element</th><th>Result</th></tr>
+    <tr><td>New nav count badges (<code>.cnt</code>) on <code>--surface-3</code></td>
+      <td>Legible. Active-state badge uses <code>--accent</code> on <code>--accent-bg</code>, matching the pilot's own pairing.</td></tr>
+    <tr><td>Primary button</td><td>Inherits the pilot&rsquo;s own dark override &mdash;
+      dark ink on the light-blue accent, because white on it is ~2.5:1. Carried over verbatim rather than re-derived.</td></tr>
+    <tr><td>Coverage strip gap segments</td><td>Hold. The gap carries <code>background-color</code>
+      (not the shorthand) plus the hatch, so the non-colour carrier survives in both themes.</td></tr>
+    <tr><td>Abstention, refusal, not-run and deferred grammars</td>
+      <td>All four remain distinguishable in dark, because each carries a <b>structural</b>
+      difference (dashed vs solid, border weight, left-bar width) and not only a hue.</td></tr>
+    <tr><td>&ldquo;No green&rdquo;</td><td>Holds. There is no green token in either theme.</td></tr>
+    <tr><td>New components (call-list, confirmation, eligible/ineligible split, queue rows)</td>
+      <td>All token-driven; no hardcoded colour except the one the pilot already overrides.</td></tr>
+  </table>
+  <div class="note">This is a <b>design</b> verification &mdash; rendered and read. It is not
+    a Test-gate contrast-ratio run; that belongs to the UX suite at the Test gate and is
+    not claimed here.</div>
+</div>
+</div>
+
+<!-- ================= 4 PROTOTYPE (original frames) ================= -->
 <div class="rvsec" id="proto">
-<h2 style="font-size:20px">4 &middot; Rendered prototype &mdash; clickable</h2>
-<p class="pagesub">Seven screens, all navigable from one another. Open any frame in its own
-tab to click through the journeys above. Built on the pilot&rsquo;s own tokens: the
-<code>:root</code> block is copied verbatim, so nothing here is a restyle.
-<b>Colour, risk grammar, coverage strip, abstention treatment and narrative behaviour are
-unchanged from the approved design.</b></p>
+<h2 style="font-size:20px">9b &middot; The original seven frames, kept for continuity</h2>
+<p class="pagesub">These were the frames in the first pass. Everything above supersedes and
+extends them; they are retained so the page you already reviewed is still here.
+Built on the pilot&rsquo;s own tokens: the <code>:root</code> block is copied verbatim, so
+nothing here is a restyle. <b>Colour, risk grammar, coverage strip, abstention treatment
+and narrative behaviour are unchanged from the approved design.</b></p>
 
 <div class="frame">
   <div class="fhd"><b>1 &middot; Close &mdash; staff accountant</b> &mdash; NEW. Default landing. Replaces landing on Ask.

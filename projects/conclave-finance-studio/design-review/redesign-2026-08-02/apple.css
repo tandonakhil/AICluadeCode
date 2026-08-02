@@ -1,0 +1,424 @@
+/* ==========================================================================
+   conclave-finance-studio — visual pass, 2026-08-02
+   "Paper & Seal, at close" — Conclave brand + Apple pro-app discipline.
+
+   BRAND: every token in the first block is lifted VERBATIM from
+   projects/conclave-marketing/dev/app/static/css/site.css (palette
+   "Paper & Seal", human-approved 2026-07-19). Not re-derived, not
+   approximated, not sampled from a screenshot.
+
+   THE GREEN: the brand's only green is --c-ship (#1E7A46 light / #6FCF8F
+   dark). It is not a status colour — it is one of six team-family accents
+   that colour-code agent families on the marketing /who page. It has no
+   status meaning to lose and no role in this product, so it is DROPPED
+   ENTIRELY rather than substituted. There is no green token below, in
+   either theme. The product rule wins and the brand loses nothing.
+
+   APPLE PRO-APP, not Apple marketing page. The reference is Numbers,
+   Xcode's inspectors and Finder list view: hairlines instead of boxes,
+   one visible alignment grid, colour only where it carries meaning,
+   density that reads as calm. A consumer-marketing treatment would produce
+   a beautiful page that holds six rows; a staff accountant has to scan a
+   queue at 11pm.
+   ========================================================================== */
+
+:root{
+  /* ---- Conclave brand, verbatim ---- */
+  --paper:#F7F5F0;      /* page ground */
+  --ink:#1D1C1A;        /* primary text, 15.63:1 on paper */
+  --teal:#0B6B60;       /* links and action, 5.87:1 */
+  --gold:#8A5A17;       /* HUMAN DECISIONS, 5.42:1 */
+  --cream:#FBF3E4;      /* artifact cards */
+  --rust:#A8432F;       /* the honest finding, 5.49:1 */
+  --muted:#5C5A54;      /* secondary text, 6.33:1 */
+  --hairline:#D8D4CA;   /* decorative rules only — never carries text */
+  --surface:#FFFFFF;
+  --line2:#ECE8DF;
+  --cta-text:#FBF3E4;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+
+  /* ---- Product semantics, layered on the brand ----
+     Four families, each meaning exactly one thing:
+       RUST  = something is wrong (severity ramp, one hue, three weights)
+       GOLD  = a human decision, or a human's forward promise
+       TEAL  = navigation and action
+       SLATE = we could not establish it, or we refuse to  */
+  --sev1:#A8432F; --sev1-bg:#FAEFEC;   /* elevated  */
+  --sev2:#93301F; --sev2-bg:#F7E7E2;   /* high      */
+  --sev3:#7A2314; --sev3-bg:#F2DDD7;   /* blast radius */
+  --slate:#48525C; --slate-bg:#EDEFF1; /* abstention / refusal / unknown */
+  --gold-bg:#FBF1DF;
+  --teal-bg:#E9F2F0;
+}
+
+[data-theme=dark]{
+  --paper:#161513; --ink:#EDEAE2; --teal:#3FC9B9; --gold:#E0A94E;
+  --cream:#242019; --rust:#E07A5F; --muted:#A5A099; --hairline:#3A3733;
+  --surface:#1E1C19; --line2:#2C2A25; --cta-text:#0E2A26;
+  --sev1:#E07A5F; --sev1-bg:#2C1E1A;
+  --sev2:#EE8F76; --sev2-bg:#33201B;
+  --sev3:#FFA98F; --sev3-bg:#3A241E;
+  --slate:#9BA6B2; --slate-bg:#1F2328;
+  --gold-bg:#2A2317; --teal-bg:#122A28;
+}
+
+/* ==========================================================================
+   TYPE SCALE — seven sizes, used consistently, nothing else.
+   12 · 13 · 15 · 17 · 21 · 28 · 40
+   FLOOR APPLIED (my gate ruling, now built rather than proposed):
+     · nothing persistently rendered below 12px
+     · navigation 15px  (was 10px computed in the pilot)
+     · any RELIABILITY QUALIFIER >= 15px — staleness, coverage, tier,
+       certification, abstention, not-run, retention non-enforcement.
+   The pilot rendered close-clock staleness at 10.5px and the risk number
+   at 42px: a 4x ratio, with the qualifier smallest on the page. Here the
+   qualifier is 15px semibold and the risk figure is 40px — 2.7x, and the
+   qualifier is never the smallest thing on any screen.
+   ========================================================================== */
+
+*{box-sizing:border-box}
+html{color-scheme:light}
+[data-theme=dark]{color-scheme:dark}
+body{margin:0;background:var(--paper);color:var(--ink);
+ font-family:var(--sans);font-size:15px;line-height:1.55;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.mono,.num,.amt{font-family:var(--mono);font-variant-numeric:tabular-nums lining-nums;
+ font-feature-settings:"tnum" 1,"lnum" 1}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.021em}
+h1{font-size:28px;line-height:1.2}
+h2{font-size:21px;line-height:1.25;letter-spacing:-.018em}
+h3{font-size:17px;letter-spacing:-.012em}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+p{margin:0 0 .6em}
+
+/* micro-label — 12px, the floor, and never carries a qualifier */
+.eyebrow{font-size:12px;font-weight:590;letter-spacing:.075em;text-transform:uppercase;
+ color:var(--muted)}
+.meta{font-size:13px;color:var(--muted)}
+.lede{font-size:17px;line-height:1.5;color:var(--muted);max-width:74ch;
+ letter-spacing:-.008em}
+
+/* the product's own voice — refusals and abstentions speak in the brand serif.
+   A different register for "this is the system talking about its own limits". */
+.voice{font-family:var(--serif);font-size:17px;line-height:1.45;letter-spacing:0}
+
+/* ==========================================================================
+   SHELL — hairlines, not boxes. One alignment grid at 28px.
+   ========================================================================== */
+.app{display:flex;min-height:100vh}
+.side{width:236px;flex:none;border-right:1px solid var(--hairline);
+ padding:20px 0 24px;display:flex;flex-direction:column;background:var(--paper)}
+.mark{display:flex;align-items:center;gap:9px;padding:0 20px 18px}
+.mark .seal{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gold);
+ position:relative;flex:none}
+.mark .seal:after{content:"";position:absolute;inset:5px;border-radius:50%;
+ background:var(--gold);opacity:.55}
+.mark .wm{font-size:15px;font-weight:600;letter-spacing:-.014em;line-height:1.15}
+.mark .wm span{display:block;font-size:12px;font-weight:450;color:var(--muted);
+ letter-spacing:.01em}
+
+.navsec{padding:16px 20px 6px}
+.nav a,.nav span.item{display:flex;align-items:center;justify-content:space-between;
+ gap:10px;margin:1px 12px;padding:7px 8px;border-radius:7px;
+ font-size:15px;color:var(--ink);letter-spacing:-.008em}
+.nav a:hover{background:var(--line2);text-decoration:none}
+.nav a.on{background:var(--teal-bg);color:var(--teal);font-weight:590}
+.nav a .badge{font-family:var(--mono);font-size:13px;color:var(--muted);
+ font-variant-numeric:tabular-nums}
+.nav a.on .badge{color:var(--teal)}
+.nav a.sub{font-size:14px;color:var(--muted);margin-left:26px;padding:5px 8px}
+.spacer{flex:1}
+.who{margin:0 12px;padding:12px 8px 0;border-top:1px solid var(--hairline);
+ font-size:13px;color:var(--muted)}
+.who b{display:block;font-size:15px;color:var(--ink);font-weight:590;letter-spacing:-.008em}
+
+.page{flex:1;min-width:0;padding:0 0 96px}
+.wrap{max-width:1080px;padding:0 28px}
+
+/* ---- context bar: one line. The staleness value is 15px semibold, which is
+   larger than every label around it. This is the inversion, fixed. ---- */
+.ctx{display:flex;align-items:center;gap:0;flex-wrap:wrap;
+ border-bottom:1px solid var(--hairline);padding:13px 28px}
+.ctx .f{display:flex;align-items:baseline;gap:7px;padding-right:20px;margin-right:20px;
+ border-right:1px solid var(--hairline)}
+.ctx .f:last-of-type{border-right:0}
+.ctx .k{font-size:13px;color:var(--muted)}
+.ctx .v{font-size:15px;font-weight:590;letter-spacing:-.008em}
+.ctx .stale .v{color:var(--sev1)}
+.ctx .fixture{margin-left:auto;font-size:13px;color:var(--muted);
+ border:1px solid var(--hairline);border-radius:999px;padding:3px 11px;background:var(--cream)}
+.ctx details{width:100%;margin-top:9px}
+.ctx summary{font-size:13px;color:var(--teal);cursor:pointer;list-style:none}
+.ctx summary::-webkit-details-marker{display:none}
+.ctx .full{font-size:15px;color:var(--muted);max-width:86ch;margin-top:7px;line-height:1.5}
+
+/* ---- page head ---- */
+.head{padding:26px 28px 18px}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:9px;
+ display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.crumb a{color:var(--muted)}
+.title{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.subtitle{margin-top:9px}
+
+/* ==========================================================================
+   SURFACES — cream is the brand's "artifact card". Evidence uses it.
+   ========================================================================== */
+.panel{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;
+ padding:20px 22px;margin-top:16px}
+.panel.art{background:var(--cream)}
+.panel.flush{padding:0;overflow:hidden}
+.panel h3{margin-bottom:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:960px){.grid2{grid-template-columns:1fr}}
+.hr{height:1px;background:var(--hairline);margin:20px 0}
+
+/* definition rows — hairline separated, no boxes */
+.dl{display:grid;grid-template-columns:auto 1fr;gap:0}
+.dl dt,.dl dd{margin:0;padding:9px 0;border-bottom:1px solid var(--line2);font-size:15px}
+.dl dt{color:var(--muted);padding-right:24px;white-space:nowrap}
+.dl dd{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+ letter-spacing:-.01em}
+.dl dd.t{font-family:var(--sans);text-align:right}
+.dl dt:last-of-type,.dl dd:last-of-type{border-bottom:0}
+
+/* tables — hairlines, tabular numerals, right-aligned money */
+table.tb{width:100%;border-collapse:collapse;font-size:15px}
+table.tb th{text-align:left;font-size:12px;font-weight:590;letter-spacing:.075em;
+ text-transform:uppercase;color:var(--muted);padding:0 14px 9px 0;
+ border-bottom:1px solid var(--hairline)}
+table.tb td{padding:11px 14px 11px 0;border-bottom:1px solid var(--line2);
+ vertical-align:top}
+table.tb tr:last-child td{border-bottom:0}
+table.tb th.n,table.tb td.n{text-align:right;padding-right:0}
+table.tb td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   STATUS GRAMMAR — one hue per meaning, structure carries the rest
+   ========================================================================== */
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;
+ padding:2px 9px;border-radius:6px;border:1px solid var(--hairline);
+ color:var(--muted);background:transparent;white-space:nowrap;letter-spacing:-.004em}
+.tag.s1{color:var(--sev1);border-color:var(--sev1);background:var(--sev1-bg)}
+.tag.s2{color:var(--sev2);border-color:var(--sev2);background:var(--sev2-bg);font-weight:590}
+.tag.s3{color:var(--sev3);border-color:var(--sev3);background:var(--sev3-bg);font-weight:650}
+.tag.omission{border-color:var(--ink);color:var(--ink);border-width:1.5px;font-weight:590}
+.tag.gold{color:var(--gold);border-color:var(--gold);background:var(--gold-bg);font-weight:560}
+.tag.slate{color:var(--slate);border-color:var(--slate);background:var(--slate-bg);
+ border-left-width:4px;font-weight:560}
+.tag.notrun{color:var(--sev1);border-color:var(--sev1);border-style:dashed;font-weight:590}
+
+/* the one big number */
+.severity{border-left:3px solid var(--sev3);padding:2px 0 2px 22px;margin-top:20px}
+.severity.s2{border-left-color:var(--sev2)}
+.severity.s1{border-left-color:var(--sev1)}
+.severity .cap{font-size:12px;font-weight:590;letter-spacing:.075em;text-transform:uppercase;
+ color:var(--sev3)}
+.severity.s2 .cap{color:var(--sev2)} .severity.s1 .cap{color:var(--sev1)}
+.severity .fig{font-family:var(--mono);font-size:40px;line-height:1.05;font-weight:600;
+ letter-spacing:-.028em;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.severity .what{font-size:21px;font-weight:590;letter-spacing:-.018em}
+.severity .why{font-size:15px;color:var(--muted);margin-top:9px;max-width:72ch}
+.severity .facts{display:flex;gap:32px;flex-wrap:wrap;margin-top:16px}
+.severity .facts div{font-size:13px;color:var(--muted)}
+.severity .facts b{display:block;font-family:var(--mono);font-size:17px;color:var(--ink);
+ font-weight:590;font-variant-numeric:tabular-nums;letter-spacing:-.014em;margin-top:2px}
+
+/* abstention — dashed slate, structurally other, and it speaks in serif */
+.abstain{border:1.5px dashed var(--slate);border-left-width:5px;background:var(--slate-bg);
+ border-radius:10px;padding:18px 20px;margin-top:16px}
+.abstain .hd{font-family:var(--serif);font-size:19px;line-height:1.35;margin-bottom:10px}
+/* refusal — solid slate, also serif. Same family, different weight of claim. */
+.refuse{border:1px solid var(--slate);border-left:5px solid var(--slate);
+ background:var(--slate-bg);border-radius:10px;padding:18px 20px;margin-top:16px}
+/* a finding-level warning that cannot be dismissed */
+.caution{border:1px solid var(--sev2);border-left:5px solid var(--sev2);
+ background:var(--sev2-bg);border-radius:10px;padding:16px 18px;margin-top:16px;font-size:15px}
+.caution .sticky{display:block;margin-top:7px;font-size:13px;color:var(--muted)}
+/* a human decision recorded — gold, the brand's own meaning for it */
+.decided{border:1px solid var(--gold);border-left:5px solid var(--gold);
+ background:var(--gold-bg);border-radius:10px;padding:18px 20px;margin-top:16px}
+.decided .hd{font-size:17px;font-weight:600;letter-spacing:-.012em;margin-bottom:6px}
+
+/* ==========================================================================
+   COVERAGE — a population, never a percentage bar
+   ========================================================================== */
+.pop{display:flex;height:34px;border:1px solid var(--hairline);border-radius:8px;
+ overflow:hidden;margin-top:12px;background:var(--surface)}
+.pop .seg{display:flex;align-items:center;justify-content:center;font-size:13px;
+ color:var(--muted);padding:0 6px;white-space:nowrap;overflow:hidden}
+.pop .seg.in{background:var(--line2);color:var(--ink);font-weight:500}
+.pop .seg.out{background-color:var(--surface);color:var(--sev2);
+ border-left:1px solid var(--hairline);font-family:var(--mono);font-size:13px;
+ background-image:repeating-linear-gradient(135deg,transparent 0 5px,
+  color-mix(in srgb,var(--sev2) 22%,transparent) 5px 6px)}
+.poplg{display:flex;justify-content:space-between;gap:16px;margin-top:9px;font-size:15px}
+.poplg b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.poplg .r{color:var(--muted)}
+
+/* ==========================================================================
+   QUEUE — Finder list view: hairlines, 3px severity rail, hover tint
+   ========================================================================== */
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:18px 0 4px}
+.seg-ctl{display:inline-flex;background:var(--line2);border-radius:9px;padding:2px}
+.seg-ctl a{font-size:14px;padding:5px 13px;border-radius:7px;color:var(--muted)}
+.seg-ctl a.on{background:var(--surface);color:var(--ink);font-weight:560;
+ box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.seg-ctl a:hover{text-decoration:none}
+.sortnote{font-size:13px;color:var(--muted);margin-left:auto}
+
+.list{margin-top:14px;border-top:1px solid var(--hairline)}
+.lrow{display:grid;grid-template-columns:96px 1fr 128px 132px 132px 84px 128px;
+ gap:16px;align-items:start;padding:14px 16px 14px 13px;
+ border-bottom:1px solid var(--line2);border-left:3px solid transparent;color:var(--ink)}
+.lhead{display:grid;grid-template-columns:96px 1fr 128px 132px 132px 84px 128px;
+ gap:16px;padding:0 16px 9px 13px;font-size:12px;font-weight:590;letter-spacing:.075em;
+ text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--hairline)}
+.lhead .s{color:var(--teal)}
+.lhead .n{text-align:right}
+a.lrow:hover{background:var(--line2);text-decoration:none}
+.lrow.t1{border-left-color:var(--sev1)}
+.lrow.t2{border-left-color:var(--sev2)}
+.lrow.t3{border-left-color:var(--sev3)}
+.lrow.done{opacity:.5}
+.lrow .acct{font-family:var(--mono);font-size:15px;font-weight:560;letter-spacing:-.01em}
+.lrow .nm{font-size:15px;font-weight:560;letter-spacing:-.01em}
+.lrow .dsc{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45}
+.lrow .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+ font-size:15px;letter-spacing:-.01em}
+
+/* ---- Close cockpit call rows ---- */
+.calls{margin-top:18px;border-top:1px solid var(--hairline)}
+a.callrow{display:grid;grid-template-columns:62px 1fr auto;gap:20px;align-items:center;
+ padding:18px 16px 18px 13px;border-bottom:1px solid var(--line2);
+ border-left:3px solid transparent;color:var(--ink)}
+a.callrow:hover{background:var(--line2);text-decoration:none}
+a.callrow .fig{font-family:var(--mono);font-size:28px;font-weight:600;line-height:1;
+ text-align:right;letter-spacing:-.022em;font-variant-numeric:tabular-nums}
+a.callrow .t{font-size:17px;font-weight:560;letter-spacing:-.012em}
+a.callrow .d{font-size:15px;color:var(--muted);margin-top:4px;max-width:76ch;line-height:1.45}
+a.callrow .go{font-size:15px;color:var(--teal);white-space:nowrap}
+a.callrow.c3{border-left-color:var(--sev3)} a.callrow.c3 .fig{color:var(--sev3)}
+a.callrow.c2{border-left-color:var(--sev2)} a.callrow.c2 .fig{color:var(--sev2)}
+a.callrow.c1{border-left-color:var(--sev1)} a.callrow.c1 .fig{color:var(--sev1)}
+a.callrow.cg{border-left-color:var(--gold)} a.callrow.cg .fig{color:var(--gold)}
+a.callrow.cs{border-left:3px dashed var(--slate)} a.callrow.cs .fig{color:var(--slate)}
+
+/* ==========================================================================
+   CONTROLS
+   ========================================================================== */
+.btn{display:inline-block;font:inherit;font-size:15px;font-weight:500;
+ padding:9px 17px;border-radius:9px;border:1px solid var(--hairline);
+ background:var(--surface);color:var(--ink);cursor:pointer;letter-spacing:-.008em}
+.btn:hover{background:var(--line2);text-decoration:none}
+.btn.go{background:var(--teal);border-color:var(--teal);color:var(--cta-text)}
+.btn.go:hover{filter:brightness(1.08)}
+.btn.decide{background:var(--gold);border-color:var(--gold);color:var(--cta-text)}
+.btn.decide:hover{filter:brightness(1.08)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:10px;margin-top:14px}
+.opt{border:1px solid var(--hairline);border-radius:10px;background:var(--surface);
+ padding:13px 14px;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.opt:hover{border-color:var(--teal)}
+.opt .c{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:-.01em}
+.opt .n{font-size:15px;margin-top:3px;letter-spacing:-.008em}
+.opt .r{font-size:13px;color:var(--muted);margin-top:6px}
+.opt .posts{display:inline-block;margin-top:8px;font-size:12px;font-weight:590;
+ letter-spacing:.06em;text-transform:uppercase;color:var(--sev2);
+ border:1px solid var(--sev2);border-radius:5px;padding:1px 6px}
+.opt.no{border-style:dashed}
+.opt.no .why{font-size:13px;color:var(--slate);margin-top:8px;
+ border-left:2px solid var(--slate);padding-left:9px;line-height:1.45}
+.after{margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline)}
+
+.radios{margin-top:12px}
+.radio{display:flex;align-items:flex-start;gap:11px;padding:11px 0;
+ border-bottom:1px solid var(--line2);font-size:15px}
+.radio:last-child{border-bottom:0}
+.radio i{width:17px;height:17px;border:1.5px solid var(--muted);border-radius:50%;
+ flex:none;margin-top:2px}
+.field{display:inline-block;min-width:130px;border-bottom:1.5px solid var(--hairline);
+ height:23px;vertical-align:-5px}
+
+/* narrative — last, closed, quiet */
+details.narr{border-top:1px solid var(--hairline);margin-top:26px;padding-top:4px}
+details.narr>summary{padding:14px 0;font-size:15px;color:var(--muted);cursor:pointer;
+ list-style:none;display:flex;justify-content:space-between;gap:14px}
+details.narr>summary::-webkit-details-marker{display:none}
+details.narr>summary:after{content:"Expand";color:var(--teal);font-size:14px}
+details.narr[open]>summary:after{content:"Collapse"}
+details.narr .body{padding:0 0 20px;font-size:15px;color:var(--muted);max-width:76ch}
+
+/* ==========================================================================
+   JOURNEY MAPS — designed artefacts, on the brand's artifact ground
+   ========================================================================== */
+.jrny{background:var(--cream);border:1px solid var(--hairline);border-radius:14px;
+ padding:26px 28px 28px;margin-top:22px}
+.jrny .top{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;
+ padding-bottom:20px;border-bottom:1px solid var(--hairline)}
+.jrny .av{width:46px;height:46px;border-radius:50%;flex:none;
+ background:var(--surface);border:1.5px solid var(--gold);
+ display:flex;align-items:center;justify-content:center;
+ font-size:17px;font-weight:600;color:var(--gold);letter-spacing:-.01em}
+.jrny .id{flex:1;min-width:260px}
+.jrny .id .who{margin:0;padding:0;border:0;font-size:13px;color:var(--muted)}
+.jrny .id .q{font-family:var(--serif);font-size:21px;line-height:1.3;margin-top:3px}
+.jrny .verdict{font-size:13px;font-weight:590;letter-spacing:.06em;text-transform:uppercase;
+ border:1px solid var(--sev2);color:var(--sev2);background:var(--sev2-bg);
+ border-radius:999px;padding:5px 13px;white-space:nowrap}
+.jrny .verdict.ok{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.jrny .tw{display:flex;gap:26px;flex-wrap:wrap;margin-top:16px}
+.jrny .tw div{font-size:13px;color:var(--muted)}
+.jrny .tw b{display:block;font-size:15px;color:var(--ink);font-weight:560;margin-top:2px}
+
+.lane{margin-top:22px}
+.lane .lbl{font-size:12px;font-weight:590;letter-spacing:.075em;text-transform:uppercase;
+ color:var(--muted);margin-bottom:12px}
+.track{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:6px}
+.stepc{flex:1 1 0;min-width:172px;background:var(--surface);
+ border:1px solid var(--hairline);border-radius:11px;padding:14px 15px;
+ margin-right:26px;position:relative}
+.stepc:last-child{margin-right:0}
+.stepc:after{content:"";position:absolute;right:-19px;top:50%;width:12px;height:1.5px;
+ background:var(--hairline)}
+.stepc:before{content:"";position:absolute;right:-19px;top:50%;width:7px;height:7px;
+ border-top:1.5px solid var(--hairline);border-right:1.5px solid var(--hairline);
+ transform:translate(5px,-3.7px) rotate(45deg)}
+.stepc:last-child:after,.stepc:last-child:before{display:none}
+.stepc .k{font-size:12px;font-weight:590;letter-spacing:.075em;text-transform:uppercase;
+ color:var(--muted)}
+.stepc .v{font-size:15px;font-weight:560;letter-spacing:-.01em;margin-top:5px}
+.stepc .w{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45}
+.stepc .rt{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:9px}
+.stepc.broken{border-color:var(--sev2);background:var(--sev2-bg)}
+.stepc.broken .k{color:var(--sev2)}
+.stepc.stop{border:1.5px solid var(--sev3);background:var(--sev3-bg)}
+.stepc.stop .k{color:var(--sev3)}
+.stepc.stop:after{background:var(--sev3)} .stepc.stop:before{border-color:var(--sev3)}
+.stepc.newst{border:1.5px dashed var(--teal);background:var(--teal-bg)}
+.stepc.newst .k{color:var(--teal)}
+.legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:3px;
+ margin-right:6px;vertical-align:-2px}
+
+/* ==========================================================================
+   REVIEW-PAGE CHROME (this artefact only, not a product component)
+   ========================================================================== */
+.rvp{max-width:1240px;margin:0 auto;padding:34px 28px 100px;background:var(--paper)}
+.rvp .kicker{font-size:12px;font-weight:590;letter-spacing:.12em;text-transform:uppercase;
+ color:var(--gold)}
+.shots{border:1px solid var(--hairline);border-radius:14px;overflow:hidden;
+ margin-top:18px;background:var(--surface)}
+.shots .bar{padding:12px 16px;border-bottom:1px solid var(--hairline);
+ display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:14px;
+ color:var(--muted);background:var(--cream)}
+.shots .bar b{color:var(--ink);font-weight:590}
+.shots iframe{display:block;width:100%;border:0;background:var(--paper)}
+.note{font-size:13px;color:var(--muted);margin-top:12px;max-width:88ch;line-height:1.5}
+.callout{border-left:3px solid var(--gold);padding:2px 0 2px 20px;margin-top:20px}
+.callout h3{margin-bottom:6px}
+.callout.warn{border-left-color:var(--sev2)}
+.callout.cool{border-left-color:var(--teal)}

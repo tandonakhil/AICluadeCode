@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>My queue — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="apple.css"></head><body>
+<div class="app">
+
+<aside class="side">
+  <div class="mark"><div class="seal"></div>
+    <div class="wm">Conclave<span>Finance Studio</span></div></div>
+  <nav class="nav">
+    <div class="navsec eyebrow">Close &mdash; 2026-06</div>
+    <a href="v2-close.html"><span>Overview</span></a>
+    <a href="v2-queue.html" class="on" aria-current="page"><span>My queue</span><span class="badge">6</span></a>
+    <a href="v2-approvals.html"><span>Approvals</span><span class="badge">0</span></a>
+    <a href="p8-ask-detect.html"><span>Ask</span></a>
+    <div class="navsec eyebrow">Evidence</div>
+    <a href="p6-period-record.html"><span>Period record</span></a>
+    <a href="p9-run.html" class="sub">Runs &amp; dossiers</a>
+    <a href="p10-agent.html" class="sub">Agents</a>
+    <a href="p11-catalogue.html" class="sub">Datasets</a>
+    <a href="p12-refusals.html" class="sub">What we refuse to do</a>
+  </nav>
+  <div class="spacer"></div>
+  <div class="who">Signed in as<b>A. Reyes</b>Staff accountant
+    <div style="margin-top:8px"><a href="p14-probe-history.html" style="font-size:13px">My probe history</a></div>
+  </div>
+</aside>
+
+<main class="page">
+  <div class="ctx">
+    <div class="f"><span class="k">Entity</span><span class="v">Northwind Grid Holdings</span></div>
+    <div class="f"><span class="k">Period</span><span class="v">2026-06</span></div>
+    <div class="f"><span class="k">Close day</span><span class="v">3 of 8</span></div>
+    <div class="f stale"><span class="k">Data</span><span class="v">1 close day behind</span></div>
+    <span class="fixture">Pilot &mdash; synthetic fixture data</span>
+    <details>
+      <summary>What &ldquo;1 close day behind&rdquo; means, and where these figures came from</summary>
+      <div class="full">Dataset <b>gl_balances vFIXTURE-2026.06.03-a</b>, as of 03 Jul 2026
+        06:15 UTC. Refreshed after the day-2 cut-off, which it was due by, and before the
+        day-3 cut-off. Figures come from the twelve-period synthetic close fixture, not an
+        Oracle-sourced warehouse, and cannot support a posting or an assurance conclusion
+        about a real ledger.</div>
+    </details>
+  </div>
+
+  <div class="head">
+    <div class="crumb"><span><a href="v2-close.html">Close</a> &rsaquo; My queue</span></div>
+    <div class="title"><h1>My queue</h1>
+      <span class="tag s3">2 blast radius</span>
+      <span class="tag s2">1 high</span>
+      <span class="tag s1">3 elevated</span></div>
+    <p class="lede subtitle">214 detections this period. 208 closed without reaching a
+      human under standing guardrail policy approved cold &mdash; every one of them listed
+      and reachable in the <a href="p9-run.html">run report</a>, none hidden. These six are
+      routed to you.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="tools">
+      <div class="seg-ctl">
+        <a href="#" class="on">Routed to me</a>
+        <a href="p9-run.html#all">All 214</a>
+        <a href="p15-dispositions.html">Resolved by me</a>
+        <a href="p15-dispositions.html">Due back</a>
+      </div>
+      <span class="sortnote">Sorted by severity, then amount</span>
+    </div>
+
+    <div class="lhead">
+      <span>Account</span><span>Finding</span><span>Type</span><span class="s">Severity &darr;</span>
+      <span class="n">Amount</span><span>Age</span><span>State</span>
+    </div>
+    <div class="list">
+      <a class="lrow t3" href="v2-item.html">
+        <div class="acct">13800</div>
+        <div><div class="nm">Intercompany Receivable &mdash; NGH-CA-200</div>
+          <div class="dsc">Iron-curtain aggregate $754,650.00 across three periods. The residual has grown in each.</div></div>
+        <div><span class="tag">Cross-period</span></div>
+        <div><span class="tag s3">Blast radius</span></div>
+        <div class="n">271,450.00</div>
+        <div class="dsc">2 days</div>
+        <div class="dsc">Not started</div>
+      </a>
+      <a class="lrow t3" href="v2-item.html">
+        <div class="acct">21400</div>
+        <div><div class="nm">GR/IR Clearing</div>
+          <div class="dsc">Iron-curtain aggregate $918,240.00 across four periods. Prior explanation restated verbatim in 3 of 4.</div></div>
+        <div><span class="tag">Cross-period</span></div>
+        <div><span class="tag s3">Blast radius</span></div>
+        <div class="n">312,480.00</div>
+        <div class="dsc">2 days</div>
+        <div class="dsc">Not started</div>
+      </a>
+      <a class="lrow t2" href="v2-item.html">
+        <div class="acct">18300</div>
+        <div><div class="nm">Deferred Storm Restoration Costs</div>
+          <div class="dsc">RJ-AMRT-18300 posted in 11 of the last 12 periods and did not post in 2026-06.</div></div>
+        <div><span class="tag omission">Omission</span></div>
+        <div><span class="tag s2">High</span></div>
+        <div class="n">412,500.00</div>
+        <div class="dsc">1 day</div>
+        <div class="dsc">Not started</div>
+      </a>
+      <a class="lrow t1" href="v2-item.html">
+        <div class="acct">11500</div>
+        <div><div class="nm">Bank Clearing &mdash; Operating</div>
+          <div class="dsc">Balance movement 4.1 sigma above the 24-period distribution.</div></div>
+        <div><span class="tag">Present anomaly</span></div>
+        <div><span class="tag s1">Elevated</span></div>
+        <div class="n">228,715.00</div>
+        <div class="dsc">1 day</div>
+        <div class="dsc">Not started</div>
+      </a>
+      <a class="lrow t1" href="v2-item.html">
+        <div class="acct">19900</div>
+        <div><div class="nm">Suspense</div>
+          <div class="dsc">Warehouse balance differs from the ERP control extract by $1,204.06 at segment level.</div></div>
+        <div><span class="tag">Fidelity</span></div>
+        <div><span class="tag s1">Elevated</span></div>
+        <div class="n">1,204.06</div>
+        <div class="dsc">1 day</div>
+        <div class="dsc">Auto-disposed<div style="font-size:12px">COLD-ROUNDING-TOLERANCE-1</div></div>
+      </a>
+      <a class="lrow t1" href="v2-item.html">
+        <div class="acct">54100</div>
+        <div><div class="nm">Transmission O&amp;M Expense</div>
+          <div class="dsc">14 invoices coded to CC-4420; comparable history codes to CC-4180.</div></div>
+        <div><span class="tag">Coding</span></div>
+        <div><span class="tag s1">Elevated</span></div>
+        <div class="n">86,340.00</div>
+        <div class="dsc">1 day</div>
+        <div class="dsc">Not started</div>
+      </a>
+    </div>
+
+    <div class="caution" style="margin-top:22px">
+      <b>Partial run &mdash; 70% coverage.</b> Seven of ten declared members were scanned.
+      Not scanned: 29100, 31200, 31300. This run cannot support a negative assurance
+      conclusion for 2026-06.
+      <span class="sticky">Non-dismissable. Reproduced verbatim in the dossier and in the export.</span>
+    </div>
+
+    <div class="pop" role="img" aria-label="Population: 7 of 10 declared members scanned">
+      <div class="seg in" style="flex:7">7 scanned</div>
+      <div class="seg out" style="flex:1">29100</div>
+      <div class="seg out" style="flex:1">31200</div>
+      <div class="seg out" style="flex:1">31300</div>
+    </div>
+    <div class="poplg"><span><b>70%</b> of 10 declared members</span>
+      <span class="r">3 segments unscanned, named above</span></div>
+
+    <h2 style="margin-top:44px" id="abstentions">Declined to conclude</h2>
+    <p class="lede" style="margin-top:8px">Held apart from the queue above. An abstention is
+      not a finding, and folding the two together would render &ldquo;I could not establish
+      this&rdquo; as &ldquo;nothing is wrong here&rdquo; &mdash; opposite statements.</p>
+
+    <div class="abstain">
+      <div style="display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:flex-start">
+        <div class="hd">The system could not establish this.</div>
+        <span class="tag slate">Abstention AB2 &mdash; coverage insufficient</span>
+      </div>
+      <div style="font-size:15px;font-weight:560">13800 Intercompany Receivable &mdash; NGH-CA-200</div>
+      <dl class="dl" style="margin-top:12px">
+        <dt>Evidence gap</dt><dd class="t">The counterparty leg is in NGH-CA-200, which was not selected for this run</dd>
+        <dt>What would resolve it</dt><dd class="t">Select the Intercompany &mdash; NGH-CA-200 dataset and re-run</dd>
+        <dt>Is this a negative finding?</dt><dd class="t"><b>No. This is not a statement that anything is wrong.</b></dd>
+      </dl>
+      <div class="btnrow"><a class="btn" href="p11-catalogue.html">Select the missing dataset</a>
+        <a class="btn" href="v2-item.html">Open the abstention</a></div>
+    </div>
+
+    <details class="narr">
+      <summary>Some items in this queue are manufactured known-error probes &mdash; read once</summary>
+      <div class="body">Probes are injected at a varying rate within a stated band: between
+        2 and 8 in every 100 items. The rate in force for any particular queue is not
+        published, is not a configuration value, and is not readable from this product.
+        <br><br><b>Used for:</b> whether this review surface is working &mdash; aggregated
+        by queue, by agent, by account and by queue load.
+        <br><b>Not used for:</b> anything about you by name. No per-named-person probe
+        score, ranking or trend exists on any management surface at any permission level,
+        including administrator. Your own outcomes are visible to
+        <a href="p14-probe-history.html">you</a> and to nobody else.</div>
+    </details>
+  </div>
+</main>
+</div></body></html>

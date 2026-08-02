@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Journey maps — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="apple.css"></head><body>
+<div class="rvp">
+
+<div class="kicker">Conclave &middot; Finance Studio &middot; Experience design</div>
+<h1 style="margin-top:10px">Journey maps</h1>
+<p class="lede" style="margin-top:12px">Four close-period tasks, mapped end to end for the
+three personas the Decisions Log binds as primary. Each map shows the persona, what
+triggers the task, every step, <b>where the product stops today</b>, and what the redesign
+changes. Two of these four cannot be walked in the pilot at all.</p>
+
+<div class="legend" style="margin-top:20px">
+  <span><i style="background:var(--surface);border:1px solid var(--hairline)"></i>Works today</span>
+  <span><i style="background:var(--sev2-bg);border:1px solid var(--sev2)"></i>Works badly &mdash; or needs a URL you cannot discover</span>
+  <span><i style="background:var(--sev3-bg);border:1.5px solid var(--sev3)"></i>Dead end &mdash; the journey stops here</span>
+  <span><i style="background:var(--teal-bg);border:1.5px dashed var(--teal)"></i>Proposed &mdash; does not exist in any form</span>
+</div>
+
+<!-- ============================= J1 ============================= -->
+<div class="jrny">
+  <div class="top">
+    <div class="av">AR</div>
+    <div class="id">
+      <div class="who">J1 &middot; A. Reyes &middot; staff accountant &mdash; the doer</div>
+      <div class="q">&ldquo;An omission is detected. I investigate it, I resolve it, and it
+        leaves my queue.&rdquo;</div>
+    </div>
+    <span class="verdict">Dead-ends at the last step</span>
+  </div>
+  <div class="tw">
+    <div>Trigger<b>Overnight run routes 6 of 214 detections to me</b></div>
+    <div>When<b>11pm, close day 3 of 8</b></div>
+    <div>Frequency<b>6&times; a night, every night of the close</b></div>
+    <div>Success looks like<b>The queue is empty and I trust that it should be</b></div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Today</div>
+    <div class="track">
+      <div class="stepc broken"><div class="k">1 &middot; Arrive</div><div class="v">Lands on Ask</div>
+        <div class="w">The default landing page is a query composer. A doer does not begin the night by writing a query.</div>
+        <div class="rt">/ &rarr; /ask</div></div>
+      <div class="stepc broken"><div class="k">2 &middot; Find work</div><div class="v">Guess: Exceptions or Review?</div>
+        <div class="w">Two nav items, the same six items, different fidelity. Nothing says which is mine.</div>
+        <div class="rt">/exceptions | /review</div></div>
+      <div class="stepc broken"><div class="k">3 &middot; Reach it</div><div class="v">Scroll past four banners</div>
+        <div class="w">The queue is 7% of a 3,483px page. The other 93% is analysis I did not ask for.</div>
+        <div class="rt">/exceptions</div></div>
+      <div class="stepc broken"><div class="k">4 &middot; Open</div><div class="v">Page titled &ldquo;Not approved&rdquo;</div>
+        <div class="w">The heading names a workflow state, not the thing I clicked. No breadcrumb, no next.</div>
+        <div class="rt">/review/ITEM-18300-OM</div></div>
+      <div class="stepc"><div class="k">5 &middot; Decide</div><div class="v">Evidence, six outcomes, forward disposition</div>
+        <div class="w">This part is good. Genuinely the best screen in the product.</div>
+        <div class="rt">&mdash;</div></div>
+      <div class="stepc stop"><div class="k">6 &middot; Save</div><div class="v">Nothing happens</div>
+        <div class="w">No confirmation. No return. Not struck from any list. Badge unchanged. The record it creates is linked from nowhere.</div>
+        <div class="rt">the journey stops</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Proposed</div>
+    <div class="track">
+      <a class="stepc newst" href="v2-close.html"><div class="k">1 &middot; Arrive</div><div class="v">Close overview</div>
+        <div class="w">&ldquo;6 routed to you. 1 abstention. 1 prediction come due.&rdquo; Every row a task with a destination.</div>
+        <div class="rt">/close</div></a>
+      <a class="stepc newst" href="v2-queue.html"><div class="k">2 &middot; Find work</div><div class="v">My queue &mdash; one list</div>
+        <div class="w">Exceptions and Review merged. Seven columns, sorted by severity then amount.</div>
+        <div class="rt">/queue</div></a>
+      <a class="stepc newst" href="v2-item.html"><div class="k">3 &middot; Open</div><div class="v">The finding names itself</div>
+        <div class="w">Breadcrumb, &ldquo;item 3 of 6&rdquo;, prev/next. Run, agent and dataset are now links.</div>
+        <div class="rt">/queue/18300</div></a>
+      <a class="stepc" href="v2-item.html"><div class="k">4 &middot; Decide</div><div class="v">Unchanged, better ordered</div>
+        <div class="w">Ineligible outcomes drop below a rule at full contrast, still clickable, reason inline.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p3-item-saved.html"><div class="k">5 &middot; Save</div><div class="v">Confirmed in place</div>
+        <div class="w">&ldquo;Recorded. Clears by 2026-07. Sent to D. Okafor.&rdquo; Undo for five minutes.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p2-queue-after.html"><div class="k">6 &middot; Loop</div><div class="v">Queue of 5, next item offered</div>
+        <div class="w">Struck through, badge 6&rarr;5. The loop closes.</div>
+        <div class="rt">/queue</div></a>
+    </div>
+  </div>
+  <div class="note"><b>The smallest build on the gap list, and the largest felt
+    improvement.</b> Steps 5 and 6 are one confirmation, one list update and one badge
+    decrement &mdash; and they are the step this persona repeats six times a night, which
+    currently ends in silence.</div>
+</div>
+
+<!-- ============================= J2 ============================= -->
+<div class="jrny">
+  <div class="top">
+    <div class="av">DO</div>
+    <div class="id">
+      <div class="who">J2 &middot; D. Okafor &middot; controller &mdash; the supervisor</div>
+      <div class="q">&ldquo;I approve a reclass, and it becomes an export.&rdquo;</div>
+    </div>
+    <span class="verdict">Cannot be walked at all</span>
+  </div>
+  <div class="tw">
+    <div>Trigger<b>A staff accountant proposes a $86,340 reclassification</b></div>
+    <div>Stakes<b>It posts to the ledger &mdash; via a human, in Oracle</b></div>
+    <div>Control<b>author &ne; resolver &ne; approver, enforced at the broker</b></div>
+    <div>Success looks like<b>I know exactly what I authorised, and what I did not</b></div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Today</div>
+    <div class="track">
+      <div class="stepc"><div class="k">1 &middot; Arrive</div><div class="v">Switch persona</div>
+        <div class="w">Works.</div><div class="rt">POST /pilot/viewing-as</div></div>
+      <div class="stepc broken"><div class="k">2 &middot; Find pending work</div><div class="v">Six blue hyperlinks</div>
+        <div class="w">Two say &ldquo;not approvable by you&rdquo;. Nothing distinguishes what awaits <i>my approval</i> from someone else&rsquo;s open findings.</div>
+        <div class="rt">/review</div></div>
+      <div class="stepc stop"><div class="k">3 &middot; Approve</div><div class="v">There is no approval surface</div>
+        <div class="w">Correctly, no Approve button on Review. But the separate act that implies was never given a screen, an object or a state.</div>
+        <div class="rt">nowhere</div></div>
+      <div class="stepc stop"><div class="k">4 &middot; Export</div><div class="v">Whole period only</div>
+        <div class="w">/audit/export exports the period, not an approved set, and nothing connects an approval to it.</div>
+        <div class="rt">/audit/export</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Proposed &mdash; every step is net-new</div>
+    <div class="track">
+      <a class="stepc newst" href="p4-close-controller.html"><div class="k">1 &middot; Arrive</div><div class="v">Close, controller view</div>
+        <div class="w">Same screen, same components, different call-list. &ldquo;4 awaiting your approval, 2 post to the ledger.&rdquo;</div>
+        <div class="rt">/close</div></a>
+      <a class="stepc newst" href="v2-approvals.html"><div class="k">2 &middot; Triage</div><div class="v">Approvals queue</div>
+        <div class="w">Sorted posts-to-ledger first. Author, amount, type, state.</div>
+        <div class="rt">/approvals</div></a>
+      <a class="stepc newst" href="p5a-approval-detail.html"><div class="k">3 &middot; Weigh</div><div class="v">Approval detail</div>
+        <div class="w">The closure that makes it valid, the model&rsquo;s measured limits, and what approving <i>does</i>, in four numbered steps, before you do it.</div>
+        <div class="rt">/approvals/54100</div></a>
+      <a class="stepc newst" href="p5a-approval-detail.html"><div class="k">4 &middot; Act</div><div class="v">Typed, not clicked</div>
+        <div class="w">Type the destination cost centre to confirm. One item. No approve-all.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p5b-export.html"><div class="k">5 &middot; Egress</div><div class="v">The export set</div>
+        <div class="w">What is in it, and what is excluded and why &mdash; at equal weight. CUEC non-authorisation disclosed here, not after download.</div>
+        <div class="rt">/approvals/export</div></a>
+    </div>
+  </div>
+  <div class="note"><b>The constraint is not the problem; honouring only half of it was.</b>
+    &ldquo;No Approve button on the Review queue&rdquo; was satisfied by deleting a button.
+    The deliberate act it implies must happen <i>somewhere</i> never got a home. The rule
+    still holds absolutely in the redesign &mdash; there is no Approve control on the queue
+    or on a finding &mdash; it simply now exists on exactly one screen, reached on purpose.</div>
+</div>
+
+<!-- ============================= J3 ============================= -->
+<div class="jrny">
+  <div class="top">
+    <div class="av">DO</div>
+    <div class="id">
+      <div class="who">J3 &middot; D. Okafor &middot; controller &mdash; and the audit committee behind her</div>
+      <div class="q">&ldquo;Was last period&rsquo;s close clean?&rdquo;</div>
+    </div>
+    <span class="verdict">Cannot even be started</span>
+  </div>
+  <div class="tw">
+    <div>Trigger<b>Audit committee papers due; last close signed 04 Jun</b></div>
+    <div>Difficulty<b>The honest answer is not yes or no</b></div>
+    <div>Refusals engaged<b>A20 materiality &middot; A21 certification</b></div>
+    <div>Success looks like<b>I can say what was examined and what nothing looked at</b></div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Today</div>
+    <div class="track">
+      <div class="stepc stop"><div class="k">1 &middot; Choose a period</div><div class="v">There is no period selector</div>
+        <div class="w">Every screen in the product is hard-bound to 2026-06 day 3. No retrospective surface exists anywhere, so the journey cannot be started.</div>
+        <div class="rt">nowhere</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Proposed</div>
+    <div class="track">
+      <a class="stepc newst" href="p6-period-record.html"><div class="k">1 &middot; Choose</div><div class="v">Period record, 2026-05</div>
+        <div class="w">Period selector in the context bar. The period becomes an object.</div>
+        <div class="rt">/period/2026-05</div></a>
+      <a class="stepc newst" href="p6-period-record.html"><div class="k">2 &middot; Meet the refusal first</div><div class="v">&ldquo;Not a statement that the period was clean&rdquo;</div>
+        <div class="w">A20 and A21 rendered at the exact moment a user asks for the thing the product refuses.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p6-period-record.html"><div class="k">3 &middot; What was examined</div><div class="v">331 detections, 19 routed, 19 resolved</div>
+        <div class="w">Coverage as a population strip: 48 of 48 declared members.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p6-period-record.html"><div class="k">4 &middot; What was <i>not</i> concluded</div><div class="v">11 abstentions, 4 refusals, 0 unrunnable checks</div>
+        <div class="w">A first-class figure, never folded into &ldquo;no issues found&rdquo;, never in a precision denominator.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p15-dispositions.html"><div class="k">5 &middot; Did we keep our word</div><div class="v">Predictions that came due</div>
+        <div class="w">One missed and unexplained. This is where the F32 control finally pays for itself.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc" href="p10-agent.html"><div class="k">6 &middot; Consequence</div><div class="v">It blocks an agent&rsquo;s promotion</div>
+        <div class="w">The missed prediction is condition P2. Not met, so the agent is not promotable.</div>
+        <div class="rt">/evidence/agents/…</div></a>
+    </div>
+  </div>
+  <div class="note"><b>Step 2 is the most product-specific thing in the whole redesign.</b>
+    A user asks for a verdict the product refuses to give. Rather than hiding that on a
+    page nobody visits, the refusal <i>is</i> the top of the screen they asked for, in the
+    brand&rsquo;s serif, followed by the six substantiable figures that are the honest
+    answer.</div>
+</div>
+
+<!-- ============================= J4 ============================= -->
+<div class="jrny">
+  <div class="top">
+    <div class="av">MH</div>
+    <div class="id">
+      <div class="who">J4 &middot; M. Haddad &middot; FP&amp;A analyst &mdash; the explainer</div>
+      <div class="q">&ldquo;Why did Transmission O&amp;M move $86k this period?&rdquo;</div>
+    </div>
+    <span class="verdict">No surface. No persona button.</span>
+  </div>
+  <div class="tw">
+    <div>Trigger<b>Variance pack due to the business next morning</b></div>
+    <div>Status<b>Net-new scope &mdash; pending a ruling, not claimed as covered</b></div>
+    <div>Refusals engaged<b>A19 estimates &middot; A22 technical accounting</b></div>
+    <div>Success looks like<b>I can defend the number without inventing a story</b></div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Today</div>
+    <div class="track">
+      <div class="stepc stop"><div class="k">1 &middot; Be the persona</div><div class="v">There is no third button</div>
+        <div class="w">The persona switch offers staff and controller. PROJECT_CONTEXT line 2507 concedes it: the FP&amp;A persona has no functioning surface.</div>
+        <div class="rt">nowhere</div></div>
+      <div class="stepc stop"><div class="k">2 &middot; Ask</div><div class="v">Ask is a detection-run composer</div>
+        <div class="w">It parameterises detection skills over populations. An FP&amp;A inquiry reaches a decline.</div>
+        <div class="rt">/ask</div></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="lbl">Proposed &mdash; pending a scope ruling</div>
+    <div class="track">
+      <a class="stepc newst" href="p7-inquiry.html"><div class="k">1 &middot; Mode</div><div class="v">Ask &rarr; Inquire</div>
+        <div class="w">Two modes chosen before you ask: Detect, and Inquire.</div>
+        <div class="rt">/ask?mode=inquire</div></a>
+      <a class="stepc newst" href="p7-inquiry.html"><div class="k">2 &middot; The substantiable half</div><div class="v">What moved, and what it is made of</div>
+        <div class="w">Decomposition to the posting, the certified metrics and joins used, the population covered.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="p12-refusals.html"><div class="k">3 &middot; The refusal</div><div class="v">&ldquo;Why&rdquo; is where this stops</div>
+        <div class="w">A22 named, linked to the register, decided at the broker. Not a failed answer &mdash; a refused speech act.</div>
+        <div class="rt">&mdash;</div></a>
+      <a class="stepc newst" href="v2-item.html"><div class="k">4 &middot; Go somewhere useful</div><div class="v">The open finding on this account</div>
+        <div class="w">And the reclass someone proposed on the same 14 postings.</div>
+        <div class="rt">/queue/54100</div></a>
+    </div>
+  </div>
+  <div class="note"><b>This journey depends on a scope decision that is not mine to
+    make.</b> It is drawn rather than omitted because you cannot rule on an FP&amp;A surface
+    you have not seen. The claim worth arguing: an inquiry surface that hands over the
+    decomposition and openly refuses the narrative is <i>more</i> useful to an analyst who
+    must defend a variance than one that manufactures a plausible sentence &mdash; and it
+    is the only shape that does not breach A19 or A22.</div>
+</div>
+
+<div class="callout" style="margin-top:36px">
+  <h3>What these four maps decide</h3>
+  <p>J1 works but ends in silence. J2 and J3 cannot be walked. J4 has no persona. Three of
+  the four failures are <b>missing destinations</b>, not missing features &mdash; the
+  evidence, the controls and the grammar already exist and are good. That is the case for
+  the information architecture, stated as journeys rather than as a menu.</p>
+  <div class="btnrow">
+    <a class="btn go" href="index.html">Back to the review page</a>
+    <a class="btn" href="v2-close.html">Start J1 &mdash; the close overview</a>
+    <a class="btn" href="v2-approvals.html">Start J2 &mdash; approvals</a>
+  </div>
+</div>
+
+</div></body></html>

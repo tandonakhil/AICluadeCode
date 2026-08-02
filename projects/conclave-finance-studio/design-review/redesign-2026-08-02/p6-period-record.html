@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>Period record 2026-05 — Conclave Finance Studio</title>
+<script src="theme.js"></script>
 <link rel="stylesheet" href="ds.css"></head><body>
 <div class="shell">
 
@@ -9,16 +10,17 @@
   <a href="p4-close-controller.html" class="navitem"><span>Close</span></a>
   <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
   <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">4</span></a>
-  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
   <div class="navgrp">Evidence</div>
   <a href="p6-period-record.html" class="navitem on" aria-current="page"><span>Period record</span></a>
-  <a href="#runs" class="navsub">Runs &amp; dossiers</a>
-  <a href="#agents" class="navsub">Agents &amp; datasets</a>
-  <a href="#refusals" class="navsub">What we refuse to do</a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
   <div class="navspacer"></div>
   <div class="navfoot">
     <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
-    <a href="#" class="navsub">My probe history</a>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
     <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
   </div>
 </nav>
@@ -106,10 +108,10 @@
     <div class="lbl">Runs and dossiers &mdash; NEW HOME for six modules currently bolted onto the queue</div>
     <table class="t">
       <tr><th>Run</th><th>Agent</th><th>Detections</th><th>Coverage</th><th>Modules</th></tr>
-      <tr><td><a href="#">RUN-2026-05-0388</a></td><td>omission-detector v3.1.0</td>
+      <tr><td><a href="p9-run.html">RUN-2026-05-0388</a></td><td>omission-detector v3.1.0</td>
         <td class="n">104</td><td>100%</td>
         <td>Fidelity &middot; Boundary checks &middot; Coding anomalies &middot; Backtest</td></tr>
-      <tr><td><a href="#">RUN-2026-05-0391</a></td><td>crossperiod-surveillance v2.2</td>
+      <tr><td><a href="p9-run.html">RUN-2026-05-0391</a></td><td>crossperiod-surveillance v2.2</td>
         <td class="n">227</td><td>100%</td>
         <td>Fidelity &middot; Boundary checks &middot; Backtest</td></tr>
     </table>
@@ -131,13 +133,13 @@
     <div class="lbl">Agents &mdash; readiness is a property of an agent, not a top-level screen</div>
     <table class="t">
       <tr><th>Agent</th><th>Version</th><th>Tier</th><th>Promotion readiness</th><th>Precision (concluded only)</th></tr>
-      <tr><td><a href="#">crossperiod-surveillance</a></td><td>v2.2</td><td>Tier 1</td>
+      <tr><td><a href="p10-agent.html">crossperiod-surveillance</a></td><td>v2.2</td><td>Tier 1</td>
         <td><b style="color:var(--risk-2)">Not ready</b> &mdash; 4 of 5 conditions not met or not yet evaluable</td>
         <td class="n">0.9123</td></tr>
-      <tr><td><a href="#">omission-detector</a></td><td>v3.1.0</td><td>Tier 1</td>
+      <tr><td><a href="p10-agent.html">omission-detector</a></td><td>v3.1.0</td><td>Tier 1</td>
         <td><b style="color:var(--risk-2)">Not ready</b> &mdash; P1, P4, P5 not yet evaluable</td>
         <td class="n">0.8840</td></tr>
-      <tr><td><a href="#">coding-detect</a></td><td>v1.4.2</td><td>Tier 1</td>
+      <tr><td><a href="p10-agent.html">coding-detect</a></td><td>v1.4.2</td><td>Tier 1</td>
         <td><b style="color:var(--risk-2)">Not ready</b> &mdash; P3 not demonstrated</td>
         <td class="n">0.6667</td></tr>
     </table>
@@ -172,7 +174,7 @@
 
   <div class="card">
     <div class="lbl">Take this period to an auditor</div>
-    <a class="btn" href="p5-approvals.html">Build the 2026-05 auditor export</a>
+    <a class="btn" href="p5b-export.html">Build the 2026-05 auditor export</a>
     <div class="note">Retention stamp: 2033-06-04. <b style="color:var(--risk-2)">Immutable
       retention is not enforced in this build.</b> The stamp is a date, not an
       enforcement, and it renders adjacent to the date because a date reads as

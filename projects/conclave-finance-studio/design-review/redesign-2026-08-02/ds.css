@@ -12,6 +12,15 @@
  --risk-3:#7A1214;--risk-3-bg:#F6E4E3;--surface:#FFFFFF;--surface-2:#F0F0EC;
  --surface-3:#E7E7E1;--uncert:#5C636E;--uncert-bg:#F1F1EF;}
 
+/* Dark tokens — copied VERBATIM from the running pilot. Not re-derived, not
+   approximated. Verified in this pass by rendering every prototype screen at
+   ?theme=dark; see index.html §8. */
+[data-theme=dark]{--accent:#7AA2F7;--accent-bg:#161E2C;--bg:#0E1013;--ink:#E7E9ED;
+ --ink-2:#A6ADB9;--ink-3:#8B929E;--line:#2B303A;--line-2:#3A414D;--refuse:#94A3B8;
+ --refuse-bg:#1B2029;--risk-1:#B87E24;--risk-1-bg:#2A2116;--risk-2:#EE7B6B;
+ --risk-2-bg:#2D1A18;--risk-3:#FF8C7C;--risk-3-bg:#3A1C19;--surface:#16191F;
+ --surface-2:#1D212A;--surface-3:#252A34;--uncert:#8B93A1;--uncert-bg:#1A1E25;}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
@@ -260,3 +269,66 @@ details.narrative .bd{padding:0 13px 13px;font-size:13.5px;color:var(--ink-2);ma
 .verdict h3{font-size:14.5px;margin-bottom:5px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:900px){.two{grid-template-columns:1fr}}
+
+/* The pilot inverts white-on-accent in dark because the dark accent is a light
+   blue. Carried over verbatim rather than re-derived. */
+[data-theme=dark] .btn.primary{color:var(--bg)}
+
+/* NEW — before/after comparison rig (review artefact only) */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line-2);
+ border-radius:8px;overflow:hidden;margin-top:14px;background:var(--surface)}
+@media(max-width:1000px){.cmp{grid-template-columns:1fr}}
+.cmp>div{min-width:0}
+.cmp .chd{padding:10px 13px;font-size:13.5px;border-bottom:1px solid var(--line-2);
+ background:var(--surface-2)}
+.cmp .chd b{display:block;font-size:14.5px}
+.cmp .before .chd{border-left:6px solid var(--risk-2)}
+.cmp .after  .chd{border-left:6px solid var(--accent)}
+.cmp .before{border-right:1px solid var(--line-2)}
+.cmp .shot{height:660px;overflow:hidden;background:var(--bg)}
+.cmp .shot.scroll{overflow:auto}
+.cmp .shot img{display:block;width:100%}
+.cmp .shot iframe{display:block;width:1430px;height:1570px;border:0;
+ transform:scale(.42);transform-origin:0 0}
+.cmp .cft{padding:11px 13px;font-size:12.5px;color:var(--ink-2);
+ border-top:1px solid var(--line-2)}
+
+/* NEW — type specimen rig (review artefact only) */
+.spec{border:1px solid var(--line-2);border-radius:8px;background:var(--surface);
+ padding:16px;margin-top:14px}
+.spec .rowx{display:grid;grid-template-columns:150px 1fr 92px;gap:14px;
+ padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.spec .rowx:last-child{border-bottom:0}
+.spec .tag{font-size:12.5px;color:var(--ink-3)}
+.spec .px{font-family:ui-monospace,monospace;font-size:13.5px;text-align:right}
+.spec .px.bad{color:var(--risk-2);font-weight:700}
+.spec .px.ok{color:var(--ink);font-weight:700}
+.s10{font-size:10px}.s105{font-size:10.5px}.s115{font-size:11.5px}
+.s125{font-size:12.5px}.s13{font-size:13px}.s14{font-size:14px}
+
+/* NEW — walkthrough step ribbon on the review page */
+.walk{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.walk a{border:1px solid var(--line-2);border-radius:6px;background:var(--surface);
+ padding:8px 11px;font-size:13px;text-decoration:none;color:var(--ink);min-width:0}
+.walk a b{display:block;font-size:12px;color:var(--ink-3);font-weight:600;
+ letter-spacing:.06em;text-transform:uppercase}
+.walk a:hover{background:var(--surface-2)}
+.walk a.new{border-color:var(--accent);border-style:dashed;background:var(--accent-bg)}
+
+/* NEW — screen index grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.gcard{border:1px solid var(--line-2);border-radius:8px;background:var(--surface);
+ padding:12px;text-decoration:none;color:inherit;display:block}
+.gcard:hover{background:var(--surface-2)}
+.gcard .gt{font-size:14.5px;font-weight:640}
+.gcard .gr{font-size:12.5px;color:var(--ink-3);font-family:ui-monospace,monospace;margin-top:2px}
+.gcard .gd{font-size:12.5px;color:var(--ink-2);margin-top:6px}
+.gcard.new{border-color:var(--accent);border-style:dashed}
+.gcard.demoted{border-color:var(--refuse);background:var(--refuse-bg)}
+
+/* NEW — edge list */
+.edge{display:grid;grid-template-columns:1fr 26px 1fr 108px;gap:10px;align-items:center;
+ padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.edge:last-child{border-bottom:0}
+.edge .ar{text-align:center;color:var(--ink-3)}
+.edge .st{font-size:12px;text-align:right;color:var(--risk-2);font-weight:640}

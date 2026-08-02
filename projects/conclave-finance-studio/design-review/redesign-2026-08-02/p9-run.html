@@ -1,0 +1,232 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>RUN-2026-06-0412 — run report — Conclave Finance Studio</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">6</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p9-run.html" class="navsub" style="color:var(--accent);font-weight:620">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p6-period-record.html">Period record 2026-06</a> &rsaquo;
+    Runs &rsaquo; RUN-2026-06-0412</div>
+  <h1 class="pagehd">RUN-2026-06-0412</h1>
+  <div class="pagesub">
+    Completed 03 Jul 2026 18:42 UTC &middot;
+    agent <a href="p10-agent.html">omission-detector v3.1.0</a> &middot;
+    dataset <a href="p11-catalogue.html">gl_balances vFIXTURE-2026.06.03-a</a> &middot;
+    invoked by user.j.mbeki
+  </div>
+
+  <div class="partial" style="border-color:var(--accent);background:var(--accent-bg)">
+    <b>This page is the composition fix.</b> Everything below the volume masthead was
+    appended to <code>/exceptions</code> in the pilot, underneath a six-row work queue,
+    making that page 3,483px tall with the accountant&rsquo;s actual work at about 7% of it.
+    <b>These six modules are properties of a <i>run</i>, not of anyone&rsquo;s night.</b>
+    Given the run an object of its own, they have a correct home &mdash; and
+    <a href="p2-queue.html">My queue</a> becomes a queue.
+    <span class="nodismiss">Nothing here was cut. Every module is present, in full.</span>
+  </div>
+
+  <div class="volume card" style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+    <div><div class="lbl">Detections</div>
+      <div style="font-size:30px;font-weight:700" class="mono">214</div></div>
+    <div style="font-size:22px;color:var(--ink-3)">&rarr;</div>
+    <div><div class="lbl">Routed to a human</div>
+      <div style="font-size:30px;font-weight:700" class="mono">6</div></div>
+    <div style="flex:1;min-width:260px;font-size:13.5px;color:var(--ink-2)">
+      208 were closed without reaching a human: disposed by standing guardrail policy
+      approved cold, held as prior-period R1 still within expiry, or duplicates.
+      <b>Every one of them is listed and reachable below. None is hidden.</b>
+      <a href="#all">See all 214 &rarr;</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Coverage this run achieved</div>
+    <div class="covstrip" role="img" aria-label="Population strip: 7 of 10 declared members scanned">
+      <div class="covseg scanned" style="flex:7">7 scanned</div>
+      <div class="covseg gap hatch" style="flex:1">29100 (1)</div>
+      <div class="covseg gap hatch" style="flex:1">31200 (1)</div>
+      <div class="covseg gap hatch" style="flex:1">31300 (1)</div>
+    </div>
+    <div class="covlegend"><span><b class="mono">70%</b> coverage of 10 declared members</span>
+      <span>3 segments unscanned, named above</span></div>
+    <div class="partial"><b>Partial run &mdash; 70% coverage.</b> This run cannot support a
+      negative assurance conclusion for 2026-06, and cannot support a conclusion about the
+      3 members it did not scan.
+      <span class="nodismiss">Non-dismissable. Reproduced verbatim in the dossier and in the export.</span></div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m1">Module 1 &mdash; Warehouse-to-ERP fidelity (F26)</h2>
+  <div class="card">
+    <div class="partial">4 divergences between the warehouse and the ERP control extract
+      across the 48 declared members of <span class="mono">pop.erp_tieout_balances@1</span>,
+      at 100% coverage.</div>
+    <table class="t">
+      <tr><th>Leg</th><th>State</th><th>Coverage</th></tr>
+      <tr><td>A1 &mdash; Warehouse-to-ERP fidelity</td><td><span class="pill">Ran</span></td>
+        <td>100% of 48 declared members</td></tr>
+      <tr><td>A2 &mdash; Feed staleness and batch completeness</td><td><span class="pill">Ran</span></td>
+        <td>100% of 4 declared members</td></tr>
+    </table>
+    <table class="t">
+      <tr><th>Account</th><th>Period</th><th class="n">Difference</th><th>Direction</th>
+        <th class="n">Warehouse</th><th class="n">ERP control extract</th></tr>
+      <tr><td>1000-6100-000</td><td>1</td><td class="n">250.00</td><td>warehouse higher</td>
+        <td class="n">48250.00</td><td class="n">48000.00</td></tr>
+      <tr><td>1000-6200-000</td><td>7</td><td class="n">0.01</td><td>warehouse higher</td>
+        <td class="n">87500.01</td><td class="n">87500.00</td></tr>
+      <tr><td>1000-6300-000</td><td>12</td><td class="n">-1204.06</td><td>ERP higher</td>
+        <td class="n">106795.94</td><td class="n">108000.00</td></tr>
+      <tr><td>1000-6400-000</td><td>4</td><td class="n">-47900.00</td><td>ERP higher</td>
+        <td class="n">76100.00</td><td class="n">124000.00</td></tr>
+    </table>
+    <div class="note">Totals compared: warehouse 7790145.95 against ERP control extract
+      7839000.00 (48 members). Tolerance in force: 0.</div>
+    <div class="partial">Scheduled load batch LB-2026-12-B never arrived. Expected
+      2026-12-02T04:00:00+00:00. It would have contributed
+      pop_tieout_balances / 1000-6400-000.</div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m2">Module 2 &mdash; Boundary checks: five results, and &lsquo;not run&rsquo; is a result</h2>
+  <div class="card">
+    <div class="partial">This boundary run does <b>NOT</b> state that the five checks
+      passed. 1 of the 5 could not run (A9), so no conclusion covers them. 4 of the
+      remaining failed.</div>
+    <table class="t">
+      <tr><th>Check</th><th>Result</th><th>Detail</th></tr>
+      <tr><td>A6 &mdash; Subledger to GL control account</td>
+        <td><span class="pill r2">Failed &mdash; 1 finding</span></td>
+        <td>Subledger differs from GL control account by 18450.00. 100% coverage of 24 declared members.</td></tr>
+      <tr><td>A7 &mdash; Intercompany pair imbalance</td>
+        <td><span class="pill r2">Failed &mdash; 1 finding</span></td>
+        <td>Intercompany pair does not net to zero. 100% coverage of 24 declared members.</td></tr>
+      <tr><td>A8 &mdash; Roll-forward continuity</td>
+        <td><span class="pill r2">Failed &mdash; 1 finding</span></td>
+        <td>Opening balance does not continue the prior period&rsquo;s closing balance. 91% coverage of 48 declared members.</td></tr>
+      <tr><td>A9 &mdash; FX / CTA arithmetic</td>
+        <td><span class="pill notrun" style="color:var(--risk-1);border-color:var(--risk-1);background:var(--risk-1-bg);font-weight:660">Not run</span></td>
+        <td>Dataset not available: dw.fx_revaluation. <b>This is not a pass and carries no
+          coverage figure.</b> The declared expected population pop.revalued_accounts@1
+          could not be resolved: GES returned 500 for boundary.revaluation_inputs@1.</td></tr>
+      <tr><td>A10 &mdash; Suspense / clearing residual</td>
+        <td><span class="pill r2">Failed &mdash; 12 findings</span></td>
+        <td>Suspense/clearing residual exceeds the policy threshold in force. 100% coverage
+          of 24 declared members. This check covers the residual BALANCE only. It makes no
+          claim about the residual&rsquo;s composition: offsetting items of any size net to
+          a balance within threshold and are not detected here.</td></tr>
+    </table>
+    <div class="note">&lsquo;Not run&rsquo; renders in risk colour, never neutral. A check
+      that could not run is closer in meaning to a failure than to a pass (convention C2).</div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m3">Module 3 &mdash; Coding anomalies (F33)</h2>
+  <div class="card">
+    <table class="t">
+      <tr><th>Posting</th><th>Sub-type</th><th>In scope</th><th>Coded</th><th>Proposed</th><th>Evidence</th></tr>
+      <tr><td>PST-4001</td><td>cost centre</td><td>Yes</td><td>CC-4420</td><td>CC-4180</td>
+        <td>166 comparable postings, 0.9819 agreement</td></tr>
+      <tr><td>PST-4002</td><td>natural account</td><td>Yes</td><td>54180</td><td>54100</td>
+        <td>166 comparable postings, 1.0000 agreement</td></tr>
+      <tr><td>PST-4003</td><td>intercompany segment</td><td>No &mdash; detection only</td><td>IC-200</td>
+        <td><b>No proposal is made</b></td>
+        <td>A legal-entity or intercompany segment reclass moves a balance between entities. Outside A3 scope.</td></tr>
+      <tr><td>PST-4004</td><td>caption crossing</td><td>No &mdash; detection only</td><td>Construction WIP</td>
+        <td><b>No proposal is made</b></td>
+        <td>An opex/capex caption crossing changes the financial statements, not only management reporting. Outside A3 scope.</td></tr>
+      <tr><td>PST-4005</td><td>cut-off</td><td>No &mdash; detection only</td><td>12</td>
+        <td><b>No proposal is made</b></td>
+        <td>Cut-off resolution is NOT proposed by this system. Deciding which is right is a
+          judgement about when a transaction occurred, and this system proposes no journal for it.</td></tr>
+    </table>
+    <div class="note">The three out-of-scope sub-types are detections with no proposal
+      attached. They are shown because a detection withheld is a detection nobody can act
+      on.</div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m4">Module 4 &mdash; Backtest evidence for the coding model version</h2>
+  <div class="card">
+    <div class="kv"><span class="k">Model version</span><span class="v">coding-detect v1.4.2</span></div>
+    <div class="kv"><span class="k">Prompt version</span><span class="v">coding-proposal-prompt v3</span></div>
+    <div class="kv"><span class="k">Held-out period</span><span class="v">3</span></div>
+    <div class="kv"><span class="k">Label count</span><span class="v">4</span></div>
+    <div class="kv"><span class="k">Precision</span><span class="v">0.6667 (2 of 3 proposed)</span></div>
+    <div class="kv"><span class="k">Recall</span><span class="v">0.5000 (2 of 4 labelled)</span></div>
+    <div class="partial">Recall is measured against reclass-journal-caught errors ONLY. The
+      labels are historical reclassification journals: they record the coding errors a
+      human found and corrected. Coding errors nobody ever found are in neither the
+      numerator nor the denominator, so recall against all coding errors is unknown and is
+      not claimed here.</div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m5">Module 5 &mdash; A second held-out period, for contrast</h2>
+  <div class="card">
+    <div class="partial">No reclassification-journal labels were available for held-out
+      period 9. <b>No precision and no recall figure is emitted: with zero labels there is
+      nothing to be right or wrong about.</b></div>
+    <div class="note">No precision and no recall figure is shown. A zero here would be an
+      accuracy claim, and none was obtained.</div>
+  </div>
+
+  <h2 style="margin-top:24px" id="m6">Module 6 &mdash; Abstentions raised by this run</h2>
+  <div class="abstention">
+    <div class="hd">The system could not establish this.</div>
+    <div class="kv"><span class="k">Abstention</span><span class="v">AB2 &mdash; coverage insufficient</span></div>
+    <div class="kv"><span class="k">Item</span><span class="v"><a href="p3-item.html">13800 Intercompany Receivable &ndash; NGH-CA-200</a></span></div>
+    <div class="kv"><span class="k">Evidence gap</span><span>The counterparty leg is in NGH-CA-200, which was not selected for this run.</span></div>
+    <div class="kv"><span class="k">What would resolve it</span><span>Select the Intercompany &ndash; NGH-CA-200 dataset and re-run.</span></div>
+    <div class="kv"><span class="k">Is this a negative finding?</span><span><b>No. This is not a statement that anything is wrong.</b></span></div>
+  </div>
+
+  <h2 style="margin-top:24px" id="all">All 214 detections</h2>
+  <div class="card">
+    <div class="qtools">
+      <a class="chip on" href="#">All (214)</a>
+      <a class="chip" href="#">Routed to a human (6)</a>
+      <a class="chip" href="#">Disposed by standing policy (191)</a>
+      <a class="chip" href="#">Held as prior-period R1 (12)</a>
+      <a class="chip" href="#">Duplicates (5)</a>
+    </div>
+    <table class="t">
+      <tr><th>Detection</th><th>Account</th><th>Outcome</th><th>Rule / route</th><th>Dossier</th></tr>
+      <tr><td>DET-0001</td><td>18300</td><td>Routed to A. Reyes</td><td>above threshold</td>
+        <td><a href="p13-dossier.html">DOS-…-02</a></td></tr>
+      <tr><td>DET-0002</td><td>19900</td><td>Auto-disposed</td>
+        <td class="mono">COLD-ROUNDING-TOLERANCE-1</td><td><a href="p13-dossier.html">DOS-…-06</a></td></tr>
+      <tr><td>DET-0003</td><td>11500</td><td>Routed to A. Reyes</td><td>4.1 sigma</td>
+        <td><a href="p13-dossier.html">DOS-…-03</a></td></tr>
+      <tr><td colspan="5"><i>&hellip; 211 further detections, each with an outcome, a rule and a dossier</i></td></tr>
+    </table>
+    <div class="note">The 208 that never reached a human are listed here rather than
+      summarised. A volume-reduction claim that cannot be inspected is a claim about
+      nothing.</div>
+  </div>
+</main>
+</div></body></html>

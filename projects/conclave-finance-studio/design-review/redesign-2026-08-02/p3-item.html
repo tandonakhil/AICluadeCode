@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>18300 Deferred Storm Restoration Costs — Conclave Finance Studio</title>
+<script src="theme.js"></script>
 <link rel="stylesheet" href="ds.css"></head><body>
 <div class="shell">
 
@@ -9,16 +10,17 @@
   <a href="p1-close-staff.html" class="navitem"><span>Close</span></a>
   <a href="p2-queue.html" class="navitem on" aria-current="page"><span>My queue</span><span class="cnt">6</span></a>
   <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
-  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
   <div class="navgrp">Evidence</div>
   <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
-  <a href="p6-period-record.html#runs" class="navsub">Runs &amp; dossiers</a>
-  <a href="p6-period-record.html#agents" class="navsub">Agents &amp; datasets</a>
-  <a href="p6-period-record.html#refusals" class="navsub">What we refuse to do</a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
   <div class="navspacer"></div>
   <div class="navfoot">
     <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
-    <a href="#" class="navsub">My probe history</a>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
     <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
   </div>
 </nav>
@@ -83,11 +85,13 @@
         <div class="kv"><span class="k">Guardrail bundle</span><span class="v">v14 &ndash; 9f3a71c2</span></div>
         <div class="kv"><span class="k">Decision ID</span><span class="v">DEC-8842-2026-06</span></div>
         <div class="kv"><span class="k">Dataset version</span>
-          <span class="v"><a href="p6-period-record.html#agents">gl_balances vFIXTURE-2026.06.03-a</a></span></div>
+          <span class="v"><a href="p11-catalogue.html">gl_balances vFIXTURE-2026.06.03-a</a></span></div>
         <div class="kv"><span class="k">Agent</span>
-          <span class="v"><a href="p6-period-record.html#agents">omission-detector v3.1.0</a></span></div>
+          <span class="v"><a href="p10-agent.html">omission-detector v3.1.0</a></span></div>
         <div class="kv"><span class="k">Run</span>
-          <span class="v"><a href="p6-period-record.html#runs">RUN-2026-06-0412</a></span></div>
+          <span class="v"><a href="p9-run.html">RUN-2026-06-0412</a></span></div>
+        <div class="kv"><span class="k">Evidence dossier</span>
+          <span class="v"><a href="p13-dossier.html">DOS-2026-06-0412-02</a></span></div>
         <div class="kv"><span class="k">Coverage of this run</span><span class="v">70% &mdash; partial</span></div>
         <div class="note">Every one of these is now a link. In the pilot all six were dead
           text: the finding could not reach the run that produced it, the agent that
@@ -155,9 +159,9 @@
   </div>
 
   <div style="margin-top:14px">
-    <button class="btn primary">Save this resolution</button>
+    <a class="btn primary" href="p3-item-saved.html">Save this resolution</a>
     <button class="btn">Reject &mdash; select a reason first</button>
-    <a class="btn" href="p6-period-record.html#runs">Open the evidence dossier</a>
+    <a class="btn" href="p13-dossier.html">Open the evidence dossier</a>
     <span class="sub"> One item. There is no control anywhere in this product that
       disposes of more than one item in a single action.</span>
   </div>
@@ -185,7 +189,10 @@
       confirmation, the item is not struck from any list, the nav badge does not move,
       and the record it creates on <code>/dispositions</code> is not linked from
       anywhere. This is the last step of the loop the staff accountant runs six times a
-      night, and it is the point at which the product stops.</div>
+      night, and it is the point at which the product stops.
+      <br><b>Walkable here:</b> <a href="p3-item-saved.html">step 5, resolution
+      recorded &rarr;</a> then <a href="p2-queue-after.html">step 6, back to a queue of
+      5 &rarr;</a>. Or press <b>Save this resolution</b> above.</div>
   </div>
 </main>
 </div></body></html>

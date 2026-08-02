@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>Approvals — Conclave Finance Studio</title>
+<script src="theme.js"></script>
 <link rel="stylesheet" href="ds.css"></head><body>
 <div class="shell">
 
@@ -9,16 +10,17 @@
   <a href="p4-close-controller.html" class="navitem"><span>Close</span></a>
   <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
   <a href="p5-approvals.html" class="navitem on" aria-current="page"><span>Approvals</span><span class="cnt">4</span></a>
-  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <a href="p8-ask-detect.html" class="navitem"><span>Ask</span></a>
   <div class="navgrp">Evidence</div>
   <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
-  <a href="p6-period-record.html#runs" class="navsub">Runs &amp; dossiers</a>
-  <a href="p6-period-record.html#agents" class="navsub">Agents &amp; datasets</a>
-  <a href="p6-period-record.html#refusals" class="navsub">What we refuse to do</a>
+  <a href="p9-run.html" class="navsub">Runs &amp; dossiers</a>
+  <a href="p10-agent.html" class="navsub">Agents</a>
+  <a href="p11-catalogue.html" class="navsub">Datasets</a>
+  <a href="p12-refusals.html" class="navsub">What we refuse to do</a>
   <div class="navspacer"></div>
   <div class="navfoot">
     <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
-    <a href="#" class="navsub">My probe history</a>
+    <a href="p14-probe-history.html" class="navsub">My probe history</a>
     <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
   </div>
 </nav>
@@ -56,7 +58,7 @@
       <span class="s">Posts?</span><span class="n" style="text-align:right">Amount</span>
       <span>Author</span><span>State</span>
     </div>
-    <a class="qrow tier3" href="#detail">
+    <a class="qrow tier3" href="p5a-approval-detail.html">
       <div><span class="acct">54100</span></div>
       <div><b>R3 &mdash; reclassification proposed</b>
         <div class="desc">14 invoices CC-4420 &rarr; CC-4180. Cost only, single legal entity, single period.</div></div>
@@ -66,7 +68,7 @@
       <div class="desc">A. Reyes</div>
       <div class="desc">Awaiting you</div>
     </a>
-    <a class="qrow tier3" href="#detail">
+    <a class="qrow tier3" href="p5a-approval-detail.html">
       <div><span class="acct">18300</span></div>
       <div><b>R4 &mdash; accrual correction proposed</b>
         <div class="desc">Recurring amortisation absent from 2026-06.</div></div>
@@ -76,7 +78,7 @@
       <div class="desc">A. Reyes</div>
       <div class="desc">Awaiting you</div>
     </a>
-    <a class="qrow tier1" href="#detail">
+    <a class="qrow tier1" href="p5a-approval-detail.html">
       <div><span class="acct">11500</span></div>
       <div><b>R1 &mdash; accepted and explained</b>
         <div class="desc">Acceptance expires 2026-09.</div></div>
@@ -86,7 +88,7 @@
       <div class="desc">A. Reyes</div>
       <div class="desc">Awaiting you</div>
     </a>
-    <a class="qrow tier1" href="#detail">
+    <a class="qrow tier1" href="p5a-approval-detail.html">
       <div><span class="acct">19900</span></div>
       <div><b>R2 &mdash; data-side fix</b>
         <div class="desc">Warehouse/ERP segment difference referred to the feed owner.</div></div>
@@ -98,10 +100,14 @@
     </a>
   </div>
 
-  <h2 style="margin-top:26px" id="detail">54100 Transmission O&amp;M Expense &mdash; approve a reclassification</h2>
-  <div class="pagesub">The approval screen is the only place in this product where an
-    Approve control exists. It shows the resolution, its evidence, and the closure
-    that makes the approval valid.</div>
+  <h2 style="margin-top:26px" id="detail">Preview &mdash; 54100 Transmission O&amp;M Expense</h2>
+  <div class="pagesub">
+    An abridged preview of the approval screen, shown here only so the shape is visible
+    from the list.
+    <b><a href="p5a-approval-detail.html">Open the full approval screen &rarr;</a></b>
+    &mdash; that is where J2 continues, and it is the only place in this product where an
+    Approve control exists.
+  </div>
 
   <div class="riskband r2">
     <div class="cap">Riskiest element of this proposal</div>
@@ -145,7 +151,7 @@
     <div style="font-size:14px">Type the account number this moves <b>to</b> to confirm you
       read the proposal: <span style="border-bottom:2px solid var(--line-2);padding:0 40px">&nbsp;</span></div>
     <div style="margin-top:12px">
-      <button class="btn primary">Approve this reclassification</button>
+      <a class="btn primary" href="p5a-approval-detail.html">Approve this reclassification</a>
       <button class="btn">Return to author &mdash; reason required</button>
     </div>
     <div class="note">One item. There is no control that approves more than one item in a
@@ -153,7 +159,7 @@
   </div>
 
   <div class="card">
-    <div class="lbl">Export set for 2026-06 &mdash; what is in it and what is not</div>
+    <div class="lbl">Export set for 2026-06 &mdash; abridged; <a href="p5b-export.html">the full export screen &rarr;</a></div>
     <table class="t">
       <tr><th>Item</th><th>Resolution</th><th class="n">Amount</th><th>In export?</th><th>Why not</th></tr>
       <tr><td>54100 Transmission O&amp;M</td><td>R3 reclass</td><td class="n">86,340.00</td>
