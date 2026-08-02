@@ -948,6 +948,74 @@ undecided.
       construction" is that it now covers the viewer session and not the
       pilot's mutable stores.
 
+      **CLOSED at pass 14.** See the pass-14 entry below.
+
+- **2026-08-01 — Gate 7 pass 14: the interleaved-shuffle order dependence,
+  fixed at the level of the class. Judgement calls by `code-agent`.** Two
+  commits (`f90484e`, `fc197a6`). Pass 13 item 10 disclosed this rather than
+  fixing it; the orchestrator declined to record an override, and it is now
+  closed. The cause was **not** one class but two, and both were process state
+  that nothing restored:
+  1. **The pilot close accumulated, and the viewer-session restore snapshotted
+     too late.** Pass 13's snapshot/restore pair covered the persona and the
+     tier and left the dispositions, the workflow records, the probe queue and
+     the produced exports untouched. Worse, the snapshot was taken by a
+     FUNCTION-scoped fixture while pytest builds higher-scoped fixtures first:
+     a module-scoped fixture that walks every screen follows the real
+     `/ask?tier=exploration` link, so the "before" value was read from an
+     already-polluted process and the restore put the pollution faithfully
+     back, permanently. That is the whole of gate 8's `no control event was
+     recorded for a refused selection` — an exploration-tier run is not
+     action-capable, so the precheck the scenario drove was never the refusal
+     it was written about.
+  2. **DISCARD, NOT UNWIND, and at setup as well as teardown.**
+     `app/process_state.py` drops the `PilotState` instance and
+     `app.pilot_close`'s held runs. There is deliberately no rollback list:
+     every store hangs off the discarded instance in a temporary directory of
+     its own, so a seventh accumulating member is covered on the day it is
+     added rather than on the day somebody extends a list. Setup as well as
+     teardown, because teardown cannot reach what a higher-scoped fixture did
+     before the first scenario in its scope ran. `app.pilot_close` is a
+     declared holder because the F9 run it holds is passed the **disposition
+     store**, so a result first computed after a scenario closed items is a
+     held result about that scenario's close.
+  3. **The guard is an AST classification, not an enumeration of mutations.**
+     Every module-level mutable binding in a participating module must be
+     declared by whoever writes it as either a holder (discarded) or a frozen
+     lookup table. That is what keeps "discard `_STATE` and `_CACHE`" a
+     COMPLETE restore: a module-level dict added tomorrow is somewhere else
+     for state to live, and no existing check would notice it.
+  4. **Two session fixtures each bound a transport, and binding is
+     last-one-wins.** The unit tree and the SME suites each built a GES app
+     over a broker store of its own, so which store the application recorded
+     decisions into was decided by which tree's first scenario ran first —
+     `test_AC_F40_09...: TypeError: 'NoneType' object is not subscriptable`,
+     a scenario reading back a decision it had just caused and finding it in
+     the other tree's ledger. `backend/pilot_test_binding.py` binds once per
+     process and hands both fixtures the same store.
+  5. **GES-side state is REBUILT between scenarios, not cleared.** The broker's
+     decision ledger, the routing ledger's caps and routed counts, the CUEC
+     register and the supersession registry's observed watermarks all
+     accumulate across a session. UX-14's `AC-F36-19` scenario, whose own
+     docstring says a rate read off a ledger somebody else filled proves
+     nothing, was reading a `2` where it had caused a `0`. Rebuilt rather than
+     cleared for the same reason the close is discarded rather than unwound.
+     The warehouse is the one thing reused: the application never writes to it.
+  6. **One scenario genuinely depended on prior state and now sets it up
+     itself.** `test_AC_F36_29_each_record_states_which_kind_it_denied_as_a_
+     field_not_a_guess` read the decision ledger as it found it, which meant it
+     was really asserting that the scenario collected before it had run first.
+     It now produces its own action denial and emission denial through the two
+     real routes and additionally asserts `action` is present — asserting
+     **more** than before, not less. No scenario was weakened.
+  7. **The runtime cost was accepted, and it is large.** The whole tree in file
+     order goes from **56s at `55878c9`** to **169s** — 3×, +113s — because
+     every scenario now rebuilds the GES-side state and discards the close.
+     Interleaved runs are 171–278s depending on order and machine load. The
+     cost is the price of a result that does not depend on collection order,
+     and it is recorded here so gate 8 and `deploy-agent` are not surprised by
+     it. It is confined to the test process: no application path changed.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -1150,7 +1218,136 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `9d819c1`** (parent repo @ `331353a`)
+### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `55878c9`** (parent repo @ `8697994`) — pass-13 verification
+
+**All seven automated suites EXECUTED, exit code 0, 2,664 of 2,664 scenarios
+passed, zero skipped. The post-deploy smoke is 14 of 14 — the previous run's one
+FAIL is fixed.** Structured per-scenario evidence:
+`test-evidence/*-2026-07-31.md`, plus eight Playwright screenshots. **The entire
+superseded corpus was deleted and rewritten**; every file names both commits.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 2,000 | 2,000 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 354 | 354 | 0 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 26 | 26 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,664** | **2,664** | **0** | **0** | | |
+| post-deploy smoke | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. 2,000 + 664 = 2,664, which
+is the headline figure. The `ux` suite launched Chromium — its conftest exits 4
+(STATIC-ONLY) rather than passing if Playwright or the browser binary is absent,
+so exit 0 is positive evidence a rendering engine answered. No server was started
+inside this agent's turn; the pilot was started, driven and reaped inside single
+command invocations five times, and 8021 was verified free after each.
+
+**Test-count delta, re-derived rather than trusted.** `9d819c1` was checked out
+into a worktree and collected there: 2,602, reconciling with the previous
+headline. Node IDs were then diffed **set-wise**, not compared as totals.
+
+| | Count |
+|---|---|
+| `9d819c1` | 2,602 |
+| `55878c9` | 2,664 |
+| added | **+62** |
+| removed | **0** |
+| changed | **0** |
+
+Nothing was removed and nothing was silently replaced. All 62 additions sit in
+five files, all of them pass-13 work: `test_export_integrity_contract.py` (+20),
+`test_tier_selection.py` (+17), `test_warehouse_migration.py` (+13),
+`test_ui_state_session.py` (+9), and three `ARCH_05` scenarios in the
+architecture suite.
+
+**The four loop-back items — verified, not accepted.** Full evidence in
+`test-evidence/fix-verification-2026-07-31.md`.
+
+1. **F1, the persisted warehouse — FIXED.** The original failing drive was
+   re-run: the pilot as found, served on 8021, driven over stdlib HTTP through
+   approve → override → export. It returns **200** with a retrievable file, where
+   gate 8 got 403 `revalidation_could_not_run` / "no such column: period_status".
+   A **negative control** proves the plant is fair: a warehouse carrying all
+   three gap kinds still returns 403 at `9d819c1` and 200 at `55878c9`, from the
+   same file. The third gap kind was also driven **in isolation** — a warehouse
+   current in every other respect with `fx_revaluation` added — and the rebuild
+   still fires, the object is removed, and `AC-F28-07`'s "not run" stays at
+   exactly one. Repopulation was checked, not assumed: `suspense_residuals` comes
+   back with 24 rows, not as an empty recreated table.
+2. **F2, the viewer-session leak — FIXED.** `_restore_run_tier` exists only as a
+   comment explaining its removal. The `ux` suite passes reversed and at three
+   shuffle seeds; the whole tree passes reversed. **The AST guard was mutation-
+   tested**: planting `self.last_persona_switch = key` in `PilotState.view_as`
+   fails it, naming the attribute and the method that set it — and fails its own
+   negative control too, which is what stops the guard passing on a scan that
+   found nothing.
+3. **F3, `export.build` — FIXED.** The exact gate-8 mutation (`integrity = {}`
+   restored on both `Export.__init__` and `build()`) now kills **3 scenarios**
+   where it previously survived all 2,602; and `Export(..., integrity={})` is
+   refused at construction rather than producing a file naming neither criterion.
+   Both **content** legs were mutated separately and both killed 2 scenarios
+   each, so the contract is enforced on content and not on presence. Registers 3
+   and 4 are unchanged and open.
+4. **A2, the unknown run tier — FIXED.** Driven on the served pilot in both
+   directions: 400 from certified and 400 from exploration, the current tier
+   untouched either way, and the second route that takes the parameter refuses
+   identically. Empty and wrong-case values are also refused. The docstring that
+   contradicted the code is rewritten.
+
+**The carried-forward disclosure is ACCURATE.** `code-agent` reports that an
+interleaved shuffle of `backend/tests` with `tests/suites` is not order-clean and
+that it predates pass 13. Verified independently: at `55878c9` seeds 1/7/42/20260731
+give 2/1/1/0 failures; at `9d819c1`, from a worktree with its own confirmed
+`2602 passed` baseline, the identical plugin and seeds give **4/2/3/0** with an
+almost entirely disjoint failure set. It is a **known limitation, not a
+regression**, and the cause is the wider class disclosed — the control-event
+sink, accumulated dispositions and workflow records — not the viewer session.
+The two trees are order-clean as whole blocks and fully reversed; they are not
+order-clean interleaved, and the fixture isolation that would close that does not
+exist.
+
+**The standing question — `does any suite report a pass the register says cannot
+be true?` — returns NO for the fourth consecutive pass.** The register has 33
+entries (1–33, verified, no gaps). The five declared criteria `AC-F1-08`,
+`AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48` are claimed by **zero** of
+the 2,664 scenario names. Two node IDs now contain `AC-F1-11` and `AC-F1-08` as
+**parametrize labels** —
+`test_declaring_the_residual_without_naming_its_criterion_is_refused[anchor-AC-F1-11]`
+and `[retention-AC-F1-08]` — and both are on a scenario asserting the export is
+**refused** unless it names the criterion it does not meet. That is the denial
+stated at the strongest available place, not a claim; it is called out here
+because a mechanical scan would flag it. All 47 textual occurrences across the
+five are denials or assertions that the product's own disclosure names the
+criterion as unmet.
+
+**Two findings that are not suite failures but belong in front of a human.**
+
+- **The previous run's evidence corpus was never written.** The Test Results
+  entry below states the `f56ab9f` corpus was deleted and rewritten at
+  `9d819c1`. It was not: all nine files on disk at the start of this run still
+  read `Commit under test: dev @ f56ab9f · parent repo @ 8939ebb`. The narrative
+  summary claimed per-scenario evidence that did not exist — which is precisely
+  what the summary/source-of-record split exists to prevent. This run's corpus
+  supersedes it; the nine stale files were deleted, not left beside.
+- **Advisory, for `ui-ux-designer`:** rendered-UI capture at two viewports found
+  the navigation computing to **10px** and the provenance strip — which is where
+  `AC-F38-11`'s close-clock staleness lands — to **10.5–11.5px**, the smallest
+  text on every screen. No criterion or `UX_KB` rule declares an absolute minimum
+  type size (UX-4/`AC-F41-03` is a *relative* check), so no suite fails. Raised
+  because the reader `AC-F38-11` exists for is somebody reading a figure years
+  later. Screenshots in `test-evidence/`.
+
+**Gate status: the interleaved-shuffle order dependence is a failing blocking
+condition** — every suite is blocking under this project's Test Policy and no
+advisory exception is recorded. It is disclosed, pre-existing and reproduced at
+`9d819c1`, so the human's choice is between sending it back to `code-agent` for
+fixture isolation and recording an `[override]` in the Decisions Log naming the
+suite and the reason. Everything else on this gate is green.
+
+### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `9d819c1`** (parent repo @ `331353a`) — SUPERSEDED
 
 **All seven automated suites EXECUTED, exit code 0, 2,602 of 2,602 scenarios
 passed, zero skipped.** The post-deploy smoke is **12 of 13**, with one FAIL.
