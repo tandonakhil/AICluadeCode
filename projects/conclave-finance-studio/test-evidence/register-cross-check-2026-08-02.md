@@ -1,94 +1,116 @@
-# Test evidence — register cross-check
+# Test evidence — register cross-check (the standing question)
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test (final re-run)
+**Gate:** 8 · Test (re-run, pass 2)
 **Date:** 2026-08-02
-**Commit under test:** `dev` @ **`fc197a6`** · parent repo @ **`7ec615a`**
+**Commit under test:** `dev` @ **`75f5e27`** · parent repo @ **`21af9da`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
+**Entry point:** `pytest --collect-only -q -o addopts=` over the whole tree,
+plus an AST walk of every `test_*.py` docstring in both trees
+**Scenarios: 5 — PASS 5, FAIL 0**
 
-## The standing question
+> **The standing question:** does any suite report a pass the 33-entry
+> deferred-substitution register says cannot be true?
+>
+> **Answer, for the sixth consecutive pass: no.**
 
-> **Does any suite report a pass that the 33-entry register says cannot be true?**
-
-**No — for the fifth consecutive pass.**
-
----
-
-### Scenario: the register still has 33 entries, no gaps
-- Status: EXECUTED
-- Input: counted the distinct entry numbers in `PROJECT_CONTEXT.md`'s
-  "Deferred-substitution register"
-- Expected: 1–33, no gaps, no duplicates
-- Actual: `1 2 3 … 33`, **count 33**
-- Result: PASS
-- Evidence: distinct-and-sorted entry numbers `1..33`, `wc -l` = 33
-
-### Scenario: the five declared criteria are claimed by no scenario name
-- Status: EXECUTED
-- Input: searched every scenario name and node ID across all 2,692 collected
-  tests for `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`
-- Expected: **zero** scenario names claim any of the five
-- Actual: zero
-- Result: PASS
-- Evidence: no `def test_*` name in `backend/tests` or `tests/suites` contains
-  any of the five IDs.
-
-### Scenario: the five are claimed by no `COVERS` line either
-- Status: EXECUTED
-- Input: `grep -rn "COVERS" backend/tests tests/` filtered to the five IDs — a
-  name-only check would miss a docstring join, which is how gate 9 maps
-  criterion to test
-- Expected: either no hit, or a hit whose denial is **inside the join string**
-  so an ID-keyed mapper cannot score it satisfied (register 27)
-- Actual: **exactly two hits, both the known and closed `AC-F36-48` case**:
-  - `backend/tests/test_abstention.py:331` — `"""COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48, WHICH IS ITSELF DENIED:`
-  - `backend/tests/test_abstention.py:360` — `"""COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48 (its above-band tail), AND AC-F36-48 IS ITSELF DENIED:`
-  Zero `COVERS` lines name the other four.
-- Result: PASS
-- Evidence: register A1 is CLOSED on exactly this condition — the denial is
-  inside the join string, so a by-ID mapper reading the join reads
-  "WHICH IS ITSELF DENIED" with it. Unchanged from the previous pass.
-
-### Scenario: every other mention of the five is a denial, not a claim
-- Status: EXECUTED
-- Input: read all 40 mentions of the five IDs across the test tree
-- Expected: each is either the product **asserting the criterion is unmet**, or
-  a comment stating the criterion is not covered
-- Actual: all 40 are one of those two shapes. Representative:
-  - `assert stamp["unmet_criterion"] == "AC-F1-08"` (the build says it is unmet)
-  - `assert integrity["anchor"]["unmet_criterion"] == "AC-F1-11"`
-  - `assert payload["unmet_criterion"] == "AC-F40-17"` and
-    `assert declared["unmet_criteria"] == ["AC-F40-17"]`
-  - `# AC-F40-17 is not claimed, and the vocabulary keeps the two apart`
-  - `"""AC-F1-08 IS NOT SATISFIED BY THIS SCENARIO — do not map it to that ID.`
-  - `#: AC-REFUSAL-11 is NOT VERIFIED.` / `"""WHY AC-REFUSAL-11 IS NOT VERIFIED. Do not "fix" this scenario.`
-  - `# AC-F36-48 IS DENIED AND NO SCENARIO IN THIS FILE CLAIMS IT.`
-- Result: PASS
-- Evidence: a test that asserts the product **states a criterion is unmet** is
-  the opposite of a test claiming it satisfied, and both the smoke test (S10,
-  S11) and the served auditor export confirm those denials reach the reader.
-
-### Scenario: two node IDs still contain two of the IDs as parameters
-- Status: EXECUTED
-- Input: `test_export_integrity_contract.py:128` —
-  `[("anchor", "AC-F1-11"), ("retention", "AC-F1-08")]`
-- Expected: carried from the previous pass, and still on a scenario asserting
-  the export **declares these unmet**
-- Actual: unchanged, and the file header states it directly: "neither
-  `AC-F1-11` nor `AC-F1-08`. Required is not validated, because…"
-- Result: PASS
-- Evidence: the parametrisation drives `assert integrity["anchor"]["unmet_criterion"] == "AC-F1-11"`.
-  A mapper keying on node IDs would see the ID; the scenario it lands on
-  asserts the denial, so the reading is safe. Carried, unchanged, not blocking.
+The five declared criteria — `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+`AC-F40-17`, `AC-F36-48` — are claimed by **zero** of the **2,736** collected
+scenario names, other than two parametrisation labels that are part of a
+**refusal**, and by **zero** `COVERS` joins that are not self-denying.
 
 ---
 
-## Conclusion
+### Scenario: `AC-F1-08` (object-lock retention) is claimed nowhere
+- Status: EXECUTED
+- Input: all 2,736 node IDs, scanned for `AC-F1-08` and `AC_F1_08`
+- Expected: zero claims
+- Actual: **1 node-ID occurrence**, and it is a denial:
+  `test_declaring_the_residual_without_naming_its_criterion_is_refused[retention-AC-F1-08]`
+- Result: PASS
+- Evidence: the scenario asserts the export is **REFUSED** when the criterion is
+  not named. The ID is the parametrisation label of the thing being refused,
+  not a claim that it is satisfied. Elsewhere the ID appears only in
+  disclosure assertions (`unmet_criterion == "AC-F1-08"`) and in a comment in
+  `test_evidence_store.py` explicitly disclaiming a coverage join it once
+  carried.
 
-**No suite reports a pass the register says cannot be true.** Four consecutive
-contradiction-free passes has become five. The five declared criteria are
-claimed by zero of the 2,692 scenario names and by zero `COVERS` joins other
-than the two register-27-compliant `AC-F36-48` strings, whose denial travels
-inside the join.
+### Scenario: `AC-F1-11` (KMS-signed anchors) is claimed nowhere
+- Status: EXECUTED
+- Input: same scan
+- Expected: zero claims
+- Actual: **1 node-ID occurrence**, the sibling parametrisation
+  `[anchor-AC-F1-11]` on the same refusal scenario
+- Result: PASS
+- Evidence: `assert integrity["anchor"]["unmet_criterion"] == "AC-F1-11"` and
+  `assert "AC-F1-11 unmet" in statement` — the build states the criterion is
+  unmet, on the screen (smoke S10) and in the auditor's file (smoke S11)
+
+### Scenario: `AC-REFUSAL-11` is claimed nowhere
+- Status: EXECUTED
+- Input: same scan, plus every `COVERS` docstring in the red-team suite
+- Expected: zero claims — register 13 holds it NOT VERIFIED and records that
+  extending the paraphrase battery does not unlock it
+- Actual: **0** node-name claims, **0** `COVERS` joins
+- Result: PASS
+- Evidence: the ID appears only in prose that denies it —
+  "`AC-REFUSAL-11` IS NOT SATISFIED BY THIS SCENARIO AND IS NOT SATISFIED…",
+  "WHY `AC-REFUSAL-11` IS NOT VERIFIED. Do not 'fix' this scenario.", and two
+  messages instructing a future reader to "re-assess AC-REFUSAL-11 on the new
+  boundary"
+
+### Scenario: `AC-F40-17` (CUEC drift detection) is claimed nowhere
+- Status: EXECUTED
+- Input: same scan
+- Expected: zero claims
+- Actual: **0** node-name claims. Two `COVERS` docstrings mention the ID and
+  both **cover `AC-F40-18` instead**, saying so explicitly:
+  "NOT AC-F40-17: `authorised_on == synthetic_attestation` is the…"
+- Result: PASS
+- Evidence: `test_cuec_export_probe.py` carries a header section titled
+  "WHAT IS NOT CLAIMED HERE — `AC-F40-17`", and one scenario asserts that
+  nothing in the file claims it
+
+### Scenario: `AC-F36-48` is claimed nowhere, and its two joins deny themselves
+- Status: EXECUTED
+- Input: same scan
+- Expected: zero bare-ID claims; the two register-27-compliant joins must carry
+  the denial **inside** the join string so an ID-keyed mapper cannot score it
+  satisfied
+- Actual: **0** node-name claims. The two `COVERS` joins read
+  "COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48, WHICH IS ITSELF DENIED…
+  DO NOT MAP THE BARE ID AC-F36-48 TO THIS SCENARIO."
+- Result: PASS
+- Evidence: both docstrings, quoted above, in `backend/tests/test_abstention.py`
+
+---
+
+## What was scanned, and how
+
+* **2,736 node IDs**, from `pytest --collect-only -q -o addopts=`. The
+  `-o addopts=` matters: the project's `pytest.ini` already carries `-q`, so a
+  second `-q` collapses collection output to per-file counts and suppresses the
+  run summary line. Both figures were reconciled against the progress-character
+  tally (`Counter({'.': 2736})`) rather than trusted from one source.
+* **Every `test_*.py` in both trees**, walked with `ast` rather than grepped, so
+  the docstring of each `test_`-prefixed function is read as a unit. Four
+  `COVERS` docstrings name a declared criterion; all four deny it in the same
+  sentence.
+
+## Register entries checked
+
+Registers **1–33**, verified present with no gaps. The two **open** registers
+(3 and 4) are the ones whose disclosures the smoke test confirmed reach both the
+auditor's screen and the auditor's file. Register **27**'s substitution gate is
+satisfied by the two `AC-F36-48` joins carrying their own denial. Registers
+**6**, **8**, **9** and **15** are exercised on the served pilot by smoke S4,
+S9, S12 and S13 respectively.
+
+## New this pass
+
+`AC-F36-33` and `AC-F36-30` were built at `a1850a5` and `faf6117`. Neither is a
+declared criterion, and neither new scenario claims one: the 44 added node IDs
+were scanned with the same query and returned **zero** occurrences of any of the
+five IDs.
