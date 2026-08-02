@@ -1107,6 +1107,71 @@ undecided.
      SQL-typed parameter was introduced, no dependency was installed, and
      `prod/` was not touched.
 
+- **2026-08-02 — Gate 7 · Code, pass 16 (two narrow items). Judgement calls by
+  `code-agent`.** Two commits (`4790f8b`, `9d605b1`). Both items are HARNESS
+  defects; neither changed product behaviour, and no criterion's coverage
+  moved.
+  1. **`AC-F12-15` is now asserted as a NUMBER, at all four sites.** Gate 8's
+     `reverse` ordering failed
+     `test_AC_F12_15_the_rendered_dom_carries_no_probe_rate` on a rendered
+     timestamp — `...T07:04:40.023468+00:00` contains the substring `0.02`,
+     the disclosed band's low bound — while both of the scenario's substantive
+     clauses passed. The assertion was wrong in the OTHER direction too, and
+     that mattered more: `0.020` is the same rate and not the same substring,
+     and every rate `plan_injection` can actually draw lies strictly *between*
+     the two bounds, so the leak the criterion is about was never in the old
+     assertion's reach. `conclave_harness.rendered_numbers` tokenises the
+     page's standalone decimal literals and refuses any that lands in the
+     closed band — strictly stronger than the two endpoints, and immune to
+     timestamps, grouped money and dotted versions by construction. Fixed at
+     all four sites (functional DOM leg, functional API leg, UX-11, and the
+     unit-tree sibling), which previously made three different versions of one
+     claim. **Known limit, asserted rather than hidden**: a bare-point decimal
+     like `.05` is not a token; no template in this build renders one, and
+     widening the token would make every sentence boundary a number.
+  2. **The guard against the developer's decision ledger watches the RESOURCE,
+     not one named fixture.** Pass 15's fix (item 7 above) was scoped to the
+     suites' `ges_http`, so it passed straight over `backend/tests`, where
+     `ges_app` and `ges_stack` had the identical defect and
+     `test_emission_gate.py` was still adding 17 rows and 32,768 bytes per
+     run. Both fixtures now inject a `tmp_broker`, AND
+     `conclave_harness.live_ledger_guard` refuses the *construction* of a
+     `BrokerStore` over the live path from either tree — so
+     `default_broker_factory`, `pilot.py`, a fixture not yet written and a
+     tree not yet created are all covered, rather than the callers known
+     today.
+  3. **The guard deliberately does not patch `default_store_path`.** That
+     function must keep returning the real path, or the architecture suite's
+     file-size scenario from pass 15 would pass vacuously. The guard raises
+     *and* records: `raise_server_exceptions=False` turns the raise into an
+     anonymous 500, so a session-end sweep is what fails the run with the
+     message and the name of the test that caused it.
+  4. **The guard is refcounted, because the first version was wrong.** It
+     built a new guard per caller and laid a second patch over the first, so
+     with both trees in one session the outermost patch recorded refusals on
+     one guard while a test asserted on the other. Invisible in file order,
+     where the trees do not interleave; three failures under `seed:1`, which
+     is how it was found and is the reason the ordering matrix is run rather
+     than reported. Both conftests now hold the same guard, and one holder
+     letting go does not disarm it for the other.
+  5. **Package named `conclave_harness`, not `harness`.** `tests/suites/ux/`
+     already has a module called `harness`, and a shared helper that shadows a
+     suite's own import is a helper that breaks the suite that adopts it.
+  6. **New modules carry their own unit tests**: 25 for `rendered_numbers`
+     (including the exact timestamp that broke the suite and the `0.020` case
+     the old form let through) and 12 for `live_ledger_guard` (each deliberate
+     violation drained, so the session sweep is not failed by its own
+     evidence).
+  7. **The existing `broker_db.sqlite3` was left in place**, as at pass 15 and
+     for the same reason: it may hold the human's own pilot runs.
+  8. **What this pass did NOT do.** No register entry opened or closed. The
+     five declared criteria are claimed nowhere and were not touched. No
+     guardrail moved to the UI, no free-form SQL or SQL-typed parameter, no
+     Oracle posting credential, no journal-submission library, no suite
+     stubbed green, no ID claimed that a check does not cover, no dependency
+     installed, `prod/` untouched, and no server started — the human's pilot
+     on 8030/8031 was left alone and 8021/8022 were never bound.
+
 ## Current Status
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
@@ -1352,6 +1417,123 @@ absent afterwards:**
 `AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
+
+### 2026-08-02 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `75f5e27`** (parent repo @ `21af9da`)
+
+**All seven automated suites EXECUTED, 2,736 of 2,736 scenarios passed at every
+suite entry point and in five of six collection orders, zero skipped. The
+post-deploy smoke is 16 of 16 against the pilot as found, driven over HTTP
+through the real export path. Everything the loop-back asked to be verified was
+verified — and eight of those verifications were done by MUTATION, breaking the
+control and watching the guard fail, rather than by reading the code.**
+
+**Two things stop this from being a clean close, and neither is rounded up:**
+
+1. **One scenario FAILED in the `reverse` collection ordering** —
+   `functional/test_f12_probe_criteria.py::test_AC_F12_15_the_rendered_dom_carries_no_probe_rate`.
+   `functional` is a **blocking** suite, so this is an **unmet gate
+   condition**. It is **not** an order dependence and **not** a product defect:
+   the scenario asserts the bare substring `"0.02"` (the disclosed probe band's
+   low bound) appears nowhere on the page, and it collided with a rendered
+   wall-clock timestamp `…T07:04:40.023468+00:00`. Its two substantive
+   assertions both passed, so no probe rate leaked. Isolated re-runs: **0
+   failures in 12**, and **the identical `reverse` permutation re-run gave
+   2,736 pass, exit 0** — the same order, the opposite result, which is what an
+   order dependence cannot do. It is an **intermittent** assertion that can fail
+   in any ordering, roughly 1 rendered timestamp in 1,000. The narrow fix —
+   assert the band value as a number, or only within the probe-adjacent windows
+   the scenario already computes — is feedback for `code-agent`, not something
+   `test-agent` applied.
+2. **A new finding, non-blocking:** `pytest backend/tests` still grows the
+   developer's live decision ledger by 32,768 bytes per run. The fix landed at
+   `4e5ee47` closed the **suites** tree (all six entry points now +0 bytes) but
+   `backend/tests/conftest.py`'s `ges_app` and `ges_stack` still call
+   `create_app(...)` with no `broker_factory`; `test_emission_gate.py` adds 17
+   decision rows per run. The new architecture guard is scoped to the suites'
+   fixture, so it passes over this.
+
+Structured per-scenario evidence: `test-evidence/*-2026-08-02.md`, plus eight
+freshly captured Playwright screenshots. **The entire superseded corpus was
+deleted and rewritten**; every file names both commits and their presence on
+disk was verified after writing.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 2,071 | 2,071 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 at entry point; **1 under `reverse`** | 354 | 354 (entry point) / **353 under `reverse`** | **1 under `reverse`** | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 27 | 27 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,736** | **2,736 in 5 of 6 orderings; 2,735 in `reverse`** | **0 / 1** | **0** | | |
+| post-deploy smoke | `EXECUTED` | 0 | 16 | 16 | 0 | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. 2,071 + 665 = 2,736, and
+the seven per-suite collections sum to the whole-tree collection exactly. The
+`ux` suite launched Chromium — its conftest exits 4 (STATIC-ONLY) rather than
+passing if Playwright or the browser binary is absent, so exit 0 is positive
+evidence a rendering engine answered. No server was started inside this agent's
+turn: the pilot was started, driven and reaped inside single command
+invocations three times, and 8021 was verified free after each.
+
+**Verified by mutation, not by reading — eight mutations, eight guards fired.**
+
+| # | Mutation applied | Guard that fired |
+|---|---|---|
+| M1 | `from app import ges_client` added to `ges/restatement.py` | `test_the_comparator_reaches_nothing_in_the_agent_runtime` — `Extra items in the left set: 'app'` |
+| M2 | the `consecutive += 1` counting the emission being judged removed | both G-RESTATE count scenarios — `assert 1 == 2` |
+| M3 | `broker_factory=lambda: suite_broker` removed from the suites' `ges_http` | the new architecture guard — "the app under test is not using the suite's broker", and the live ledger grew 4,096 bytes on cue |
+| M4 | `UNEVALUABLE = "did_not_fire"` | `…a_missing_emission_fixture_is_not_read_as_the_constraint_holding` |
+| M5 | the inconclusive branch moved ahead of the unevidenced branch | `…fails_the_suite_even_with_no_baseline` — `assert 'inconclusive' == 'fail'` |
+| M6 | `comparator.record(...)` moved out of `if decision.allowed:` | `test_a_withheld_emission_does_not_become_a_prior_period_narrative` — `assert [12] == []` |
+| M7 | the `restatement_field_write_attempt` control event suppressed while the refusal still raises | **6** scenarios, covering all three agent write paths |
+| M8 | `app.ges_gateway` moved into `PROCESS_STATE_MODULES` | **11** scenarios, led by `test_the_gateway_is_guarded_without_being_discarded` |
+
+Every mutation was reverted with `git checkout` and the tree re-checked clean;
+`dev` stayed at `75f5e27` and the parent at `21af9da` throughout.
+
+**The loop-back's six items, each answered:**
+
+1. **`AC-F36-33`'s comparator** — the AST guard is load-bearing (M1); all three
+   agent write paths fail **and** each records a control event, asserted per
+   path and proved by M7; `/ges/emit` records a narrative only on an ALLOW,
+   proved by M6. The comparator runs **before** the broker, so there is no
+   window in which the request carries anything else.
+2. **`AC-F36-30`'s failing case** — it fails for the missing fixture, not for
+   `AC-F36-24`'s inconclusive: the scenario seeds a baseline and asserts the
+   suite **PASSes** before the removal, and a separate scenario asserts FAIL ≠
+   INCONCLUSIVE with no baseline (M5 confirms the ordering is real).
+   `unevaluable != did_not_fire` is asserted and M4 confirms it.
+3. **The live-ledger finding** — fixed for the suites tree and re-verified by
+   reverting it (M3). All six suite entry points now grow the file by **0
+   bytes**. **The unit tree is not fixed** — see the finding above.
+4. **`PROCESS_STATE_MODULES` was split, not widened** — the gateway being *not*
+   discarded is asserted twice, and M8 shows moving it into the discarded set
+   fails 11 scenarios rather than reading as a tightening.
+5. **Order independence** — this agent's own plugin, its own seeds. Five of six
+   green at 2,736; the sixth carries the intermittent scenario described above.
+6. **The four changed G-RESTATE scenarios assert strictly more** — each retains
+   every prior assertion and gains one on the comparator-derived value. The
+   escalation count of 3 is now an off-by-one the comparator can fail, proved
+   by M2.
+
+**Test-count delta: +44, 0 removed, 7 changed.** Computed by collecting node IDs
+at `fc197a6` (in a throwaway `git worktree`, so nothing was checked out over the
+tree under test) and at `75f5e27`, then differencing the sets: 2,692 → 2,736,
+added 44, removed **0**. Accounted for exactly: `test_restatement_comparator.py`
+32, `test_bundle_publication.py` 7, `test_pilot_process_state.py` 4,
+`architecture` 1. The 7 changed scenarios are tabulated in
+`test-evidence/unit-integration-2026-08-02.md`; every one asserts at least as
+much as before.
+
+**The standing question, sixth consecutive pass: no.** No suite reports a pass
+the 33-entry register says cannot be true. The five declared criteria
+(`AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`) are claimed
+by **zero** of the 2,736 scenario names — the only two node IDs containing an ID
+are the parametrisation labels of a scenario asserting the export is **refused**
+— and by zero `COVERS` joins that are not self-denying. The 44 new node IDs were
+scanned with the same query and returned zero occurrences.
 
 ### 2026-08-02 — Gate 8 · Test — `test-agent`, **FINAL re-run at `dev` @ `fc197a6`** (parent repo @ `7ec615a`)
 
