@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Close — 2026-06 Day 3 — Conclave Finance Studio</title>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p1-close-staff.html" class="navitem on" aria-current="page"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">6</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">0</span></a>
+  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p6-period-record.html#runs" class="navsub">Runs &amp; dossiers</a>
+  <a href="p6-period-record.html#agents" class="navsub">Agents &amp; datasets</a>
+  <a href="p6-period-record.html#refusals" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>A. Reyes</b>staff accountant</div>
+    <a href="#" class="navsub">My probe history</a>
+    <a href="p4-close-controller.html" class="navsub">Pilot: view as controller &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+  <div class="ctxdetail">
+    Dataset <b>gl_balances vFIXTURE-2026.06.03-a</b>, as of 03 Jul 2026 06:15 UTC.
+    Refreshed after the day-2 cut-off, which it was due by, and before the day-3
+    cut-off: the data is 1 close day behind (2026-07-03T06:15:00+00:00).
+    Figures come from the twelve-period synthetic close fixture, not an
+    Oracle-sourced warehouse, and cannot support a posting or an assurance
+    conclusion about a real ledger.
+  </div>
+
+  <div class="crumb">Close</div>
+  <h1 class="pagehd">2026-06 close &mdash; day 3 of 8</h1>
+  <div class="pagesub">
+    What this close needs from you tonight. Every row below is a task with a
+    destination; nothing on this screen is a report.
+  </div>
+
+  <div class="calls">
+    <a class="call urgent" href="p2-queue.html">
+      <div class="n">6</div>
+      <div>
+        <div class="t">Findings routed to you</div>
+        <div class="d">2 blast-radius, 1 omission, 3 elevated. Oldest has been open 2 close days.</div>
+      </div>
+      <div class="go">Work the queue &rarr;</div>
+    </a>
+    <a class="call abst" href="p2-queue.html#abstentions">
+      <div class="n">1</div>
+      <div>
+        <div class="t">The system could not establish this</div>
+        <div class="d">An abstention, not a finding. It is not a statement that anything is wrong,
+          and it is not a statement that nothing is wrong. It needs a human because
+          the system declined to conclude.</div>
+      </div>
+      <div class="go">See what is missing &rarr;</div>
+    </a>
+    <a class="call warn" href="p6-period-record.html#dueback">
+      <div class="n">1</div>
+      <div>
+        <div class="t">A forward prediction you made has come due</div>
+        <div class="d">16200 CWIP &ndash; Substation. You recorded in 2026-05 that this would clear by
+          2026-06. It did not clear. This is the check-back, arriving on its own.</div>
+      </div>
+      <div class="go">Explain the miss &rarr;</div>
+    </a>
+    <a class="call warn" href="p6-period-record.html#coverage">
+      <div class="n">3</div>
+      <div>
+        <div class="t">Accounts nothing has scanned this period</div>
+        <div class="d">29100, 31200, 31300. No run has covered them, so no conclusion &mdash;
+          including a negative one &mdash; covers them either.</div>
+      </div>
+      <div class="go">Close the coverage gap &rarr;</div>
+    </a>
+    <a class="call" href="p6-period-record.html#runs">
+      <div class="n">1</div>
+      <div>
+        <div class="t">Boundary check that could not run</div>
+        <div class="d">A9 &mdash; FX/CTA arithmetic. Not run is a result, not a pass. Nothing concludes
+          over this boundary for 2026-06.</div>
+      </div>
+      <div class="go">Open the run report &rarr;</div>
+    </a>
+  </div>
+
+  <div class="row" style="margin-top:20px">
+    <div class="col">
+      <div class="card">
+        <div class="lbl">Coverage achieved so far this period</div>
+        <div class="covstrip" role="img" aria-label="Population strip: 7 of 10 declared members scanned">
+          <div class="covseg scanned" style="flex:7">7 scanned</div>
+          <div class="covseg gap hatch" style="flex:1">29100</div>
+          <div class="covseg gap hatch" style="flex:1">31200</div>
+          <div class="covseg gap hatch" style="flex:1">31300</div>
+        </div>
+        <div class="covlegend">
+          <span><b class="mono">70%</b> of 10 declared members</span>
+          <span>3 segments unscanned, named above</span>
+        </div>
+        <div class="note">Rendered as a population, never as a bare percentage: 70% of what,
+          and which three are missing, is the whole content of the figure.</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <div class="lbl">What this screen does not tell you</div>
+        <div class="refused">
+          <b>This is not a statement that the close is clean.</b>
+          This product does not conclude that a period is materially correct, and it
+          does not certify. Those are refused by design (A20, A21) &mdash; not missing
+          features. What it can tell you is what was examined, what was concluded,
+          and what nothing has looked at.
+          <div class="note" style="margin-top:8px"><a href="p6-period-record.html#refusals">The full list of what this product refuses to do &rarr;</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div></body></html>

@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 9 \u2014 Verification (final)",
+  "position": "Gate 9 \u2014 Verification; UX redesign running in parallel",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": null,
@@ -124,7 +124,7 @@
       "participants": [
         "test-agent"
       ],
-      "note": "CLOSED at dev@fc197a6. 8 suites EXECUTED, 2,692 scenarios, 0 failures, 0 blocking conditions, no override required. Order independence verified with a DIFFERENT generator (global Fisher-Yates vs round-robin), proven different rather than asserted. 5th consecutive pass with no register contradiction."
+      "note": "CLOSED at dev@9d605b1. 2,774 scenarios, 8 suites, 0 failures, 9 whole-tree orderings, no override. 7th consecutive pass with no register contradiction."
     },
     {
       "n": 9,

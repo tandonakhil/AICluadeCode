@@ -1,98 +1,89 @@
-# Test evidence — architecture conformance suite
+# Test evidence — architecture suite
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test (re-run, pass 2)
+**Gate:** 8 · Test (final re-run)
 **Date:** 2026-08-02
-**Commit under test:** `dev` @ **`75f5e27`** · parent repo @ **`21af9da`**
+**Commit under test:** `dev` @ **`9d605b1`** · parent repo @ **`e14c497`**
 **Owner:** `solution-architect` (authored) · executed and reported by `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
 **Entry point:** `dev/tests/suites/architecture/run.sh`
 **Exit code:** 0
-**Scenarios: 27 — PASS 27, FAIL 0, SKIP 0** (1 scenario file)
+**Scenarios: 28 — PASS 28, FAIL 0, SKIP 0** (27 at the previous run; **+1**)
 
 ---
 
 ### Scenario: the suite executes end to end
 - Status: EXECUTED
 - Input: `bash tests/suites/architecture/run.sh`
-- Expected: exit 0
-- Actual: `scenarios: 1 file(s)`, 27 collected, `EXECUTED — suite passed`
+- Expected: exit 0, not exit 3 or 4
+- Actual: `scenarios: 1 file(s)`, 28 collected, `EXECUTED — suite passed`
 - Result: PASS
-- Evidence: progress tally `Counter({'.': 27})`, exit 0
+- Evidence: 28 dots, exit 0
 
-### Scenario: the new live-ledger guard fails with the fix reverted
+### Scenario: the one added scenario — the guard is installed in the suites tree too
 - Status: EXECUTED
-- Input: **Mutation.** `tests/suites/conftest.py`'s `ges_http` restored to
-  `create_app(lambda: seeded_warehouse)` — i.e. the `broker_factory=lambda:
-  suite_broker` argument removed — then
-  `test_the_suites_ges_app_does_not_write_to_the_live_decision_ledger` run.
-- Expected: the guard fails, and fails on the right thing
-- Actual: **FAILED** —
-  `AssertionError: the app under test is not using the suite's broker` /
-  `assert None is not None`, and the mutated run grew
-  `dev/var/broker_db.sqlite3` by **4,096 bytes**, which is the defect itself
-  reappearing on cue
-- Result: PASS — this is `test-agent`'s own finding from the previous pass,
-  re-verified rather than accepted on report
-- Evidence: the FAILED line above plus `ledger delta under mutation = 4096`;
-  `git checkout` restored the file and the tree was re-checked clean
-
-### Scenario: the guard is driven by a real emission, not by inspecting a fixture
-- Status: EXECUTED
-- Input: reading the scenario — it `POST`s `/ges/emit` through `ges_http`,
-  reads the returned `decision_id` back out of `suite_broker.store`, asserts
-  `suite_broker.store.path != default_store_path()`, and asserts the live
-  file's byte size is identical before and after
-- Expected: the check is on where a request's decision actually landed, since
-  the leak was a request handler resolving a default
-- Actual: exactly that; `None` before and after is accepted as the correct
-  state on a fresh clone where the file does not exist
+- Input: the new
+  `test_the_guard_against_the_live_ledger_is_installed_in_this_tree_too`,
+  which builds a GES app the leaking way (`create_app(...)` with **no**
+  `broker_factory`) and drives a real emission through it
+- Expected: the request is refused, the refusal is recorded on the guard, and
+  the message names `broker_factory`
+- Actual: passes — `response.status_code != 200`, `live_ledger_guard.drain()`
+  non-empty, `"broker_factory" in refused[0]`
 - Result: PASS
-- Evidence: `tests/suites/architecture/test_architecture_conformance.py`
-  lines 686–744
+- Evidence: this is the difference between "our fixture is wired correctly
+  today" (the pass-15 scenario) and "the next fixture written the wrong way
+  fails on the day it is written". The first was scoped to one fixture in one
+  tree, which is exactly how the identical defect survived its first fix.
 
-### Scenario: no suite run touches the live ledger
+### Scenario: the scenario is driven through a real emission, not a fixture inspection
 - Status: EXECUTED
-- Input: `stat` on `dev/var/broker_db.sqlite3` around each of the six suite
-  entry points
-- Expected: 0 bytes of growth for every suite
-- Actual: `functional 0`, `red-team 0`, `architecture 0`, `security 0`,
-  `industry 0`, `ux 0`
+- Input: `POST /ges/emit` with a full context, token and principal header
+- Expected: the broker is resolved lazily inside the request handler, so only a
+  real request reaches it
+- Actual: the emission is what triggers construction and therefore the refusal
 - Result: PASS
-- Evidence: the per-suite deltas above. **The unit tree is a separate finding**
-  — `pytest backend/tests` still grows the file by 32,768 bytes; see
-  `unit-integration-2026-08-02.md`. That is reported, not fixed, and this
-  suite's guard does not cover it because it is scoped to the suites' fixture.
+- Evidence: `an app built without a broker_factory and never asked for a
+  decision touches nothing at all, which is exactly why most of this tree's
+  broker-less apps were never leaking` — the scenario's own reasoning, and it
+  is correct
 
-### Scenario: the comparator is outside the agent runtime (RAI-ARCH-3)
+### Scenario: the pass-15 file-size scenario still measures the real file
 - Status: EXECUTED
-- Input: `ges/restatement.py` lives in the GES plane, is wired into
-  `/ges/emit`, and is asserted from the AST to import nothing from `app.`
-- Expected: the thing being measured cannot reach the measurement
-- Actual: green, and **mutation-verified** — adding `from app import
-  ges_client` fails the guard naming `app`
+- Input: `test_the_suites_ges_app_does_not_write_to_the_live_decision_ledger`,
+  which reads `live = default_store_path()` and compares `os.path.getsize(live)`
+  before and after a real emission
+- Expected: it measures the developer's actual ledger, not a redirect
+- Actual: it does — `default_store_path()` is deliberately left unpatched, and
+  the scenario additionally asserts
+  `suite_broker.store.path != default_store_path()`
 - Result: PASS
-- Evidence: `unit-integration-2026-08-02.md`, first mutation
+- Evidence: proved by simulation that a redirected `default_store_path` would
+  make this check pass vacuously while the real ledger grew — see
+  `unit-integration-2026-08-02.md`. `code-agent`'s stated reasoning holds.
 
-### Scenario: the suite passes under every collection order
+### Scenario: MUTATION M3 reaches this suite too
 - Status: EXECUTED
-- Input: all six whole-tree orderings
-- Expected: green in all six
-- Actual: green in all six — every scenario of this suite passed in every
-  ordering. The single failure of this pass, in the `reverse` ordering, is in
-  the **functional** suite, not this one.
+- Input: the refcount mutation described in `unit-integration-2026-08-02.md`
+- Expected: under a shuffle, the suites-tree guard scenario fails as well
+- Actual: at `seed:1` the failure set includes
+  `tests/suites/architecture/test_architecture_conformance.py::test_the_guard_against_the_live_ledger_is_installed_in_this_tree_too`
+- Result: PASS (the guard fired; the mutation was reverted)
+- Evidence: `6 failed, 2768 passed` at `seed:1`; 0 failures after revert
+
+### Scenario: the suite's own live-ledger delta
+- Status: EXECUTED
+- Input: `stat -f%z dev/var/broker_db.sqlite3` around every whole-tree run
+- Expected: 0
+- Actual: 0 across all nine whole-tree runs
 - Result: PASS
-- Evidence: `order-independence-2026-08-02.md`
+- Evidence: `10371072` unchanged, mtime unchanged
 
----
-
-## Test-count delta
-
-| | Before (`fc197a6`) | After (`75f5e27`) | Delta |
-|---|---|---|---|
-| architecture | 26 | **27** | **+1** |
-
-**Added 1, removed 0, changed 0.** The one addition is
-`test_the_suites_ges_app_does_not_write_to_the_live_decision_ledger`
-(`4e5ee47`). Node-ID set difference confirms no removal.
+### Scenario: register cross-check on this suite's 28 names
+- Status: EXECUTED
+- Input: all 28 node IDs and every `COVERS` join
+- Expected: none of the five declared criteria claimed
+- Actual: zero occurrences
+- Result: PASS
+- Evidence: see `register-cross-check-2026-08-02.md`

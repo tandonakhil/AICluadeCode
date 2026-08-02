@@ -762,6 +762,209 @@ rather than quietly omitting it.
 ---
 ---
 
+# PART A2 — NAVIGATION & JOURNEY REDESIGN (2026-08-02)
+
+**Trigger.** The human opened the running pilot and said *"UI/UX in the link you
+gave me is really bad. I just cannot follow anything,"* then asked for a
+parallel design thread producing journey maps and an end-to-end navigation
+model per use case. This section is that pass. It does **not** supersede Part A:
+the visual language, palette, risk grammar, coverage strip, abstention
+treatment and narrative behaviour in §§2–3 and §5 all survive intact and are
+reused verbatim. What is added is the layer above them.
+
+Rendered prototype: `design-review/redesign-2026-08-02/index.html`.
+The gate-5 approved record at `design-review/index.html` is untouched.
+
+## A2.1 · What I found by using the pilot, and what §4 got wrong
+
+§4 of this file claimed an information architecture: nine screens, three groups
+(Work / Govern / Evidence). **The build shipped twelve screens in two groups.**
+Evidence was dissolved into Govern; `/readiness` and `/my-probe-history` were
+added at top level with no design pass. The IA degraded after approval with no
+gate watching it. That is the first lesson: **§4 was a paragraph, not a checked
+artefact, and a paragraph does not survive contact with 262 acceptance
+criteria.**
+
+Three findings from actually walking the running build:
+
+1. **The navigation graph has no edges.** Eight of twelve screens contain zero
+   outbound links other than the global nav — `/dispositions`, `/readiness`,
+   `/monitors`, `/refusals`, `/catalogue`, `/inventory`, `/my-probe-history`.
+   Exactly three screens produce forward motion. Every journey is
+   *nav → screen → dead end → nav*. It is worse inside the objects: a finding
+   cannot reach the run that produced it, the agent that authored it, or the
+   dataset it was computed over — all three render as dead text.
+
+2. **The deeper defect is composition, not location.** `/exceptions` renders
+   3,483px tall and stacks seven unrelated analytical modules; the six-row work
+   queue is ~250px of it, about 7%. The mechanism: a criterion says "X must be
+   visible on screen Y", and the cheapest way to satisfy 262 of those is to
+   append X to Y. Each screen became **the union of every criterion that named
+   it**. A perfect IA would not fix this, because the problem is inside the page.
+
+3. **The item page is good; everything above it is not.** `/review/ITEM-…` is
+   well composed and is Part A working as designed. This is a
+   navigation-and-composition problem sitting on a sound design system — which
+   makes the fix additive rather than a restyle.
+
+Also recorded: `/review` (the controller's primary surface) is a bare bulleted
+list of six hyperlinks with no risk, amount, age, state, sort or filter, behind
+a ~300px probe-programme essay; the item page's `<h1>` is **"Not approved"**,
+naming a workflow state rather than the object the user clicked; and
+`/readiness` is a permanent nav slot hard-bound to a single agent with no
+selector, making every other agent's readiness unreachable by any means.
+
+## A2.2 · Design intent — the IA that replaces §4
+
+**Organising principle: the close period is the object, the queue is the verb,
+and everything else is evidence reached from a thing rather than from a menu.**
+
+Primary navigation, four items, task-ordered:
+
+| # | Item | Answers |
+|---|---|---|
+| 1 | **Close** (new) | "Where is this close and what does it need from me tonight?" Default landing, per-persona call-list. Replaces landing on Ask — a doer does not begin the night by writing a query. |
+| 2 | **My queue** | "What am I working?" Merges the work half of Exceptions with all of Review. |
+| 3 | **Approvals** (new) | "What awaits my deliberate act, and what does approving actually do?" |
+| 4 | **Ask** | Detect mode (staff) and Inquire mode (FP&A). |
+| — | **Evidence** (section) | Period record · Runs & dossiers · Agents & datasets · What we refuse to do. |
+
+Demotions and dissolutions, with reasons:
+
+| Screen | Becomes | Why |
+|---|---|---|
+| `/dispositions` | Dissolved — a queue filter, a Close row, a Period-record table | Its whole content is one row. A forward prediction is worth something when it *comes back*, so its home is where you stand when it does. |
+| `/readiness` | Deleted from nav — a property of an agent | One row of a table that should have many, promoted to a permanent slot. |
+| `/inventory`, `/catalogue`, `/monitors` | Under Evidence, plus in-context routes | Nobody navigates *to* an inventory; they arrive from a thing they were looking at. |
+| `/my-probe-history` | Identity menu | Per-person, private by design, empty most of the time. A permanent top-level slot also subtly advertises a surveillance affordance A24 refuses to have. |
+| `/refusals` | **Kept in global nav**, under Evidence | §5.11's argument holds: burying a refusal makes it look like an omission. Evidence is not a settings drawer. |
+| F26 fidelity, boundary checks, F33, backtest, second held-out period | `/evidence/run/<id>` | Properties of a **run**, not of my night's work. Give the run an object and the queue becomes a queue. |
+
+**The single rule that removes most dead ends:** every object gets one canonical
+page; every page names its object in its `<h1>`; every reference to an object is
+a link to it. Objects: period, run, finding, dossier, agent, dataset,
+resolution, approval.
+
+## A2.3 · The four journeys
+
+| # | Persona | Journey | State today |
+|---|---|---|---|
+| J1 | Staff accountant | Omission detected → investigate → resolve → leaves my queue | Walks, but **dead-ends at the last step**: saving produces no confirmation, no queue removal, no badge change, and the record it creates is linked from nowhere. Six times a night. |
+| J2 | Controller | Approve a reclass → it becomes an export | **Unwalkable.** No approvals surface exists. |
+| J3 | Controller | Was last period's close clean? | **Unstartable.** No period-parameterised surface anywhere. |
+| J4 | FP&A analyst | Why did this account move? | **No surface, no persona button.** Confirmed by `PROJECT_CONTEXT.md` L2507. |
+
+Full before/after step maps are rendered in the prototype's §2.
+
+**J3's design claim, which is the most product-specific thing in this pass:**
+the honest answer to "was it clean" is not yes or no. The Period record leads
+with *"This is a record of what was examined and what was concluded. It is not a
+statement that the period was clean"* and names A20/A21. This renders the
+product's central refusal at the exact moment a user asks for the thing it
+refuses — which is the strongest possible place for it to appear, and better
+than a `/refusals` page nobody visits.
+
+**J4 is net-new scope, flagged not claimed.** Proposed Inquire mode returns the
+substantiable half (decomposition to the posting, certified metrics and joins,
+population covered) and openly refuses the explanatory half under A22. The
+claim worth arguing: an FP&A surface that hands over the decomposition and
+refuses the narrative is *more* useful to an analyst defending a variance than
+one that manufactures a plausible sentence — and it is the only FP&A surface
+that can exist without breaching A19 or A22.
+
+## A2.4 · The six binding constraints — tested, none is the cause
+
+Tested individually against observed behaviour. **No green** (zero
+contribution), **narrative collapsed and last** (right, and extended to the
+probe essay), **coverage as a population strip** (best component in the
+product, promoted to two more screens), **abstention structurally distinct**
+(already implemented well, given a first-class count), **desktop-only MVP1**
+(honoured) — none causes the unusability.
+
+Two require a recorded note:
+
+- **"No Approve button on the Review screen" was honoured *negatively*.** The
+  button was removed; the separate deliberate act it implies must happen
+  somewhere was never given a screen, an object or a state. J2 is therefore
+  unwalkable. **This is a gap created by honouring a constraint only in its
+  subtractive form, and it is the highest-value gap in the product.** The
+  constraint is correct and stays.
+- **"Guardrails at the broker, never the UI" is not a cause of unusability but
+  is a cause of clutter, and I am not asking for it to be relaxed.** Because the
+  UI may never disable, ineligible affordances render live and compete visually
+  with eligible ones. Proposed change is **ordering, not enforcement**:
+  ineligible options move below a rule, keep full contrast, stay clickable and
+  submittable, and carry the broker's last-known reason inline. The UI still
+  decides nothing.
+
+**What actually causes the visual clutter belongs to no constraint:** the
+provenance strip plus pilot strip occupy ~110px identically on all twelve
+screens with no delta between visits — 12% of a 900px viewport, forever.
+Proposed: one 30px context line always naming the staleness number, full
+sentence behind a disclosure. `AC-F38-11` requires staleness on the *same
+surface* as the figure, not in the same 110 pixels.
+
+## A2.5 · Typography floor — a call I am making, and a criterion I am asking for
+
+`test-agent` measured navigation at **10px** computed and the provenance strip
+at **10.5–11.5px**, the smallest text on every screen. No criterion sets a
+minimum, so nothing failed. **I am failing it**, on two grounds:
+
+1. **Audience and hour.** Used at 11pm on close night by finance staff whose age
+   distribution skews well above consumer software's.
+2. **The inversion is a design contradiction, not a rounding error.** The
+   smallest text on every screen is the provenance strip, which carries
+   close-clock staleness — the datum that determines whether *any other figure
+   on the screen* may be relied upon. The risk number renders at 42px. A product
+   whose entire claim is that it does not assert what it cannot substantiate is
+   rendering the qualifier at 10.5px and the assertion at 42px. That states the
+   opposite of the thesis in the one language a tired reader actually processes.
+
+**Proposed criterion**, for `plan-agent` to rule on and `test-agent` to assert:
+no persistently-rendered or interactive text below **12px** computed; primary
+navigation items **≥ 14px**; any text carrying a **reliability qualifier**
+(staleness, coverage, tier, certification state, abstention, not-run, retention
+non-enforcement) **≥ 13px**. Stated as a class, not a selector list, so it
+survives new components. Applied throughout the prototype.
+
+## A2.6 · Gaps this redesign needs, by blocking severity
+
+**A — blocks a whole journey:** Approvals screen/object/state (J2, large);
+Period record and period parameterisation (J3, large); FP&A inquiry mode and a
+third persona (J4, large, **net-new scope requiring a ruling not a design
+decision**); post-resolution confirmation + queue removal + undo + next-item
+(J1's final step, small — smallest fix on the list, probably the largest felt
+improvement).
+
+**B — structural:** a run object; an agent object with readiness as a property;
+the Close cockpit; eight missing object-graph edges; queue columns/sort/filter;
+item `<h1>` naming the object; context-bar collapse; the typography criterion.
+
+**C — deleted or demoted:** see the table in A2.2. **Nothing that satisfies an
+acceptance criterion is deleted** — every module moves to an object that owns
+it. Criteria of the form "X must be visible on screen Y" will need Y
+re-pointed, which is precisely the point: those criteria built the 3,483px page.
+
+## A2.7 · Not covered by this pass, stated rather than omitted
+
+- **`DesignSync` is still unavailable in the runtime** — same finding as §10.5
+  at gate 5, re-confirmed 2026-08-02: it is not in this agent's tool grant and
+  there is no MCP configuration providing it. **No component-library push
+  happened.** The deliverable is rendered HTML on disk instead, which satisfies
+  the standing "a rendered artefact, never a text summary" rule but does *not*
+  satisfy the contract's DesignSync obligation. Flagged for the orchestrator.
+- **Mobile and native surfaces** — out of scope per desktop-only MVP1, as at
+  gate 5. Nothing in this IA forecloses a later mobile pass; the four-item
+  primary nav is materially easier to carry to a small surface than eleven.
+- **Dark theme** — the prototype renders light only. The dark tokens are
+  untouched and the new components use the same variables, so dark is expected
+  to work, but it is **not verified** in this pass.
+- **No accessibility execution.** This is a design pass, not a Test-gate pass;
+  the typography call is a design judgement, not a suite result.
+
+---
+---
+
 # PART B — OBSERVED POST-DEPLOY BEHAVIOUR
 
 **Status: empty. This project has not been built or deployed.**
@@ -801,4 +1004,5 @@ _(no entries — no production usage)_
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-02 | 1.1.0 | MINOR — **Part A2, navigation & journey redesign.** Parallel design thread requested by the human after using the running pilot. Adds: four end-to-end journey maps (J1–J4, two of them currently unwalkable and one unstartable); a four-item task-ordered IA replacing §4's eleven-item flat nav, with demotions for `/readiness`, `/inventory`, `/catalogue`, `/monitors`, `/my-probe-history` and dissolution of `/dispositions`; a verdict that none of the six binding constraints causes the unusability, with the "no Approve button" constraint's unbuilt positive half identified as the highest-value gap; a **FAIL** call on the 10px navigation / 10.5px provenance typography with a proposed floor criterion; and a gap list. §4 is superseded by A2.2 but retained for the record. Rendered clickable prototype at `design-review/redesign-2026-08-02/index.html`; gate-5 record untouched. `DesignSync` re-confirmed unavailable — no library push. | Human request, 2026-08-02; approval pending |
 | 2026-07-31 | 1.0.0 | Initial Experience Design pass. Visual language, IA and nine screens designed against all 186 acceptance criteria; rendered mockup at `design-review/index.html`. Four items escalated (§9), two assumptions recorded (§10.2, §10.3), one recorded requirement flagged as **not covered** (§10.4, multi-surface header vs desktop-only MVP1), one tooling gap recorded (§10.5, `DesignSync` unavailable). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 5 human review pending |

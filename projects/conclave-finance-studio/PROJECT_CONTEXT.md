@@ -1418,6 +1418,154 @@ absent afterwards:**
 
 ## Test Results
 
+### 2026-08-02 — Gate 8 · Test — `test-agent`, **FINAL re-run at `dev` @ `9d605b1`** (parent repo @ `e14c497`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,774 of 2,774 scenarios
+passed at every suite entry point and in NINE whole-tree runs — file order plus
+four seeds plus `reverse` four separate times — zero skipped. The post-deploy
+smoke is 17 of 17 against the pilot as found, driven over HTTP through the real
+export path on 8021. Both of the previous pass's items are closed, and both were
+verified by MUTATION rather than by reading the code.** Structured per-scenario
+evidence: `test-evidence/*-2026-08-02.md`, plus eight freshly captured
+Playwright screenshots. **The entire superseded corpus was deleted and
+rewritten**; all ten files name both commits and their presence on disk was
+verified after writing.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 2,108 | 2,108 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 354 | 354 | 0 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 28 | 28 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,774** | **2,774** | **0** | **0** | | |
+| post-deploy smoke | `EXECUTED` | 0 | 17 | 17 | 0 | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. 2,108 + 666 = 2,774, and
+the seven per-suite collections sum to the whole-tree collection exactly. The
+`ux` suite launched Chromium — its conftest exits 4 (STATIC-ONLY) rather than
+passing if Playwright or the browser binary is absent, so exit 0 is positive
+evidence a rendering engine answered. No server was started inside this agent's
+turn: the pilot was started, driven and reaped inside single command invocations
+six times.
+
+**Finding 1 — the `AC-F12-15` assertion. Fixed, and genuinely stronger, with
+one qualification stated rather than glossed.**
+
+- **The timestamp case passes clean.** `2026-08-02T07:04:40.023468+00:00` no
+  longer registers: `0.02` inside `40.023468` is not a standalone token.
+- **`0.020` is now caught** — the "passed dirty" case. So is `0.0473`, and so is
+  every value strictly between the bounds, which is what `plan_injection`
+  actually draws and what the old assertion never reached.
+- **Proved on the real leak path by MUTATION**, not on synthetic strings:
+  `BAND_STATEMENT` amended to leak `0.0473` failed **all four** sites, including
+  the Playwright-driven UX one that reads `inner_text` from a real browser. The
+  **old** assertion, evaluated against the same mutated build, returned
+  `PASSES -- leak undetected`.
+- **`code-agent`'s measurement is confirmed**: zero in-band tokens across all
+  twelve served pages (81–98 numeric tokens per page). Zero old-form substring
+  hits too, so the two agree on this build and the previous failure was genuinely
+  intermittent.
+- **The honest qualification: it is not a strict superset.** The only inputs the
+  old form flagged and the new one does not are digit runs inside a longer
+  numeric run — precisely the false positives. On every shape that is a readable
+  rate, the new form is strictly stronger.
+
+**Finding 2 — the live-ledger guard. Closed, and the refcounting is
+mutation-proved.**
+
+- **The unit tree's leak is gone**: `dev/var/broker_db.sqlite3` shows a **0-byte
+  delta** across all nine whole-tree runs, mtime unchanged. The previous pass's
+  32,768-bytes-per-run finding is closed.
+- **MUTATION M3 — the refcount removed** (each caller builds a new `Guard` and
+  lays a second patch, exactly the defect `code-agent`'s own ordering matrix
+  caught): **3 failures in file order, 6 under `seed:1`**. Reverted, tree
+  re-verified clean. Worth recording: **the original defect was invisible in file
+  order and this mutation is not** — the two pinning scenarios now catch it in
+  any ordering, which is a strict improvement on the condition that exposed it.
+- **The reasoning about `default_store_path` holds, and was tested rather than
+  accepted.** Simulated both ways: unpatched, the pass-15 file-size check catches
+  the write; redirected, it returns **True while the real ledger grows** —
+  vacuous, exactly as `code-agent` says. Leaving it unpatched is correct.
+
+**Order independence — nine whole-tree runs, all 2,774.** This agent's own
+plugin, outside the repository, a uniform global Fisher–Yates (35 same-file
+adjacencies at `seed:1`, which `code-agent`'s round-robin cannot produce).
+`reverse` was re-run **four** times — identical fingerprint `d0ee639c287714bd`
+each time, so it is the same permutation four times, which is what ruling out an
+intermittent failure requires. The realised order was fingerprinted for every run.
+
+**Test-count delta: +38 added, 0 removed, 4 changed.** Baseline 2,736 → 2,774,
+computed by differencing collected node-ID sets between a throwaway `git
+worktree` at `75f5e27` and the tree at `9d605b1`. Accounted for exactly:
+`test_harness_rendered_numbers.py` 25, `test_harness_live_ledger_guard.py` 12,
+architecture 1. **Zero removed** — `comm -23` over the two sets returns empty and
+no test file was deleted. The 4 changed are the `AC-F12-15` sites; every prose
+ban, the percentage-window regex, the twelve-path sweep and the header sweep are
+all retained.
+
+**Rendered-UI verification: Playwright/Chromium against the SERVED pilot.** Four
+screens × two viewports, 8 captures, 8 clean: 200 everywhere, **zero green
+elements under computed colour**, **zero text nodes below 0.05 effective
+(compounded) opacity**, and the gate-5 reading order confirmed on the item
+screen — `riskiest-figure` `$918,240.00` rendered at **42.0px**, the largest text
+on the screen, against a 20.0px `h1`; controls are R1–R6 and Reject, with **no
+approve control**. RNTL is not applicable: MVP1 is desktop web only.
+
+**Findings for a human — none blocking, all recorded.**
+
+- **NEW: the collision class is relocated, not eliminated.** The band check reads
+  the whole served document **including the `<style>` block**, where in-band
+  decimals are ordinary. Rewriting one declaration from `letter-spacing:.05em`
+  to `letter-spacing:0.05em` — **zero rendered effect** — fails three
+  `AC-F12-15` scenarios with `['0.05']`. It passes today only because the
+  stylesheet happens to be authored in leading-dot form. Mutation-proved,
+  reverted. Feedback for `code-agent`.
+- **NEW: the docstring again claims more than the assertion checks.**
+  `rendered_numbers` names `.02` among the leaks the substring form let through,
+  in the passage justifying the replacement — but a leading-dot decimal produces
+  no token, so the new form misses it too. Not a regression (neither form catches
+  it) and nothing leaks today, but it is the **same class of defect as the
+  original**.
+- **NEW, this agent's own driver defect, fixed inside the pass:** the first smoke
+  attempt read override reason codes from `<option>` elements; they are radio
+  inputs, so it posted the *denial* code and the product correctly refused with
+  403, naming the closed list. S6–S8 failed on that attempt and **the failures
+  were this agent's, not the build's** — recorded rather than quietly re-run.
+- **Observation: the smoke and the human's pilot share one live ledger.** The
+  smoke wrote +20,480 bytes to `dev/var/broker_db.sqlite3`, the same file the
+  human's instance on 8030 uses, so the override and export it recorded on
+  `PROP-2026-06-0031` are visible there. Not a fault — the pilot is the real app
+  and the guard's scope is tests.
+- **Recorded: `SIGTERM` never sufficed.** Teardown needed `SIGKILL` on all six
+  invocations. The previous pass's `SIGTERM`-then-`wait` is exactly what left a
+  survivor — and the name-based sweep that followed killed the human's pilot.
+  This pass scopes teardown to the process group it created (`os.killpg`), never
+  to a process name; **pid 6587 was verified alive at the start and end of every
+  invocation** and ports 8030/8031 were never probed.
+- **Carried advisory for `ui-ux-designer`, re-verified and unchanged:** minimum
+  computed font size is **10.0px** on all four screens at both viewports.
+  UX-4/`AC-F41-03` is a *relative* check and passes, and no rule sets an absolute
+  minimum, so no suite fails.
+
+**The standing question — `does any suite report a pass the register says cannot
+be true?` — returns NO for the SEVENTH consecutive pass.** The register has 33
+entries (1–33, verified, no gaps). `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+`AC-F40-17` and `AC-F36-48` are claimed by **zero** of the 2,774 scenario names —
+the only two node IDs containing an ID are the parametrisation labels of a
+scenario asserting the export is **refused** — and by zero `COVERS` joins that
+are not self-denying. The 38 new node IDs were scanned with the same query and
+returned zero.
+
+**Gate status: PASS. No blocking suite failed and no blocking condition remains
+open.** All seven suites plus the smoke are `EXECUTED` and green; both items the
+loop-back raised were fixed rather than overridden, and both were verified here
+by mutation rather than accepted. No `[override]` is required.
+
+---
+
 ### 2026-08-02 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `75f5e27`** (parent repo @ `21af9da`)
 
 **All seven automated suites EXECUTED, 2,736 of 2,736 scenarios passed at every

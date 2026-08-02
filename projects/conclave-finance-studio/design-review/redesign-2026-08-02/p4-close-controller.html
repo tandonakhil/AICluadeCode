@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Close (controller) — Conclave Finance Studio</title>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p4-close-controller.html" class="navitem on" aria-current="page"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
+  <a href="p5-approvals.html" class="navitem"><span>Approvals</span><span class="cnt">4</span></a>
+  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p6-period-record.html#runs" class="navsub">Runs &amp; dossiers</a>
+  <a href="p6-period-record.html#agents" class="navsub">Agents &amp; datasets</a>
+  <a href="p6-period-record.html#refusals" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
+    <a href="#" class="navsub">My probe history</a>
+    <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb">Close</div>
+  <h1 class="pagehd">2026-06 close &mdash; day 3 of 8</h1>
+  <div class="pagesub">
+    Same screen, same components, different call-list. The controller&rsquo;s job is
+    supervision and egress, so approvals and things that could not run sit at the
+    top; individual findings sit below.
+  </div>
+
+  <div class="calls">
+    <a class="call urgent" href="p5-approvals.html">
+      <div class="n">4</div>
+      <div>
+        <div class="t">Resolutions awaiting your approval</div>
+        <div class="d">2 of them post to the ledger. Approval is a separate, deliberate
+          act on its own screen &mdash; it is never available from a review queue.</div>
+      </div>
+      <div class="go">Open approvals &rarr;</div>
+    </a>
+    <a class="call warn" href="p6-period-record.html#runs">
+      <div class="n">1</div>
+      <div>
+        <div class="t">Boundary check that could not run</div>
+        <div class="d">A9 &mdash; FX/CTA arithmetic. Dataset dw.fx_revaluation unavailable.
+          <b>Not run is not a pass</b> and carries no coverage figure. Nothing concludes
+          over this boundary.</div>
+      </div>
+      <div class="go">See the run report &rarr;</div>
+    </a>
+    <a class="call warn" href="p6-period-record.html#dueback">
+      <div class="n">1</div>
+      <div>
+        <div class="t">Forward prediction missed, unexplained</div>
+        <div class="d">16200 CWIP &ndash; Substation. Predicted 2026-05 to clear by 2026-06;
+          it did not. This is also condition P2 on the surveillance agent&rsquo;s promotion
+          readiness, which is why that agent is not promotable.</div>
+      </div>
+      <div class="go">Chase the explanation &rarr;</div>
+    </a>
+    <a class="call abst" href="p2-queue.html#abstentions">
+      <div class="n">6</div>
+      <div>
+        <div class="t">Abstentions this period</div>
+        <div class="d">Items the system declined to conclude about. Counted as a
+          first-class figure, never folded into &lsquo;no issues found&rsquo;, and not in the
+          denominator of any precision figure.</div>
+      </div>
+      <div class="go">Review abstentions &rarr;</div>
+    </a>
+    <a class="call" href="p6-period-record.html">
+      <div class="n">1</div>
+      <div>
+        <div class="t">Auditor export is not authorised</div>
+        <div class="d">The CUEC probe cannot execute in this build, so the export
+          authorises on stored pass state. Disclosed here rather than at the moment you
+          click download.</div>
+      </div>
+      <div class="go">See the period record &rarr;</div>
+    </a>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="lbl">Where this close is, as a whole</div>
+    <table class="t">
+      <tr><th>Measure</th><th class="n">2026-06 (day 3)</th><th class="n">2026-05 (final)</th><th>Note</th></tr>
+      <tr><td>Detections</td><td class="n">214</td><td class="n">331</td><td></td></tr>
+      <tr><td>Routed to a human</td><td class="n">8</td><td class="n">19</td><td></td></tr>
+      <tr><td>Resolved</td><td class="n">1</td><td class="n">19</td><td></td></tr>
+      <tr><td>Abstentions</td><td class="n">6</td><td class="n">11</td><td>Not in any precision denominator</td></tr>
+      <tr><td>Declared population covered</td><td class="n">70%</td><td class="n">100%</td>
+        <td>3 accounts unscanned, named</td></tr>
+      <tr><td>Boundary checks that could not run</td><td class="n">1</td><td class="n">0</td><td>A9</td></tr>
+      <tr><td>Forward predictions come due</td><td class="n">1</td><td class="n">3</td><td>1 missed, unexplained</td></tr>
+    </table>
+    <div class="refused" style="margin-top:12px">
+      <b>This table is not a statement that either period was clean.</b>
+      It is a record of what was examined and what was concluded. This product does not
+      conclude that a period is materially correct (A20) and does not certify (A21).
+      Those are refusals by design, not gaps in the table.
+    </div>
+  </div>
+</main>
+</div></body></html>

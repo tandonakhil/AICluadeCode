@@ -1,22 +1,22 @@
 # Test evidence — functional suite
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test (re-run, pass 2)
+**Gate:** 8 · Test (final re-run)
 **Date:** 2026-08-02
-**Commit under test:** `dev` @ **`75f5e27`** · parent repo @ **`21af9da`**
+**Commit under test:** `dev` @ **`9d605b1`** · parent repo @ **`e14c497`**
 **Owner:** `functional-agent` (authored) · executed and reported by `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
 **Entry point:** `dev/tests/suites/functional/run.sh`
-**Exit code:** 0 at its own entry point; **1** inside the `reverse` whole-tree ordering
-**Scenarios: 354 — PASS 354, FAIL 0, SKIP 0** at the entry point
-**Under the six collection orderings: PASS in five, 1 FAIL in `reverse`**
+**Exit code:** 0
+**Scenarios: 354 — PASS 354, FAIL 0, SKIP 0**
+**Under all eight collection orderings: PASS 354 in every one, including four
+separate `reverse` runs**
 
-> **This suite carries the one failure of this pass.** It passes its own entry
-> point and five of six whole-tree orderings; in `reverse`,
-> `test_AC_F12_15_the_rendered_dom_carries_no_probe_rate` failed. See the
-> collection-order scenario below and `order-independence-2026-08-02.md` for
-> the diagnosis. It is reported as a FAIL and not rounded up.
+> **The one failure of the previous pass is closed.** At `75f5e27`,
+> `test_AC_F12_15_the_rendered_dom_carries_no_probe_rate` failed inside the
+> `reverse` ordering on a rendered wall-clock timestamp. `reverse` was re-run
+> **four** times at `9d605b1`: 2,774 pass, exit 0, every time.
 
 `test-agent` does not author this suite. It ran it, read its scenario names and
 docstrings against the 33-entry deferred-substitution register, and reports the
@@ -28,73 +28,134 @@ result.
 - Status: EXECUTED
 - Input: `bash tests/suites/functional/run.sh`
 - Expected: exit 0, and specifically not exit 3 (no scenarios) or 4 (cannot execute)
-- Actual: `scenarios: 19 file(s)`, 354 collected, `EXECUTED — suite passed`
+- Actual: 354 collected, `EXECUTED — suite passed`
 - Result: PASS
-- Evidence: progress tally `Counter({'.': 354})`, exit 0
+- Evidence: progress tally 354 dots, no `F`/`E`/`s`; exit 0
 
-### Scenario: the suite passes under every collection order
+### Scenario: the previously failing scenario now passes in `reverse`, repeatedly
 - Status: EXECUTED
-- Input: the suite as collected inside all six whole-tree orderings
-- Expected: no scenario depends on what ran before it
-- Actual: **green in five of six. In the `reverse` ordering one scenario
-  FAILED** —
-  `test_f12_probe_criteria.py::test_AC_F12_15_the_rendered_dom_carries_no_probe_rate`
-- Result: **FAIL**
-- Evidence: `order-independence-2026-08-02.md`. The failure is **not** an order
-  dependence and **not** a product defect: the scenario asserts the bare
-  substring `"0.02"` (the disclosed band's low bound) appears nowhere in the
-  page, and it collided with a rendered wall-clock timestamp
-  `…T07:04:40.023468+00:00`. Its two substantive assertions — `"probe rate"`
-  absent, and no percentage within 240 characters of the word "probe" — both
-  passed, so no probe rate leaked. Re-run in isolation 12 times: 0 failures.
-  **The identical `reverse` permutation re-run gave 2,736 pass, exit 0** — the
-  same order, the opposite result, which is what an order dependence cannot do.
-  It is an **intermittent** assertion that can fail in any ordering, roughly 1
-  rendered timestamp in 1,000.
-- Gate consequence: this suite is **blocking**. One scenario failing in one of
-  six orderings is an unmet gate condition, reported at full weight rather than
-  averaged into "five of six green". `test-agent` does not fix it — the narrow
-  fix (assert the band value as a number, or only within the probe-adjacent
-  windows the scenario already computes) is feedback for `code-agent`.
-
-### Scenario: the suite no longer writes to the developer's decision ledger
-- Status: EXECUTED
-- Input: `stat` on `dev/var/broker_db.sqlite3` before and after the entry point
-- Expected: 0 bytes of growth — this suite was **the** source of the leak I
-  reported last pass (`test_emission_gate_criteria.py`, three rows per run)
-- Actual: **0**
+- Input: the whole tree under `TA_ORDER=reverse`, run four separate times
+- Expected: no failure, and specifically not an intermittent one
+- Actual: `2774 passed` on all four, fingerprint `d0ee639c287714bd` each time
 - Result: PASS
-- Evidence: `functional EXIT=0 ledger_delta=0`. Under the fix reverted, the same
-  request grew the file by 4,096 bytes — see `architecture-2026-08-02.md`.
+- Evidence: 175.82s / 174.79s / 172.46s / 174.11s; see
+  `order-independence-2026-08-02.md`
 
-### Scenario: no scenario claims a criterion the register denies
+### Scenario: the timestamp that broke the old assertion now passes clean
 - Status: EXECUTED
-- Input: all 354 node IDs and every `COVERS` docstring in this suite, scanned
-  for the five declared criteria
-- Expected: zero claims
-- Actual: zero node-name claims. Two `COVERS` docstrings mention `AC-F40-17`
-  and both say **"NOT AC-F40-17"** in the same sentence, on scenarios that
-  cover `AC-F40-18`.
+- Input: `rendered_numbers.band_is_not_readable("captured at
+  2026-08-02T07:04:40.023468+00:00", (0.02, 0.08))`
+- Expected: no leak reported — `0.02` inside `40.023468` is not a standalone
+  numeric token
+- Actual: no leak reported. The old substring form flags it.
 - Result: PASS
-- Evidence: `register-cross-check-2026-08-02.md`
+- Evidence: `timestamp that broke the old form  new=no leak reported
+  old_substring=flag`
 
-### Scenario: `AC-F40-18` is exercised on the served pilot, not only in the suite
+### Scenario: `0.020` — the case that PASSED DIRTY — is now caught
 - Status: EXECUTED
-- Input: the smoke test's S8 — the export screen the real export path produced
-- Expected: `data-authorised-on="synthetic_attestation"`, never a stored CUEC
-  pass state
-- Actual: `synthetic_attestation`
+- Input: `band_is_not_readable("rate: 0.020", band)`
+- Expected: leak reported — the same rate, a different substring
+- Actual: `AssertionError: a number inside the undisclosed probe band
+  ('0.02', '0.08') is rendered at …: ['0.020']`
 - Result: PASS
-- Evidence: `smoke-test-2026-08-02.md` S6–S8
+- Evidence: exact decimals rather than floats, so `0.020 == 0.02`; the old
+  substring form passes this input
 
----
+### Scenario: a rate strictly BETWEEN the bounds — what `plan_injection` actually draws — is caught
+- Status: EXECUTED
+- Input: `band_is_not_readable("rate: 0.0473", band)`; `plan_injection` draws
+  `rng.uniform(0.02, 0.08)`, so the bounds are the two values it almost never takes
+- Expected: leak reported
+- Actual: leak reported. **The old substring form passes it.**
+- Result: PASS
+- Evidence: `0.0473 -- strictly between … new=LEAK REPORTED
+  old_substring=pass` — this is the leak the criterion is about, and it was
+  never in the old assertion's reach
 
-## Test-count delta
+### Scenario: MUTATION M2 — a real leak on the real leak path fails all four sites
+- Status: EXECUTED
+- Input: `BAND_STATEMENT` in `app/f12/probes.py` amended to
+  `"…is not readable from this product. (rate in force tonight: 0.0473)"` — the
+  realistic shape of the leak, a drawn in-band rate appended to the disclosure
+  the product already renders
+- Expected: all four `AC-F12-15` numeric sites fail
+- Actual: **4 failed** — the unit site, both functional sites, and the
+  Playwright-driven UX site (which reads `inner_text` from a real browser)
+- Result: PASS (the assertion fired; the mutation was reverted)
+- Evidence: `4 failed in 0.75s`. Against the same mutated build the **old**
+  assertion was evaluated directly and returned
+  `/review OLD assertion … PASSES -- leak undetected` with `"0.0473" in body ==
+  True`. Reverted with `git checkout`; tree re-verified clean at `9d605b1`.
+  The immediately preceding run of the same four scenarios on the unmutated
+  tree gave `4 passed`, so the mutation is the only difference.
 
-| | Before (`fc197a6`) | After (`75f5e27`) | Delta |
-|---|---|---|---|
-| functional | 354 | **354** | — |
+### Scenario: measured over all twelve served pages — zero in-band tokens
+- Status: EXECUTED
+- Input: every one of the twelve paths the scenario sweeps, fetched and
+  tokenised
+- Expected: `code-agent`'s claim of zero in-band tokens on all twelve
+- Actual: **confirmed, zero on all twelve**; 81–98 numeric tokens per page and
+  none in `[0.02, 0.08]`. Zero old-form substring hits too, so on this build
+  the two forms agree and the timestamp collision was genuinely intermittent.
+- Result: PASS
+- Evidence: `TOTAL in-band tokens across 12 pages: 0` /
+  `TOTAL old-substring hits across 12 pages: 0`; all twelve returned 200
 
-**Added 0, removed 0, changed 0.** Verified by node-ID set difference between
-the two commits: no `tests/suites/functional/**` node ID was added or removed,
-and `git diff fc197a6..HEAD -- tests/suites/functional` is empty.
+### Scenario: is it genuinely STRONGER, or merely different?
+- Status: EXECUTED
+- Input: both forms evaluated over eleven crafted inputs and over the twelve
+  served pages
+- Expected: a measured answer, not an assertion
+- Actual: **Stronger on every real-leak shape, and not a strict superset.** The
+  new form catches everything the old caught that is actually a readable rate
+  (`0.02`, `0.08`), plus `0.020` and every value strictly between the bounds.
+  The only inputs the old form flagged and the new one does not are digit runs
+  sitting *inside* a longer numeric run (`40.023468`, `1.0.02`) — which are
+  precisely the false positives, not readable rates.
+- Result: PASS, with two qualifications reported as findings below
+- Evidence: the eleven-case table; `0.0473` new=LEAK old=pass;
+  `1.0.02` new=pass old=flag
+
+### Scenario: FINDING — the collision class is relocated, not eliminated (non-blocking)
+- Status: EXECUTED
+- Input: the check reads the **whole served document, including the `<style>`
+  block**, where in-band decimals are ordinary. `MUTATION`: one CSS declaration
+  rewritten from `letter-spacing:.05em` to `letter-spacing:0.05em` — a change
+  with **zero rendered effect**.
+- Expected: if the concern were closed, a cosmetic CSS rewrite could not fail
+  an `AC-F12-15` scenario
+- Actual: **3 scenarios FAILED** — `a number inside the undisclosed probe band
+  ('0.02','0.08') is rendered at /: ['0.05']`
+- Result: FAIL as a *robustness* observation; **not** a suite failure — nothing
+  is failing on the build as it stands, and the tree is green
+- Evidence: today all 84 in-band leading-dot values on the served pages are CSS
+  (`letter-spacing:.06em`, `.08em`, `.05em`) and pass only because the
+  stylesheet happens to be authored in leading-dot form. Feedback for
+  `code-agent`, not something `test-agent` applied. Mutation reverted; tree
+  clean at `9d605b1`.
+
+### Scenario: FINDING — the docstring again claims more than the assertion checks (non-blocking)
+- Status: EXECUTED
+- Input: `conclave_harness/rendered_numbers.py` names `.02` among the leaks the
+  substring form let through, in the passage justifying the replacement. Tested
+  directly.
+- Expected: if the docstring is accurate, the new form catches `.02`
+- Actual: it does **not** — the lookbehind `(?<![\d.,])` means a leading-dot
+  decimal produces no token at all. `rate: .02` → no leak reported.
+  `2.0e-2` likewise.
+- Result: FAIL as a *documentation-accuracy* observation; **not** a suite failure
+- Evidence: `.02 leading-dot form  new=no leak reported  old_substring=pass` —
+  neither form catches it, so this is not a regression, but it is the **same
+  class of defect as the original**: a comment asserting coverage the
+  assertion does not have. No rate is rendered in leading-dot form today (the
+  156 such decimals on the served pages are all CSS), so nothing leaks.
+
+### Scenario: register cross-check on this suite's 354 names
+- Status: EXECUTED
+- Input: all 354 node IDs and every `COVERS` join in the suite
+- Expected: none of the five declared criteria claimed
+- Actual: zero occurrences of `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+  `AC-F40-17`, `AC-F36-48` in this suite's node IDs or joins
+- Result: PASS
+- Evidence: see `register-cross-check-2026-08-02.md`

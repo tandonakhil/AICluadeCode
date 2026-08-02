@@ -1,0 +1,262 @@
+/* ============================================================
+   conclave-finance-studio — redesign pass, 2026-08-02
+   Tokens copied VERBATIM from the running pilot (gate-5 approved
+   visual language). Nothing in :root is new. Everything below the
+   token block is either unchanged pilot CSS or a NEW structural
+   component, marked /* NEW */.
+   ============================================================ */
+
+:root{--accent:#1D4ED8;--accent-bg:#ECF1FE;--bg:#F6F6F3;--ink:#14161A;--ink-2:#4A4F58;
+ --ink-3:#5E646E;--line:#D9D9D2;--line-2:#C2C2B8;--refuse:#334155;--refuse-bg:#EDF0F4;
+ --risk-1:#B45309;--risk-1-bg:#FDF6EC;--risk-2:#B42318;--risk-2-bg:#FBECEA;
+ --risk-3:#7A1214;--risk-3-bg:#F6E4E3;--surface:#FFFFFF;--surface-2:#F0F0EC;
+ --surface-3:#E7E7E1;--uncert:#5C636E;--uncert-bg:#F1F1EF;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
+.mono,.amt,.num,td.n,th.n{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+ font-variant-numeric:tabular-nums lining-nums}
+h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.012em}
+h1{font-size:22px} h2{font-size:16px} h3{font-size:14px}
+a{color:var(--accent)}
+p{margin:.5em 0}
+
+/* ---- shell ---- */
+.shell{display:flex;min-height:100vh}
+.nav{width:212px;flex:none;background:var(--surface-2);border-right:1px solid var(--line);
+ padding:14px 0 20px;display:flex;flex-direction:column}
+.brand{padding:0 14px 10px;font-size:14px;font-weight:680}
+
+/* NEW — context bar. Was a 110px two-block masthead repeated on all 12
+   screens (provenance strip + pilot strip). Now ONE line, always naming the
+   staleness number, with the full AC-F38-11 sentence behind a disclosure.
+   Same surface as the figure, which is what the criterion requires; a
+   criterion says "same surface", not "same 110 pixels". */
+.ctxbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+ font-size:12.5px;color:var(--ink-2);background:var(--surface);
+ border-bottom:1px solid var(--line);padding:8px 24px;margin:0 -24px 0}
+.ctxbar b{color:var(--ink)}
+.ctxbar .stale{color:var(--risk-1);font-weight:640}
+.ctxbar .pilot{border:1px solid var(--uncert);background:var(--uncert-bg);
+ border-radius:4px;padding:1px 7px;font-size:11.5px;
+ background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(120,128,140,.16) 7px 8px)}
+.ctxbar details{display:inline}
+.ctxbar summary{cursor:pointer;color:var(--accent);font-size:12.5px}
+.ctxdetail{padding:8px 24px;margin:0 -24px;font-size:12.5px;color:var(--ink-2);
+ background:var(--surface-2);border-bottom:1px solid var(--line)}
+
+/* NEW — 4-item task-ordered nav. TYPOGRAPHY FLOOR APPLIED:
+   nav items 14px (were 10px computed in the pilot), group labels 11.5px
+   (were 10px), no persistently-rendered text below 12px anywhere. */
+.navgrp{padding:14px 14px 4px;font-size:11.5px;letter-spacing:.08em;
+ text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.navitem{display:flex;justify-content:space-between;align-items:center;gap:8px;
+ padding:8px 14px;font-size:14px;color:var(--ink-2);text-decoration:none}
+.navitem:hover{background:var(--surface-3)}
+.navitem.on{background:var(--surface);color:var(--ink);font-weight:620;
+ box-shadow:inset 3px 0 0 var(--accent)}
+.navitem .cnt{font-size:12.5px;color:var(--ink-2);font-family:ui-monospace,monospace;
+ background:var(--surface-3);border-radius:9px;padding:0 7px}
+.navitem.on .cnt{background:var(--accent-bg);color:var(--accent)}
+.navsub{padding:3px 14px 3px 26px;font-size:13px;color:var(--ink-3);text-decoration:none;display:block}
+.navspacer{flex:1}
+.navfoot{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+.whoami{padding:8px 14px;font-size:12.5px;color:var(--ink-3)}
+.whoami b{display:block;font-size:13.5px;color:var(--ink)}
+
+main{flex:1;min-width:0;padding:0 24px 60px;max-width:1180px}
+.crumb{font-size:13px;color:var(--ink-3);margin:14px 0 4px}
+.crumb a{color:var(--ink-3)}
+.sub{font-size:13px;color:var(--ink-3)}
+.pagehd{margin:0 0 4px}
+.pagesub{font-size:13.5px;color:var(--ink-2);margin-bottom:14px;max-width:84ch}
+
+/* ---- generic (unchanged from pilot) ---- */
+.card{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px;margin-top:12px}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.col{flex:1;min-width:0}
+.lbl{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+ margin-bottom:6px;font-weight:600}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:5px 0;
+ border-bottom:1px dotted var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--ink-3)}
+.kv .v{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+ font-variant-numeric:tabular-nums lining-nums}
+.note{font-size:12.5px;color:var(--ink-3);margin-top:8px;max-width:88ch}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+table.t th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--ink-3);border-bottom:1px solid var(--line-2);padding:6px 8px 6px 0;font-weight:600}
+table.t td{border-bottom:1px solid var(--line);padding:7px 8px 7px 0;vertical-align:top}
+table.t th.n,table.t td.n{text-align:right}
+.pill{display:inline-block;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+ padding:2px 7px;border-radius:4px;border:1px solid var(--line-2);color:var(--ink-2);
+ background:var(--surface-2);white-space:nowrap}
+.pill.r1{color:var(--risk-1);border-color:var(--risk-1);background:var(--risk-1-bg)}
+.pill.r2{color:var(--risk-2);border-color:var(--risk-2);background:var(--risk-2-bg)}
+.pill.r3{color:var(--risk-3);border-color:var(--risk-3);background:var(--risk-3-bg);font-weight:700}
+.pill.omission{border-color:var(--ink-2);border-width:2px;color:var(--ink);font-weight:660}
+.pill.unknown{color:var(--refuse);border-color:var(--refuse);background:var(--refuse-bg);
+ border-left-width:5px;font-weight:660}
+.btn{font:inherit;font-size:13.5px;padding:8px 13px;border-radius:6px;
+ border:1px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer;
+ text-decoration:none;display:inline-block}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.hatch{background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(120,128,140,.28) 6px 7px)}
+
+/* ---- coverage population strip — UNCHANGED, constraint honoured ---- */
+.covstrip{display:flex;height:28px;border:1px solid var(--line-2);border-radius:5px;
+ overflow:hidden;margin-top:8px}
+.covseg{display:flex;align-items:center;justify-content:center;font-size:12px;
+ white-space:nowrap;overflow:hidden;color:var(--ink-2);padding:0 4px}
+.covseg.scanned{background:var(--surface-3);color:var(--ink)}
+.covseg.gap{background-color:var(--surface);color:var(--risk-2);border-left:1px solid var(--line-2)}
+.covlegend{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;
+ color:var(--ink-3);margin-top:6px}
+
+.partial{border:1px solid var(--risk-2);border-left-width:6px;background:var(--risk-2-bg);
+ color:var(--ink);border-radius:6px;padding:11px 13px;font-size:13.5px;margin-top:12px}
+.nodismiss{display:block;margin-top:6px;font-size:12.5px;color:var(--ink-3)}
+
+/* ---- risk band — unchanged ---- */
+.riskband{border:1px solid var(--risk-3);border-left-width:8px;background:var(--risk-3-bg);
+ border-radius:8px;padding:16px 18px;margin-top:14px}
+.riskband .cap{font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+ color:var(--risk-3);font-weight:700}
+.riskband .big{font-size:42px;line-height:1.05;font-weight:700;margin:6px 0 4px;
+ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+ font-variant-numeric:tabular-nums lining-nums}
+.riskband .what{font-size:22px;font-weight:640}
+.riskband .why{font-size:13.5px;color:var(--ink-2);margin-top:7px;max-width:78ch}
+.riskband .facts{display:flex;gap:20px;flex-wrap:wrap;margin-top:11px;font-size:12.5px;color:var(--ink-3)}
+.riskband .facts b{display:block;font-size:14.5px;color:var(--ink);
+ font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums lining-nums}
+.riskband.r1{border-color:var(--risk-1);background:var(--risk-1-bg)}
+.riskband.r1 .cap{color:var(--risk-1)}
+.riskband.r2{border-color:var(--risk-2);background:var(--risk-2-bg)}
+.riskband.r2 .cap{color:var(--risk-2)}
+
+/* ---- abstention — unchanged, constraint honoured ---- */
+.abstention{border:1px solid var(--refuse);border-left-width:8px;border-style:dashed;
+ background:var(--refuse-bg);border-radius:6px;padding:12px 14px;margin-top:12px}
+.abstention .hd{font-size:14.5px;font-weight:660}
+.refused{border:1px solid var(--refuse);border-left-width:6px;background:var(--refuse-bg);
+ border-radius:6px;padding:12px 14px;margin-top:12px}
+
+/* ---- narrative: LAST and CLOSED — unchanged, constraint honoured ---- */
+details.narrative{border:1px solid var(--line);border-radius:7px;background:var(--surface-2);margin-top:12px}
+details.narrative>summary{padding:11px 13px;font-size:13.5px;color:var(--ink-2);cursor:pointer;list-style:none}
+details.narrative>summary::-webkit-details-marker{display:none}
+details.narrative .bd{padding:0 13px 13px;font-size:13.5px;color:var(--ink-2);max-width:80ch}
+
+/* ============ NEW STRUCTURAL COMPONENTS ============ */
+
+/* NEW — Close cockpit "what this close needs from you" call-list.
+   Each row is a task with a destination. Nothing here is a report. */
+.calls{border:1px solid var(--line-2);border-radius:8px;overflow:hidden;margin-top:10px;background:var(--surface)}
+.call{display:grid;grid-template-columns:56px 1fr 190px;gap:14px;padding:14px 16px;
+ border-top:1px solid var(--line);align-items:center;text-decoration:none;color:inherit}
+.call:first-child{border-top:0}
+.call:hover{background:var(--surface-2)}
+.call .n{font-size:30px;font-weight:700;font-family:ui-monospace,monospace;
+ font-variant-numeric:tabular-nums lining-nums;line-height:1;text-align:right}
+.call .t{font-size:15.5px;font-weight:620}
+.call .d{font-size:13px;color:var(--ink-2);margin-top:3px}
+.call .go{font-size:13.5px;color:var(--accent);text-align:right}
+.call.urgent .n{color:var(--risk-3)}
+.call.warn  .n{color:var(--risk-1)}
+.call.abst  .n{color:var(--refuse)}
+.call.abst{border-left:6px dashed var(--refuse)}
+
+/* NEW — queue with real columns, sort and filter */
+.qtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;
+ font-size:13px;color:var(--ink-3)}
+.chip{border:1px solid var(--line-2);border-radius:14px;padding:4px 11px;font-size:13px;
+ background:var(--surface);color:var(--ink-2);text-decoration:none;cursor:pointer}
+.chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:620}
+.q{margin-top:10px;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.qhdr,.qrow{display:grid;
+ grid-template-columns:120px 1fr 118px 108px 128px 92px 120px;gap:12px;
+ padding:11px 14px;align-items:start}
+.qhdr{background:var(--surface-2);font-size:12px;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.qhdr .s{color:var(--accent)}
+.qrow{border-top:1px solid var(--line);border-left:6px solid transparent;
+ background:var(--surface);text-decoration:none;color:inherit}
+.qrow:hover{background:var(--surface-2)}
+.qrow.tier1{border-left-color:var(--risk-1)}
+.qrow.tier2{border-left-color:var(--risk-2)}
+.qrow.tier3{border-left-color:var(--risk-3)}
+.qrow.abst{border-left-color:var(--refuse);border-left-style:dashed}
+.qrow.done{opacity:.55}
+.qrow .acct{font-family:ui-monospace,monospace;font-size:13.5px;font-weight:620}
+.qrow .desc{font-size:13px;color:var(--ink-2);margin-top:3px}
+.qrow .amt{font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums lining-nums;
+ text-align:right;font-size:13.5px}
+
+/* NEW — post-resolution confirmation. Closes the loop the pilot leaves open. */
+.confirm{border:1px solid var(--accent);border-left-width:6px;background:var(--accent-bg);
+ border-radius:7px;padding:13px 15px;margin-top:12px;font-size:13.5px}
+.confirm .hd{font-size:15px;font-weight:660;margin-bottom:4px}
+
+/* NEW — eligible / ineligible split. The broker still decides; the UI only
+   ORDERS. Ineligible options keep full contrast and stay clickable. */
+.rrow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.rbtn{flex:1 1 0;min-width:150px;border:1px solid var(--line-2);border-radius:7px;
+ background:var(--surface);padding:11px;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.rbtn .code{font-size:13.5px;font-weight:700;font-family:ui-monospace,monospace}
+.rbtn .nm{font-size:13px;margin-top:2px}
+.rbtn .req{font-size:12px;color:var(--ink-3);margin-top:4px}
+.rbtn .posts{display:inline-block;margin-top:5px;font-size:11.5px;letter-spacing:.05em;
+ text-transform:uppercase;color:var(--risk-2);border:1px solid var(--risk-2);
+ border-radius:3px;padding:1px 5px}
+.inelig{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2)}
+.inelig .lbl{margin-bottom:8px}
+.rbtn.no{border-style:dashed}
+.rbtn.no .why{font-size:12px;color:var(--refuse);margin-top:5px;
+ border-left:3px solid var(--refuse);padding-left:7px}
+
+/* NEW — journey map rendering (review artefact, not a product component) */
+.jm{border:1px solid var(--line-2);border-radius:8px;background:var(--surface);
+ padding:16px;margin-top:14px;overflow-x:auto}
+.jmhd{font-size:15.5px;font-weight:660}
+.jmwho{font-size:13px;color:var(--ink-3);margin-top:2px}
+.steps{display:flex;gap:0;margin-top:14px;min-width:min-content}
+.step{flex:1 1 0;min-width:150px;border:1px solid var(--line-2);border-radius:7px;
+ padding:11px;margin-right:22px;position:relative;background:var(--surface)}
+.step:last-child{margin-right:0}
+.step:after{content:"\2192";position:absolute;right:-18px;top:50%;transform:translateY(-50%);
+ color:var(--ink-3);font-size:17px}
+.step:last-child:after{content:""}
+.step .sn{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.step .sv{font-size:13.5px;font-weight:620;margin-top:3px}
+.step .sw{font-size:12.5px;color:var(--ink-2);margin-top:4px}
+.step .sr{font-size:12px;color:var(--ink-3);margin-top:6px;font-family:ui-monospace,monospace}
+.step.broken{border-color:var(--risk-2);border-width:2px;background:var(--risk-2-bg)}
+.step.broken:after{color:var(--risk-2)}
+.step.new{border-color:var(--accent);border-style:dashed;background:var(--accent-bg)}
+.step.dead{border-color:var(--risk-3);border-width:2px;background:var(--risk-3-bg)}
+.step.dead:after{content:"\2716";color:var(--risk-3);font-size:15px}
+.jmkey{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-3);margin-top:12px}
+.jmkey i{font-style:normal;display:inline-block;width:12px;height:12px;border-radius:2px;
+ margin-right:5px;vertical-align:-1px}
+
+/* NEW — review-page chrome (the assembly page only) */
+.rv{max-width:1240px;margin:0 auto;padding:26px 26px 90px}
+.rvhd{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:8px}
+.rvsec{margin-top:38px;padding-top:20px;border-top:1px solid var(--line-2)}
+.frame{border:1px solid var(--line-2);border-radius:8px;overflow:hidden;
+ margin-top:12px;background:var(--surface)}
+.frame .fhd{background:var(--surface-2);border-bottom:1px solid var(--line-2);
+ padding:9px 13px;font-size:13px;color:var(--ink-2);display:flex;
+ justify-content:space-between;gap:12px;flex-wrap:wrap}
+.frame .fhd b{color:var(--ink)}
+.frame iframe{display:block;width:100%;border:0;background:var(--bg)}
+.verdict{border:1px solid var(--risk-2);border-left-width:7px;background:var(--risk-2-bg);
+ border-radius:7px;padding:14px 16px;margin-top:14px}
+.verdict.keep{border-color:var(--refuse);background:var(--refuse-bg)}
+.verdict.new{border-color:var(--accent);background:var(--accent-bg)}
+.verdict h3{font-size:14.5px;margin-bottom:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}

@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Approvals — Conclave Finance Studio</title>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="shell">
+
+<nav class="nav" aria-label="Primary">
+  <div class="brand">Conclave Finance Studio</div>
+  <div class="navgrp">Work</div>
+  <a href="p4-close-controller.html" class="navitem"><span>Close</span></a>
+  <a href="p2-queue.html" class="navitem"><span>My queue</span><span class="cnt">2</span></a>
+  <a href="p5-approvals.html" class="navitem on" aria-current="page"><span>Approvals</span><span class="cnt">4</span></a>
+  <a href="p7-inquiry.html" class="navitem"><span>Ask</span></a>
+  <div class="navgrp">Evidence</div>
+  <a href="p6-period-record.html" class="navitem"><span>Period record</span></a>
+  <a href="p6-period-record.html#runs" class="navsub">Runs &amp; dossiers</a>
+  <a href="p6-period-record.html#agents" class="navsub">Agents &amp; datasets</a>
+  <a href="p6-period-record.html#refusals" class="navsub">What we refuse to do</a>
+  <div class="navspacer"></div>
+  <div class="navfoot">
+    <div class="whoami">Signed in as<b>D. Okafor</b>controller</div>
+    <a href="#" class="navsub">My probe history</a>
+    <a href="p1-close-staff.html" class="navsub">Pilot: view as staff accountant &rarr;</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ctxbar">
+    <span>Entity <b>Northwind Grid Holdings</b></span>
+    <span>Period <b>2026-06</b></span>
+    <span>Close day <b>Day 3</b></span>
+    <span class="stale">Data 1 close day behind</span>
+    <span class="pilot">Pilot &mdash; synthetic fixture data</span>
+    <details><summary>What that means</summary></details>
+  </div>
+
+  <div class="crumb"><a href="p4-close-controller.html">Close</a> &rsaquo; Approvals</div>
+  <h1 class="pagehd">Approvals &mdash; 4 awaiting you</h1>
+  <div class="pagesub">
+    <b>ENTIRELY NEW. Nothing like this screen exists in the pilot.</b>
+    The constraint &ldquo;no Approve button on the Review screen&rdquo; was honoured by
+    removing the button. Its other half &mdash; the separate, deliberate act it implies
+    must happen <i>somewhere</i> &mdash; was never given a home, so the controller journey
+    &ldquo;I approve a reclass and it becomes an export&rdquo; currently cannot be walked at all.
+  </div>
+
+  <div class="qtools">
+    <a class="chip on" href="#">Awaiting me (4)</a>
+    <a class="chip" href="#">Approved, in the export set (3)</a>
+    <a class="chip" href="#">Returned to author (1)</a>
+    <span style="margin-left:10px">Sorted by <b>posts-to-ledger first</b></span>
+  </div>
+
+  <div class="q">
+    <div class="qhdr">
+      <span>Item</span><span>Resolution proposed</span><span>Type</span>
+      <span class="s">Posts?</span><span class="n" style="text-align:right">Amount</span>
+      <span>Author</span><span>State</span>
+    </div>
+    <a class="qrow tier3" href="#detail">
+      <div><span class="acct">54100</span></div>
+      <div><b>R3 &mdash; reclassification proposed</b>
+        <div class="desc">14 invoices CC-4420 &rarr; CC-4180. Cost only, single legal entity, single period.</div></div>
+      <div><span class="pill">Coding</span></div>
+      <div><span class="pill r2">Posts</span></div>
+      <div class="amt">86,340.00</div>
+      <div class="desc">A. Reyes</div>
+      <div class="desc">Awaiting you</div>
+    </a>
+    <a class="qrow tier3" href="#detail">
+      <div><span class="acct">18300</span></div>
+      <div><b>R4 &mdash; accrual correction proposed</b>
+        <div class="desc">Recurring amortisation absent from 2026-06.</div></div>
+      <div><span class="pill omission">Omission</span></div>
+      <div><span class="pill r2">Posts</span></div>
+      <div class="amt">412,500.00</div>
+      <div class="desc">A. Reyes</div>
+      <div class="desc">Awaiting you</div>
+    </a>
+    <a class="qrow tier1" href="#detail">
+      <div><span class="acct">11500</span></div>
+      <div><b>R1 &mdash; accepted and explained</b>
+        <div class="desc">Acceptance expires 2026-09.</div></div>
+      <div><span class="pill">Present anomaly</span></div>
+      <div><span class="pill">No</span></div>
+      <div class="amt">228,715.00</div>
+      <div class="desc">A. Reyes</div>
+      <div class="desc">Awaiting you</div>
+    </a>
+    <a class="qrow tier1" href="#detail">
+      <div><span class="acct">19900</span></div>
+      <div><b>R2 &mdash; data-side fix</b>
+        <div class="desc">Warehouse/ERP segment difference referred to the feed owner.</div></div>
+      <div><span class="pill">Fidelity</span></div>
+      <div><span class="pill">No</span></div>
+      <div class="amt">1,204.06</div>
+      <div class="desc">A. Reyes</div>
+      <div class="desc">Awaiting you</div>
+    </a>
+  </div>
+
+  <h2 style="margin-top:26px" id="detail">54100 Transmission O&amp;M Expense &mdash; approve a reclassification</h2>
+  <div class="pagesub">The approval screen is the only place in this product where an
+    Approve control exists. It shows the resolution, its evidence, and the closure
+    that makes the approval valid.</div>
+
+  <div class="riskband r2">
+    <div class="cap">Riskiest element of this proposal</div>
+    <div class="big">$86,340.00</div>
+    <div class="what">Would move cost between cost centres in a posted period</div>
+    <div class="why">A reclassification proposal that, if approved, becomes an export the
+      ledger team posts. This system never posts. It produces a proposal and an export
+      of it, and the posting is a separate human act in the ERP.</div>
+    <div class="facts">
+      <span>From<b>CC-4420</b></span><span>To<b>CC-4180</b></span>
+      <span>Postings<b>14</b></span><span>Agreement<b>0.9819</b></span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col"><div class="card">
+      <div class="lbl">Closure that makes this approval valid</div>
+      <div class="kv"><span class="k">Author</span><span class="v">agent.coding-detect v1.4.2</span></div>
+      <div class="kv"><span class="k">Invoker</span><span class="v">user.j.mbeki</span></div>
+      <div class="kv"><span class="k">Resolver</span><span class="v">user.a.reyes (staff accountant)</span></div>
+      <div class="kv"><span class="k">Approver</span><span class="v">user.d.okafor (you)</span></div>
+      <div class="kv"><span class="k">Enforced by the broker</span>
+        <span class="v">author &ne; resolver &ne; approver</span></div>
+      <div class="kv"><span class="k">Guardrail bundle in force</span><span class="v">v14 &ndash; 9f3a71c2</span></div>
+      <div class="kv"><span class="k">Decision ID</span><span class="v">DEC-8851-2026-06</span></div>
+    </div></div>
+    <div class="col"><div class="card">
+      <div class="lbl">What approving does, stated before you do it</div>
+      <div class="kv"><span class="k">1</span><span>The proposal joins the 2026-06 export set.</span></div>
+      <div class="kv"><span class="k">2</span><span>An export file is produced containing this and 3 other approved items.</span></div>
+      <div class="kv"><span class="k">3</span><span>Someone with ledger access posts it in Oracle. Not this system.</span></div>
+      <div class="kv"><span class="k">4</span><span>The forward prediction (clears by 2026-07) is armed and checks back on its own.</span></div>
+      <div class="note">In the pilot, none of steps 1&ndash;4 has a surface. <code>/audit/export</code>
+        exports the whole period rather than an approved set, and is reachable only
+        from <code>/audit</code>.</div>
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Approve &mdash; a deliberate act, typed not clicked</div>
+    <div style="font-size:14px">Type the account number this moves <b>to</b> to confirm you
+      read the proposal: <span style="border-bottom:2px solid var(--line-2);padding:0 40px">&nbsp;</span></div>
+    <div style="margin-top:12px">
+      <button class="btn primary">Approve this reclassification</button>
+      <button class="btn">Return to author &mdash; reason required</button>
+    </div>
+    <div class="note">One item. There is no control that approves more than one item in a
+      single action, and no &ldquo;approve all&rdquo;.</div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Export set for 2026-06 &mdash; what is in it and what is not</div>
+    <table class="t">
+      <tr><th>Item</th><th>Resolution</th><th class="n">Amount</th><th>In export?</th><th>Why not</th></tr>
+      <tr><td>54100 Transmission O&amp;M</td><td>R3 reclass</td><td class="n">86,340.00</td>
+        <td>Pending your approval</td><td>&mdash;</td></tr>
+      <tr><td>16200 CWIP &ndash; Substation</td><td>R1 accepted</td><td class="n">54,900.00</td>
+        <td>No</td><td>Forward prediction missed and unexplained</td></tr>
+      <tr><td>13800 Intercompany</td><td>&mdash;</td><td class="n">&mdash;</td>
+        <td>No</td><td><b>Abstention</b> &mdash; the system declined to conclude; there is nothing to export</td></tr>
+      <tr><td>29100 / 31200 / 31300</td><td>&mdash;</td><td class="n">&mdash;</td>
+        <td>No</td><td>Never scanned. No conclusion, negative or otherwise, covers them</td></tr>
+    </table>
+    <div class="partial">
+      <b>This export cannot be authorised in this build.</b> The CUEC probe cannot
+      execute, so authorisation would fall back to stored pass state. Disclosed here,
+      at the point of egress, rather than discovered after download.
+      <span class="nodismiss">Non-dismissable.</span>
+    </div>
+  </div>
+</main>
+</div></body></html>

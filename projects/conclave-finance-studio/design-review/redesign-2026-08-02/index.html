@@ -1,0 +1,541 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Navigation &amp; journey redesign — conclave-finance-studio — 2026-08-02</title>
+<link rel="stylesheet" href="ds.css"></head><body>
+<div class="rv">
+
+<div class="rvhd">
+  <h1 style="font-size:26px">Navigation &amp; journey redesign &mdash; conclave-finance-studio</h1>
+  <div class="pagesub" style="margin-top:6px">
+    <b>ui-ux-designer &middot; 2026-08-02 &middot; parallel design thread.</b>
+    Prompted by the human, having used the running pilot at
+    <code>http://127.0.0.1:8030</code>: <i>&ldquo;UI/UX in the link you gave me is really bad.
+    I just cannot follow anything.&rdquo;</i>
+    <br>This does not replace <code>design-review/index.html</code>, which remains the
+    gate-5 approved record and is untouched. Every token in this prototype is copied
+    verbatim from the pilot&rsquo;s own stylesheet; nothing has been restyled.
+  </div>
+  <div class="qtools">
+    <a class="chip on" href="#diagnosis">1 &middot; Diagnosis</a>
+    <a class="chip on" href="#journeys">2 &middot; Journey maps</a>
+    <a class="chip on" href="#ia">3 &middot; Information architecture</a>
+    <a class="chip on" href="#proto">4 &middot; Prototype</a>
+    <a class="chip on" href="#constraints">5 &middot; The six constraints</a>
+    <a class="chip on" href="#type">6 &middot; The typography call</a>
+    <a class="chip on" href="#gaps">7 &middot; Gap list</a>
+  </div>
+</div>
+
+<!-- ================= 1 DIAGNOSIS ================= -->
+<div class="rvsec" id="diagnosis">
+<h2 style="font-size:20px">1 &middot; Was the diagnosis right?</h2>
+<p class="pagesub">The diagnosis offered was: <i>gate 5 approved a visual language and 19
+component sections but never produced an information architecture, a navigation model or
+an end-to-end journey; criteria specify correctness, not findability.</i>
+<b>Directionally right, wrong on one point of fact, and understating the problem by
+about one order of magnitude.</b></p>
+
+<div class="verdict keep">
+  <h3>Wrong on one point &mdash; an IA <i>was</i> designed. It then drifted with nothing to stop it.</h3>
+  <code>UX_KB.md</code> &sect;4 specifies nine screens in three groups &mdash; Work
+  (Ask &middot; Exceptions &middot; Review &middot; Dispositions), Govern
+  (Monitors &middot; Catalogue &middot; Inventory), Evidence (Audit &middot; Refusals) &mdash;
+  with a stated rationale and a nav-badge attention model.
+  <b>The build shipped twelve screens in two groups.</b> The Evidence group was dissolved
+  into Govern; <code>/readiness</code> and <code>/my-probe-history</code> were added at
+  top level with no design pass at all. So the failure is not &ldquo;no IA was
+  designed&rdquo; &mdash; it is &ldquo;a thin IA was designed, and then degraded between
+  gate 5 and gate 9 with no gate watching it.&rdquo; That changes the fix: the IA has to
+  become a checked artefact, not a paragraph in a KB.
+</div>
+
+<div class="verdict">
+  <h3>Understated #1 &mdash; the navigation graph has no edges. Nav is the only transport in the product.</h3>
+  <b>Eight of the twelve screens contain zero outbound links other than the global nav.</b>
+  <code>/dispositions</code>, <code>/readiness</code>, <code>/monitors</code>,
+  <code>/refusals</code>, <code>/catalogue</code>, <code>/inventory</code> and
+  <code>/my-probe-history</code> are terminal leaves. Exactly three screens produce
+  forward motion: <code>/exceptions</code> &rarr; item, <code>/review</code> &rarr; item,
+  <code>/audit</code> &rarr; dossier. Every journey in this product is
+  <i>nav &rarr; screen &rarr; dead end &rarr; nav</i>.
+  <p>It is worse inside the objects than between them. A finding cannot reach the run that
+  produced it, the agent that authored it, or the dataset it was computed over &mdash; all
+  three are rendered as dead text on the item page. A dossier cannot get back to the item
+  it evidences. So &ldquo;flat nav in no task order&rdquo; is true but too kind: reordering
+  a menu does not create edges that were never built.</p>
+</div>
+
+<div class="verdict">
+  <h3>Understated #2 &mdash; the deeper defect is composition, not location. This is the real answer.</h3>
+  <code>/exceptions</code> renders <b>3,483px tall</b> and stacks seven unrelated
+  analytical modules: the six-row work queue, abstentions, warehouse-to-ERP fidelity
+  (F26), five boundary checks, coding anomalies (F33), backtest evidence, and a second
+  held-out period for contrast. <b>The staff accountant&rsquo;s actual task &mdash; the six
+  rows they must work &mdash; occupies roughly 250px of that, about 7%.</b>
+  <p>The mechanism is exactly the one the diagnosis identifies, but its output is not
+  misplacement, it is <i>concatenation</i>. A criterion says &ldquo;X must be visible on
+  screen Y.&rdquo; The cheapest way to satisfy 262 of those is to append X to Y. Twelve
+  screens each became <b>the union of every acceptance criterion that named them</b>.
+  You could give this product a flawless IA tomorrow and <code>/exceptions</code> would
+  still be unreadable, because the problem is inside the page.</p>
+  <p><b>The one-sentence version: the product has no unit of work.</b> It has report
+  surfaces, plus one genuinely good object page, which the report surfaces link into
+  almost by accident.</p>
+</div>
+
+<div class="verdict keep">
+  <h3>The strongest evidence that the design system is not the problem</h3>
+  <code>/review/ITEM-18300-OM</code> is well composed: risk band first and largest,
+  evidence set before anyone&rsquo;s reasoning about it, in-force-at-approval-time block,
+  authorship closure, six resolutions with none pre-selected, a mandatory forward
+  disposition, reject behind a closed reason list, narrative last and collapsed. That page
+  works. <b>The component grammar, the palette and the four-state risk language are
+  fine.</b> What is missing is everything one level above the component: IA, routing, task
+  framing and page composition. This is a navigation-and-composition problem sitting on
+  top of a sound design system &mdash; which is the good news, because it means the fix is
+  additive rather than a restyle.
+</div>
+
+<div class="verdict">
+  <h3>Three findings not in the diagnosis at all</h3>
+  <p><b>a. <code>/review</code> is strictly worse than <code>/exceptions</code> at the same
+  job.</b> Both list the same six items. <code>/exceptions</code> gives account, finding,
+  type, risk, amount and a risk-banded left bar. <code>/review</code> gives
+  <i>a bulleted list of six blue hyperlinks</i> &mdash; no risk, no amount, no age, no
+  state, no sort, no filter, no columns. The controller&rsquo;s primary work surface is the
+  weakest artefact in the product, and it is preceded by a ~300px essay on the probe
+  programme that must be scrolled past on every single visit by a reader who needs it
+  once.</p>
+  <p><b>b. Arrival destroys orientation.</b> Click &ldquo;18300 Deferred Storm Restoration
+  Costs &mdash; recurring amortisation did not post in 2026-06&rdquo; and you land on a page
+  whose <code>&lt;h1&gt;</code> is <b>&ldquo;Not approved.&rdquo;</b> The heading names a
+  workflow state, not the object. The user&rsquo;s own click is not echoed back to them
+  anywhere on the page they land on.</p>
+  <p><b>c. <code>/readiness</code> is a permanent nav slot hard-bound to one agent.</b>
+  &ldquo;Promotion readiness &mdash; crossperiod-surveillance&rdquo;, no selector, no
+  parameter, no route in. The other agents listed in <code>/inventory</code> have
+  readiness that is unreachable by any means, including guessing a URL. It is one row of a
+  table that should have many, promoted to top-level navigation.</p>
+</div>
+</div>
+
+<!-- ================= 2 JOURNEYS ================= -->
+<div class="rvsec" id="journeys">
+<h2 style="font-size:20px">2 &middot; Journey maps &mdash; four real close-period tasks, end to end</h2>
+<p class="pagesub">Each journey is drawn twice: as it walks in the pilot today, and as
+proposed. Where a journey dead-ends or requires knowing a URL, the step is marked.</p>
+<div class="jmkey">
+  <span><i style="background:var(--surface);border:1px solid var(--line-2)"></i>Works today</span>
+  <span><i style="background:var(--risk-2-bg);border:2px solid var(--risk-2)"></i>Broken / requires a URL you cannot discover</span>
+  <span><i style="background:var(--risk-3-bg);border:2px solid var(--risk-3)"></i>Dead end &mdash; journey stops here</span>
+  <span><i style="background:var(--accent-bg);border:1px dashed var(--accent)"></i>Does not exist &mdash; proposed</span>
+</div>
+
+<div class="jm">
+  <div class="jmhd">J1 &mdash; &ldquo;An omission is detected, I investigate it, I resolve it, it leaves my queue.&rdquo;</div>
+  <div class="jmwho">Staff accountant &middot; A. Reyes &middot; runs 6&times; a night &middot; 11pm on close day 3</div>
+  <div class="lbl" style="margin-top:14px">Today</div>
+  <div class="steps">
+    <div class="step broken"><div class="sn">Arrive</div><div class="sv">Lands on Ask</div>
+      <div class="sw">The doer&rsquo;s default landing page is a query composer. A staff accountant does not begin the night by writing a query.</div><div class="sr">/ &rarr; /ask</div></div>
+    <div class="step broken"><div class="sn">Find work</div><div class="sv">Guess between Exceptions and Review</div>
+      <div class="sw">Two nav items, same six items, different fidelity. Nothing says which is mine.</div><div class="sr">/exceptions | /review</div></div>
+    <div class="step broken"><div class="sn">Reach the queue</div><div class="sv">Scroll past 4 banners</div>
+      <div class="sw">Provenance strip, pilot strip, partial-run banner, coverage banner. Queue is 7% of a 3,483px page.</div><div class="sr">/exceptions</div></div>
+    <div class="step broken"><div class="sn">Open the item</div><div class="sv">Page titled &ldquo;Not approved&rdquo;</div>
+      <div class="sw">The object you clicked is not named in the heading. No breadcrumb, no prev/next.</div><div class="sr">/review/ITEM-18300-OM</div></div>
+    <div class="step"><div class="sn">Decide</div><div class="sv">Six resolutions, evidence, forward disposition</div>
+      <div class="sw">This part is good. Genuinely the best screen in the product.</div><div class="sr">&mdash;</div></div>
+    <div class="step dead"><div class="sn">Save</div><div class="sv">Nothing happens</div>
+      <div class="sw">No confirmation. No return. Item is not struck from any list. Nav badge does not move. The record it creates on /dispositions is linked from nowhere. <b>The loop never closes &mdash; six times a night.</b></div><div class="sr">dead end</div></div>
+  </div>
+  <div class="lbl" style="margin-top:18px">Proposed</div>
+  <div class="steps">
+    <div class="step new"><div class="sn">Arrive</div><div class="sv">Close cockpit</div>
+      <div class="sw">&ldquo;6 findings routed to you. 1 abstention. 1 prediction come due.&rdquo; Every row is a task with a destination.</div><div class="sr">/close</div></div>
+    <div class="step new"><div class="sn">Find work</div><div class="sv">My queue &mdash; one list</div>
+      <div class="sw">Exceptions and Review merged. Real columns: risk, account, finding, type, amount, age, state. Sorted by risk.</div><div class="sr">/queue</div></div>
+    <div class="step new"><div class="sn">Open</div><div class="sv">h1 = the finding</div>
+      <div class="sw">Breadcrumb Close &rsaquo; My queue &rsaquo; 18300. &ldquo;Item 3 of 6&rdquo;, prev/next. Run, agent and dataset are now links.</div><div class="sr">/queue/18300</div></div>
+    <div class="step"><div class="sn">Decide</div><div class="sv">Unchanged</div>
+      <div class="sw">Ineligible resolutions move below a rule, keep full contrast, stay clickable, carry the broker&rsquo;s reason inline.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Save</div><div class="sv">Confirmed in place</div>
+      <div class="sw">&ldquo;Recorded. Predicted to clear 2026-07. Sent to D. Okafor for approval.&rdquo; Undo for 5 min.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Loop</div><div class="sv">Next item offered</div>
+      <div class="sw">Struck from the queue, nav badge 6&rarr;5, &ldquo;Next item &mdash; 11500 Bank Clearing&rdquo;. The loop closes.</div><div class="sr">/queue</div></div>
+  </div>
+</div>
+
+<div class="jm">
+  <div class="jmhd">J2 &mdash; &ldquo;I approve a reclass and it becomes an export.&rdquo;</div>
+  <div class="jmwho">Controller &middot; D. Okafor &middot; the supervisory act the product exists to protect</div>
+  <div class="lbl" style="margin-top:14px">Today &mdash; <b style="color:var(--risk-3)">this journey cannot be walked at all</b></div>
+  <div class="steps">
+    <div class="step"><div class="sn">Arrive</div><div class="sv">Switch persona to controller</div>
+      <div class="sw">Works.</div><div class="sr">POST /pilot/viewing-as</div></div>
+    <div class="step broken"><div class="sn">Find pending work</div><div class="sv">Review queue</div>
+      <div class="sw">Six blue hyperlinks. Two say &ldquo;not approvable by you&rdquo;. Nothing says which await <i>my approval</i> versus which are someone&rsquo;s open findings.</div><div class="sr">/review</div></div>
+    <div class="step dead"><div class="sn">Approve</div><div class="sv">There is no approval surface</div>
+      <div class="sw">Correctly, no Approve button on Review. But the separate deliberate act that constraint implies was never given a home. No approvals screen, no approval object, no approval state. <b>Journey ends.</b></div><div class="sr">nowhere</div></div>
+    <div class="step dead"><div class="sn">Export</div><div class="sv">Whole period only</div>
+      <div class="sw">/audit/export exports the period, not the approved set, and is reachable only from /audit. Nothing connects an approval to it.</div><div class="sr">/audit/export</div></div>
+  </div>
+  <div class="lbl" style="margin-top:18px">Proposed</div>
+  <div class="steps">
+    <div class="step new"><div class="sn">Arrive</div><div class="sv">Close cockpit, controller</div>
+      <div class="sw">Same screen, same components, different call-list. &ldquo;4 resolutions awaiting your approval. 2 post to the ledger.&rdquo;</div><div class="sr">/close</div></div>
+    <div class="step new"><div class="sn">Triage</div><div class="sv">Approvals queue</div>
+      <div class="sw">Sorted posts-to-ledger first. Columns: item, resolution proposed, type, posts?, amount, author, state.</div><div class="sr">/approvals</div></div>
+    <div class="step new"><div class="sn">Weigh</div><div class="sv">Approval detail</div>
+      <div class="sw">Risk band, author &ne; resolver &ne; approver closure, guardrail bundle in force, and a plain statement of what approving <i>does</i>, in four numbered steps, before you do it.</div><div class="sr">/approvals/54100</div></div>
+    <div class="step new"><div class="sn">Act</div><div class="sv">Typed, not clicked</div>
+      <div class="sw">Type the destination account to confirm. One item; no approve-all. This is the deliberate act the constraint requires, finally given a place.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Egress</div><div class="sv">Export set</div>
+      <div class="sw">Shows what is in it, what is excluded and why &mdash; including the abstention, which has nothing to export, and the three never-scanned accounts. CUEC non-authorisation disclosed at the point of egress.</div><div class="sr">/approvals/export</div></div>
+  </div>
+</div>
+
+<div class="jm">
+  <div class="jmhd">J3 &mdash; &ldquo;I want to know whether last period&rsquo;s close was clean.&rdquo;</div>
+  <div class="jmwho">Controller &middot; also the FP&amp;A analyst&rsquo;s and the audit committee&rsquo;s question</div>
+  <div class="lbl" style="margin-top:14px">Today &mdash; <b style="color:var(--risk-3)">unstartable</b></div>
+  <div class="steps">
+    <div class="step dead"><div class="sn">Choose a period</div><div class="sv">There is no period selector</div>
+      <div class="sw">Every screen in the product is hard-bound to 2026-06 day 3. There is no retrospective surface anywhere, so the journey cannot be started, let alone finished.</div><div class="sr">nowhere</div></div>
+  </div>
+  <div class="lbl" style="margin-top:18px">Proposed &mdash; and the honest answer is not yes or no</div>
+  <div class="steps">
+    <div class="step new"><div class="sn">Choose</div><div class="sv">Period record, 2026-05</div>
+      <div class="sw">Period selector in the context bar. The period is the object.</div><div class="sr">/period/2026-05</div></div>
+    <div class="step new"><div class="sn">Read the refusal first</div><div class="sv">&ldquo;This is not a statement that the period was clean.&rdquo;</div>
+      <div class="sw">A20 and A21 rendered at the exact moment a user asks for the thing the product refuses. The single most important sentence in the redesign.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">What was examined</div><div class="sv">331 detections, 19 routed, 19 resolved</div>
+      <div class="sw">Plus coverage as a population strip, not a percentage.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">What was <i>not</i> concluded</div><div class="sv">11 abstentions, 0 unrunnable checks, 4 refusals</div>
+      <div class="sw">Abstentions are a first-class figure, never folded into &ldquo;no issues found&rdquo;, never in a precision denominator.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Did we keep our word</div><div class="sv">Forward predictions that came due</div>
+      <div class="sw">1 missed and unexplained &mdash; which is also condition P2 blocking an agent&rsquo;s promotion. This is where the F32 control finally pays for itself.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Take it out</div><div class="sv">Auditor export</div>
+      <div class="sw">Retention stamp rendered with its non-enforcement adjacent, because a date reads as enforcement.</div><div class="sr">&mdash;</div></div>
+  </div>
+</div>
+
+<div class="jm">
+  <div class="jmhd">J4 &mdash; &ldquo;Why did Transmission O&amp;M move $86k?&rdquo;</div>
+  <div class="jmwho">FP&amp;A analyst &middot; M. Haddad &middot; <b style="color:var(--risk-2)">one of three bound personas, with no surface at all</b></div>
+  <div class="lbl" style="margin-top:14px">Today</div>
+  <div class="steps">
+    <div class="step dead"><div class="sn">Be the persona</div><div class="sv">There is no third button</div>
+      <div class="sw">The pilot persona switch offers staff and controller. FP&amp;A cannot be assumed. <code>PROJECT_CONTEXT.md</code> line 2507 concedes it: <i>&ldquo;the FP&amp;A persona has no functioning surface.&rdquo;</i></div><div class="sr">nowhere</div></div>
+    <div class="step dead"><div class="sn">Ask</div><div class="sv">Ask is a detection-run composer</div>
+      <div class="sw">It parameterises detection skills over populations. An FP&amp;A inquiry reaches a decline.</div><div class="sr">/ask</div></div>
+  </div>
+  <div class="lbl" style="margin-top:18px">Proposed &mdash; <b>net-new scope, flagged for a decision, not claimed as covered</b></div>
+  <div class="steps">
+    <div class="step new"><div class="sn">Mode</div><div class="sv">Ask &rarr; Inquire</div>
+      <div class="sw">Two modes chosen before you ask: Detect (unchanged) and Inquire (new).</div><div class="sr">/ask?mode=inquire</div></div>
+    <div class="step new"><div class="sn">Get the substantiable half</div><div class="sv">What moved and what it is made of</div>
+      <div class="sw">Decomposition to the posting, the certified metrics and joins used, the population it was computed over.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Meet the refusal</div><div class="sv">&ldquo;The word <i>why</i> is where this stops.&rdquo;</div>
+      <div class="sw">A22 named, linked to the refusal register, decided at the broker. Not a failed answer &mdash; a refused speech act.</div><div class="sr">&mdash;</div></div>
+    <div class="step new"><div class="sn">Go somewhere useful</div><div class="sv">Four onward routes</div>
+      <div class="sw">The postings, the 24-period distribution, the open finding on this account, the reclass someone proposed on the same 14 postings.</div><div class="sr">/queue/54100</div></div>
+  </div>
+  <div class="note"><b>The design claim worth arguing about:</b> an FP&amp;A surface that hands
+    over the decomposition and openly refuses the narrative is <i>more</i> useful to an
+    analyst who must defend a variance than one that manufactures a plausible sentence.
+    It is also the only FP&amp;A surface that can exist without breaching A19 or A22.</div>
+</div>
+</div>
+
+<!-- ================= 3 IA ================= -->
+<div class="rvsec" id="ia">
+<h2 style="font-size:20px">3 &middot; Information architecture</h2>
+<p class="pagesub">Organising principle: <b>the close period is the object, the queue is the
+verb, and everything else is evidence reached from a thing rather than from a menu.</b>
+Primary navigation goes from eleven flat items to four task-ordered ones.</p>
+
+<div class="two">
+<div><div class="card">
+  <div class="lbl">Today &mdash; 11 items, 2 groups, alphabetical-ish, no task order</div>
+  <table class="t">
+    <tr><th>Group</th><th>Item</th><th>Outbound links</th></tr>
+    <tr><td rowspan="5">Work</td><td>Ask</td><td>3 (catalogue, exceptions)</td></tr>
+    <tr><td>Exceptions</td><td>6 items + 1 dossier</td></tr>
+    <tr><td>Review</td><td>6 items</td></tr>
+    <tr><td>Dispositions</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td>My probe history</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td rowspan="6">Govern</td><td>Catalogue</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td>Monitors</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td>Inventory</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td>Audit</td><td>7 dossiers + export</td></tr>
+    <tr><td>Refusals</td><td><b style="color:var(--risk-2)">0 &mdash; dead end</b></td></tr>
+    <tr><td>Readiness</td><td><b style="color:var(--risk-2)">0 &mdash; dead end, 1 hard-bound agent</b></td></tr>
+  </table>
+  <div class="note">The gate-5 IA specified <b>nine</b> screens in <b>three</b> groups
+    (Work / Govern / Evidence). Evidence was dissolved, and Readiness and My probe history
+    were added at top level with no design pass. The nav degraded after approval.</div>
+</div></div>
+
+<div><div class="card">
+  <div class="lbl">Proposed &mdash; 4 primary items, task-ordered</div>
+  <table class="t">
+    <tr><th>#</th><th>Item</th><th>Answers</th></tr>
+    <tr><td>1</td><td><b>Close</b> <span class="pill accent">new</span></td>
+      <td>&ldquo;Where is this close and what does it need from me tonight?&rdquo; Default landing, per-persona call-list.</td></tr>
+    <tr><td>2</td><td><b>My queue</b></td>
+      <td>&ldquo;What am I working?&rdquo; Merges the work half of Exceptions with all of Review.</td></tr>
+    <tr><td>3</td><td><b>Approvals</b> <span class="pill accent">new</span></td>
+      <td>&ldquo;What awaits my deliberate act, and what does approving actually do?&rdquo;</td></tr>
+    <tr><td>4</td><td><b>Ask</b></td>
+      <td>Detect mode (staff) and Inquire mode (FP&amp;A). No longer the default landing for anyone.</td></tr>
+    <tr><td>5</td><td><b>Evidence</b> &mdash; a section, not a screen</td>
+      <td>Period record &middot; Runs &amp; dossiers &middot; Agents &amp; datasets &middot; What we refuse to do</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="lbl">Demoted, dissolved or relocated &mdash; and why</div>
+  <table class="t">
+    <tr><th>Screen</th><th>Becomes</th><th>Reason</th></tr>
+    <tr><td><code>/dispositions</code></td><td><b>Dissolved.</b> A filter on My queue, plus a due-back row on Close, plus a table on Period record</td>
+      <td>Its entire content today is one row. A forward prediction is worth something when it <i>comes back</i>, so its home is where you will be standing when it does.</td></tr>
+    <tr><td><code>/readiness</code></td><td><b>Deleted from nav.</b> A property of an agent: <code>/evidence/agents/&lt;agent&gt;</code></td>
+      <td>Hard-bound to one agent with no selector. It is one row of a table that should have many.</td></tr>
+    <tr><td><code>/inventory</code></td><td>Under Evidence; also reached by clicking any agent name on any finding</td>
+      <td>Nobody navigates <i>to</i> an inventory. They arrive at it from a thing they were already looking at.</td></tr>
+    <tr><td><code>/catalogue</code></td><td>Under Evidence; primary route stays the dataset picker in Ask</td>
+      <td>Already correctly linked from Ask. The nav slot was redundant.</td></tr>
+    <tr><td><code>/monitors</code></td><td>Under Evidence, merged into Agents</td>
+      <td>Monitoring an agent and judging its readiness are the same question asked twice.</td></tr>
+    <tr><td><code>/my-probe-history</code></td><td><b>Identity menu</b>, not primary nav</td>
+      <td>Per-person, private by design, empty most of the time. Giving it a permanent top-level slot also subtly advertises a surveillance affordance the product deliberately refuses to have (A24).</td></tr>
+    <tr><td><code>/refusals</code></td><td><b>Stays reachable from global nav</b>, under Evidence</td>
+      <td>The gate-5 argument holds: burying a refusal makes it look like an omission. Evidence is not a settings drawer.</td></tr>
+    <tr><td>F26 fidelity, boundary checks, F33 coding anomalies, backtest, second held-out period</td>
+      <td><b>Moved off the queue</b> to <code>/evidence/run/&lt;run-id&gt;</code></td>
+      <td>These are properties of a <b>run</b>, not of my night&rsquo;s work. Six modules, ~3,200px, appended below a six-row queue. Give the run an object and they have a correct home &mdash; and the queue becomes a queue.</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="lbl">One rule that fixes most of the dead ends</div>
+  <b>Every object gets one canonical page; every page names its object in its
+  <code>&lt;h1&gt;</code>; every reference to an object is a link to it.</b>
+  Objects: period, run, finding, dossier, agent, dataset, resolution, approval.
+  That single rule creates the run&rarr;finding, finding&rarr;agent, finding&rarr;dataset,
+  dossier&rarr;finding and resolution&rarr;approval edges that do not exist today, and it
+  replaces &ldquo;Not approved&rdquo; as a page title.
+</div>
+</div></div>
+</div>
+
+<!-- ================= 4 PROTOTYPE ================= -->
+<div class="rvsec" id="proto">
+<h2 style="font-size:20px">4 &middot; Rendered prototype &mdash; clickable</h2>
+<p class="pagesub">Seven screens, all navigable from one another. Open any frame in its own
+tab to click through the journeys above. Built on the pilot&rsquo;s own tokens: the
+<code>:root</code> block is copied verbatim, so nothing here is a restyle.
+<b>Colour, risk grammar, coverage strip, abstention treatment and narrative behaviour are
+unchanged from the approved design.</b></p>
+
+<div class="frame">
+  <div class="fhd"><b>1 &middot; Close &mdash; staff accountant</b> &mdash; NEW. Default landing. Replaces landing on Ask.
+    <a href="p1-close-staff.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p1-close-staff.html" height="900" title="Close cockpit, staff accountant"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>2 &middot; My queue</b> &mdash; merges Exceptions + Review. Real columns, sort, filters. Abstentions structurally apart. Probe essay demoted to a closed disclosure.
+    <a href="p2-queue.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p2-queue.html" height="1100" title="My queue"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>3 &middot; Finding detail</b> &mdash; largely retained. Changed: h1 names the object, breadcrumb + prev/next, provenance fields become links, ineligible resolutions ordered below a rule, and the post-save confirmation that closes the loop.
+    <a href="p3-item.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p3-item.html" height="1400" title="Finding detail"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>4 &middot; Close &mdash; controller</b> &mdash; same screen, same components, different call-list.
+    <a href="p4-close-controller.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p4-close-controller.html" height="1000" title="Close cockpit, controller"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>5 &middot; Approvals</b> &mdash; ENTIRELY NEW. The separate deliberate act the constraint requires, finally given a home. Unblocks J2.
+    <a href="p5-approvals.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p5-approvals.html" height="1500" title="Approvals"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>6 &middot; Period record</b> &mdash; NEW. The retrospective surface. Unblocks J3, and renders the product&rsquo;s central refusal at the moment a user asks for it.
+    <a href="p6-period-record.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p6-period-record.html" height="1600" title="Period record"></iframe>
+</div>
+
+<div class="frame">
+  <div class="fhd"><b>7 &middot; Ask &rarr; Inquire</b> &mdash; NET-NEW SCOPE, flagged not claimed. The FP&amp;A persona&rsquo;s only possible surface. Unblocks J4.
+    <a href="p7-inquiry.html" target="_blank">Open full screen &rarr;</a></div>
+  <iframe src="p7-inquiry.html" height="1200" title="FP&A inquiry"></iframe>
+</div>
+</div>
+
+<!-- ================= 5 CONSTRAINTS ================= -->
+<div class="rvsec" id="constraints">
+<h2 style="font-size:20px">5 &middot; The six non-negotiable constraints &mdash; is any of them causing this?</h2>
+<p class="pagesub">Tested one at a time against what I actually saw in the pilot.
+<b>Answer: none of the six is causing the unusability.</b> One of them has an unbuilt
+positive half, which is a gap rather than a fault in the constraint.</p>
+
+<table class="t">
+  <tr><th>Constraint</th><th>Verdict</th><th>Finding</th></tr>
+  <tr><td><b>No green anywhere</b></td><td>Not a cause. Keep, unchanged.</td>
+    <td>Zero contribution to the problem. Red/amber/neutral with structural carriers (left bars, hatching, dashed borders, border-weight) reads perfectly well. Honoured throughout the prototype.</td></tr>
+  <tr><td><b>Narrative collapsed by default, last in reading order</b></td><td>Not a cause. Keep, and it is right.</td>
+    <td>The <code>AC-F12-03</code> argument holds. Retained on every screen. I extended the pattern &mdash; the probe-programme essay now uses the same treatment on the queue, which is a 300px improvement per visit.</td></tr>
+  <tr><td><b>Coverage as a population strip</b></td><td>Not a cause. Keep. Best component in the product.</td>
+    <td>&ldquo;70% of 10 declared members, these 3 unscanned and named&rdquo; does work no percentage can do. Promoted: it now also appears on Close and on Period record.</td></tr>
+  <tr><td><b>No Approve button on Review</b></td>
+    <td><b style="color:var(--risk-2)">Not a cause &mdash; but it has an unbuilt half.</b></td>
+    <td>The constraint was honoured <i>negatively</i>, by removing a button. Its positive half &mdash; the separate deliberate act it implies must happen somewhere &mdash; was never given a screen, an object or a state. The result is that J2 cannot be walked at all. <b>This is the single highest-value gap in the product</b>, and it is a gap created by honouring a constraint only in its subtractive form.</td></tr>
+  <tr><td><b>Abstention structurally distinct</b></td><td>Not a cause. Keep. Implemented well already.</td>
+    <td>8px dashed left border, own titled section, explicit &ldquo;Is this a negative finding? No.&rdquo; row. Retained verbatim and given a first-class count on Close and Period record.</td></tr>
+  <tr><td><b>Guardrails enforced at the broker, never the UI</b></td>
+    <td>Not a cause of unusability. Is a cause of clutter. <b>Not asking for it to be relaxed.</b></td>
+    <td>Because the UI may never disable, every ineligible affordance renders live plus a sentence explaining why nothing is greyed. On the item page that is six resolution buttons, three labelled &ldquo;not allowed for this item&rdquo;, all competing for attention equally. <b>Proposed change is ordering, not enforcement:</b> ineligible options move below a rule, keep full contrast, stay clickable and submittable, and carry the broker&rsquo;s last-known reason inline. The UI still decides nothing &mdash; it only stops the ineligible from being visually indistinguishable from the eligible, and saves a round trip to discover a reason it already knows.</td></tr>
+  <tr><td><b>Desktop web only for MVP1</b></td><td>Not a cause. Honoured.</td>
+    <td>Prototype is desktop-width. Per the Decisions Log this is MVP1 only; the product remains multi-surface, so nothing here is designed in a way that forecloses a later mobile pass.</td></tr>
+</table>
+
+<div class="verdict keep">
+  <h3>What <i>is</i> causing the visual clutter, and it belongs to no constraint</h3>
+  The provenance strip and the pilot-data strip together occupy ~110px, render identically
+  on all twelve screens and every item page, and carry no delta between visits.
+  On a 900px viewport that is 12%, every time, forever.
+  <p><b>Proposed:</b> one 30px context line that always names the staleness number, with
+  the full sentence behind a disclosure. <code>AC-F38-11</code> requires staleness on the
+  <i>same surface</i> as the figure &mdash; not in the same 110 pixels &mdash; so a
+  one-line strip satisfies it. The number stays; the prose is demoted. Rendered on every
+  prototype screen so it can be judged rather than described.</p>
+</div>
+</div>
+
+<!-- ================= 6 TYPE ================= -->
+<div class="rvsec" id="type">
+<h2 style="font-size:20px">6 &middot; The typography call &mdash; mine to make, and I am failing it</h2>
+<div class="verdict">
+  <h3>Verdict: FAIL. The absence of a criterion is the defect, so the deliverable is a proposed criterion.</h3>
+  <p><code>test-agent</code> measured navigation at <b>10px</b> computed and the provenance
+  strip at <b>10.5&ndash;11.5px</b> &mdash; the smallest text on every screen. No criterion
+  sets a minimum, so nothing failed. I am calling it a fail on two grounds.</p>
+  <p><b>1. The audience and the hour.</b> This is used at 11pm on close night by finance
+  staff whose age distribution skews well above consumer software&rsquo;s. 10px computed
+  navigation is below any defensible floor for that context.</p>
+  <p><b>2. The inversion is a design contradiction, not a rounding error.</b> The smallest
+  text on every single screen is the provenance strip &mdash; which carries close-clock
+  staleness, the one datum that determines whether <i>any other figure on the screen</i>
+  may be relied upon. Meanwhile the risk number renders at 42px. This product&rsquo;s
+  entire claim is that it does not assert what it cannot substantiate; rendering the
+  substantiation qualifier at 10.5px and the assertion at 42px states the opposite of the
+  thesis in the one language a tired reader actually processes. That is not a
+  contrast-ratio quibble. It is the product arguing against itself typographically.</p>
+  <p><b>Proposed criterion, for <code>plan-agent</code> to rule on and
+  <code>test-agent</code> to assert:</b></p>
+  <div class="card">
+    <div class="kv"><span class="k">No persistently-rendered or interactive text</span><span class="v">&ge; 12px computed</span></div>
+    <div class="kv"><span class="k">Primary navigation items</span><span class="v">&ge; 14px computed</span></div>
+    <div class="kv"><span class="k">Any text carrying a reliability qualifier</span>
+      <span class="v">&ge; 13px computed</span></div>
+    <div class="note">&ldquo;Reliability qualifier&rdquo; = staleness, coverage, tier,
+      certification state, abstention, not-run, retention non-enforcement. The whole class,
+      not a list of selectors, so the criterion survives new components.</div>
+  </div>
+  <p style="margin-top:10px">Applied throughout this prototype: nav 14px, group labels
+  11.5px&rarr;12px, table headers 12px, notes 12.5px, context bar 12.5px with the
+  staleness value at full weight in risk colour. Nothing below 11.5px anywhere, and
+  nothing carrying a qualifier below 12.5px.</p>
+</div>
+</div>
+
+<!-- ================= 7 GAPS ================= -->
+<div class="rvsec" id="gaps">
+<h2 style="font-size:20px">7 &middot; Gap list &mdash; what the redesign needs that does not exist</h2>
+
+<div class="card">
+  <div class="lbl">A &middot; Blocks a whole journey &mdash; must be built for the journey to walk at all</div>
+  <table class="t">
+    <tr><th>Gap</th><th>Blocks</th><th>Size</th><th>Note</th></tr>
+    <tr><td><b>Approvals: screen, object and state</b></td><td>J2, entirely</td><td>Large</td>
+      <td>An approval is a first-class object with an author, an approver, a closure and a
+        state. None of it exists. The constraint that created the hole is correct; the
+        hole is not.</td></tr>
+    <tr><td><b>Period record / retrospective surface</b></td><td>J3, entirely</td><td>Large</td>
+      <td>Nothing in the product is period-parameterised. Also needs a period selector in
+        the context bar and period-scoped aggregates.</td></tr>
+    <tr><td><b>FP&amp;A inquiry mode + a third persona</b></td><td>J4, entirely</td><td>Large &mdash; <b>net-new scope</b></td>
+      <td>Requires a scope decision, not a design decision. Explicitly flagged, not
+        claimed. One of three bound personas has no surface and no persona-switch button.</td></tr>
+    <tr><td><b>Post-resolution confirmation, queue removal, undo, next-item</b></td>
+      <td>J1&rsquo;s final step</td><td>Small</td>
+      <td>Smallest fix on this list and probably the largest felt improvement, because it
+        is the step the staff accountant repeats six times a night and it currently ends
+        in silence.</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="lbl">B &middot; Structural &mdash; needed for the IA to hold</div>
+  <table class="t">
+    <tr><th>Gap</th><th>Size</th></tr>
+    <tr><td><b>A run object</b> at <code>/evidence/run/&lt;id&gt;</code> &mdash; new home for the six analytical modules currently appended to the queue</td><td>Medium (content exists, home does not)</td></tr>
+    <tr><td><b>An agent object</b>, with readiness and monitoring as properties of it, selectable across all agents</td><td>Medium</td></tr>
+    <tr><td><b>A Close cockpit</b> with a per-persona call-list, replacing Ask as the landing page</td><td>Medium</td></tr>
+    <tr><td><b>Back-links and breadcrumbs across the object graph:</b> dossier&rarr;finding, finding&rarr;run, finding&rarr;agent, finding&rarr;dataset, resolution&rarr;approval, prediction&rarr;period</td><td>Small each, 8 edges</td></tr>
+    <tr><td><b>Queue columns, sort, filter and saved views</b> &mdash; the review queue currently has none of the four</td><td>Medium</td></tr>
+    <tr><td><b>Item <code>&lt;h1&gt;</code> names the object</b>, not the workflow state</td><td>Trivial</td></tr>
+    <tr><td><b>Context bar collapse</b> &mdash; 110px of repeated masthead to one 30px line plus disclosure</td><td>Small</td></tr>
+    <tr><td><b>A typography floor criterion</b> &mdash; none exists, which is why nothing failed</td><td>Trivial to state, needs a ruling</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="lbl">C &middot; What the redesign deletes or demotes &mdash; nothing is destroyed, only relocated</div>
+  <table class="t">
+    <tr><th>Action</th><th>What</th></tr>
+    <tr><td><b>Deleted from primary nav</b></td><td><code>/readiness</code> (becomes an agent property), <code>/my-probe-history</code> (identity menu)</td></tr>
+    <tr><td><b>Demoted to Evidence / in-context</b></td><td><code>/catalogue</code>, <code>/inventory</code>, <code>/monitors</code></td></tr>
+    <tr><td><b>Dissolved into other surfaces</b></td><td><code>/dispositions</code> &rarr; a queue filter + a Close row + a Period-record table</td></tr>
+    <tr><td><b>Merged</b></td><td><code>/exceptions</code> (work half) + <code>/review</code> &rarr; <code>/queue</code></td></tr>
+    <tr><td><b>Relocated, not cut</b></td><td>F26 fidelity, five boundary checks, F33 coding anomalies, backtest evidence, second held-out period &rarr; the run report</td></tr>
+    <tr><td><b>Kept exactly where it is</b></td><td><code>/refusals</code> &mdash; reachable from global nav, under Evidence, per the gate-5 argument that burying a refusal makes it look like an omission</td></tr>
+  </table>
+  <div class="note"><b>Nothing that satisfies an acceptance criterion is deleted.</b> Every
+    module moves to an object that owns it. Criteria of the form &ldquo;X must be visible
+    on screen Y&rdquo; will need Y re-pointed &mdash; which is the point: those criteria
+    are what built the 3,483px page, and re-pointing them is how the redesign lands
+    without losing evidence.</div>
+</div>
+
+<div class="verdict new">
+  <h3>What I am asking for</h3>
+  A decision on <b>three things</b>, in this order:
+  <p><b>1.</b> Does the IA in &sect;3 replace the current nav? (Design decision. Mine to
+  propose, yours to approve.)</p>
+  <p><b>2.</b> Are the four A-list gaps in scope for MVP1, or does the pilot ship with J2
+  and J3 unwalkable? (Scope decision &mdash; <code>plan-agent</code>&rsquo;s to rule,
+  since it is core-pipeline and my input at that gate is advisory.)</p>
+  <p><b>3.</b> Is the FP&amp;A inquiry mode in or out? It is the one item on this page that
+  is genuinely new product, and one of three bound personas depends on it.</p>
+</div>
+</div>
+
+<div style="margin-top:40px;padding-top:16px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-3)">
+  Prototype files: <code>ds.css</code>, <code>p1-close-staff.html</code>,
+  <code>p2-queue.html</code>, <code>p3-item.html</code>, <code>p4-close-controller.html</code>,
+  <code>p5-approvals.html</code>, <code>p6-period-record.html</code>,
+  <code>p7-inquiry.html</code>, <code>index.html</code> (this page).
+  The gate-5 approved record at <code>design-review/index.html</code> is untouched.
+</div>
+
+</div></body></html>
