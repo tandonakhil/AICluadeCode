@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 9 \u2014 Verification (final audit)",
+  "position": "Gate 9 \u2014 Verification (final)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": null,
@@ -124,14 +124,14 @@
       "participants": [
         "test-agent"
       ],
-      "note": "Re-run at dev@9ecb335: 8 suites EXECUTED, 2,223 scenarios, 0 failures, 0 contradictions. Four scrutiny questions answered by MUTATION TESTING, not inspection. Corpus redated 07-31 by orchestrator ruling to match the commits it names."
+      "note": "CLOSED at dev@fc197a6. 8 suites EXECUTED, 2,692 scenarios, 0 failures, 0 blocking conditions, no override required. Order independence verified with a DIFFERENT generator (global Fisher-Yates vs round-robin), proven different rather than asserted. 5th consecutive pass with no register contradiction."
     },
     {
       "n": 9,
       "name": "Verify",
       "status": "active",
       "approval": "pending",
-      "date": "2026-07-31",
+      "date": "2026-08-02",
       "participants": [
         "verification-agent"
       ],

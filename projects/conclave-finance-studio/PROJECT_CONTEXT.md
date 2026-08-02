@@ -1218,6 +1218,156 @@ absent afterwards:**
 
 ## Test Results
 
+### 2026-08-02 — Gate 8 · Test — `test-agent`, **FINAL re-run at `dev` @ `fc197a6`** (parent repo @ `7ec615a`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,692 of 2,692 scenarios
+passed, zero skipped, under SIX different collection orders. The post-deploy
+smoke is 14 of 14. The interleaved-shuffle order dependence — the blocking
+condition that stopped this gate at the previous pass — is CLOSED, verified
+with this agent's own plugin and its own seeds.** Structured per-scenario
+evidence: `test-evidence/*-2026-08-02.md`, plus eight Playwright screenshots.
+**The entire superseded corpus was deleted and rewritten**; every file names
+both commits, and their presence on disk was verified after writing.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 2,028 | 2,028 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 354 | 354 | 0 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 26 | 26 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 186 | 186 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,692** | **2,692** | **0** | **0** | | |
+| post-deploy smoke | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. 2,028 + 664 = 2,692. The
+`ux` suite launched Chromium — its conftest exits 4 (STATIC-ONLY) rather than
+passing if Playwright or the browser binary is absent, so exit 0 is positive
+evidence a rendering engine answered. No server was started inside this agent's
+turn: the pilot was started, driven and reaped inside single command
+invocations four times, and 8021 was verified free after each.
+
+**Order independence — the gate-stopping item, CLOSED.** `code-agent` flagged
+the one gap it could not close itself: its interleave plugin is not
+`test-agent`'s. So this agent wrote its own, and it is a **different generator,
+not the same one at different seeds** — `code-agent`'s is a round-robin across
+shuffled per-file buckets; this agent's is a uniform global Fisher–Yates over
+all 2,692 items with no bucketing. Measured proof they differ: a strict
+round-robin can never place two same-file items adjacently, and this agent's
+seed-1 order contains **39 such adjacencies**. All six orderings green:
+
+| Ordering | Result | Wall | Order fingerprint |
+|---|---|---|---|
+| file order (control) | 2,692 pass, exit 0 | 194.8s | — |
+| `seed:1` | 2,692 pass, exit 0 | 193.7s | `b31c9d98856be496` |
+| `seed:7` | 2,692 pass, exit 0 | 202.4s | `3f744be61621fdc0` |
+| `seed:42` | 2,692 pass, exit 0 | 203.8s | `546d6faf3545cf2c` |
+| `seed:20260731` | 2,692 pass, exit 0 | 199.0s | `2b0624f1c8bba047` |
+| `reverse` | 2,692 pass, exit 0 | 178.7s | `1694d285798347f9` |
+
+At `55878c9` the same tree gave four different failure sets under four seeds.
+The realised order was written to disk and fingerprinted for every run, so the
+permutation used is evidence rather than a claim. The plugin lives outside the
+repository, so the tree stayed clean at `fc197a6` throughout.
+
+**Runtime: budgeted, not a hang.** ~3×, as `code-agent` predicted. Notably the
+uniform global shuffle — which forces far more higher-scoped fixture rebuilding
+— landed in a *narrower* band (178–204s) than the round-robin's reported
+171–278s, so the widest interleaved times were not caused by interleave depth.
+
+**`code-agent` corrected this agent's diagnosis, and the correction is right.**
+This agent had named the control-event sink. It was not the cause.
+
+1. **Cause A — the snapshot was function-scoped and taken too late — CONFIRMED,
+   and the fixture it describes was located**:
+   `test_f36_47_abstention_on_three_surfaces.py:86`, the only module-scoped
+   fixture in the tree that *traverses* (the other six fetch one named screen).
+   Confirmed by a throwaway probe reproducing the shape, run twice: it passes
+   at `fc197a6` and **fails** with the setup-side restore removed, with its own
+   negative control passing both ways. **Refinement worth recording**: the whole
+   tree at `seed:1` still passes 2,692 with the setup-side half removed, so no
+   current scenario falls inside the narrow window it protects. It is correct
+   and justified insurance, not a currently failing case.
+2. **Cause B — two session fixtures each bound a transport, last-one-wins —
+   CONFIRMED** documentarily: at `55878c9` both `backend/tests/conftest.py:312`
+   and `tests/suites/conftest.py:112` were `scope="session", autouse=True`, each
+   built its own `BrokerStore`, and each called `pilot_transport.install(...)`.
+
+**The AST guard is a classification — MUTATION-TESTED, twice.** An undeclared
+`_TA_MUTATION_CACHE = {}` in `app.ui.state` and an undeclared
+`_TA_LAZY_HOLDER = None` in `app.pilot_close` — the second being the shape every
+real holder actually takes — each failed the guard, which named the binding, and
+each also failed the guard's own negative control. Both mutations reverted; tree
+verified clean at `fc197a6` after each.
+
+**`AC-F36-29` asserts MORE — CONFIRMED. +3 assertions, −0.** Every prior
+assertion is retained and it now produces its own action denial and emission
+denial through the two real routes (previously it read the ledger as it found
+it, so it was really asserting that the scenario before it had run first).
+
+**The standing question — `does any suite report a pass the register says cannot
+be true?` — returns NO for the FIFTH consecutive pass.** The register has 33
+entries (1–33, verified, no gaps). `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+`AC-F40-17` and `AC-F36-48` are claimed by **zero** of the 2,692 scenario names
+and by zero `COVERS` joins other than the two register-27-compliant `AC-F36-48`
+strings, whose denial travels *inside* the join string.
+
+**Test-count delta against `55878c9`: +28 added, 0 removed, 1 changed.** The +28
+is accounted for exactly with no residue — 27 new test functions in two new
+files (`test_pilot_process_state.py` 16 functions/17 node IDs,
+`test_pilot_test_binding.py` 11), one parametrized over the two participating
+modules. Zero removed `def test_`/`class Test` lines in the diff and zero
+deleted test files. The one changed test is `AC-F36-29`, which gained
+assertions. All six SME suite counts are unchanged.
+
+**Findings for a human — neither is blocking, both are recorded.**
+
+- **Carried: `ges_gateway._HTTP` restored by named snapshot.** `code-agent`
+  named this as the next one that will bite, in "three function-scoped
+  fixtures". Right about the fixtures, but the count is **six** sites — three
+  fixtures (`swapped_transport`, `transport_without_an_attestation`,
+  `poar_world`) and three inline `try/finally` blocks inside test bodies. All
+  six are function-scoped and therefore correct today. Also noted: the AST
+  guard classifies bindings *within* participating modules, but the **set of
+  participating modules is itself an enumeration**, and `app.ges_gateway` —
+  which holds `_HTTP` and `_CLIENTS` — is not in it.
+- **NEW, found this run: the test suite writes into the developer's live
+  decision ledger.** `tests/suites/functional/test_emission_gate_criteria.py`
+  adds 3 rows per run to `dev/var/broker_db.sqlite3` (measured: 4,575 → 4,578;
+  the file now holds 4,578 rows / 9.3 MB), because `tests/suites/conftest.py`'s
+  `ges_http` calls `create_app(...)` with **no `broker_factory`** and falls
+  through to `default_store_path()`. The warehouse is injected; the broker store
+  is not. This contradicts the conftest docstrings' claim that "a run never
+  writes into the developer's live decision ledger". **Not blocking** — nothing
+  reads that store order-dependently and all six orderings are green — but it
+  sits entirely *outside* the rebuild mechanism (neither tmp-pathed, nor rebuilt
+  between scenarios, nor discarded by `restore()`), it accumulates across runs,
+  and it is the same file `backend/pilot.py` uses. A fresh clone and this
+  machine are therefore different starting states. Localised precisely: this is
+  the only suite of six with a non-zero `var/` delta.
+- **Carried advisory for `ui-ux-designer`, re-verified and unchanged:** minimum
+  computed font size is **10.0px** on all four screens at both viewports.
+  UX-4/`AC-F41-03` is a *relative* check and passes, and no rule sets an
+  absolute minimum, so no suite fails.
+
+**Rendered-UI verification: Playwright/Chromium against the SERVED pilot**, not
+`set_content` over an in-process client. Four screens × two viewports = 8
+captures, 8 clean: 200 everywhere, **zero green elements under computed colour**
+(the gate-5 no-green rule, checked on what the browser resolved rather than on
+authored CSS), **zero text nodes at `opacity: 0`**, and the gate-5 reading order
+confirmed visually on Review — riskiest element first and largest, narrative
+collapsed and last, no approve control. RNTL is not applicable: MVP1 is desktop
+web only and there is no React Native surface, so two desktop viewports is
+complete coverage rather than a partial pass.
+
+**Gate status: PASS. No blocking suite failed and no blocking condition remains
+open.** All seven suites plus the smoke are `EXECUTED` and green; the one
+previously failing blocking condition was fixed rather than overridden, and was
+verified here independently rather than accepted. No `[override]` is required.
+
+---
+
 ### 2026-07-31 — Gate 8 · Test — `test-agent`, **re-run at `dev` @ `55878c9`** (parent repo @ `8697994`) — pass-13 verification
 
 **All seven automated suites EXECUTED, exit code 0, 2,664 of 2,664 scenarios
