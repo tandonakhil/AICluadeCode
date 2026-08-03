@@ -9,19 +9,23 @@ name = that project's detail).
 Notation and gate definitions: `admin/PIPELINE.md`.
 Per-project detail: `projects/<name>/PIPELINE_LOG.md`.
 
-**Last regenerated**: 2026-07-29
+**Last regenerated**: 2026-08-03  ·  table generated from `pipeline-state.json` by `admin/regen-portfolio-glance.py`, not hand-maintained  ·  table generated from `pipeline-state.json` by `admin/regen-portfolio-glance.py`, not hand-maintained
 
 ---
 
 ## At a glance
 
-| Project | Template | Position | Env | Gates run | Last activity |
-|---|---|---|---|---|---|
-| [grid-assistant](#grid-assistant) | genai-chatbot | Released `v1.0.0` | prod | 9 of 9 *(pre-11)* | 2026-07-09 |
-| [load-alert-agent](#load-alert-agent) | agentic-workflow | Released `v1.0.0` | prod | 8 of 9 *(core-only)* | 2026-07-09 |
-| [policy-lookup-assistant](#policy-lookup-assistant) | rag-knowledge-base | Deployed | dev, local | 9 of 9 *(pre-11)* | 2026-07-09 |
-| [conclave-marketing](#conclave-marketing) | custom (FastAPI) | Deployed | dev, local | 9 of 9 *(pre-11)* | 2026-07-17 |
-| [little-milestones](#little-milestones) | genai-chatbot | Deployed + post-deploy fixes | dev, local | 7 of 11 | **2026-07-28** |
+<!-- AT-A-GLANCE:START -->
+| Project | Template | Position | Env | Gates done | Live | Last activity |
+|---|---|---|---|---|---|---|
+| [conclave-dashboard](#conclave-dashboard) | custom (Flask) | Deployed (dev, local) | dev, local | 11 of 11 | [live](http://127.0.0.1:5050/) | 2026-07-31 |
+| [conclave-finance-studio](#conclave-finance-studio) | custom (FastAPI, server-rendered) | Gate 7 — Code (pass 17, approved UX redesign); gates 9-11 follow | dev, local | 7 of 11 | [live](http://127.0.0.1:8030/) | 2026-08-03 |
+| [conclave-marketing](#conclave-marketing) | custom (FastAPI) | Deployed | dev, local | 9 of 11 | [live](http://127.0.0.1:8100/) | 2026-07-17 |
+| [grid-assistant](#grid-assistant) | genai-chatbot | Released v1.0.0 | prod | 9 of 11 | [live](http://127.0.0.1:8010/) | 2026-07-09 |
+| [little-milestones](#little-milestones) | genai-chatbot | Deployed + post-deploy fixes | dev, local | 8 of 11 | [live](http://localhost:3000/) | 2026-07-28 |
+| [load-alert-agent](#load-alert-agent) | agentic-workflow | Released v1.0.0 | prod | 8 of 11 | [live](http://127.0.0.1:8020/) | 2026-07-09 |
+| [policy-lookup-assistant](#policy-lookup-assistant) | rag-knowledge-base | Deployed | dev, local | 9 of 11 | [live](http://127.0.0.1:3421/) | 2026-07-05 |
+<!-- AT-A-GLANCE:END -->
 
 > **All five predate the 11-gate pipeline.** Functional Design and Verification
 > were added 2026-07-28 and show as **`⊘ pre-gate`** throughout — visually

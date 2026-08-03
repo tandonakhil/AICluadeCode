@@ -1,6 +1,6 @@
 {
   "name": "conclave-finance-studio",
-  "template": "genai-chatbot (first slice only \u2014 plan-agent)",
+  "template": "custom (FastAPI, server-rendered)",
   "position": "Gate 7 \u2014 Code (pass 17, approved UX redesign); gates 9-11 follow",
   "env": "dev, local",
   "last_activity": "2026-07-31",
@@ -200,5 +200,6 @@
       "requested_by": "human"
     }
   ],
-  "served_url_note": "Pilot build, not a deployment \u2014 gate 11 has not run. Started with `CONCLAVE_ENV=pilot API_PORT=8030 GES_PORT=8031 .venv/bin/python backend/pilot.py`. Default port is 8021; 8030 is used so test-agent's smoke runs on 8021 do not collide with the human's own instance. In this configuration the broker runs inside the api process (register 19), which is refused under CONCLAVE_ENV=production."
+  "served_url_note": "Pilot build, not a deployment \u2014 gate 11 has not run. Started with `CONCLAVE_ENV=pilot API_PORT=8030 GES_PORT=8031 .venv/bin/python backend/pilot.py`. Default port is 8021; 8030 is used so test-agent's smoke runs on 8021 do not collide with the human's own instance. In this configuration the broker runs inside the api process (register 19), which is refused under CONCLAVE_ENV=production.",
+  "template_note": "plan-agent recommended genai-chatbot as the first slice at gate 3. The build diverged at gate 7 pass 3: server-rendered HTML from the existing FastAPI api process, not the template's Next.js front end, because ARCHITECTURE_KB 9.4 requires a server-rendered style-inlined evidential region and AC-F41-04 requires the retained view to reproduce what the approver saw. Server-rendered makes the response and the retained artefact the same bytes. Recorded here because the registry row said genai-chatbot for a build that has not been one since 2026-08-01."
 }
