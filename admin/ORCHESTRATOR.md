@@ -98,6 +98,20 @@ is never invoked as a subagent and never will be.
   loop-back, exception and route change updates it. A step that leaves it stale
   is not finished.
 
+- **Runs `admin/check-dashboard-fresh.py` before reporting any gate result, and
+  fixes what it reports before continuing.** The dashboard rule already existed —
+  "a step that leaves it stale is not finished" — and it still rotted: on
+  2026-08-03 the human found `conclave-finance-studio` reading **"gate 1 Intake"**
+  in `memory/INDEX.md` while the project sat at gate 9, five days and eight gates
+  behind, and `conclave-dashboard` had **no row at all**. The rule was never the
+  problem; nothing checked it. The script compares `pipeline-state.json` against
+  `memory/INDEX.md` for every project and fails loudly on: a missing `updated`
+  field (staleness that cannot be detected, only noticed), a `position` naming a
+  gate that is not active, a later gate done behind an active one with no
+  `loop_backs`/`route_changes` entry, a project absent from the index, and an
+  index row older than the state it describes. **A dashboard nobody can check is
+  a dashboard that will be wrong, and the human should never be the detector.**
+
 - **Monitors each project against its own record, and stops work when they
   disagree.** The human has granted explicit authority to halt and require
   approval. The triggers are mechanical, not a judgement call — any of these is

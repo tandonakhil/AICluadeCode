@@ -5,7 +5,7 @@
   "env": "prod",
   "last_activity": "2026-07-09",
   "served_url": "http://127.0.0.1:8010/",
-  "notes": "First project through the full lifecycle incl. enhance-agent and release-manager. API-only in practice: only the backend was ever built/deployed/released (v1.0.0); the genai-chatbot frontend stub was never built. served_url intentionally points at the backend API, so the console will show it 'degraded' (404 at /) like load-alert-agent — that is correct, not a fault. NOTE (2026-07-31 audit): served_url port 8010 does not match the historically deployed backend port 8420 — record drift to reconcile.",
+  "notes": "First project through the full lifecycle incl. enhance-agent and release-manager. API-only in practice: only the backend was ever built/deployed/released (v1.0.0); the genai-chatbot frontend stub was never built. served_url intentionally points at the backend API, so the console will show it 'degraded' (404 at /) like load-alert-agent \u2014 that is correct, not a fault. NOTE (2026-07-31 audit): served_url port 8010 does not match the historically deployed backend port 8420 \u2014 record drift to reconcile.",
   "gates": [
     {
       "n": 1,
@@ -78,5 +78,7 @@
       "approval": "approved"
     }
   ],
-  "loop_backs": []
+  "loop_backs": [],
+  "updated": "2026-07-09",
+  "updated_by": "orchestrator (backfilled from INDEX.md, not from today)"
 }

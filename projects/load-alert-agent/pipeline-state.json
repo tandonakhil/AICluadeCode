@@ -80,5 +80,7 @@
       "approval": "approved"
     }
   ],
-  "loop_backs": []
+  "loop_backs": [],
+  "updated": "2026-07-09",
+  "updated_by": "orchestrator (backfilled from INDEX.md, not from today)"
 }

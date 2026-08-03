@@ -249,5 +249,7 @@
       "name": "Offline queue (mobile)",
       "status": "backlog"
     }
-  ]
+  ],
+  "updated": "2026-07-28",
+  "updated_by": "orchestrator (backfilled from INDEX.md, not from today)"
 }

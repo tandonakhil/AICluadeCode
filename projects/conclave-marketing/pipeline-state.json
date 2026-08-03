@@ -145,5 +145,7 @@
       "name": "Real contact address",
       "status": "backlog"
     }
-  ]
+  ],
+  "updated": "2026-07-17",
+  "updated_by": "orchestrator (backfilled from INDEX.md, not from today)"
 }

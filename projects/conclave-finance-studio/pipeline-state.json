@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "genai-chatbot (first slice only \u2014 plan-agent)",
-  "position": "Gate 9 \u2014 Verification; UX redesign running in parallel",
+  "position": "Gate 7 \u2014 Code (pass 17, approved UX redesign); gates 9-11 follow",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": null,
@@ -107,13 +107,13 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "done",
-      "approval": "batch_authorized",
+      "status": "active",
+      "approval": "pending",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
       ],
-      "note": "Pass 5 closed the gate-9 loop-back: four missing detector families built (F26, F28, F9, F33), 41 criteria newly evidenced, 1,428 unit + 388 suite scenarios green."
+      "note": "Re-opened 2026-08-03 for pass 17: implementing the human-approved UX redesign (Work/Govern/Evidence IA, 8 missing graph edges, Approvals screen, composition fix, typography floors)."
     },
     {
       "n": 8,
@@ -129,13 +129,13 @@
     {
       "n": 9,
       "name": "Verify",
-      "status": "active",
+      "status": "pending",
       "approval": "pending",
       "date": "2026-08-02",
       "participants": [
         "verification-agent"
       ],
-      "note": "BLOCKED. 262 live criteria (spec says 261 -- arithmetic error, 186+77=263-1=262). 142 VERIFIED, 3 CONTRADICTED, 117 NOT VERIFIED of which 94 are in approved MVP1 scope and unevidenced. Four detector families never built: F26, F28, F9, F33 = 39 criteria. Evidence corpus predates the gate-8 loop-back."
+      "note": "Must re-audit after pass 17 \u2014 the IA move touches observable-UI criteria."
     },
     {
       "n": 10,
@@ -189,6 +189,15 @@
       "resolved": true,
       "reason": "94 in-scope criteria unevidenced, dominated by four detector families never built (F26 10, F28 10, F9 8, F33 11). Plus 3 contradictions where a green check claims more than the register permits.",
       "resolution": "Pass 5: F26, F28, F9 and F33 built with 41 AC IDs newly evidenced. AC-F26-05 left NOT VERIFIED (no close clock, register 6). AC-F41-08 and AC-REFUSAL-11 left NOT VERIFIED with the reason recorded and no scenario naming either. AC-F12-20's dossier leg built, closing register 11. FUNCTIONAL_SPEC 27.11 arithmetic corrected to 263 issued / 262 live at v1.1.1, no ID renumbered."
+    }
+  ],
+  "updated": "2026-08-03",
+  "updated_by": "orchestrator",
+  "route_changes": [
+    {
+      "date": "2026-08-03",
+      "change": "Gate 7 re-opened after gate 8 closed, to implement the UX redesign the human approved. Gate 9 returns to pending: the IA move relocates elements that observable-UI criteria assert are visible on specific screens, so the prior audit no longer describes the tree.",
+      "requested_by": "human"
     }
   ]
 }
