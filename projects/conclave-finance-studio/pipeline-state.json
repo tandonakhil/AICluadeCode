@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 8 \u2014 Test (re-run after the UX redesign)",
+  "position": "Gate 8 \u2014 Test (re-run after the pass-18 loop-back)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -113,7 +113,7 @@
       "participants": [
         "code-agent"
       ],
-      "note": "Pass 17 complete: Work/Govern/Evidence IA as a checked artefact, 8 object-graph edges declared as data with one test each, Approvals as its own screen and object, composition fix, /readiness?agent=, item h1 names the finding, Conclave identity applied. 2,955 scenarios, 0 deleted."
+      "note": "Pass 18 closed gate 8's two blocking findings. Orphaned-style-rule checker added with NO_EXEMPTIONS empty AND ASSERTED EMPTY. AC-F5-02/-03/-05 left NOT VERIFIED (register 34) rather than reconciled by inventing governance facts."
     },
     {
       "n": 8,
