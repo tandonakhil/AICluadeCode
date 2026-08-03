@@ -1172,9 +1172,137 @@ undecided.
      installed, `prod/` untouched, and no server started — the human's pilot
      on 8030/8031 was left alone and 8021/8022 were never bound.
 
+- **2026-08-03 — Gate 7 pass 17 (`code-agent`): the approved UX redesign,
+  `UX_KB` Part A2, built.** Six judgment calls the plan did not fully specify,
+  recorded because each is a place a later reader would otherwise have to guess
+  at.
+  1. **The merged queue keeps three addresses.** `UX_KB` A2.2 merges Exceptions
+     and Review into one queue. `/exceptions` and `/review` were not removed:
+     a great many acceptance criteria name those addresses, and a criterion
+     pointing at a screen that no longer exists is a criterion nobody can
+     check. All three render the same screen, byte for byte, and the two old
+     ones are declared in `routes.SCREEN_ALIASES` — product code, so an alias
+     cannot be added by widening a constant in a test file.
+  2. **The dossier now carries exactly one link, and that is a narrowed
+     check.** `UX_KB` A2.2's eighth graph edge is the dossier's way back to the
+     finding it evidences; the exhibit previously carried none at all, and
+     `test_ui_dossier` asserted `hrefs() == []`. The self-containment substance
+     is unchanged and still asserted — no external reference of any kind, so
+     the document fetches nothing and renders identically offline — and the
+     narrowed check is "exactly one link, the back-reference, relative and
+     same-origin". `AC-F41-04`'s retained view is `state._retained_view`, which
+     is assembled separately and still carries no anchor. **If zero anchors on
+     this screen was the intent, that is `functional-design-agent`'s ruling and
+     was not made here.**
+  3. **Gold is narrower than `UX_KB` A2.8 specifies, in the direction of the
+     brand's own rule.** The brand law is "gold means a human decision". It is
+     bound to the one Approve control, the seal recording that somebody used
+     it, and the Council Mark's pull-line and terminus dot — the human above
+     the machine, the same meaning. A2.8 also gives gold to the six section
+     icons and to `.goldline`; neither is a human decision, so the icons take
+     `--ink-3` and `.goldline` is not carried at all.
+  4. **The readiness selector is links, not a picker.** `test_ui_boundaries`
+     refuses a `<select>` on every screen in this build, because a picker is
+     one control away from a multi-select and `AC-F41-01` forbids a bulk
+     affordance at every permission level. Links also give each agent's
+     readiness its own address, which is the defect A2.1 actually recorded.
+  5. **Four of the five agents have no readiness evidence, and say so.**
+     `SKILL_OBSERVATION` holds one entry. The others report every condition
+     `not_yet_evaluable` with the window named, and no precision figure is
+     rendered for a skill it was not computed for. Inventing an evidence window
+     to make four more reports look complete is what `AC-F12-21` exists to
+     stop.
+  6. **A real disagreement is rendered rather than tidied away.** The ids
+     findings are authored under (`agent.omission-detector`) and the ids the
+     principal registry publishes (`agent.omission_detector@1`) are not the
+     same strings. The agent page states this on its own face. Dropping the
+     unmatched agents would have made the object graph look complete and made
+     the disagreement invisible — the failure `AC-F5-06` refuses for retired
+     agents, in a new place.
+
 ## Current Status
 
+### Screen architecture after pass 17 (`UX_KB` Part A2 built)
+
+The interface is an OBJECT GRAPH with a four-group navigation over it, replacing
+twelve top-level screens in two groups. `app/ui/graph.py` declares the eight
+edges as data; `app/ui/chrome.py` declares the navigation; both are asserted by
+`backend/tests/test_ui_information_architecture.py` and
+`test_ui_object_graph.py`, so the IA is a checked artefact rather than a
+paragraph — which is the specific failure `UX_KB` A2.1 records.
+
+| Group | Screens |
+|---|---|
+| Work | `/queue` (the merged queue; `/exceptions` and `/review` are declared aliases serving the same screen) · `/approvals` · `/ask` |
+| Govern | `/catalogue` · `/monitors` |
+| Evidence | `/audit` (runs & dossiers) · `/inventory` (agents & datasets) · `/refusals` |
+| Identity block | `/my-probe-history`, plus the pilot persona switch |
+
+Objects, each with one canonical page naming it in its `<h1>`: the finding
+(`/review/<item>`), the run (`/evidence/run/<id>`), the agent
+(`/evidence/agent/<id>`), the dataset (`/evidence/dataset/<id>`), the dossier
+(`/dossier/<id>`), the proposal (`/proposal/<id>`) and the approval
+(`/approvals/<proposal>`). Readiness is a property of an agent
+(`/readiness?agent=<id>`), not a screen.
+
+`/` renders the queue, not Ask. **The one Approve control in the product is on
+`/approvals/<proposal>` and nowhere else**, which is counted by walking the
+whole reachable surface.
+
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
+
+**Pass 17 — the approved UX redesign (`UX_KB` Part A2). Test-count delta
+against pass 16's final run at `b38214d`:**
+
+| Suite | Before | After | Delta |
+|---|---|---|---|
+| unit/integration | 2,119 | **2,281** | **+162** |
+| functional | 354 | 354 | — |
+| architecture | 28 | 28 | — |
+| security | 14 | 14 | — |
+| red-team | 61 | 61 | — |
+| industry | 23 | 23 | — |
+| ux | 186 | **194** | **+8** |
+| **total collected** | 2,785 | **2,955** | **+170** |
+
+**0 tests deleted.** The +162 in unit/integration is four new files —
+`test_ui_object_graph.py` (35: one scenario per declared edge, both chains
+walked, and the four object pages), `test_ui_information_architecture.py` (27),
+`test_ui_approvals.py` (41) and `test_ui_brand.py` (32) — plus additions to
+`test_ui_review.py`, `test_ui_readiness.py`, `test_ui_exceptions.py` and
+`test_ui_boundaries.py`. The +8 in `ux` is the run report entering the
+accessibility suite's screen matrix (four scenarios × two themes) and the
+readiness journey splitting into a per-agent walk.
+
+**Scenarios CHANGED, all named, none weakened:**
+
+| Where | Change | Why it is not a weakening |
+|---|---|---|
+| `test_ui_dossier` | "no links at all" → "exactly one link, the back-reference, relative and same-origin" | The fetch-nothing substance is a separate scenario and is untouched. Flagged to `functional-design-agent` in the Decisions Log. |
+| `test_f26_criteria`, `test_f28_criteria`, `test_f33_criteria`, `test_f26_fidelity`, `test_ui_exceptions` | screen re-pointed from `/exceptions` to `/evidence/run/<id>` | `UX_KB` A2.6: nothing satisfying a criterion is deleted; criteria naming a screen have that screen re-pointed. Reachability of the new screen is asserted alongside. |
+| `test_ui_proposal` | approve-control scenarios re-pointed to `/approvals/<proposal>` | The control moved screens; its checks moved with it, including `AC-F40-11`'s lines-before-control ordering and both supersession removals. |
+| `test_ui_ask`, `test_ui_ask_resolver`, `test_semantic_versions_criteria`, `test_ask_request_criteria`, `test_ux_journey` | "`/` renders Ask" → "`/` links to Ask, one click away" | `/` is the queue now. "Reached by following a link" is a stronger claim than "the browser landed on it". |
+| `test_ui_probe_surface`, `test_f12_probe_criteria`, `test_ux_flow` | `review-queue` → `exception-queue` | The parallel `<ul>` was removed by the merge; the ordering and row-shape claims are asserted against the list that survived, which carries more for a probe's row to differ in. |
+| `test_ui_probe_surface` | render-path probe check reads the AST instead of grepping source text | The merged queue's prose legitimately says "probe" — it is the screen the programme is disclosed on. The criterion is about what the CODE does. |
+| `test_ui_boundaries` | reachability allows declared aliases | The allowance is read from `routes.SCREEN_ALIASES` (product code), and each alias's target is separately asserted reachable. |
+| `test_ui_approvals` | gold selectors widened from three to five | The Council Mark's pull-line and terminus dot. Same meaning — a human decision — under the brand's own colour law, which is itself asserted. |
+
+**Order independence verified at `6bf8ed9`.** All 2,955 pass under six
+orderings, with the same out-of-tree uniform global Fisher–Yates plugin
+approach as earlier passes so the tree stayed clean:
+
+| Ordering | Result | Wall | Same-file adjacencies | Order fingerprint |
+|---|---|---|---|---|
+| file order (control) | 2,955 pass, exit 0 | 244s | 2,846 | `8dfbccb220751114` |
+| `seed:1` | 2,955 pass, exit 0 | 283s | 38 | `759308beb6c37d78` |
+| `seed:7` | 2,955 pass, exit 0 | 284s | 35 | `652298ba83465fc4` |
+| `seed:42` | 2,955 pass, exit 0 | 285s | 32 | `13eb7530e5746536` |
+| `seed:20260731` | 2,955 pass, exit 0 | 324s | 32 | `e611d0c50e37510d` |
+| `reverse` | 2,955 pass, exit 0 | 228s | 2,846 | `fa4584ef39e7c77b` |
+
+A separate matrix over shuffled FILE order (the same four seeds, plus sorted
+and reversed) also passed, which is the weaker property but the one a suite
+owner invoking `run.sh` on one directory actually gets.
 (261 until the gate-9 loop-back: `FUNCTIONAL_SPEC` §27.11's arithmetic said
 "262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
 spec at v1.1.1; **no ID was renumbered, added or removed**.)

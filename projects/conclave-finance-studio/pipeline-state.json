@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 7 \u2014 Code (pass 17, approved UX redesign); gates 9-11 follow",
+  "position": "Gate 8 \u2014 Test (re-run after the UX redesign)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -107,20 +107,20 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
       ],
-      "note": "Re-opened 2026-08-03 for pass 17: implementing the human-approved UX redesign (Work/Govern/Evidence IA, 8 missing graph edges, Approvals screen, composition fix, typography floors)."
+      "note": "Pass 17 complete: Work/Govern/Evidence IA as a checked artefact, 8 object-graph edges declared as data with one test each, Approvals as its own screen and object, composition fix, /readiness?agent=, item h1 names the finding, Conclave identity applied. 2,955 scenarios, 0 deleted."
     },
     {
       "n": 8,
       "name": "Test",
-      "status": "done",
-      "approval": "batch_authorized",
-      "date": "2026-07-31",
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-08-03",
       "participants": [
         "test-agent"
       ],
