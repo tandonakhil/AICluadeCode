@@ -1,0 +1,159 @@
+/* ==========================================================================
+   conclave-finance-studio — BRANDING LAYER, 2026-08-03
+   Loads AFTER apple.css. Purely additive: identity, page-opening pattern and
+   carried-forward marketing components. Adds no layout rules that would
+   conflict with code-agent's pass-17 build of the A2.2 IA — every selector
+   below is new, and nothing here restructures a screen.
+
+   SOURCE for every component: projects/conclave-marketing/dev/app/
+     · static/css/site.css      (.wordmark, .artifact, .sealrow/.seal,
+                                  .goldline, .section-icon, .mark/.thread/
+                                  .pull/.core-dot/.node-ring/.sig3, .stat-strip)
+     · templates/base.html      (wordmark lockup, six section-icon symbols)
+     · templates/index.html     (Council Mark Tier 2 hero glyph)
+     · templates/how.html       (Council Mark Tier 3 signature + seal row,
+                                  gold = approved, rust = sent back)
+
+   NO GREEN. Nothing carried across depends on --c-ship or any green; the
+   marketing components used here are gold / teal / rust / neutral only.
+   ========================================================================== */
+
+:root{
+  /* The ONE token the Council Mark needs that apple.css did not carry.
+     Marketing note, verbatim: "Council Mark core — decorative graphic only,
+     3.18:1 on paper (>= 3:1 non-text); never carries text". */
+  --neutral-core:#8C8A82;
+}
+[data-theme=dark]{ --neutral-core:#9A968C; }
+
+/* ==========================================================================
+   1 · THE COUNCIL MARK — carried forward whole, including its own colour law
+   Marketing site.css, verbatim: "GOLD IS USED ONLY FOR THE PULL-LINE + ITS
+   TERMINUS DOT — never the core, never the threads."
+   The first visual pass invented a gold filled disc as an app icon. That
+   broke this rule. It is replaced by the real mark.
+   ========================================================================== */
+.mark svg{display:block}
+.thread{stroke:var(--teal);fill:none;stroke-linecap:round}
+.core-dot{fill:var(--neutral-core)}
+.pull{stroke:var(--gold);fill:none;stroke-linecap:round}
+.pull-dot{fill:var(--gold)}
+.node-ring{fill:var(--paper);stroke:var(--teal)}
+
+/* Tier 3 — the pull-line signature. Marketing uses it at human-decision
+   beats on /how and /what. That is exactly what this product needs, so it
+   is reused for its own meaning rather than restyled. */
+.sig3{width:34px;height:34px;flex-shrink:0;display:inline-block}
+.sig3.sm{width:26px;height:26px}
+
+/* Tier 4 — NEW, product-only: the mark reduced to an app lockup glyph.
+   Three threads and a core at 26px; the full six-thread Tier-2 glyph is
+   illegible below ~180px, so this is a reduction of the same geometry, not
+   a different mark. */
+.lockup{display:flex;align-items:center;gap:10px;padding:0 20px 18px}
+.lockup .glyph{width:28px;height:28px;flex:none}
+.lockup .wm{font-size:17px;font-weight:700;letter-spacing:.02em;color:var(--ink);
+ line-height:1.1}
+.lockup .wm span{display:block;font-family:var(--sans);font-size:11.5px;font-weight:600;
+ letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+/* ==========================================================================
+   2 · SECTION ICONS — the six thin-line symbols, carried verbatim from
+   base.html. Decorative, gold, stroke-only. Mapped 1:1 onto product
+   sections; no new glyph was drawn.
+   ========================================================================== */
+.section-icon{width:20px;height:20px;display:inline-block;vertical-align:-3px;
+ margin-right:9px;color:var(--gold);fill:none;stroke:currentColor;stroke-width:1.6;
+ stroke-linecap:round;stroke-linejoin:round;flex:none}
+.section-icon.sm{width:16px;height:16px;vertical-align:-2px;margin-right:7px}
+
+/* ==========================================================================
+   3 · PAGE-OPENING PATTERN — the marketing hero, compressed for a pro-app.
+   Marketing home opens: serif headline -> lede -> stat strip -> CTA -> mark,
+   about 520px tall. Above a queue an accountant scans six times a night that
+   is pure cost. What is carried: the ORDER, the stat strip, the gold
+   underline, the hairline close. What is dropped: the full-bleed height, the
+   Tier-2 glyph, the CTA button (the call-list is the product's CTA).
+   Result: ~150px, same reading rhythm.
+   ========================================================================== */
+.opening{padding:26px 28px 0}
+.opening .eyebrow{display:flex;align-items:center;gap:0}
+.opening h1{margin-top:10px}
+/* The serif headline is used ONLY where the product speaks in its own voice
+   (see §5). Data-object titles stay sans. */
+.opening h1.voice-title{font-family:var(--serif);font-weight:500;
+ font-size:clamp(26px,2.9vw,34px);line-height:1.16;letter-spacing:-.01em}
+.opening .answer{font-size:17px;line-height:1.55;color:var(--muted);
+ max-width:68ch;margin-top:10px}
+.opening .answer strong{color:var(--ink)}
+
+/* the gold underline, verbatim from marketing .goldline */
+.goldline{display:inline;-webkit-box-decoration-break:clone;box-decoration-break:clone;
+ background-image:linear-gradient(var(--gold),var(--gold));background-repeat:no-repeat;
+ background-position:0 96%;background-size:100% 4px}
+
+/* stat strip — carried from marketing .stat-strip. This is the single most
+   directly reusable marketing component: it is already the right shape for
+   "6 routed / 1 abstention / 70% coverage". Two adaptations: figures are
+   MONO not serif (they are ledger quantities and must align in a column),
+   and a figure may take a severity colour. */
+.statstrip{display:flex;gap:34px;flex-wrap:wrap;margin-top:20px}
+.statstrip .stat{display:flex;align-items:baseline;gap:9px}
+.statstrip .num{font-family:var(--mono);font-variant-numeric:tabular-nums;
+ font-size:30px;font-weight:600;line-height:1;color:var(--teal);letter-spacing:-.02em}
+.statstrip .num.s3{color:var(--sev3)} .statstrip .num.s2{color:var(--sev2)}
+.statstrip .num.s1{color:var(--sev1)} .statstrip .num.slate{color:var(--slate)}
+.statstrip .num.gold{color:var(--gold)}
+.statstrip .lab{font-size:12px;line-height:1.3;color:var(--muted);
+ text-transform:uppercase;letter-spacing:.055em}
+.opening .rule{border:0;border-top:1px solid var(--hairline);margin:24px 0 0}
+
+/* ==========================================================================
+   4 · SEAL ROW — carried forward from /how, for its original meaning.
+   Marketing: gold seal = "Approved", rust seal = "Sent back", with the
+   sentence "Your decision: …". The finance product records exactly these
+   acts, so the component transfers with no reinterpretation.
+   ========================================================================== */
+.sealrow{margin-top:18px;display:flex;align-items:center;gap:15px}
+.seal{width:60px;height:60px;flex:none;border-radius:50%;border:2.5px solid var(--gold);
+ color:var(--gold);display:flex;align-items:center;justify-content:center;
+ text-align:center;font-size:11px;font-weight:800;letter-spacing:.06em;
+ text-transform:uppercase;line-height:1.15;padding:4px}
+.seal.rust{border-color:var(--rust);color:var(--rust)}
+.seal.slate{border-color:var(--slate);color:var(--slate);border-style:dashed}
+.sealrow p{font-size:15px;color:var(--muted);max-width:60ch;margin:0}
+.sealrow p b{color:var(--ink)}
+
+/* the inline decision beat — marketing .sig-beat */
+.sigbeat{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gold);
+ font-weight:600}
+
+/* ==========================================================================
+   5 · ARTIFACT CARDS — marketing .artifact is serif on cream with a sans
+   .art-kind label. Carried, with ONE adaptation stated in the review page:
+   marketing artifacts hold quoted prose, so the whole card is serif. This
+   product's artifacts hold ledger tables, and serif tabular figures at 15px
+   in a dense grid hurt scanning. So: the KIND label and any quoted statement
+   are serif; the data stays sans/mono.
+   ========================================================================== */
+.artifact{background:var(--cream);border:1px solid var(--hairline);border-radius:10px;
+ padding:18px 20px;margin-top:16px}
+.artifact .art-kind{display:block;font-family:var(--sans);font-size:11px;font-weight:700;
+ letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.artifact .art-say{font-family:var(--serif);font-size:16px;line-height:1.6;color:var(--ink)}
+.artifact.rust-edge{border-left:4px solid var(--rust)}
+.artifact.gold-edge{border-left:4px solid var(--gold)}
+
+/* ==========================================================================
+   6 · REVIEW-PAGE ONLY — brand asset sheet chrome
+   ========================================================================== */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;margin-top:14px}
+.sw{border:1px solid var(--hairline);border-radius:10px;overflow:hidden;background:var(--surface)}
+.sw .chip{height:56px}
+.sw .txt{padding:9px 11px;font-size:12px;color:var(--muted);line-height:1.4}
+.sw .txt b{display:block;font-size:13.5px;color:var(--ink)}
+.glyphsheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:14px}
+.gl{border:1px solid var(--hairline);border-radius:10px;background:var(--surface);
+ padding:14px;display:flex;gap:11px;align-items:flex-start}
+.gl .t{font-size:13.5px;font-weight:560}
+.gl .u{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}

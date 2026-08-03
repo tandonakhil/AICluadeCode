@@ -1037,7 +1037,128 @@ additions (the rust severity ramp, the slate family) have not been run through
 a checker. That is the UX suite's job at the Test gate and is not claimed here.
 No motion. Desktop only.
 
-## A2.8 · Not covered by this pass, stated rather than omitted
+## A2.8 · Identity carried forward — logo, hero, motifs (2026-08-03)
+
+Human request: *"please make sure we have conclave branding and design
+language from the Conclave-marketing project carried forward. Logos, heros
+etc."* A2.7 carried the brand's **tokens**; this carries its **identity**.
+Delivered as `brand.css` (a layer over `apple.css`) plus `brand-assets.html`
+(the asset sheet `code-agent` copies from).
+
+### The logo is a wordmark plus the Council Mark
+
+Source: `templates/base.html`, `templates/index.html`, `templates/how.html`,
+`static/css/site.css`. There is **no SVG logotype** — the wordmark is a type
+treatment (`.wordmark`: 17px / 700 / `.02em` / ink), carried verbatim.
+
+The **Council Mark** is six teal threads converging on a neutral core with a
+single gold pull-line above: the six SDLC disciplines, the Conclave core, and
+the human. It carries one hard colour law, quoted from `site.css`: **"GOLD IS
+USED ONLY FOR THE PULL-LINE + ITS TERMINUS DOT — never the core, never the
+threads."**
+
+**A2.7 broke that law** — it invented a gold filled disc as an app icon.
+Corrected: the real geometry, core in `--neutral-core` (the one token
+`apple.css` had not carried).
+
+Marketing defines three tiers. Product usage:
+
+| Tier | Marketing use | Product use |
+|---|---|---|
+| 1 (full labelled) | `/who` lead-in | **Not used** |
+| 2 (440px hero glyph) | home hero | **Left behind** — illegible small, pure cost large |
+| 3 (`.sig3`, 34px signature) | human-decision beats on `/how`, `/what` | **Carried verbatim** — the Approve control and recorded decisions |
+| 4 (28px lockup) | — | **NEW, but a reduction**: three threads + core for sidebar chrome |
+
+**Tier 3 transfers with zero reinterpretation**, which is the find of this
+pass: marketing already pairs it with `.sealrow`/`.seal` — gold seal
+"Approved", **rust seal "Sent back"** — and this product records exactly those
+acts. Both variants already existed. I added one: **dashed slate, "Not
+concluded"** — the state marketing has no beat for, because the system
+abstained and no human decision was ever offered. Dashed because it is the
+absence of a decision, not a decision.
+
+### The hero: carried as rhythm, not as height
+
+Marketing opens a page with serif headline (one phrase gold-underlined) → lede
+→ stat strip → CTA → Council Mark: ~520px before content. **Carried**: the
+order, the stat strip, `.goldline`, the closing hairline. **Dropped**: the
+full-bleed height, the Tier-2 glyph, the `.cta` button — the call-list *is*
+this product's call to action. Result ~150px.
+
+**The opening is graded by visit frequency** — the density adaptation as a
+rule:
+
+| Screen | Visits per night | Opening |
+|---|---|---|
+| Close | once | Full: icon, serif headline, answer, 4-stat strip |
+| Approvals | a few | Full, 3-stat strip |
+| Finding | six | Icon, **sans** title, one answer line |
+| Queue | after every item | Shortest: icon, title, one line, rule |
+
+`.stat-strip` was the most directly reusable marketing component — already the
+right shape for "6 routed / 1 abstention / 70% coverage". Two adaptations:
+figures **mono not serif** (ledger quantities must align in a column), and a
+figure may take a severity colour so **70%** reads as the partial-coverage
+warning it is rather than an achievement in teal.
+
+### The serif: deliberately narrower, and it is the same rule
+
+Marketing uses Georgia for almost everything with a voice (`h1.q`/`h2.q` — the
+site is built as questions — home headline, panel headings, pull-quotes, stat
+figures, all of `.artifact`). The product uses far less. **The rule is not
+"headings are serif"; it is: the serif carries Conclave's voice, the sans
+carries the evidence.** On marketing nearly everything is voice; in this
+product nearly everything is evidence, so the identical rule yields a much
+smaller footprint.
+
+Two A2.7 errors corrected:
+- **The artifact card.** Marketing's `.artifact` is serif on cream; mine was
+  sans on cream. Now the kind label and the statement are serif, the table
+  inside stays sans/mono — serif tabular figures do not align in a column.
+- **Page-opening headlines.** Close and Approvals now open in Georgia because
+  they are the product speaking. The finding screen deliberately stays sans:
+  "18300 Deferred Storm Restoration Costs" is a ledger account, not a voice.
+  That contrast is the rule made visible and is worth preserving.
+
+### Section icons: carried verbatim, mapped 1:1, no new glyph drawn
+
+`si-seal` → approvals · `si-record` → dossier/period record · `si-gate` →
+boundary checks/guardrails · `si-flask` → run report/backtest · `si-door` →
+refusals · `si-build` → agents/datasets.
+
+### Left behind, on purpose
+
+`#conclaveNet` (the site-wide ambient drifting-node canvas) — a continuously
+animating background behind a queue scanned at 11pm is the clearest case of a
+marketing treatment that would actively hurt the work. `motion.css` draw-in —
+noise on a screen visited forty times a night. `.cta` button. The six `/who`
+family accents including `--c-ship`. **Nothing ported depends on any green**;
+verified by grep — the only occurrences of the word across the visual layer are
+the comments recording its absence.
+
+### What cannot come across at all
+
+**The question-and-answer spine.** Marketing is a chain of questions —
+`h1.q`, `.answer`, a `chain-nav` walking Why → What → How → Who. It is a
+rhetorical structure and the best thing about that site. A close queue has no
+rhetoric, only a task order. The **tone** transfers — plain, unhedged, willing
+to state what it will not do, which is why the refusal blocks read as they do.
+The **structure** cannot. Also capped: `.goldline` marks one phrase per page on
+marketing; in a product with forty findings a night it would become decoration
+within a week, so it is limited to one per page-opening and unavailable in
+lists.
+
+### Build-safety
+
+`brand.css` is a layer, not a restructure: loads after `apple.css`, adds one
+token, and every selector is new. It changes no layout rule `code-agent`'s
+pass-17 work touches (IA, eight graph edges, Approvals, composition split,
+typography floors). Applying it is four mechanical steps: link the stylesheet,
+paste the glyph `<defs>` once into the base template, swap the sidebar block
+for `.lockup`, wrap each page head in `.opening`.
+
+## A2.9 · Not covered by this pass, stated rather than omitted
 
 - **`DesignSync` is still unavailable in the runtime** — same finding as §10.5
   at gate 5, re-confirmed 2026-08-02: it is not in this agent's tool grant and
@@ -1096,6 +1217,7 @@ _(no entries — no production usage)_
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-03 | 1.3.0 | MINOR — **A2.8, identity carried forward.** Logo (wordmark + Council Mark, incl. the Tier-3 signature and seal row reused for their original meaning), page-opening pattern graded by visit frequency, six section icons mapped 1:1, artifact card, gold underline. Corrects two A2.7 errors: the invented gold-disc app icon broke the Council Mark's own colour law, and the artifact card was sans where marketing is serif. New `brand.css` + `brand-assets.html`; applied to the four branded screens. Records what was left behind (`#conclaveNet`, `motion.css`, Tier-2 glyph, `.cta`, all six `/who` accents incl. the green) and what cannot come across (the question-and-answer spine). | Human request, 2026-08-03; approval pending |
 | 2026-08-02 | 1.2.0 | MINOR — **A2.7, visual pass "Paper & Seal, at close".** Conclave brand (read from `conclave-marketing/dev/.../site.css`, not a summary) + Apple pro-app discipline, in a new `apple.css`. Records that the **brand's green is not a status colour** — it is one of six team-family accents on the marketing `/who` page — and is therefore **dropped entirely rather than substituted**, with the no-green rule intact. Applies the typography ruling as built fact: staleness 10.5px → 15px, nav 10px → 15px, qualifier-to-assertion ratio 4.0× → 2.7×. Journey maps redrawn as designed artefacts. Four screens restyled, fifteen not — disclosed. | Human request, 2026-08-02; approval pending |
 | 2026-08-02 | 1.1.0 | MINOR — **Part A2, navigation & journey redesign.** Parallel design thread requested by the human after using the running pilot. Adds: four end-to-end journey maps (J1–J4, two of them currently unwalkable and one unstartable); a four-item task-ordered IA replacing §4's eleven-item flat nav, with demotions for `/readiness`, `/inventory`, `/catalogue`, `/monitors`, `/my-probe-history` and dissolution of `/dispositions`; a verdict that none of the six binding constraints causes the unusability, with the "no Approve button" constraint's unbuilt positive half identified as the highest-value gap; a **FAIL** call on the 10px navigation / 10.5px provenance typography with a proposed floor criterion; and a gap list. §4 is superseded by A2.2 but retained for the record. Rendered clickable prototype at `design-review/redesign-2026-08-02/index.html`; gate-5 record untouched. `DesignSync` re-confirmed unavailable — no library push. | Human request, 2026-08-02; approval pending |
 | 2026-07-31 | 1.0.0 | Initial Experience Design pass. Visual language, IA and nine screens designed against all 186 acceptance criteria; rendered mockup at `design-review/index.html`. Four items escalated (§9), two assumptions recorded (§10.2, §10.3), one recorded requirement flagged as **not covered** (§10.4, multi-surface header vs desktop-only MVP1), one tooling gap recorded (§10.5, `DesignSync` unavailable). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 5 human review pending |

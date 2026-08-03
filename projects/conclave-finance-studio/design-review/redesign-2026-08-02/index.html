@@ -16,6 +16,7 @@
   </div>
   <div class="qtools">
     <a class="chip on" href="#visual" style="background:#8A5A17;border-color:#8A5A17;color:#FBF3E4">0 &middot; The visual pass &mdash; start here</a>
+    <a class="chip on" href="#identity" style="background:#8A5A17;border-color:#8A5A17;color:#FBF3E4">0b &middot; Identity carried forward</a>
     <a class="chip on" href="#diagnosis">1 &middot; Diagnosis</a>
     <a class="chip on" href="#journeys">2 &middot; Journey maps</a>
     <a class="chip on" href="#ia">3 &middot; Information architecture</a>
@@ -227,6 +228,145 @@ tokens from the brand&rsquo;s dark block, verbatim.</div>
     <li><b>No motion.</b> The brand has a <code>motion.css</code>; nothing here animates.</li>
     <li><b>Desktop only</b>, per MVP1.</li>
   </ul>
+</div>
+</div>
+
+<!-- ================= 0b IDENTITY ================= -->
+<div class="rvsec" id="identity">
+<h2 style="font-size:22px">0b &middot; Identity carried forward &mdash; logo, hero, motifs</h2>
+<p class="pagesub">The previous pass carried the brand&rsquo;s <b>tokens</b>. This one
+carries its <b>identity</b>: the Council Mark, the wordmark, the page-opening pattern, the
+section-icon set, the seal row, the artifact card and the gold underline &mdash; all lifted
+from <code>conclave-marketing/dev/app/</code> rather than reinvented.
+<b>Full asset sheet, with the reused-vs-adapted-vs-left-behind table:</b>
+<a href="brand-assets.html" target="_blank">brand-assets.html &rarr;</a></p>
+
+<div class="frame">
+  <div class="fhd"><b>Identity asset sheet</b> &mdash; one page for <code>code-agent</code> to copy from
+    <span><a href="brand-assets.html" target="_blank">Open &rarr;</a> &middot;
+    <a href="brand-assets.html?theme=dark" target="_blank">dark &rarr;</a></span></div>
+  <iframe src="brand-assets.html" height="1500" title="Brand asset sheet"></iframe>
+</div>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>The logo &mdash; and a rule my first pass broke</h3>
+    <p>Conclave&rsquo;s logo is <b>a wordmark plus the Council Mark</b>: six teal threads
+    converging on a neutral core, with a single gold pull-line above &mdash; the six SDLC
+    disciplines, the Conclave core, and you. The marketing CSS states one hard law
+    verbatim: <b>&ldquo;GOLD IS USED ONLY FOR THE PULL-LINE + ITS TERMINUS DOT &mdash;
+    never the core, never the threads.&rdquo;</b></p>
+    <p><b>My earlier sidebar used a gold filled disc as an app icon. That broke the
+    law.</b> It is replaced by the real geometry, core in <code>--neutral-core</code>
+    where it belongs. The wordmark type is marketing&rsquo;s <code>.wordmark</code>
+    verbatim &mdash; 17px, weight 700, <code>.02em</code> tracking.</p>
+    <p>Marketing defines three tiers. <b>Tier 3 &mdash; the 34px pull-line signature used
+    at human-decision beats on <code>/how</code></b> &mdash; transfers with no
+    reinterpretation at all, because this product records exactly those acts. Gold seal =
+    approved, rust seal = sent back; <b>both variants already existed</b>. I added one:
+    dashed slate, for the state marketing has no beat for &mdash; the system abstained, so
+    no human decision was ever offered.</p>
+    <p><b>Tier 4 is new but is a reduction, not a new mark:</b> three threads and a core at
+    28px for 236px of sidebar chrome, because the Tier-2 hero glyph is illegible below
+    ~180px. The gold pull-line survives the reduction because it is the one element
+    carrying meaning; dropping it would leave a generic node-graph icon.</p>
+  </div>
+
+  <div class="verdict">
+    <h3>The hero &mdash; carried as rhythm, not as height</h3>
+    <p>Marketing opens a page with serif headline (one phrase gold-underlined) &rarr; lede
+    &rarr; <b>stat strip</b> &rarr; CTA &rarr; Council Mark: about <b>520px</b> before any
+    content. Above a queue scanned six times a night that is pure cost.</p>
+    <p><b>Carried:</b> the order, the stat strip, the gold underline, the closing hairline.
+    <b>Dropped:</b> the full-bleed height, the Tier-2 glyph, and the CTA button &mdash; the
+    call-list <i>is</i> this product&rsquo;s call to action, and a marketing CTA would
+    compete with it. Result: ~150px, same reading rhythm.</p>
+    <p><b>The opening is then graded by visit frequency</b>, which is the density
+    adaptation stated as a rule:</p>
+    <div class="card" style="margin-top:8px">
+      <div class="kv"><span class="k"><a href="v2-close.html">Close</a> &mdash; visited once a night</span><span class="v">Full opening: icon, serif headline, answer, 4-stat strip</span></div>
+      <div class="kv"><span class="k"><a href="v2-approvals.html">Approvals</a> &mdash; visited a few times</span><span class="v">Full opening, 3-stat strip</span></div>
+      <div class="kv"><span class="k"><a href="v2-item.html">Finding</a> &mdash; visited six times</span><span class="v">Icon, sans title, one answer line</span></div>
+      <div class="kv"><span class="k"><a href="v2-queue.html">Queue</a> &mdash; returned to after every item</span><span class="v">Shortest: icon, title, one line, rule</span></div>
+    </div>
+    <div class="note"><b>The stat strip was the single most reusable component in the
+    marketing site</b> &mdash; already the right shape for &ldquo;6 routed / 1 abstention /
+    70% coverage&rdquo;. Two adaptations: figures are <b>mono not serif</b>, because ledger
+    quantities must align in a column, and a figure may take a severity colour so
+    <b>70%</b> reads as the partial-coverage warning it is rather than an achievement in
+    teal.</div>
+  </div>
+</div>
+
+<div class="verdict keep">
+  <h3>The serif &mdash; the product is deliberately narrower, and here is why that is the same rule</h3>
+  <p>Marketing uses Georgia for almost everything with a voice: <code>h1.q</code> /
+  <code>h2.q</code> (the site is literally built as questions), the home headline, panel
+  headings, pull-quotes, stat figures, and the whole of <code>.artifact</code>. The product
+  uses it for far less. That is deliberate, and it follows the same underlying rule:
+  <b>the serif carries Conclave&rsquo;s voice; the sans carries the evidence.</b> On a
+  marketing site nearly everything is voice. In this product nearly everything is evidence
+  &mdash; account codes, amounts, coverage, versions &mdash; so the identical rule yields a
+  much smaller serif footprint.</p>
+  <p>Two places the earlier visual pass got this wrong, now corrected:</p>
+  <ul style="margin:8px 0 0 18px;font-size:13.5px;line-height:1.6">
+    <li><b>The artifact card.</b> Marketing&rsquo;s <code>.artifact</code> is serif on
+      cream; mine was sans on cream. Now the kind label and the statement are serif and the
+      table inside stays sans/mono &mdash; serif tabular figures do not align in a column,
+      and the card exists to be scanned as much as read.</li>
+    <li><b>Page-opening headlines.</b> Close and Approvals now open in Georgia, because
+      &ldquo;Four things are waiting on a decision only you can make&rdquo; is the product
+      speaking. The <a href="v2-item.html">finding</a> screen deliberately stays sans:
+      &ldquo;18300 Deferred Storm Restoration Costs&rdquo; is a ledger account, not a
+      voice. That contrast is the rule made visible.</li>
+  </ul>
+</div>
+
+<div class="verdict">
+  <h3>Left behind on purpose &mdash; and the one thing that cannot come across at all</h3>
+  <table class="t">
+    <tr><th>Marketing asset</th><th>Decision</th><th>Reason</th></tr>
+    <tr><td><code>#conclaveNet</code> &mdash; the site-wide ambient network canvas</td>
+      <td><b>Left behind</b></td>
+      <td>A fixed canvas of continuously drifting nodes behind a queue an accountant scans
+        at 11pm is the clearest case of a marketing treatment that would actively hurt the
+        work.</td></tr>
+    <tr><td><code>motion.css</code> draw-in-once on the mark</td><td><b>Left behind</b></td>
+      <td>A mark that redraws itself on every navigation is noise on a screen visited forty
+        times a night.</td></tr>
+    <tr><td>Council Mark Tier 2 (440px hero glyph, six labels)</td><td><b>Reduced to Tier 4</b></td>
+      <td>Illegible small; pure cost at full size.</td></tr>
+    <tr><td><code>.cta</code> teal button</td><td><b>Left behind</b></td>
+      <td>The product's primary actions are the call-list row and the typed approval.</td></tr>
+    <tr><td>The six <code>/who</code> family accents, incl. <code>--c-ship</code></td>
+      <td><b>Left behind</b></td>
+      <td>Page-specific colour-coding with no product meaning &mdash; and one of them is
+        the green. Nothing ported depends on any of them.</td></tr>
+  </table>
+  <div class="note" style="margin-top:12px"><b>What cannot come across at all: the
+    question-and-answer spine.</b> Marketing is built as a chain of questions &mdash;
+    <code>h1.q</code>, <code>.answer</code>, and a <code>chain-nav</code> walking Why &rarr;
+    What &rarr; How &rarr; Who. It is a rhetorical structure and it is the best thing about
+    that site. A close queue has no rhetoric; it has a task order. The <i>tone</i> transfers
+    &mdash; plain, unhedged, willing to state what it will not do, which is why the refusal
+    blocks read the way they do. The <i>structure</i> cannot.
+    <br><br><b>Also capped:</b> the gold underline marks one phrase per page on marketing.
+    In a product with forty findings a night it would become decoration within a week, so
+    it is limited to one per page-opening and is unavailable inside lists.</div>
+</div>
+
+<div class="verdict new">
+  <h3>How this lands on the build in flight</h3>
+  <code>brand.css</code> is a <b>layer, not a restructure</b>. It loads after
+  <code>apple.css</code>, adds one token (<code>--neutral-core</code>), and every selector
+  in it is new &mdash; <code>.lockup</code>, <code>.sig3</code>, <code>.sealrow</code>,
+  <code>.seal</code>, <code>.section-icon</code>, <code>.opening</code>,
+  <code>.statstrip</code>, <code>.goldline</code>, <code>.artifact</code>. It changes no
+  layout rule that <code>code-agent</code>'s pass-17 work touches: the IA, the eight graph
+  edges, the Approvals screen, the composition split and the typography floors are all
+  unaffected. Applying it is: link the stylesheet, paste the glyph <code>&lt;defs&gt;</code>
+  once into the base template, swap the sidebar block for <code>.lockup</code>, and wrap
+  each page head in <code>.opening</code>.
 </div>
 </div>
 

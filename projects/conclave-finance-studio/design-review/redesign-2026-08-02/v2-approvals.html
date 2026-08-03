@@ -1,12 +1,26 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>Approvals — Conclave Finance Studio</title>
 <script src="theme.js"></script>
-<link rel="stylesheet" href="apple.css"></head><body>
+<link rel="stylesheet" href="apple.css"><link rel="stylesheet" href="brand.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="si-seal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M10 12 l1.6 1.6 L15 10"/></symbol>
+  <symbol id="si-record" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></symbol>
+  <symbol id="si-flask" viewBox="0 0 24 24"><path d="M10 3 V9 L4 19 C3.5 20 4 21 5 21 H19 C20 21 20.5 20 20 19 L14 9 V3"/><line x1="8" y1="3" x2="16" y2="3"/><line x1="7.5" y1="15" x2="16.5" y2="15"/></symbol>
+</defs></svg>
 <div class="app">
 
 <aside class="side">
-  <div class="mark"><div class="seal"></div>
-    <div class="wm">Conclave<span>Finance Studio</span></div></div>
+  <div class="lockup">
+    <span class="glyph mark" aria-hidden="true"><svg viewBox="0 0 28 28">
+      <path class="thread" d="M4 7 L12.5 13" stroke-width="1.3"/>
+      <path class="thread" d="M4 21 L12.5 15" stroke-width="1.3"/>
+      <path class="thread" d="M24.5 14 L15.5 14" stroke-width="1.3"/>
+      <circle class="core-dot" cx="14" cy="14" r="3.1"/>
+      <path class="pull" d="M14 3.5 L14 10.4" stroke-width="1.9"/>
+      <circle class="pull-dot" cx="14" cy="2.6" r="2.2"/>
+    </svg></span>
+    <div class="wm">Conclave<span>Finance Studio</span></div>
+  </div>
   <nav class="nav">
     <div class="navsec eyebrow">Close &mdash; 2026-06</div>
     <a href="v2-close.html"><span>Overview</span></a>
@@ -42,13 +56,20 @@
     </details>
   </div>
 
-  <div class="head">
+  <div class="opening">
     <div class="crumb"><span><a href="v2-close.html">Close</a> &rsaquo; Approvals</span></div>
-    <div class="title"><h1>Approvals</h1><span class="tag gold">4 awaiting you</span>
-      <span class="tag s2">2 post to the ledger</span></div>
-    <p class="lede subtitle">The only screen in this product with an Approve control.
-      There is none on the review queue and none on a finding &mdash; approval is a
-      separate, deliberate act, taken by someone who did not author or resolve the item.</p>
+    <div class="eyebrow"><svg class="section-icon sm"><use href="#si-seal"/></svg>Your decision &middot; 2026-06 day 3</div>
+    <h1 class="voice-title">Four things are waiting on
+      <span class="goldline">a decision only you can make</span>.</h1>
+    <p class="answer">The only screen in this product with an Approve control. There is
+      none on the review queue and none on a finding &mdash; approval is a separate,
+      deliberate act, taken by someone who did not author or resolve the item.</p>
+    <div class="statstrip">
+      <div class="stat"><span class="num gold">4</span><span class="lab">awaiting<br>your approval</span></div>
+      <div class="stat"><span class="num s2">2</span><span class="lab">post to<br>the ledger</span></div>
+      <div class="stat"><span class="num">0</span><span class="lab">approved<br>so far tonight</span></div>
+    </div>
+    <hr class="rule">
   </div>
 
   <div class="wrap">
@@ -162,6 +183,14 @@
     </div>
 
     <div class="decided">
+      <div class="sealrow" style="margin-top:0;margin-bottom:14px">
+        <span class="sig3 mark" aria-hidden="true"><svg viewBox="0 0 34 34"><path class="pull" d="M17 6 L17 22" stroke-width="2.6"/><circle class="pull-dot" cx="17" cy="5" r="4"/><circle class="core-dot" cx="17" cy="25" r="4"/></svg></span>
+        <div class="seal">Your call</div>
+        <p><b>The Council Mark, Tier 3.</b> On the marketing site this signature marks every
+          point where a human overruled or confirmed the machine. It marks the same thing
+          here &mdash; the gold line above the neutral core is you, and it is the only gold
+          on this screen apart from the control itself.</p>
+      </div>
       <div class="hd">Approve &mdash; a deliberate act, typed rather than clicked</div>
       <div style="font-size:17px;margin-top:12px">Type the cost centre this moves
         <b>to</b>, to confirm you read the proposal: <span class="field"></span></div>
