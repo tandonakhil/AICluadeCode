@@ -1546,7 +1546,218 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-08-02 — Gate 8 · Test — `test-agent`, **FINAL re-run at `dev` @ `9d605b1`** (parent repo @ `e14c497`)
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-17 UX redesign, at `dev` @ `6bf8ed9`** (parent repo @ `5268e9b`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,955 of 2,955 scenarios
+passed at every suite entry point and in EIGHT whole-tree runs — file order,
+four salted seeds, `reverse` twice, and once under vacuous-pass
+instrumentation — zero skipped. The rendered-UI backend and the smoke each
+found one thing the 2,955 do not.** Structured per-scenario evidence:
+`test-evidence/*-2026-08-03.md` (13 files), plus 13 freshly captured Playwright
+screenshots. **The entire superseded corpus was deleted and rewritten**; every
+file names both commits and its presence on disk was verified after writing.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Skip | Owner | Blocking |
+|---|---|---|---|---|---|---|---|---|
+| unit/integration | `EXECUTED` | 0 | 2,281 | 2,281 | 0 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 354 | 354 | 0 | 0 | `functional-agent` | yes |
+| architecture | `EXECUTED` | 0 | 28 | 28 | 0 | 0 | `solution-architect` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | 0 | `security-architect` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | 0 | `responsible-ai-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | 0 | `industry-expert` | yes |
+| ux | `EXECUTED` | 0 | 194 | 194 | 0 | 0 | `ui-ux-designer` | yes |
+| **automated total** | | | **2,955** | **2,955** | **0** | **0** | | |
+| post-deploy smoke | `EXECUTED` | 1 | 19 | 18 | **1** | 0 | `test-agent` | yes |
+| rendered-UI (Playwright) | `EXECUTED` | — | 10 | 9 | **1** | 0 | `test-agent` | yes |
+
+No suite is `STATIC ONLY` and no suite is `PARTIAL`. 2,281 + 674 = 2,955, and
+the seven per-suite collections sum to the whole-tree collection exactly. The
+`ux` suite launched Chromium 148.0.7778.96 — its conftest exits 4 (STATIC-ONLY)
+rather than passing if Playwright or the browser binary is absent, so exit 0 is
+positive evidence a rendering engine answered. No server was started inside this
+agent's turn: the pilot was started, driven and reaped inside single command
+invocations four times.
+
+**The screens moved and the checks moved with them — verified independently,
+not accepted.** `code-agent`'s eight-row changed-scenario table was checked row
+by row against `git diff 9d605b1..6bf8ed9`, and then twice more by whole-tree
+set difference:
+
+* **Every `data-testid` asserted before is still asserted, with exactly one
+  exception** — 133 before, 171 after, and the only one dropped is
+  `nav-readiness`, the navigation slot `UX_KB` A2.2 deliberately removed, which
+  no longer exists anywhere in `backend/app/` either.
+* **175 criterion IDs are named by some node ID before and after — set
+  identical.** **103 `COVERS` joins before and after — set identical.** No
+  criterion lost its scenario and none lost its join.
+
+**Test-count delta: +200 added, −19 removed, 4 changed groups.** Baseline 2,774
+at `9d605b1` (this agent's last verified tree, not `code-agent`'s 2,785
+baseline; the 11 between is `test_ui_typography_floor.py`). **`code-agent`
+reports "0 tests deleted" and at node-ID level that is not accurate — 19 node
+IDs are gone.** No test file was deleted and no coverage was abandoned: 17 are
+renames or screen re-points, and each of the 19 is tabulated with its successor
+in `test-evidence/unit-integration-2026-08-03.md`. The other two —
+`test_it_has_a_permanent_place_in_the_navigation` and
+`test_readiness_is_reachable_from_the_navigation_on_every_screen` — assert a
+property the approved redesign deliberately **reversed**, and each is replaced
+by a stronger claim (every agent has its own linkable readiness address, which
+the old build could not satisfy for four of five agents). Recorded as a coverage
+decision in front of the human rather than folded into a rename.
+
+**The eight edges are mutation-proved.** Breaking edge **E5**'s target
+mid-chain failed exactly two scenarios and the chain failed **at the agent
+hop** — `/evidence/agent/agent.crossperiod-surveillance-mutated returned 404`
+raised from `U.fetch(agent_href)` — with the run hop's assertion already passed
+above it, and not at the readiness hop after it. Deleting the **row** `E8` from
+`graph.EDGES` failed the guard `test_exactly_the_eight_declared_edges_exist`.
+The table is genuinely load-bearing in both directions.
+
+**`SCREEN_ALIASES` — the claim holds literally; the property it secures does
+not.** There is no test-side alias constant to widen, the router does not even
+consult the table at request time (mutating it is inert on routing), and a bogus
+alias to a non-served path is caught. **But a test file can still hide an
+orphan**: with `/refusals` de-linked from the navigation the sweep correctly
+failed with `AssertionError: {'/refusals'}`, and **one line** in a test file —
+`routes.SCREEN_ALIASES["/refusals"] = "/queue"` — made all 8 scenarios pass.
+Both guards are satisfied by the forged row, because nothing checks that an
+alias serves the screen it names except for the three hard-coded queue
+addresses. **Nothing in the build does this today**, so no suite reports a false
+pass on this path. Feedback for `code-agent`.
+
+**Readiness is honest.** Driven over HTTP for all five agents: four
+(`omission-detector`, `coding-detect`, `anomaly-detect`, `fidelity-check`)
+render **all five conditions `not_yet_evaluable`**, `data-ready="false"`, **no
+`precision-figure`** and an explicit `precision-figure-absent`. Nothing is
+rendered as a pass and no precision figure appears for a skill it was not
+computed for. The fifth, `crossperiod-surveillance`, has real data (3
+`not_yet_evaluable`, 1 `not_met`, 1 `met`) and carries its figure.
+
+**BLOCKING FINDING 1 — the id mismatch is disclosed on the agent page and
+silently dropped on the Inventory, and a suite reports the criterion green.**
+The brief asked whether anything elsewhere drops the unmatched agents. It does.
+Five agents authored findings in the pilot run; **four have no registry entry
+under their author id and do not appear on `/inventory` at all**. `AC-F5-02`'s
+Given clause is *"an agent that has been deployed and has **performed at least
+one action**"*. The covering scenario nevertheless passes, because it asserts
+`inventory == principals.DIRECTORY` — **the projection compared against its own
+source**, an equality true by construction that cannot fail for the reason the
+criterion is about. `/inventory`'s own rendered prose still reads *"An agent
+that can act is an agent that is listed."* The agent page's own comment states
+the standard being missed: *"an inventory that silently omits an agent that
+acted is an inventory that makes its own artefacts unattributable."*
+Same gap, second face: **seven dossiers exist and zero appear in any lineage**
+(union of artefacts across all eleven rows is 9, none a dossier), yet every row
+reports `complete=True` and `test_AC_F5_03_…` asserts exactly that — against
+`AC-F5-05`'s *"a partial list is never returned unlabelled"*. Reproduced over
+HTTP against the served pilot as smoke **S12 FAIL**.
+
+**BLOCKING FINDING 2 — a rendering defect the redesign introduced, on every
+screen, that no suite can see.** The sidebar context line
+("Northwind Grid Holdings - 2026-06 - Day 3") renders in a **67.5px-wide,
+116.25px-tall box, roughly one word per line**, on all four screens measured at
+both viewports. Root cause: the rule is scoped **`.brand .ctx`**, and pass 17's
+A2.8 identity layer replaced `.brand` with `.lockup` — `chrome.lockup()`'s own
+docstring says *"Replaces the plain `.brand` text block"* — without re-scoping
+it. **`.lockup .ctx` has no rule**, so the span is an unstyled min-content flex
+child of an `align-items:center` row in a ~160px sidebar. Invisible to every
+non-rendering check: the class is emitted, the string `.ctx` *does* exist in the
+stylesheet so a grep passes, and the page returns 200 with the right text.
+`test_ui_brand.py`'s 32 new scenarios do not catch it and neither does the
+194-scenario `ux` suite. Visible top-left in
+`ux-queue-desktop-1280-2026-08-03.png`.
+
+**The two conflicts, reported and not resolved.**
+* **(a) `test_ui_dossier` vs edge E8.** Both halves of the claim confirmed
+  genuinely untouched. `test_there_is_no_external_reference_of_any_kind` does
+  not appear in the diff, and it was re-proved in a real browser: the served
+  dossier saved to disk and opened as `file://` issued **zero** non-`file://`
+  requests and rendered still styled (`risk-band` → `rgb(246, 228, 227)`).
+  `AC-F41-04`'s retained view (`state._retained_view`) is a `<section>` with an
+  `<h2>`, a `<table>` and a `<p>` and contains **no anchor of any kind**.
+  §9.4's three binding consequences concern purity, byte-determinism and inlined
+  styles — none speaks to anchors on the dossier screen. Whether the screen
+  should carry zero anchors is a ruling for `functional-design-agent`.
+* **(b) Gold narrower than `UX_KB` A2.8.** The build paints gold on five
+  selectors, asserted by set **equality**; A2.8 additionally gives it to
+  `.goldline` and the six section icons, and neither is carried. Material to
+  whoever rules: **A2.8's own version row reads "Human request, 2026-08-03;
+  approval pending"** — the KB entry the build departs from is not yet approved.
+  Confirmed in a real browser: **28 gold-painted elements across 12 renders, all
+  `.pull`, `.pull-dot` or `.btn.approve`, zero offenders** — the independent
+  witness, since the unit suite asserts the law by parsing the stylesheet as
+  text.
+
+**Order independence — eight whole-tree runs, all 2,955, ledger untouched in
+every one.** The generator is **salted, and the reason is itself a finding**:
+the obvious unsalted `random.Random(seed)` + Fisher–Yates reproduced
+`code-agent`'s fingerprints **exactly** (`seed:1` → `759308beb6c37d78`, 38
+adjacencies). That corroborates that the recorded permutations are real, but it
+is the same run twice, so the matrix was discarded and re-run salted.
+
+| Ordering | Result | Wall | Same-file adjacencies | Fingerprint |
+|---|---|---|---|---|
+| file order (control) | 2,955 pass, exit 0 | 209.4s | 2,846 | — |
+| `seed:1` salted | 2,955 pass, exit 0 | 243.3s | 28 | `9595c2e4e0f72c1c` |
+| `seed:7` salted | 2,955 pass, exit 0 | 249.6s | 39 | `d929fa3e6a9f5d91` |
+| `seed:42` salted | 2,955 pass, exit 0 | 250.2s | 32 | `45a3759ce39c82bb` |
+| `seed:20260803` salted | 2,955 pass, exit 0 | 247.4s | 34 | `cf3222bf352fa738` |
+| `reverse` | 2,955 pass, exit 0 | 215.5s | 2,846 | `fa4584ef39e7c77b` |
+| `reverse` again | 2,955 pass, exit 0 | 214.9s | 2,846 | `fa4584ef39e7c77b` |
+
+**The two sweeps.** Empty-`parametrize`: **0 sites** across 99 modules. Vacuous
+pass, run **dynamically** rather than inferred — a whole-tree run under an
+out-of-tree plugin wrapping `Document.all`/`.tags`: 484 scenarios make document
+queries, **15 passed with every query empty, and all 15 are negative assertions
+where the empty result IS the claim.** The three IA-relevant ones each have a
+positive counterpart on the other screen, so neither can pass on a page that
+failed to render.
+
+**Rendered-UI verification: Playwright/Chromium against the SERVED pilot.** Six
+screens × two viewports plus the offline dossier, 13 screenshots. **Zero green
+under computed colour** across 12 renders; **zero text below 0.05 effective
+(compounded) opacity**; `AC-F41-03` holds — `riskiest-figure` at **40.0px** is
+the largest text on the finding, against a 28.0px `h1`; **every object page
+names its object in its rendered `<h1>`** and the finding's carries **no
+approval vocabulary** at either viewport. Minimum computed font size is
+**12.0px**, improved from 10.0px last pass — the carried `ui-ux-designer`
+advisory is materially better.
+
+**This agent's own defects, recorded rather than quietly corrected.** Two, both
+mine. **(1)** Smoke S7 reported two links on the dossier where there is one
+anchor — the driver's `href="…"` regex also matched `data-href="…"` on the same
+element. Verified against `Document.hrefs()`, fixed, whole smoke re-run. **(2)**
+Rendered R7 **passed on an empty set**: the gold detector used a guessed colour
+range requiring `r > 140` and light `--gold` is `#8A5A17` (`r = 138`), so it
+measured nothing and reported PASS — a vacuous pass in my own suite. Rewritten
+to resolve the document's own token through the engine and to carry a
+non-vacuity guard. Also recorded: the "clipped PRESENT ANOMAL pill" I thought I
+saw in a screenshot was **refuted by measurement** (136.4px of text in a 152.4px
+box) and is not a defect.
+
+**The standing question — `does any suite report a pass the register says cannot
+be true?` — returns YES, breaking six consecutive clean passes.** The register
+has 33 entries (1–33, verified, no gaps) and **the five declared criteria are
+clean**: `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17` and `AC-F36-48`
+are claimed by **zero** of the 2,955 scenario names — the only two node IDs
+containing an ID are the parametrisation labels of a scenario asserting the
+export is **refused** — and by zero `COVERS` joins that are not self-denying.
+The 200 new node IDs were scanned with the same query and returned zero. **The
+YES comes from a route the register does not cover**: `AC-F5-02` and
+`AC-F5-03`/`-05` are reported green over a build that cannot support them, and
+on the evidence that gap needs a register entry it does not have.
+
+**Gate status: BLOCKED — two blocking findings, neither of which is a failing
+automated suite.** All seven suites are `EXECUTED` and green, which is exactly
+why both are reported: a green suite is not the same as a true claim. The
+decision is the human's — send back to `code-agent` (both findings are build
+defects), or record an `[override]` in the Decisions Log naming the
+suite/scenario and the reason. No override is recorded here; `test-agent` does
+not grant one.
+
+---
+
+### 2026-08-02 — Gate 8 · Test — `test-agent`, **FINAL re-run at `dev` @ `9d605b1`** (parent repo @ `e14c497`) — SUPERSEDED
 
 **All seven automated suites EXECUTED, exit code 0, 2,774 of 2,774 scenarios
 passed at every suite entry point and in NINE whole-tree runs — file order plus
@@ -2688,9 +2899,17 @@ its guarantee and its one-host bound.
 |---|---|
 | 9 | **The A20 residual is WIDER after the F39 resolver, and the widening is the finding.** Register 9 recorded that A20 holds absolutely where an emission carries a disposition on a size-shaped ground and heuristically in free prose. What narrowed it was that *there was nothing downstream to evade into* — all three triage outcomes were declines, so a request slipping past every request pattern still produced no answer. **That is no longer true.** Re-running the RT05 battery against the resolving path found that **eleven of the twelve paraphrases are not refused at the REQUEST surface**, including all eight the emission broker refuses: the request matcher and the emission matcher are different sets over different objects, which was harmless while every request declined. A crafted paraphrase that evades every A20 request pattern and names a mapped subject now reaches an **answer with real rows**. `RT05_AT_THE_REQUEST_SURFACE` records what each of the twelve reaches so a change to either matcher fails the map, and `test_RT05_a_paraphrase_that_evades_A20_now_reaches_an_ANSWER` asserts the new pass-through directly. Bounded, and the bound is asserted too: what it reaches is **rows and a coverage statement** — no disposition, no recommendation, no characterisation of a difference as small — and the structural leg is unweakened. **`AC-REFUSAL-11` stays phase 2, is claimed nowhere, and the resolver does not unlock it** |
 
-**Thirty-three entries as of pass 12. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
+### Entry OPENED at pass 18 (gate-8 loop-back)
+
+| # | Spec | Built instead | Unmet criterion / consequence |
+|---|---|---|---|
+| 34 | `AC-F5-02`'s population — *"an agent that has been deployed and has **performed at least one action**"* appears in the Inventory with its identity, entitlements and version — together with `AC-F5-03`/`-05`'s lineage completeness over an agent's artefacts | the Inventory is a projection of the **principal registry**, and lineage is a traversal of the **decision ledger**. Neither population is the criterion's population | **`AC-F5-02`, `AC-F5-03` and `AC-F5-05` are NOT VERIFIED and are claimed by no scenario.** Two faces of one gap, both found by gate 8 at pass 17. (a) **Five agents authored findings in the pilot close and four are absent from `/inventory`** — `agent.crossperiod-surveillance`, `agent.omission-detector`, `agent.anomaly-detect`, `agent.fidelity-check` — because the run's author ids and the registry's principal ids are not the same strings. The covering scenario asserted `inventory == principals.DIRECTORY`, **the projection against its own source, an equality that cannot fail for the reason the criterion is about**. (b) **Seven evidence dossiers exist and zero appear in any lineage**, while every row reported `complete=True` — a partial list returned labelled complete, which is precisely what `-05` forbids. **Why it is not closed in this pass:** reconciling the ids means either registering four principals the F5 compile step never produced — the manual registration step `-02` itself forbids, and it would fabricate entitlements for agents that never went through registration — or renaming author ids to registry ids when two of the four have no registry counterpart at all. Both invent governance facts. **What was built instead:** the incompleteness is stated on the face of the surfaces that have it. `/inventory` names all four absent agents, links each to its agent page, and says `AC-F5-02` is not met; the unqualified sentence *"An agent that can act is an agent that is listed"* is gone from that screen. Every lineage row states its **scope** (`decision_ledger`), is labelled **INCOMPLETE**, and names the artefact classes it could not traverse, from `ges/main.py:LINEAGE_UNTRAVERSED` — declared at the broker, because the label belongs to the thing making the claim. `/ges/inventory` additionally returns `unregistered_actors`, the broker's own answer to the population question computed from its ledger. The two scenarios are rewritten to assert against **the agents that actually authored findings** and against **the dossiers that actually exist**, so each fails if the gap moves in either direction — including if the ids are reconciled and the disclosure is left behind. Closing it needs the F5 registration path to be the same id space the run authors under, which is a registry change, not a rendering one |
+
+**Thirty-four entries as of pass 18. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
 are CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
-4 are still the two that cannot quietly become "MVP1 ready".**
+4 are still the two that cannot quietly become "MVP1 ready". Entry 34 is the
+newest and is the first opened by a gate-8 finding rather than by `code-agent`'s
+own disclosure.**
 
 **On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
 claiming closure with no covering check is the same defect class as an
