@@ -56,7 +56,14 @@ def check():
                     problems.append((name, "gate %s is done while gate %s is active, "
                                            "with no loop_backs or route_changes entry "
                                            "explaining it" % (g["n"], seen_active)))
-        # 4. INDEX.md must agree with the state file
+        # 4. a project that has reached Code should carry a live link
+        reached_code = any(g.get("n", 0) >= 7 and g.get("status") in ("done", "active", "warn")
+                           for g in d.get("gates", []))
+        if reached_code and not d.get("served_url"):
+            problems.append((name, "reached gate 7 but `served_url` is null — the dashboard "
+                                   "shows no live link for a project that has something to show"))
+
+        # 5. INDEX.md must agree with the state file
         row = [l for l in index.splitlines() if l.startswith("| %s " % name)]
         if not row:
             problems.append((name, "no row in memory/INDEX.md"))

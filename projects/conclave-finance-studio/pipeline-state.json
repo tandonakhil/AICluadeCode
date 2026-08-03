@@ -4,7 +4,7 @@
   "position": "Gate 7 \u2014 Code (pass 17, approved UX redesign); gates 9-11 follow",
   "env": "dev, local",
   "last_activity": "2026-07-31",
-  "served_url": null,
+  "served_url": "http://127.0.0.1:8030/",
   "notes": "Sits ON TOP of Oracle ERP Cloud data in a warehouse. Detects and resolves close anomalies; triggers postings into ERP. Does NOT imitate GL. Surface is a natural-language, dataset-selection agent interface with guardrails.",
   "gates": [
     {
@@ -199,5 +199,6 @@
       "change": "Gate 7 re-opened after gate 8 closed, to implement the UX redesign the human approved. Gate 9 returns to pending: the IA move relocates elements that observable-UI criteria assert are visible on specific screens, so the prior audit no longer describes the tree.",
       "requested_by": "human"
     }
-  ]
+  ],
+  "served_url_note": "Pilot build, not a deployment \u2014 gate 11 has not run. Started with `CONCLAVE_ENV=pilot API_PORT=8030 GES_PORT=8031 .venv/bin/python backend/pilot.py`. Default port is 8021; 8030 is used so test-agent's smoke runs on 8021 do not collide with the human's own instance. In this configuration the broker runs inside the api process (register 19), which is refused under CONCLAVE_ENV=production."
 }
