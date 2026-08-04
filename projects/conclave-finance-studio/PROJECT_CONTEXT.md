@@ -1220,6 +1220,92 @@ undecided.
      the disagreement invisible — the failure `AC-F5-06` refuses for retired
      agents, in a new place.
 
+- **2026-08-03 — Gate 7 pass 19, SECOND LOOP-BACK FROM GATE 8: the three
+  findings of `register-cross-check-2026-08-03.md`. Judgement calls by
+  `code-agent`.** Three commits (`3fc105f`, `9ce09cc`, `e00a214`), one per
+  finding. **No register entry opened or closed**; registers 33 and 34 both
+  gain a correction described below, and 34's "built instead" list is now held
+  by scenarios in all three of its parts rather than two.
+  1. **F1 — the claim a screen dropped was still standing on the four it links
+     to.** Pass 18 removed *"An agent that can act is an agent that is
+     listed"* from `/inventory` and left it in the subtitle of all four
+     `/evidence/agent/<id>` pages, four lines above the block stating that
+     THAT agent acted and is in no registry. Register 34's wording ("gone from
+     that screen") was literally true and is not contradicted; the fix is the
+     four pages plus the scoping. **The guard is now the surface, not a named
+     screen**: every URL reachable from `/` by following real links, plus every
+     document that exists only as the result of operating a control, and it
+     asserts the four agent pages are IN that traversal so it cannot pass by
+     reaching nothing. The subtitle now says what is true — the page is the
+     agent, and not every agent that acted has a registry entry, with the
+     Inventory named as where the gap is.
+  2. **F1's own mutation found a second unheld claim.** Register 34 credits
+     `/inventory` with *"links each to its agent page"*. Repointing all four
+     hrefs at `/inventory` left all 2,977 scenarios green — the link was
+     credited and held by nothing. The disclosure scenario now follows each
+     link and asserts it lands on that agent's page. Note for the record: the
+     whole-surface guard does NOT catch that mutation, correctly — the agent
+     pages stay reachable through the object graph's finding→run→agent chain,
+     so the traversal is not vacuous either way.
+  3. **F2 — `AC-F5-07` built, not deferred, on `test-agent`'s ruling.**
+     `code-agent` declined this at pass 18 as a Plan-gate call. The ruling
+     came back that nothing needs narrowing: the build satisfies "each agent"
+     today and the scenario merely sampled `agents[0]`, so asserting every row
+     is **strengthening an under-asserting test**, not changing scope. It is
+     accepted and built. Every agent row, labels AND values, joined to the
+     broker's own payload — so a label rendered over a neighbour's version
+     fails too. The sibling `a_lineage_view_is_reachable_for_each_listed_version`
+     asserted `len(lineage) == len(rows)`, which eleven views all belonging to
+     one agent would satisfy; it asserts containment now. **The criterion's
+     status is unchanged** — it was met before this pass and is met after it;
+     what changed is that a check now holds it.
+  4. **The sampling sweep, and what it is not.** Swept both trees for the same
+     shape — a criterion or scenario name saying each/every, a check reading
+     `[0]`, `[-1]`, `.first()` or `next(iter(…))`. 39 candidates, **5 real**,
+     all fixed in the same commit: `obligation_gap`'s "each kind" named two of
+     the three kinds in `KIND_VOCABULARY` and left `intercompany_counterparty`
+     unasserted (now parametrised over the mapping, plus a check that no two
+     kinds share a label, since "in its own words" is a claim about
+     difference); `distribution_outlier`'s "every anomaly" read one finding of
+     one run in the above direction only; `AC-F40-16`'s "every produced file"
+     read `entries[-1]`; `AC-F38-01`'s nine attributes were pinned on one
+     catalogue card of three; and the export reconstruction fields were
+     asserted on `dossiers[0]` of a one-dossier export. The other 34 are
+     legitimate — a header row, a string split, or a population the scenario
+     first asserts has exactly one member. **This is a sampling fault and not
+     the `AC-F5-02` tautology fault**: these checks could always have failed
+     for the right reason, they just did not look.
+  5. **F3 — `unregistered_actors` is UNKNOWN, not none.** It returned a bare
+     `[]` while four unregistered actors existed, was asserted by nothing, and
+     **could not become non-empty in this build**: it is a set difference over
+     the decision ledger and findings are not ledger-recorded, which is
+     `LINEAGE_UNTRAVERSED`'s own second entry. Register 33's convention C2 in
+     its population form, in the same shape `resolver._population_coverage`
+     already uses — `computable: False`, the scope, the untraversed class, and
+     a statement saying UNKNOWN rather than none. The ledger difference is
+     still returned under a name that says what it is, because suppressing a
+     true fact would be a second rounding. **Two scenarios**: one asserts the
+     SHAPE rather than the emptiness, so it survives the day findings become
+     ledger-recorded; the other joins `computable: False` to the
+     `LINEAGE_UNTRAVERSED` entry that justifies it, so the UNKNOWN cannot
+     outlive its reason.
+  6. **The broker's answer is rendered on `/inventory`.** An answer only a
+     reader of the payload ever meets is the shape this project keeps finding,
+     and the register already credits this field as disclosure. The screen
+     renders the broker's own statement string rather than composing a second
+     wording of the same fact. It is a new UI element and is asserted through
+     the real route, on the screen a reader reaches.
+  7. **What this pass did NOT do.** No register entry opened or closed. The
+     eight forbidden criteria (`AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+     `AC-F40-17`, `AC-F36-48`, `AC-F5-02`, `-03`, `-05`) are claimed nowhere
+     and none was touched; `AC-F5-02`/`-03`/`-05` remain NOT VERIFIED and the
+     three scenarios naming them still assert unmet-ness. No guardrail moved
+     to the UI, no free-form SQL or SQL-typed parameter, no Oracle posting
+     credential, no journal-submission library, no suite stubbed green, no
+     exemption table added, no dependency installed, `prod/` untouched, and no
+     server started — the human's pilot on 8030 was left running and
+     untouched.
+
 ## Current Status
 
 ### Screen architecture after pass 17 (`UX_KB` Part A2 built)
@@ -1303,6 +1389,64 @@ approach as earlier passes so the tree stayed clean:
 A separate matrix over shuffled FILE order (the same four seeds, plus sorted
 and reversed) also passed, which is the weaker property but the one a suite
 owner invoking `run.sh` on one directory actually gets.
+
+### After pass 19 (`e00a214`) — counts and order independence
+
+**2,987 collected, 2,987 pass, 0 fail.** Delta against gate 8's `1b1b56e`
+baseline of 2,977, measured by comparing collected node ids rather than counted
+by hand: **+12 node ids added, −2 removed, net +10, and 5 more changed in
+place.**
+
+**The two removals are not a coverage reduction and are named as such.** They
+are the pre-parametrisation ids of
+`test_every_anomaly_states_the_threshold_in_force` and
+`test_each_kind_labels_its_own_fields_in_its_own_words`, both of which survive
+as parametrised sets of 4 and 3 respectively — a scenario that checked one case
+became one that checks all of them. **No scenario was deleted in this pass, and
+no scenario asserts less than it did.**
+
+| Suite | At `1b1b56e` | At `e00a214` | Delta |
+|---|---|---|---|
+| unit/integration | 2,302 | **2,309** | **+7** |
+| functional | 355 | **358** | **+3** |
+| architecture | 28 | 28 | — |
+| security | 14 | 14 | — |
+| red-team | 61 | 61 | — |
+| industry | 23 | 23 | — |
+| ux | 194 | 194 | — |
+| **total** | 2,977 | **2,987** | **+10** |
+
+**Added (12):** the whole-surface disclosure guard; the two
+`unregistered_actors` scenarios; `AC-F38-01`'s every-card scenario;
+`no_two_kinds_share_a_label`; `obligation_gap`'s label scenario at 3
+parametrisations (it named 2 of the 3 kinds by hand and now runs the mapping);
+`distribution_outlier`'s threshold scenario at 4 (it ran 1 case, above only).
+
+**Changed in place (5), each asserting strictly more:** `AC-F5-07`'s two
+scenarios, the `AC-F5-02` disclosure scenario (it now follows the four agent
+links), `AC-F40-16` (every register entry, not `entries[-1]`), and the export
+reconstruction-field scenario (two dossiers, not `dossiers[0]`).
+
+**Order independence verified at `e00a214`**, with an out-of-tree plugin salted
+on a token that `grep -rl` finds nowhere in `dev/`, so no suite can recognise
+it. Seven whole-tree runs, all 2,987 pass, exit 0:
+
+| Ordering | Result | Wall | Order fingerprint |
+|---|---|---|---|
+| canonical (control) | 2,987 pass, exit 0 | 222s | `4a9b46c1…` |
+| file order | 2,987 pass, exit 0 | 219s | `4a9b46c1…` |
+| `reverse` | 2,987 pass, exit 0 | 226s | `16f41929…` |
+| `seed:1` | 2,987 pass, exit 0 | 266s | `3d2e0c14…` |
+| `seed:7` | 2,987 pass, exit 0 | 267s | `88dab037…` |
+| `seed:42` | 2,987 pass, exit 0 | 264s | `ac629eda…` |
+| `seed:20260731` | 2,987 pass, exit 0 | 262s | `7330ba7d…` |
+
+File order fingerprints identically to canonical, which is expected — pytest
+already collects in file order — and is reported rather than presented as a
+seventh distinct sequence. All seven dumps carry the same 2,987 node ids
+(`sort | md5` identical), so no ordering silently dropped a scenario. All six
+suite entry points exit 0. `dev/var/broker_db.sqlite3` is byte-identical
+(`a638fc51…`) after every run.
 (261 until the gate-9 loop-back: `FUNCTIONAL_SPEC` §27.11's arithmetic said
 "262 issued, 261 live (186 + 77 − 1)" and 186 + 77 is 263. Corrected in the
 spec at v1.1.1; **no ID was renumbered, added or removed**.)
@@ -3001,6 +3145,28 @@ its guarantee and its one-host bound.
 | # | Spec | Built instead | Unmet criterion / consequence |
 |---|---|---|---|
 | 34 | `AC-F5-02`'s population — *"an agent that has been deployed and has **performed at least one action**"* appears in the Inventory with its identity, entitlements and version — together with `AC-F5-03`/`-05`'s lineage completeness over an agent's artefacts | the Inventory is a projection of the **principal registry**, and lineage is a traversal of the **decision ledger**. Neither population is the criterion's population | **`AC-F5-02`, `AC-F5-03` and `AC-F5-05` are NOT VERIFIED and are claimed by no scenario.** Two faces of one gap, both found by gate 8 at pass 17. (a) **Five agents authored findings in the pilot close and four are absent from `/inventory`** — `agent.crossperiod-surveillance`, `agent.omission-detector`, `agent.anomaly-detect`, `agent.fidelity-check` — because the run's author ids and the registry's principal ids are not the same strings. The covering scenario asserted `inventory == principals.DIRECTORY`, **the projection against its own source, an equality that cannot fail for the reason the criterion is about**. (b) **Seven evidence dossiers exist and zero appear in any lineage**, while every row reported `complete=True` — a partial list returned labelled complete, which is precisely what `-05` forbids. **Why it is not closed in this pass:** reconciling the ids means either registering four principals the F5 compile step never produced — the manual registration step `-02` itself forbids, and it would fabricate entitlements for agents that never went through registration — or renaming author ids to registry ids when two of the four have no registry counterpart at all. Both invent governance facts. **What was built instead:** the incompleteness is stated on the face of the surfaces that have it. `/inventory` names all four absent agents, links each to its agent page, and says `AC-F5-02` is not met; the unqualified sentence *"An agent that can act is an agent that is listed"* is gone from that screen. Every lineage row states its **scope** (`decision_ledger`), is labelled **INCOMPLETE**, and names the artefact classes it could not traverse, from `ges/main.py:LINEAGE_UNTRAVERSED` — declared at the broker, because the label belongs to the thing making the claim. `/ges/inventory` additionally returns `unregistered_actors`, the broker's own answer to the population question computed from its ledger. The two scenarios are rewritten to assert against **the agents that actually authored findings** and against **the dossiers that actually exist**, so each fails if the gap moves in either direction — including if the ids are reconciled and the disclosure is left behind. Closing it needs the F5 registration path to be the same id space the run authors under, which is a registry change, not a rendering one |
+
+**Corrections to entries 33 and 34 at pass 19 — no entry opened, closed or
+narrowed.** Two sentences of entry 34 were accurate when written and are no
+longer the whole picture, so they are amended here rather than silently
+outgrown.
+
+- *"the unqualified sentence … is gone **from that screen**"* — literally true,
+  and gate 8 found the same sentence standing in the subtitle of all four
+  `/evidence/agent/<id>` pages that screen links to. **The sentence is now on
+  no reachable screen**, and the guard that says so walks the whole reachable
+  surface plus the post-control documents instead of naming `/inventory`.
+- *"`/ges/inventory` additionally returns `unregistered_actors`, the broker's
+  own answer to the population question computed from its ledger"* — accurate
+  about the method, and the method cannot answer the question: findings are not
+  ledger-recorded, so the field could not become non-empty. It now returns
+  **UNKNOWN rather than an empty list**, in register 33's convention C2 shape,
+  and is rendered on `/inventory` and asserted by two scenarios. **Register
+  33's convention therefore now has a second application in the build**, which
+  is the point of recording a convention rather than a fix.
+- Entry 34's third "built instead" claim — the `/inventory` links to each
+  absent agent's page — was held by no scenario and is now followed and
+  asserted. All three parts of that list are mutation-held as of pass 19.
 
 **Thirty-four entries as of pass 18. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
 are CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
