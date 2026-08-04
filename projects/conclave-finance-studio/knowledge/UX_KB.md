@@ -320,6 +320,13 @@ than the risky one. `AC-F41-13` requires only that approve not be the *only*
 visible terminal action; I have gone further and removed it from the generic
 case entirely.
 
+> **Editorial marker (gate 7, pass 23) — `AC-F41-13` is RETIRED.** Retired
+> 2026-08-03, body preserved, replaced by `AC-F41-22`/`-23`/`-24`; see
+> `FUNCTIONAL_SPEC` §28.1 (and §20). The reasoning above stands and is
+> `ui-ux-designer`'s — only the ID's tense is corrected here, because a
+> live-tense reference to a retired ID is how a retired ID gets re-adopted.
+> The clause this paragraph relies on is now `AC-F41-24`.
+
 **Resolution typing (`AC-F35-09`, `AC-F35-05`).** All six types are one row of
 six **equal-sized, equal-weight** buttons, fixed order R1–R6, none
 pre-selected. R2 (data-side fix) and R5 (handoff) — the majority outcome per
@@ -546,7 +553,7 @@ are listed alongside (`AC-REFUSAL-07`).
 |---|---|---|
 | **Ask** | `AC-F38-14`, `AC-F39-09`, `AC-REFUSAL-03` | §3 coverage meter + declared-population panel + NL input + resolved query; §4 inline A19 refusal |
 | **Exceptions** | `AC-F26-10`, `AC-F28-10`, `AC-F29-12`, `AC-F33-12`, `AC-F42-08`, `AC-F41-09`, `AC-F41-10`, `AC-F38-15` | §5 queue with per-type labels, five-check table, backtest panel; §6 zero-pending state |
-| **Review** | `AC-F35-09`, `AC-F36-18`, `AC-F40-11`, `AC-F41-01`–`06`, `AC-F41-13` | §7 risk band, in-force panel, six-button resolution row, structured reject; §9 journal lines |
+| **Review** | `AC-F35-09`, `AC-F36-18`, `AC-F40-11`, `AC-F41-01`–`06`, ~~`AC-F41-13`~~ (RETIRED 2026-08-03 — `FUNCTIONAL_SPEC` §28.1; now `AC-F41-22`/`-23`/`-24`) | §7 risk band, in-force panel, six-button resolution row, structured reject; §9 journal lines |
 | **Dispositions** | `AC-F32-09`, `AC-F35-07` | §12 open-items table with missed vs within-horizon; zero-open state |
 | **Catalogue** | `AC-F38-01`, `AC-F38-12`, `AC-F38-13` | §13 full-attribute table, failed tie-out row, no-certified-datasets state |
 | **Monitors** | `AC-F9-08`, `AC-F12-08`, `AC-F32-10`, `AC-F36-19`, `AC-F41-07` | §14 hit-rate masthead, tiles incl. explicit zero, per-user table, escalations |
