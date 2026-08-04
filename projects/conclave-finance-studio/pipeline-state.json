@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 8 \u2014 Test (re-run after the pass-18 loop-back)",
+  "position": "Gate 8 \u2014 Test (re-run after pass 19)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -113,7 +113,7 @@
       "participants": [
         "code-agent"
       ],
-      "note": "Pass 18 closed gate 8's two blocking findings. Orphaned-style-rule checker added with NO_EXEMPTIONS empty AND ASSERTED EMPTY. AC-F5-02/-03/-05 left NOT VERIFIED (register 34) rather than reconciled by inventing governance facts."
+      "note": "Pass 19 closed gate 8's F1/F2/F3. Sampling sweep over 39 candidates found 5 real defects. 2,987 scenarios, seven orderings."
     },
     {
       "n": 8,
