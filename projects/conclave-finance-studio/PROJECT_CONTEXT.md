@@ -1456,6 +1456,55 @@ undecided.
      exemption table, no dependency installed, `prod/` untouched, no server
      started, and the human's pilot on 8030 was left running and untouched.
 
+- **2026-08-04 — Gate 7 pass 23 (`code-agent`): the verbatim check that gate 8
+  mutated through, and the four live-tense `AC-F41-13` references.** Two
+  commits — `dev` @ `142c734`, parent @ `4ce9e55`. Cleanup gate 8 flagged as
+  advisory after it closed; not a loop-back. 3,037 → **3,038** scenarios
+  (+1 unit, 1 changed, 0 removed), exit 0 in all six orders.
+  1. **The fifth instance of the projection-against-its-own-source shape.**
+     `test_every_evidential_element_of_the_screen_is_in_the_artefact_verbatim`
+     compared `retained.render(...)` against `pages.approval_evidential_region
+     (...)` — the same call `retained.region` renders. It proved *artefact ==
+     region*, which is two names for one call agreeing with itself, and left
+     the join it is **named** for — *the screen's evidential content IS that
+     region* — asserted by nothing. Gate 8's M3b mutation (a second composition
+     of `in-force-panel` on the screen: same testid, same words, different
+     bytes) passed 89 retained-view scenarios. Weaker than the earlier four —
+     smoke S32 catches it over HTTP and the property does hold — but the
+     unit-level check did not earn its name. Register 34, `AC-F5-02`,
+     `obligation_gap`, `inventory == principals.DIRECTORY`, and now this.
+  2. **The left-hand side is the screen now.** The elements walked come from
+     `pages.approval_detail` — what the route renders — minus only the ids
+     `NOT_RETAINED` classifies as chrome or controls with their reasons. M3b is
+     staged as a scenario of its own, which asserts **both** halves: the
+     name-based drift check is blind to a twin card (it still produces a file)
+     and the verbatim comparison refuses it. Re-verified by re-applying the
+     mutation to `pages.py` itself in both shapes — appending a twin, and
+     replacing the region's panel with a second composition: under the previous
+     test file the whole tree went green; under this one the named check fails,
+     and in the replacement shape it is the **only** failure.
+  3. **Judgement calls.** (a) The comparison subtracts `NOT_RETAINED` rather
+     than walking the raw screen, because the chrome/control classification is
+     a declared, reasoned list that a separate scenario already holds to real
+     ids — subtracting it keeps this check about drift rather than re-deciding
+     what is evidence. (b) The test reads a top-level testid through **its own**
+     three-line accessor rather than `retained._testid`, so no further piece of
+     the comparison sits on the producer's side of it.
+  4. **`AC-F41-13` in `ui-ux-designer`'s artefacts.** `UX_KB` §5.4 and its §6
+     traceability table, and `design-review/index.html`'s two criterion chip
+     lists for §7, read as though the ID is live. The designer's reasoning is
+     untouched; only the ID's tense is marked, with a pointer to
+     `FUNCTIONAL_SPEC` §28.1 and to `AC-F41-22`/`-23`/`-24`. `dev/` remains at
+     **0** occurrences, re-verified.
+  5. **What this pass did NOT do.** Neither of `plan-agent`'s two open
+     questions was touched, and the style-inlining residual was left for
+     `solution-architect` at gate 10. Nine forbidden criteria are claimed
+     nowhere. No guardrail moved to the UI, no free-form SQL or SQL-typed
+     parameter, no Oracle posting credential, no journal-submission library, no
+     suite stubbed green, no exemption table, no dependency installed, `prod/`
+     untouched, no server started, and the human's pilot on 8030 (pid 78317)
+     was left running and untouched.
+
 ## Current Status
 
 ### Screen architecture after pass 17 (`UX_KB` Part A2 built)
