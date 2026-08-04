@@ -1390,6 +1390,72 @@ undecided.
      dependency installed, `prod/` untouched, and no server started — the
      human's pilot on 8030 was left running and untouched.
 
+- **2026-08-04 — Gate 7 pass 22 (`code-agent`): the retained view is DERIVED
+  from the approval screen, and a drift check now fails when the screen gains an
+  element the artefact does not carry.** Two commits (`5cd4a85`, `7757e0d`).
+  One item, per the orchestrator's ruling that completing `AC-F41-04` is not new
+  scope: the criterion did not change, the screen did, and the retained view had
+  to follow it. 2,997 → **3,037** scenarios (+33 unit, +7 functional), all
+  green in file order and in five permutations.
+  1. **What was wrong was structural, not a missing card.**
+     `state._retained_view` hand-assembled a five-row summary — account,
+     finding, riskiest element, why, amount — composed separately from the
+     screen and joined to it by nothing. It had drifted from three criteria at
+     once: `AC-F41-23`'s detection evidence (put on the approval screen at pass
+     21, never added here), `AC-F40-11`'s explicit *"that same rendering is what
+     `AC-F41-04` retains"* (the journal lines were on the screen and not in the
+     artefact — `components.journal_lines`' own docstring asserted otherwise),
+     and `AC-F41-04`'s own named threshold and bundle version, neither of which
+     the artefact carried.
+  2. **There is now no second composition to drift.**
+     `pages.approval_evidential_region` is the one definition of the evidential
+     content of the approval act; `/approvals/<proposal>` renders it and
+     `app/ui/retained.py` renders the same call. A scenario asserts the artefact
+     contains each region element's **own rendered bytes**, not merely the same
+     words — a text comparison would pass on a summary that happened to agree
+     today and drift again on the next change.
+  3. **THE DRIFT CHECK, which is the part worth more than the fix.**
+     `retained.unclassified` walks the top-level elements of the real approval
+     screen and returns every one that is neither in the retained region nor
+     named in `retained.NOT_RETAINED` **with the reason it is not evidence**;
+     `render()` raises `RetainedViewDrift` on a non-empty result, so the
+     artefact refuses to be produced at all — `AC-F1-07`'s posture, since a view
+     that has silently stopped being the view IS a file presented as complete.
+     Verified by mutation: adding an unclassified card to `approval_detail`
+     fails the **export path**, not merely a unit. Every top-level element of
+     that screen now carries a `data-testid`, because the check classifies by
+     id and "the check could not see it" must not equal "the check approved it".
+     `NOT_RETAINED` holds only chrome and controls; it is not an exemption table
+     for criteria, and a scenario requires every name in it to be a real id used
+     by `pages` and to carry a reason.
+  4. **Two judgement calls, both disclosed rather than folded in.**
+     (a) `C.in_force_panel` now renders on `/approvals/<proposal>`. `AC-F41-04`
+     requires the threshold and bundle version in the artefact and `AC-F41-05`
+     requires them visible **at approval time**; approval time moved to this
+     screen at pass 17, so the clause followed the button exactly as `AC-F41-23`
+     and `AC-F41-24` did. Retaining them without showing them would have been
+     the same defect from the opposite direction — an artefact carrying a fact
+     the approver was not shown. (b) `approval_subject` states the item, the
+     account, the finding and the **amount** as facts; they were on that screen
+     only inside a link's text, which is a label of a destination rather than a
+     fact stated there, and the navigation card carries anchors so it cannot
+     itself be in an artefact opened from a file.
+  5. **RESIDUAL, stated rather than left silent.** `ARCHITECTURE_KB` §9.4 says
+     the retained artefact is **style-inlined**; the `/dossier/<id>` exhibit is,
+     and the export's per-dossier `rendered_view` still is not — it is unstyled
+     markup, as it was before this pass. Inlining `chrome.stylesheet()` is
+     mechanically safe (20 KB, deterministic, no `url(`, no absolute URL) but
+     would add roughly 280 KB to the export file, which genuinely is a change to
+     what an export contains and is not required by the text of `AC-F41-04`.
+     Flagged for `solutions-architect` rather than decided here.
+  6. **What this pass did NOT do.** Neither of `plan-agent`'s two open questions
+     was touched. Nine forbidden criteria are claimed nowhere and `AC-F41-13`
+     stays absent from both trees including docstrings. No guardrail moved to
+     the UI, no free-form SQL or SQL-typed parameter, no Oracle posting
+     credential, no journal-submission library, no suite stubbed green, no
+     exemption table, no dependency installed, `prod/` untouched, no server
+     started, and the human's pilot on 8030 was left running and untouched.
+
 ## Current Status
 
 ### Screen architecture after pass 17 (`UX_KB` Part A2 built)
@@ -1431,6 +1497,23 @@ hazard was relocated rather than removed. The finding screen's *absence* of an
 approve control is unchanged and is now specified rather than merely honoured
 (`AC-F41-22`). `/inventory` additionally lists the agents it knows only by
 authorship, with each unheld value naming the registry gap (`AC-F5-08`).
+
+**Amended at pass 22 — the retained view is a rendering of that screen, not a
+description of it.** `AC-F41-04`'s artefact used to be hand-assembled in
+`state._retained_view`. It is now `app/ui/retained.py` rendering
+`pages.approval_evidential_region`, which is the same call
+`/approvals/<proposal>` renders — one composition, so the screen and the
+artefact cannot disagree. That screen additionally carries `in-force-panel`
+(threshold and bundle version, `AC-F41-04`/`AC-F41-05`, which followed the
+approve button to this screen) and `approval-subject` (the item, account,
+finding and amount as facts rather than as a link's label). Every top-level
+element of the screen is classified: it is either in the evidential region and
+therefore retained, or named in `retained.NOT_RETAINED` with the reason it is
+not evidence — the approve form, the rejection form and the navigation are
+excluded because an artefact opening from a file, offline, must contain no
+control and no anchor (`ARCHITECTURE_KB` §9.4). An element in neither list makes
+`retained.render` raise, so the auditor export refuses to be produced rather
+than shipping a view that has quietly stopped being the view.
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
 
