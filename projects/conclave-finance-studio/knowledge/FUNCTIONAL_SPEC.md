@@ -4,7 +4,11 @@
 **Status**: proposed under standing authorization (`batch_authorized`).
 **Pass 2 (2026-07-31)** — gate-4 loop-back after gate 6. Pass-1 content stands as
 written; everything issued at the loop-back is in **§27**, and §20 carries the one
-retired ID. This file is a durable
+retired ID.
+**Pass 3 (2026-08-03)** — gate-4 loop-back from gate 9's Verification block.
+Three rulings in **§28**: `AC-F41-13` retired and replaced by `AC-F41-22`–`-24`;
+`AC-F5-07`'s population ruled and `AC-F5-08` issued; §23's screen table re-keyed
+to routes. §20 now carries two retired IDs. This file is a durable
 knowledge base: it accumulates across features and enhancements, and it is what
 `verification-agent` audits against at the Verification gate.
 
@@ -774,10 +778,23 @@ as incomplete because it does not require good explanations has misread it.
 - **When** an approver attempts to approve it
 - **Then** the approval is blocked, and the block names the superseding run and its completion time
 
-### AC-F41-13 — observable UI
+### AC-F41-13 — observable UI — **RETIRED 2026-08-03 (pass 3), see §20 and §28.1**
 - **Given** a signed-in user with at least one pending proposal
 - **When** they open the Review screen for that proposal
 - **Then** the proposal's evidence set, the approve control, the structured-reject control and the resolution-type control are all visible on that screen, and the approve control is not the only visible terminal action
+
+> **Retired, body preserved.** This criterion asserts the **co-visibility** of
+> four elements on one screen. The approved design (`UX_KB` §5.4, gate 5) removes
+> the approve control from the finding screen entirely, and the human-approved
+> pass-17 IA gives the approve act its own object and screen. Under that IA no
+> single screen can carry all four, so the criterion's meaning changes materially
+> and §0 requires a new ID rather than a rewrite. **It is replaced by three IDs,
+> which together assert strictly more than this one did**: `AC-F41-22`
+> (finding-screen co-visibility), `AC-F41-23` (evidence beside the approve
+> control) and `AC-F41-24` (approve is not the only visible terminal action on
+> the screen that carries it). Nothing is dropped and nothing is weakened; see
+> §28.1 for the ruling, including why the resolution-type element does not follow
+> the approve control to the approval screen. **No check may bear this ID.**
 
 ---
 
@@ -912,6 +929,33 @@ Obligations D, G.
 - **Given** a signed-in user and at least one deployed agent
 - **When** they open the Inventory screen
 - **Then** the agent inventory is visible listing each agent, its version and its entitlements, and a lineage view for a selected agent version is reachable from that list
+
+> **Ruling 2026-08-03 (pass 3) — what "each agent" quantifies over.** Gate 9 asked
+> whether `AC-F5-07`'s *each agent* includes agents that acted without a registry
+> entry, or whether that population belongs wholly to `AC-F5-02`. **It includes
+> them.** `AC-F5-02` and `AC-F5-07` are not two populations; they are two
+> assertions over one. `AC-F5-02` fixes the population — *an agent that has been
+> deployed and has performed at least one action* — and asserts that it reaches
+> the Inventory **without a manual registration step**. `AC-F5-07` asserts what
+> the Inventory screen **renders for the agents in it**. Reading `each agent` as
+> "each agent holding a registry entry" makes `AC-F5-07` satisfiable by the
+> projection of the registry onto itself, which is exactly the tautology gate 8
+> found in `AC-F5-02`'s own scenario, relocated one criterion to the right. An
+> agent that authored an artefact and is absent from the Inventory is the
+> obligation-D failure both criteria exist to make visible.
+>
+> **Consequence, stated plainly and not softened:** while agents that authored in
+> a run are absent from the Inventory, `AC-F5-07` is **not met**, for the same
+> cause already disclosed under `AC-F5-02`. Two criteria failing for one cause is
+> the normal case; it is not a reason to narrow either. `AC-F5-08` below covers
+> the boundary case `AC-F5-07` was silent on, and **satisfying `AC-F5-08` does
+> not satisfy `AC-F5-07`** — `AC-F5-07` is met only when each acting agent's
+> actual version and entitlements render.
+
+### AC-F5-08 — observable UI
+- **Given** an agent that authored at least one artefact in a completed run and holds no entry in the principal registry under the identity it authored as
+- **When** a signed-in user opens the Inventory screen
+- **Then** that agent is present in the inventory listing under the identity it authored as, and for each of version and entitlements that the product does not hold for it, the listing states that the value is not recorded and names the registry gap — it is neither omitted from the listing nor rendered with a blank, a dash or a neighbour's value
 
 ---
 
@@ -1151,6 +1195,7 @@ are never shifted up to close the gap, and a retired ID is never reissued.
 | Retired ID | Date | Note | Replaced by |
 |---|---|---|---|
 | `AC-F12-08` | 2026-07-31 (pass 2) | Readable as a per-named-user probe score, which G-PROBE-3 prohibits and the gate-6 ruling 4 forbids. Meaning materially narrowed to aggregate-only, so replaced rather than rewritten. | `AC-F12-10` |
+| `AC-F41-13` | 2026-08-03 (pass 3) | Asserts four elements **co-visible on one screen**. The approved design removes the approve control from the finding screen (`UX_KB` §5.4) and the human-approved pass-17 IA gives the approve act its own screen, so no screen in the approved IA can carry the set. Meaning changes materially; replaced, not rewritten. Split across three IDs asserting strictly more in total. | `AC-F41-22`, `AC-F41-23`, `AC-F41-24` |
 
 **No criterion referencing the ≥95%-precision promotion gate was ever issued**, so
 `RESPONSIBLE_AI_KB` §6's inversion finding retires nothing here. The gate lives in
@@ -1183,6 +1228,10 @@ file rather than a search.
 > record of what pass 1 issued and are not restated; §27.11 carries the pass-2
 > additions and the current file total of **263 issued, 262 live**
 > (arithmetic corrected at the gate-9 loop-back; see §27.11).
+>
+> **Pass 3 (2026-08-03)** issued four further criteria (`AC-F41-22`, `-23`, `-24`,
+> `AC-F5-08`) and retired `AC-F41-13`. File total: **267 issued, 265 live**, two
+> retired (`AC-F12-08`, `AC-F41-13`). Per-feature deltas in §28.4.
 
 ### 22.1 Criteria per feature
 
@@ -1287,17 +1336,32 @@ bundle checks and to API tests by construction. Each criterion below is written
 as *"the X is visible on the Y screen in state Z"*, never as *"the X exists"* or
 *"the X is imported"*.
 
-| Screen | Criteria requiring something visible on it |
+**Updated 2026-08-03 (pass 3). This table now maps criteria to _routes_, not to
+screen names.** The pass-1 table named Exceptions / Review / Monitors and went
+stale the moment the human-approved pass-17 IA landed — screen names are
+descriptive per §0 and `ui-ux-designer` owns them, so a table keyed on names is
+guaranteed to rot. A route is the stable join key a future audit can actually
+follow. **A route named here is a statement about where a criterion must be
+checkable, not a design instruction**: if the IA moves a criterion's full element
+set to a different route, this table is re-pointed (see §28.1 for the rule
+governing when that is legitimate and when it is not).
+
+| Route | Criteria requiring something visible on it |
 |---|---|
-| **Ask** | `AC-F38-14`, `AC-F39-09`, `AC-REFUSAL-03` |
-| **Exceptions** | `AC-F26-10`, `AC-F28-10`, `AC-F29-12`, `AC-F33-12`, `AC-F42-08`, `AC-F41-09`, `AC-F41-10`, `AC-F38-15` |
-| **Review** | `AC-F35-09`, `AC-F36-18`, `AC-F40-11`, `AC-F41-01`–`AC-F41-06`, `AC-F41-13` |
-| **Dispositions** | `AC-F32-09`, `AC-F35-07` |
-| **Catalogue** | `AC-F38-01`, `AC-F38-12`, `AC-F38-13` |
-| **Monitors** | `AC-F9-08`, `AC-F12-10` (replacing the retired `AC-F12-08`), `AC-F32-10`, `AC-F36-19`, `AC-F41-07`, `AC-F41-19` |
-| **Inventory** | `AC-F5-07` |
-| **Audit** | `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-04` |
-| **Refusals** | `AC-REFUSAL-01`, `AC-REFUSAL-02` |
+| `/ask` | `AC-F38-14`, `AC-F39-09`, `AC-REFUSAL-03` |
+| `/queue` (also served at `/exceptions`, `/review`) | `AC-F29-12`, `AC-F42-08`, `AC-F41-09`, `AC-F41-10`, `AC-F38-15` |
+| `/review/<item>` — the **finding** object | `AC-F35-09`, `AC-F36-18`, `AC-F40-11`, `AC-F41-01`–`AC-F41-06`, **`AC-F41-22`**, `AC-F41-20` |
+| `/proposal/<id>` — the **artefact** object | `AC-F40-11`'s journal-line rendering |
+| `/approvals` and `/approvals/<proposal>` — the **approval** object | **`AC-F41-23`**, **`AC-F41-24`**, `AC-F41-01` (no bulk affordance on the list) |
+| `/evidence/run/<id>` — the **run** object | `AC-F26-10`, `AC-F28-10`, `AC-F33-12` (relocated intact from the pass-1 Exceptions screen; admitted at gate 9) |
+| `/dispositions` | `AC-F32-09`, `AC-F35-07` |
+| `/catalogue` | `AC-F38-01`, `AC-F38-12`, `AC-F38-13` |
+| `/monitors` | `AC-F9-08`, `AC-F12-10` (replacing the retired `AC-F12-08`), `AC-F32-10`, `AC-F36-19`, `AC-F41-07`, `AC-F41-19` |
+| `/inventory` | `AC-F5-07`, **`AC-F5-08`** |
+| `/audit` | `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-04` |
+| `/refusals` | `AC-REFUSAL-01`, `AC-REFUSAL-02` |
+
+`AC-F41-13` appears nowhere in this table: it is retired (§20, §28.1).
 
 Two features are predominantly backend and their observable-UI criteria are
 correspondingly narrow, stated here so the narrowness is visible rather than
@@ -2037,3 +2101,211 @@ gate that owns it.
    Decisions Log — the refusal surface has feature ID F50, and F42's cut-marking
    is withdrawn. §25 is left as written, since it is the record of what was found
    at pass 1.
+
+---
+
+## 28 · Pass 3 — the gate-9 criterion rulings (2026-08-03)
+
+Gate 9 Verification blocked on `AC-F41-13` and raised two further ambiguities.
+Three rulings, four new IDs, one ID retired in place. **No feature is added,
+removed, deferred or re-cut here, and no design decision is overturned.**
+
+### 28.1 · Ruling 1 — `AC-F41-13`: a split element set is not a relocation
+
+**The question.** Does §0's IA-ownership clause permit one criterion's element
+set to be **split across two screens**, or only relocated intact?
+
+**Ruling: only relocated intact. A split is not a relocation, and §0 does not
+license it.**
+
+§0 says screen names are descriptive and `ui-ux-designer` owns the final IA. What
+that clause licenses is re-pointing the **Y** in "X must be visible on screen Y".
+It says nothing about **X**, and it cannot, because the element set is the
+criterion. Where a Then-clause is conjunctive — *A, B, C and D are all visible on
+that screen* — the conjunction **is** the assertion. `AC-F41-13`'s subject is
+co-visibility at the moment of decision: whether the person about to commit sees
+the alternatives to committing in the same field of view. Distributing A and B to
+one screen and C and D to another satisfies neither half of that; it satisfies
+the vocabulary and abandons the claim. The gate-9 admission of F26/F28/F33 to
+`/evidence/run/<id>` was correct on exactly this test — those sets **moved
+whole** — and the same test is why `AC-F41-13` does not close.
+
+The mechanical harm is the one this pipeline has now met three times
+(`AC-F12-05` at register 18, `AC-F5-02` at register 34, this): a scenario bearing
+the bare ID asserts a strict subset and passes, and a by-ID mapper scores the
+whole criterion satisfied. `test_AC_F41_13_the_evidence_the_resolution_and_the_reject_control_are_all_visible`
+asserts three of four elements and lives in a class whose two sibling scenarios
+assert the fourth element's **absence** from the same screen. The suite is not
+wrong — it is a faithful test of the approved design. The **ID on it** is wrong.
+
+**Which screen is "the Review screen for that proposal"?** Under the pass-17 rule
+that every object gets one canonical page, the three candidates are three
+different objects: `/review/<item>` is the **finding**, `/proposal/<id>` is the
+**artefact**, `/approvals/<proposal>` is the **approval**. `AC-F41-13`'s Given
+names *a pending **proposal*** and its When is the screen on which that proposal
+is disposed of. That is `/approvals/<proposal>`. The finding screen is not the
+successor screen; it is a different object that the criterion also happened to
+describe when one screen did both jobs.
+
+**And so the honest finding, which is larger than the bookkeeping one.** Gate 5
+removed the approve control from the finding screen and, as `UX_KB` A2.4 itself
+records, the deliberate act it implies *"was never given a screen, an object or a
+state"* — honoured subtractively. Pass 17 gave it one. But on that new screen
+**the approve control is the only visible terminal action**, which is the precise
+condition `AC-F41-13`'s final clause was written to forbid. The clause did not
+stop applying when the button moved; it followed the button. The hazard was not
+removed from the product at gate 5 — it was relocated, and arrived unaccompanied.
+
+This is **not** an argument for restoring an approve control to the finding
+screen. That decision is `ui-ux-designer`'s, it was argued and approved at gate 5,
+it is correct, and it stands untouched — `AC-F41-22` below writes its **absence**
+into the specification so no later pass can re-add it by accident.
+
+Nor is the counterweight new scope. `AC-F41-06` already reads *"Given an approver
+**rejecting a proposal**"* — an approver-facing rejection path for a proposal is
+approved behaviour that has been in this specification since pass 1. What
+`AC-F41-24` requires is that it be **visible where the approving happens**, which
+is a rendering requirement on approved behaviour, not a new capability.
+
+**Replacement IDs.** `AC-F41-13` is retired (§20). Three IDs replace it. Together
+they assert strictly more than it did: the co-visibility claim survives on both
+screens rather than being traded away, and the finding screen's *absence* of an
+approve control becomes assertable, which the original never made it.
+
+#### AC-F41-22 — observable UI
+- **Given** a signed-in user with at least one finding awaiting disposition
+- **When** they open the canonical screen for that finding
+- **Then** the finding's evidence set, the resolution-type control and the structured-reject control are all visible on that screen together, none of them behind a disclosure control, and **no control that approves anything is visible on that screen at any permission level**
+
+#### AC-F41-23 — observable UI
+- **Given** a signed-in approver and a proposal awaiting a deliberate approval
+- **When** they open the screen that carries the approve control for that proposal
+- **Then** the evidence the proposal rests on is visible on that same screen — the detection evidence, not only the artefact's own journal lines — and it is readable without following a link, opening a disclosure control or leaving the screen
+
+#### AC-F41-24 — observable UI
+- **Given** a signed-in approver and a proposal awaiting a deliberate approval, on the screen that carries the approve control
+- **When** that screen is rendered in the state in which the approve control is visible
+- **Then** at least one terminal action that does **not** approve the proposal is visible on that same screen, no less reachable than the approve control and not behind a disclosure control, so the approve control is never the only visible terminal action
+
+**Deliberately not carried over: the resolution-type control.** `AC-F41-13` named
+it as a fourth element and `AC-F41-23`/`-24` do not. This is a ruling, not an
+omission, and it is the one place where the replacement set is narrower than the
+original — so it is stated where a reader will trip over it. Resolution typing
+R1–R6 is a property of a **finding**: it is the act by which a reviewer chooses
+between six outcomes, of which only R3/R4 produce a proposal at all. By the time
+a proposal exists, that choice is made. The anti-default protection the
+resolution row provides — six equal-weight options, none pre-selected, no safe
+outcome more effortful than a posting one (`AC-F35-05`, `AC-F35-09`) — is
+delivered once, at the point of choice, and `AC-F41-22` now binds it there.
+Requiring R1–R6 beside the approve control would ask the approver to re-type a
+resolution that is already recorded, and would contradict the approved design
+without protecting anything the design does not already protect. **What is not
+dropped is the reason the fourth element was there**: that approve must not stand
+alone. `AC-F41-24` carries that whole, on the screen where it now bites.
+
+**What `code-agent` must do.**
+
+1. **Remove the `AC-F41-13` ID from every check that bears it.** The scenario
+   itself is sound and should be kept — re-point it at **`AC-F41-22`** and extend
+   it to assert what its two sibling scenarios in `TestNoApproveControlHere`
+   already assert, so that one ID's evidence is not spread across three
+   independently-named scenarios. No ID may name `AC-F41-13` after this pass.
+2. **`AC-F41-23`** — the detection evidence must render on the approval screen
+   itself. It is currently reachable only through `approval-finding-link`. Note
+   the independent reason this matters: `AC-F41-04` retains *the rendered view
+   the approver was shown*, and `UX_KB` §5.4 already rules that nothing at
+   approval time may be reachable only by hover or lazy load — evidence behind a
+   link is evidence absent from the retained artefact, which is obligation A
+   failing quietly.
+3. **`AC-F41-24`** — a non-approving terminal action must be visible on
+   `/approvals/<proposal>`. `/proposal/<id>/override` is **not** it: an override
+   is a path *to* approval with a second authoriser, not an alternative to it.
+   `AC-F41-06`'s structured rejection currently posts only from the finding
+   route. **How this renders, what it is called and where it sits are
+   `ui-ux-designer`'s to decide, not mine and not `code-agent`'s** — the criterion
+   requires only that a non-approving terminal action be visible there and no
+   harder to reach than approving.
+4. **`AC-F41-01` still binds on the approval screen** and is unaffected: a
+   non-approving action is a per-proposal action, and nothing here permits an
+   affordance acting on more than one proposal.
+
+**If item 3 is not built, `AC-F41-24` is a disclosed unmet criterion** and must be
+recorded as one, joined to this ruling. That is an acceptable outcome and this
+project already carries eight. What is **not** acceptable is a check bearing
+`AC-F41-24` that asserts anything less than the whole of it.
+
+### 28.2 · Ruling 2 — `AC-F5-07`'s "each agent"
+
+Ruled in place at §15, beside the criterion, so a reader meets the ruling where
+they meet the ID. In summary: **one population, two assertions** — `AC-F5-02`
+fixes the population and asserts it arrives without manual registration;
+`AC-F5-07` asserts what the Inventory renders for it. The build's split is not
+supported by the text, and reading `each agent` as "each registered agent" makes
+the criterion satisfiable by the registry's projection onto itself — the tautology
+gate 8 already found once. `AC-F5-07` is therefore **not met** while agents that
+authored in a run are absent from `/inventory`, for the cause already disclosed
+under `AC-F5-02`. **`AC-F5-08`** is issued for the boundary case `AC-F5-07` was
+silent on: what the Inventory must render for an agent it knows only by
+authorship. Satisfying `AC-F5-08` does not satisfy `AC-F5-07`.
+
+**Scope note, flagged not resolved.** `AC-F5-08` asks only that agents the
+product already knows about be *rendered*, on a screen that exists — that is a
+rendering requirement on approved feature F5 and is mine to issue. **Closing the
+underlying registry gap** (so those agents have a real version and real
+entitlements, which is what `AC-F5-07` needs) may be a scope question about
+principal registration. If `code-agent` finds it cannot be done without new
+scope, that is a **Plan-gate finding for the human**, not a criterion to weaken.
+
+### 28.3 · Ruling 3 — §23's screen table
+
+Maintenance, done: §23's table is re-keyed from **screen names to routes**, with
+`AC-F41-13` removed, the three new F41 IDs and `AC-F5-08` placed, and the
+F26/F28/F33 relocation to `/evidence/run/<id>` recorded where gate 9 admitted it.
+A table keyed on names that `ui-ux-designer` owns and §0 declares descriptive was
+guaranteed to rot; a route is a join key a future audit can follow.
+
+### 28.4 · Counts
+
+| Feature | Criteria before pass 3 | Retired | Issued | After |
+|---|---|---|---|---|
+| F41 | 21 | 1 (`AC-F41-13`) | 3 (`AC-F41-22`, `-23`, `-24`) | 23 issued, 22 live |
+| F5 | 7 | 0 | 1 (`AC-F5-08`) | 8 |
+
+All four new criteria are **observable-UI** criteria, each naming which component,
+on which screen, in which state. No feature loses observable-UI coverage in this
+pass: F41 gains two on a screen that previously carried none of its criteria at
+all, and F5's single observable-UI criterion becomes two.
+
+### 28.5 · Completeness check — binding decisions this pass was checked against
+
+`PROJECT_CONTEXT.md`'s Decisions Log re-read in full, plus every entry recorded
+since pass 2. Those that bind this pass:
+
+| Binding decision | How this pass satisfies it |
+|---|---|
+| **Gate 5 / `UX_KB` §5.4 — no Approve button on the Review screen, *"removed from the generic case entirely"*** | Not overturned, and now **specified**: `AC-F41-22`'s Then requires that no approving control be visible on the finding screen at any permission level. The decision moves from a design note into a checkable criterion, which is strictly safer for it. |
+| **2026-08-03 — the human-approved pass-17 UX redesign, Approvals as its own screen/object/state** | Accepted as the IA. `AC-F41-23`/`-24` are written against *the screen that carries the approve control* rather than against a route name, so they survive further IA change. |
+| **2026-08-03 pass 17, judgement call 1 — three addresses for one queue, because "a criterion pointing at a screen that no longer exists is a criterion nobody can check"** | Agreed and generalised: §23 is re-keyed to routes for this reason. |
+| **2026-07-30 — write-back with per-action approval, "the defining decision"** | `AC-F41-24` requires a per-proposal non-approving action; nothing here introduces an affordance acting on more than one proposal, so `AC-F41-01` is unweakened. `AC-F41-23` strengthens the evidential leg by requiring the evidence to be inside the artefact `AC-F41-04` retains. |
+| **`responsible-ai-architect` / `INDUSTRY_KB` §15.4 — no criterion may assert explanation quality** | Honoured. `AC-F41-23` requires the evidence set to be **present and not behind a control**. It says nothing about its clarity, wording, legibility or persuasiveness, and no later pass may read it as licensing that. |
+| **A3.2 approval-under-pressure; `DOMAIN_KB` §10.2 — if the UI makes the safe answer harder than the risky one, the risky one wins** | This is the substantive ground of ruling 1. A screen on which approving is the only visible act makes approving the only answer at 11pm. |
+| **Gate-6 ruling 4 / G-PROBE-3, and A24 — no per-named-person judgement surface** | Untouched; nothing in this pass renders anything about a named person. |
+| **Test Policy: all suites blocking, no advisory exceptions** | No criterion here is written that the build cannot be checked against; where the build cannot meet one, §28.1 requires it be recorded as a **disclosed unmet criterion** rather than narrowed. |
+| **Standing authorization; trust SME judgement** | Rulings made, not returned — except the two genuine scope questions in §28.6, which are `plan-agent`'s and the human's. |
+
+**Conflicts: none.** No binding decision is contradicted by this pass, and the one
+that came closest — gate 5's removal of Approve from Review — is reinforced
+rather than eroded.
+
+### 28.6 · Scope ambiguity found and **not** resolved in this pass
+
+1. **Closing the principal-registry gap behind `AC-F5-07`.** See §28.2. Rendering
+   the known-by-authorship agents is mine (`AC-F5-08`); giving them real registry
+   entries may not be. **Owner: `plan-agent`, then the human.**
+2. **Whether a proposal rejected at the approval screen returns to the finding's
+   queue, expires, or becomes a new resolution state.** `AC-F41-24` requires a
+   non-approving terminal action to be **visible**; `AC-F41-06` already specifies
+   that a rejection needs a structured reason and that the proposal stays pending
+   without one. Neither says what the proposal's lifecycle is afterwards. I have
+   deliberately not invented it — that is workflow scope. **Owner: `plan-agent`.**
+   Note that `AC-F41-24` is checkable without this being settled.

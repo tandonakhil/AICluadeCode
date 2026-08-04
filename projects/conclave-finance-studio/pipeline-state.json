@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 9 \u2014 Verification (final audit after the redesign)",
+  "position": "Gate 7 \u2014 Code (pass 21, implementing the AC-F41-13 ruling)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -107,8 +107,8 @@
     {
       "n": 7,
       "name": "Code",
-      "status": "done",
-      "approval": "batch_authorized",
+      "status": "active",
+      "approval": "pending",
       "date": "2026-07-31",
       "participants": [
         "code-agent"
@@ -129,13 +129,13 @@
     {
       "n": 9,
       "name": "Verify",
-      "status": "active",
-      "approval": "pending",
+      "status": "looped",
+      "approval": "request_changes",
       "date": "2026-08-03",
       "participants": [
         "verification-agent"
       ],
-      "note": "Must re-audit after pass 17 \u2014 the IA move touches observable-UI criteria."
+      "note": "253/262 VERIFIED, 0 FAILED, 8 NOT VERIFIED (all disclosed, dependency-bound), 1 CONTRADICTED: AC-F41-13's element set is split across two screens post-redesign, so no screen satisfies it while a passing scenario carries its bare ID."
     },
     {
       "n": 10,
@@ -189,6 +189,13 @@
       "resolved": true,
       "reason": "94 in-scope criteria unevidenced, dominated by four detector families never built (F26 10, F28 10, F9 8, F33 11). Plus 3 contradictions where a green check claims more than the register permits.",
       "resolution": "Pass 5: F26, F28, F9 and F33 built with 41 AC IDs newly evidenced. AC-F26-05 left NOT VERIFIED (no close clock, register 6). AC-F41-08 and AC-REFUSAL-11 left NOT VERIFIED with the reason recorded and no scenario naming either. AC-F12-20's dossier leg built, closing register 11. FUNCTIONAL_SPEC 27.11 arithmetic corrected to 263 issued / 262 live at v1.1.1, no ID renumbered."
+    },
+    {
+      "from_gate": 9,
+      "to_gate": 7,
+      "date": "2026-08-03",
+      "resolved": false,
+      "reason": "AC-F41-13 contradicted. functional-design-agent ruled: a split element set is not a relocation. AC-F41-13 retired in place; AC-F41-22/-23/-24 and AC-F5-08 issued. Spec now 267 issued / 265 live / 2 retired."
     }
   ],
   "updated": "2026-08-03",
