@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 8 \u2014 Test (final confirmation after pass 20)",
+  "position": "Gate 9 \u2014 Verification (final audit after the redesign)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -118,20 +118,20 @@
     {
       "n": 8,
       "name": "Test",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-08-03",
       "participants": [
         "test-agent"
       ],
-      "note": "CLOSED at dev@9d605b1. 2,774 scenarios, 8 suites, 0 failures, 9 whole-tree orderings, no override. 7th consecutive pass with no register contradiction."
+      "note": "CLOSED at dev@c428fe5. 2,988 scenarios, 9 suites, 0 failures, 6 orderings. 397 assert-bearing loops AST-instrumented with real iteration counts."
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "pending",
+      "status": "active",
       "approval": "pending",
-      "date": "2026-08-02",
+      "date": "2026-08-03",
       "participants": [
         "verification-agent"
       ],

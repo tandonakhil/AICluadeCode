@@ -1285,8 +1285,15 @@ undecided.
      a statement saying UNKNOWN rather than none. The ledger difference is
      still returned under a name that says what it is, because suppressing a
      true fact would be a second rounding. **Two scenarios**: one asserts the
-     SHAPE rather than the emptiness, so it survives the day findings become
-     ledger-recorded; the other joins `computable: False` to the
+     SHAPE rather than the emptiness, so it FAILS the day findings become
+     ledger-recorded — **corrected 2026-08-03**. This line originally said it
+     *survives* that day. It does not, and that is the design: an UNKNOWN is
+     honest only while the ledger cannot carry the answer, so the build change
+     that makes it answerable must force this scenario and its text to be
+     revisited. `c428fe5` corrected the docstring; this is the decision record
+     that generated the wrong one. A code record and a decision record that
+     disagree is the same defect class gate 8 spent five loop-backs finding —
+     which is why it is corrected here rather than left as history; the other joins `computable: False` to the
      `LINEAGE_UNTRAVERSED` entry that justifies it, so the UNKNOWN cannot
      outlive its reason.
   6. **The broker's answer is rendered on `/inventory`.** An answer only a
@@ -1689,6 +1696,113 @@ absent afterwards:**
 `AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
+
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **pass 20, FINAL CONFIRMATION, at `dev` @ `c428fe5`** (parent repo @ `67d0517`)
+
+**Both gate-8 findings are CLOSED, re-verified by re-running the original
+mutations rather than by reading the fixes. All seven automated suites
+EXECUTED, exit 0, 2,988 of 2,988 scenarios passed at every suite entry point
+and in SIX whole-tree runs. Smoke 29 of 29 against a served pilot. Rendered-UI
+13 of 13 in a real browser at two viewports, nothing inconclusive. No suite is
+`STATIC ONLY`. No blocking gate condition is unmet.**
+
+Structured per-scenario evidence: `test-evidence/*-2026-08-03.md` (15 files,
+16 screenshots), written this pass; the superseded set was deleted.
+
+#### Per-suite breakdown — never merged
+
+| Suite | Status | Scenarios | Result | Delta vs `e00a214` | Blocking |
+|---|---|---|---|---|---|
+| unit / integration (`backend/tests`) | **EXECUTED** | 2,310 | **2,310 pass, 0 fail** | **+1 added, 0 removed** | yes |
+| functional | **EXECUTED** | 358 | **358 pass, 0 fail** | 0 added, 0 removed, **2 changed** (1 of them docstring-only) | yes |
+| ux | **EXECUTED** | 194 | **194 pass, 0 fail** | unchanged | yes |
+| red-team | **EXECUTED** | 61 | **61 pass, 0 fail** | unchanged | yes |
+| architecture | **EXECUTED** | 28 | **28 pass, 0 fail** | unchanged | yes |
+| industry | **EXECUTED** | 23 | **23 pass, 0 fail** | unchanged | yes |
+| security | **EXECUTED** | 14 | **14 pass, 0 fail** | unchanged | yes |
+| post-deploy smoke (served pilot, 8021) | **EXECUTED** | 29 | **29 pass, 0 fail** | unchanged | yes |
+| rendered-UI — Playwright/Chromium, web | **EXECUTED** | 13 | **13 pass, 0 fail** | unchanged | yes |
+| rendered-UI — RNTL, native | **N/A — not applicable** | — | — | — | MVP1 is desktop web only |
+| rendered-UI — Maestro + simulator | **NOT BUILT** | — | — | — | no simulator on this machine (2026-07-26 spike, unchanged) |
+
+2,310 + 358 + 194 + 61 + 28 + 23 + 14 = **2,988**, exact. The only suite whose
+count moved is unit/integration, and the single addition is named.
+
+#### The two findings, closed by mutation and not by inspection
+
+- **Finding B — `obligation_gap`.** The comparison target moved out of the code
+  under test into a literal `EXPECTED_KIND_WORDS` table (`6da659e`). Rewording
+  all three `scheduled_reversal` labels to `"thing"`/`"when"`/`"how much"` —
+  the exact mutation that left the tree green before — **now fails**. Rewording
+  `summary`, a field never asserted in any earlier revision, **also fails**:
+  coverage widened from four worded fields to five. Adding a benign fourth kind
+  to `KIND_VOCABULARY` **fails three scenarios**, including the new key-set
+  companion, so a fourth kind cannot arrive comparing its labels to themselves.
+- **Finding A — `AC-F40-16`.** The scenario now drives the real export control
+  three times (`05be347`). Blanking the three facts on every register entry but
+  the last **now fails on the FULL TREE** (`1 failed, 2987 passed`) — at
+  `1b1b56e` that mutation could not fail at all. The guard-first ordering was
+  verified, not assumed: making re-export idempotent per proposal fails at
+  `assert register["count"] >= 3` (line 904), not by passing over one row (line
+  909). A negative control is also recorded — content-hash-keyed idempotency
+  leaves the population at three, because the three exports are genuinely
+  distinct artefacts.
+- **F3 docstring** (`c428fe5`) now states the scenario **fails** when findings
+  become ledger-recorded, matching the F3-M2 result. Docstring only; no
+  assertion changed, so the earlier mutation evidence still holds.
+
+#### The standing sweeps
+
+- **Order independence** — six whole-tree runs (canonical, `file`, `reverse`,
+  salt 8003 / 29 / 777) on `test-agent`'s own plugin, held outside `dev/` and
+  loaded by `PYTHONPATH`. **2,988 passed in all six.**
+- **Register cross-check** — the register holds 34 contiguous entries. All
+  **eight forbidden criteria are claimed nowhere**: five have zero node IDs and
+  zero `COVERS` joins; three appear only in self-denying node IDs or explicitly
+  narrowed `COVERS` lines. Identical outcome to the previous pass.
+- **Vacuous-pass sweep, run in its sharpened form.** Because Finding A was a
+  loop that read as a quantifier and ran over one row — and four static reviews
+  had passed it — this sweep no longer only reads. All **397** assert-bearing
+  loops in the tree were AST-instrumented and their real iteration counts
+  recorded over a full run. **One loop has max 0 iterations** (a negative
+  watchdog whose own population is guarded at `assert len(urls) > 8` and which
+  entered 47 times — reviewed, not a defect) and **17 have max 1**, all
+  reviewed, all singular by construction or self-guarded. The instrumented tree
+  also passed 2,988/2,988. **Zero empty `parametrize`, zero skips, zero
+  scenarios that cannot fail** (13 assert-free functions, all delegating to
+  helpers that assert or raise — the same 13, no new ones).
+
+#### Process lifecycle
+
+The human's pilot (**pid 59422, port 8030**) was re-read from `lsof` at the
+start of the pass, never carried forward, and confirmed alive after every
+invocation. 8030/8031 were never probed. Every pilot this agent started ran on
+8021 in its own process group and was reaped with `os.killpg` on that group
+only, inside a single command invocation; 8021 and 8022 were empty afterwards
+each time. The shared broker ledger grew **10,813,440 → 10,891,264 bytes**
+across the smoke and rendered-UI invocations — the evidence the write path
+really ran; the 2,988-scenario test tree leaves it byte-identical.
+
+#### Four harness defects found and recorded, none of them build defects
+
+The smoke harness reported four failures on its first run and the rendered-UI
+harness one. All five were **defects in this agent's own harness** — an `href`
+regex that also matched `data-href`, a `data-agent-id` attribute that does not
+exist (the build uses `data-principal`), a single seal testid expected on three
+screens that each carry their own, and a gold-exclusion predicate that named
+the brand lockup by class and then flagged the lockup's own `path.pull`. Each
+is recorded in the relevant evidence file, because "I fixed my test until it
+passed" is exactly the move that has to be visible. In every case a second,
+independent scenario already asserted the same fact and had been green
+throughout, which is what exposed the contradiction.
+
+#### Verdict
+
+**No scenario passes that should not. Nothing is outstanding from this
+agent.** Four passes of loop-back are closed and the evidence supports the
+gate closing.
+
+---
 
 ### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-19 loop-back, at `dev` @ `e00a214`** (parent repo @ `8dcb490`)
 

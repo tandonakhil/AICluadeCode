@@ -1,81 +1,106 @@
-# Test evidence — order independence, on test-agent's own salted plugin
+# Test evidence — order independence
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-19 loop-back
+**Gate:** 8 · Test — pass 20, final confirmation
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`e00a214`** · parent repo @ **`8dcb490`**
+**Commit under test:** `dev` @ **`c428fe5`** · parent repo @ **`67d0517`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
 
-## The plugin
+## Method
 
-`scratchpad/p19/ta19_order.py` — **outside the repository**, loaded by
-`PYTHONPATH` + `-p ta19_order`, so `dev/` stayed clean at `e00a214` throughout.
-Uniform global Fisher–Yates over the whole collected list, seeded from a salt
-string:
+A collection-order plugin written by `test-agent` and held **outside the tree
+under test** (`scratchpad/salt_plugin.py`, loaded by `PYTHONPATH` and
+`-p salt_plugin`), so the build cannot influence the order it is shuffled into.
+It reorders `items` in `pytest_collection_modifyitems` according to `TA_ORDER`:
+`canonical`, `file`, `reverse`, and `salt<N>` (a seeded `random.shuffle`).
 
-```
-SALT = "test-agent/verify/quartzite-heronwing-8021/2026-08-03"
-```
+Six whole-tree runs. **No `-k`, no deselection, no `-x`** — every run collects
+and executes all 2,988.
 
-### Scenario: the salt appears nowhere in the project tree
-- Status: EXECUTED
-- Input: `grep -rl` for `quartzite`, `heronwing`, `CONCLAVE_TA_ORDER`, `ta19_order`
-  across `dev/` excluding `.git` and `.venv`
-- Expected: zero files
-- Actual: **0, 0, 0, 0**
-- Result: PASS — no suite can recognise this permutation
+## Result
 
-This is deliberately **not** `code-agent`'s plugin
-(`SALT = "code-agent/gate7-pass18/2026-08-03"`); the fingerprints below differ
-from the ones in `PROJECT_CONTEXT.md`'s pass-19 table, which is the point.
+| Order | Result | Wall |
+|---|---|---|
+| canonical | **2988 passed** | 218.37s |
+| `file` | **2988 passed** | 221.04s |
+| `reverse` | **2988 passed** | 224.44s |
+| `salt8003` | **2988 passed** | 264.89s |
+| `salt29` | **2988 passed** | 262.26s |
+| `salt777` | **2988 passed** | 263.55s |
 
-## Runs
-
-| Ordering | Result | Exit | Wall | Same-file adjacencies | Order fingerprint |
-|---|---|---|---|---|---|
-| `file` (control) | 2,987 pass | 0 | 222s | 2,877 | `f129ce908bd65249` |
-| `reverse` | 2,987 pass | 0 | 227s | 2,877 | `f9f81e5692a07192` |
-| `seed:31337` | 2,987 pass | 0 | 272s | 32 | `ba284ef0f64de489` |
-| `seed:8021` | 2,987 pass | 0 | 267s | 31 | `0e09478c9f1f3238` |
-| `seed:20260803` | 2,987 pass | 0 | 268s | 45 | `8c56d03e1e8c766e` |
-
-Plus a sixth whole-tree run in canonical order without the plugin (2,987 pass,
-exit 0), and a seventh under the S1b mutation (2,987 pass — that one is a
-finding, see `sampling-sweep-2026-08-03.md`).
-
-The three shuffles drop same-file adjacency from 2,877 to 31–45, so the
-permutation genuinely interleaves files rather than reordering within them.
+**Six for six, 2,988 every time, exit 0 every time.** No scenario depends on
+another having run first, and no scenario is order-sensitive through the
+process-scoped state (`process_state.guarded_modules()`) or the shared broker
+ledger.
 
 ---
 
-### Scenario: every ordering collects the same 2,987 node ids
+### Scenario: canonical order
 - Status: EXECUTED
-- Input: the plugin dumps its realised order to a file each run; `sort | md5`
-- Expected: identical digests, so no ordering silently dropped a scenario
-- Actual: **`15e22b1aa8387286c0783d7c90219d72` for all five, and identical to the
-  canonical `--collect-only` dump**
+- Input: `pytest -o addopts= -q -p no:cacheprovider`
+- Expected: 2,988 pass
+- Actual: **2988 passed in 218.37s**, exit 0
 - Result: PASS
+- Evidence: pytest summary line
 
-### Scenario: the fingerprints are genuinely distinct sequences
+### Scenario: grouped by file
 - Status: EXECUTED
-- Expected: five different digests
-- Actual: **five distinct**; `file` and `reverse` share an adjacency count (as
-  they must — reversal preserves file grouping) but differ in fingerprint
+- Input: `TA_ORDER=file`, items sorted by the file part of the node id
+- Expected: 2,988 pass
+- Actual: **2988 passed in 221.04s**
 - Result: PASS
+- Evidence: `order.log`
 
-### Scenario: the live ledger is byte-identical after every ordering
+### Scenario: reversed
 - Status: EXECUTED
-- Input: md5 of `dev/var/broker_db.sqlite3` before the first run and after each
-- Expected: unchanged
-- Actual: **`449791062f2f1adb8db41a9d5406fb24` before, and after all five**
+- Input: `TA_ORDER=reverse`, `items.reverse()`
+- Expected: 2,988 pass
+- Actual: **2988 passed in 224.44s**
 - Result: PASS
-- Evidence: measured in the same shell invocation as each run
+- Evidence: `order.log`
 
-### Scenario: the working tree is clean at `e00a214` after the whole pass
+### Scenario: salted shuffle, seed 8003
 - Status: EXECUTED
-- Expected: `git status --porcelain` empty, HEAD `e00a214`
-- Actual: **empty, `e00a214a8444e5e89118d5f03f7a1b993f56326b`** at the start;
-  all mutation work was done in detached worktrees under the scratchpad
+- Input: `TA_ORDER=salt8003`, `random.Random(8003).shuffle(items)`
+- Expected: 2,988 pass
+- Actual: **2988 passed in 264.89s**
 - Result: PASS
+- Evidence: `order.log`
+
+### Scenario: salted shuffle, seed 29
+- Status: EXECUTED
+- Input: `TA_ORDER=salt29`
+- Expected: 2,988 pass
+- Actual: **2988 passed in 262.26s**
+- Result: PASS
+- Evidence: `order.log`
+
+### Scenario: salted shuffle, seed 777
+- Status: EXECUTED
+- Input: `TA_ORDER=salt777`
+- Expected: 2,988 pass
+- Actual: **2988 passed in 263.55s**
+- Result: PASS
+- Evidence: `order.log`
+
+### Scenario: the shuffled runs collected the same population as the canonical run
+- Status: EXECUTED
+- Input: the progress-character count of every run
+- Expected: 2,988 in every order — a shuffle that silently dropped scenarios
+  would show as a smaller total, not as a failure
+- Actual: **2,988 in all six**
+- Result: PASS
+- Evidence: each run's own summary line
+
+### Scenario: the plugin is not something the build can influence
+- Status: EXECUTED
+- Input: `salt_plugin.py` lives in the agent's scratchpad, is loaded by
+  `PYTHONPATH` + `-p`, and is not importable from, referenced by, or committed
+  to `dev/`
+- Expected: the ordering authority sits outside the tree under test
+- Actual: confirmed — `dev` working tree stayed clean (`git status --porcelain`
+  empty) across all six runs
+- Result: PASS
+- Evidence: `git status --porcelain` empty at `c428fe5` after the runs
