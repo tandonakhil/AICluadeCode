@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 9 \u2014 Verification (final audit)",
+  "position": "Gate 9 \u2014 Verification: 256/265, awaiting human decision on the nine",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -129,13 +129,13 @@
     {
       "n": 9,
       "name": "Verify",
-      "status": "active",
-      "approval": "pending",
+      "status": "warn",
+      "approval": "awaiting",
       "date": "2026-08-04",
       "participants": [
         "verification-agent"
       ],
-      "note": "253/262 VERIFIED, 0 FAILED, 8 NOT VERIFIED (all disclosed, dependency-bound), 1 CONTRADICTED: AC-F41-13's element set is split across two screens post-redesign, so no screen satisfies it while a passing scenario carries its bare ID."
+      "note": "256/265 VERIFIED, 0 FAILED, 0 CONTRADICTED, 9 NOT VERIFIED -- all disclosed, all dependency- or scope-bound. Blocks because disclosure is not evidence. Disposition is the human's decision; verification-agent proposes no override."
     },
     {
       "n": 10,
