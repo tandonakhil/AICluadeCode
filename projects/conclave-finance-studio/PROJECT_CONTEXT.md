@@ -1870,7 +1870,137 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-08-03 — Gate 8 · Test — `test-agent`, **pass 20, FINAL CONFIRMATION, at `dev` @ `c428fe5`** (parent repo @ `67d0517`)
+### 2026-08-04 — Gate 8 · Test — `test-agent`, **pass 22 re-run, after the `AC-F41-13` ruling was built, at `dev` @ `7757e0d`** (parent repo @ `299369e`)
+
+**Everything passes. The gate closes on the evidence.**
+
+**3,037 scenarios, 3,037 pass, 0 fail, 0 skip, exit 0**, on a verified-clean
+tree, plus 38 smoke scenarios against a served pilot and 19 rendered-UI
+scenarios in Chromium — **all executed, none static, none advisory.**
+
+#### Per-suite breakdown — every suite marked, never merged
+
+| Suite | Owner | Status | Result | Δ since `c428fe5` | Blocking |
+|---|---|---|---|---|---|
+| unit / integration (`backend/tests`) | `test-agent` | **`EXECUTED`** | **2,352 / 2,352** | **+42** | yes |
+| functional | `functional-design-agent` | **`EXECUTED`** | **365 / 365** | **+7** | yes |
+| UX | `ui-ux-designer` | **`EXECUTED`** | **194 / 194** | 0 | yes |
+| red-team | `responsible-ai-architect` | **`EXECUTED`** | **61 / 61** | 0 | yes |
+| architecture | `solution-architect` | **`EXECUTED`** | **28 / 28** | 0 | yes |
+| industry | `industry-expert` | **`EXECUTED`** | **23 / 23** | 0 | yes |
+| security | `security-architect` | **`EXECUTED`** | **14 / 14** | 0 | yes |
+| **whole tree** | — | **`EXECUTED`** | **3,037 / 3,037** | **+49** | yes |
+| post-deploy smoke (served pilot, 8021) | `test-agent` | **`EXECUTED`** | **38 / 38** | +9 | yes |
+| rendered-UI (Playwright / Chromium, web) | `test-agent` | **`EXECUTED`** | **19 / 19** | +6 | yes |
+| rendered-UI (RNTL, native) | — | **N/A** | no native surface in MVP1 | — | — |
+| rendered-UI (Maestro + simulator) | — | **NOT BUILT** | no simulator on this machine (2026-07-26 spike, unchanged) | — | — |
+
+Every SME suite ran through its own `run.sh` and returned **exit 0** with
+`EXECUTED — suite passed`. Exit 3 (no scenarios) and exit 4 (cannot execute)
+did not occur, so no empty suite is being reported as a passing one.
+
+#### Test-count delta — measured, not counted
+
+**2,988 → 3,037: +54 added, −5 removed, 1 parametrisation widened, 0 silent
+assertion edits.** All five removals are instructed consequences of the ruling
+and every one is named in `test-evidence/unit-integration-2026-08-04.md`: three
+`TestNoApproveControlHere` scenarios folded into the single `AC-F41-22`
+scenario per §28.1's own instruction, and two `AC-F5-07` scenarios that
+quantified over the registry's projection onto itself — the tautology §28.2
+ruled against — replaced by three whose names state their scope. **Neither fold
+narrowed coverage**; both replacements assert strictly more.
+
+#### The four things this pass was asked to verify
+
+1. **`AC-F41-13` is written nowhere in the tree.** 0 source occurrences, 0 node
+   ids, 0 `COVERS` lines, tracked and untracked, docstrings included. Each
+   replacement's check covers its criterion **whole**, in one scenario:
+   `AC-F41-22` includes "no approving control at any permission level" (asserted
+   across both personas, over 14 finding screens reached by traversal, guarded
+   so it cannot pass by reaching nothing); `AC-F41-24` requires a non-approving
+   terminal action neither behind a disclosure, a dialog nor a link, posting to
+   an endpoint that is neither approve nor override, with the property itself
+   computed from the screen rather than asserted by testid.
+2. **The shipped reject-radio bug is fixed, verified from a browser.** All six
+   reason codes were driven by **clicking the rendered radio** on six different
+   findings — six `"Rejection recorded"`, none by hand-posting a code — with a
+   negative control (submit with nothing selected) confirming the form can
+   still fail. Restoring the row-index value (mutation M7) fails at the store's
+   **422**, not at a string comparison.
+3. **The retained view is derived, not assembled.** The auditor export **refuses
+   to be produced** when an unclassified card is added to the approval screen —
+   observed at the route: `/audit/export/file` returns **500** where the
+   unmutated build returns 200. `NOT_RETAINED` is a classification, not an
+   exemption table: all 8 entries are real testids the screen emits, each with a
+   reason, no overlap with the retained region, and mutations that break any of
+   those three properties all fail.
+4. **The artefact opens offline.** Six dossiers, zero hits across 13
+   external-reference and active-content constructs, byte-identical across two
+   independent renders (SHA-256 per dossier recorded), `approver_view` ==
+   `rendered_view` on all six, and each of the eight evidential elements found
+   **verbatim, as its own rendered bytes** from the served screen inside the
+   artefact.
+
+**The forbidden set is nine and all nine are claimed nowhere** — `AC-F1-08`,
+`AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`, `AC-F5-02`, `-03`, `-05`
+and now `AC-F5-07`, whose two prior joins (the bare ID in `pages.inventory`'s
+docstring and the test file's section header) are both gone.
+
+#### Standing sweeps
+
+- **Order independence:** six whole-tree runs — canonical, file, reverse, and
+  seeds 8003 / 29 / 777 — **3,037 pass every time**, on a plugin held outside
+  the tree under test.
+- **Empty `parametrize`:** none. Per-suite counts reconcile to 3,037 exactly.
+- **Vacuous-pass sweep, AST-instrumented:** 426 assert-bearing loops measured at
+  runtime (was 397). 425 iterate; the one zero-iteration loop is the same
+  reviewed watchdog as pass 20. 17 single-iteration loops, all reviewed, none a
+  defect. 13 no-assert candidates, the same 13, all delegating. **Zero skips,
+  zero xfails.** The instrumented tree also passed 3,037/3,037.
+- **Mutation tests:** 11 applied to product code, reverted, tree verified clean.
+  **10 caught.**
+
+#### One advisory — nothing stops the gate
+
+**The in-tree "own rendered bytes" scenario compares the artefact to the
+*region*, not to the *screen*.** Mutation **M3b** put a **second composition** of
+`in-force-panel` on the approval screen — same testid, same words, different
+bytes — and **89 retained-view scenarios stayed green**. The drift check
+classifies by testid (the testid was present); the verbatim check compares
+`retained.render(...)` against `pages.approval_evidential_region(...)`, so it
+proves *artefact == region*, and the join *"the screen's evidential content is
+that region"* is a source-level fact no scenario asserts.
+
+**This is not a build defect and it does not block:** the property genuinely
+holds on this build, and **this gate does catch the mutation** — smoke **S32**,
+which extracts each element's markup from the *served screen* and requires it
+verbatim in the artefact, fails under M3b and passes on all eight elements
+without it. The fix for `code-agent`, after human review, is one line: compare
+against `pages.approval_detail(...)`'s own nodes rather than the region's.
+
+Two stale live-tense references to the retired `AC-F41-13` remain **outside**
+`dev/` — `knowledge/UX_KB.md:319,549` and `design-review/index.html:878,1022`.
+§28.1's prohibition binds *checks*, and no check names it; recorded because a
+live-tense reference in a KB is how a retired ID gets re-adopted.
+
+#### Process discipline
+
+The human's pilot was **pid 78317 on 8030** — re-read from `lsof`, **not** the
+59422 carried from pass 20, so the human has restarted it. It was alive before
+and after every invocation, and 8030/8031 were never probed. Every pilot this
+agent started was on 8021, in its own process group, started/driven/reaped
+inside a single command invocation; `lsof` on 8021 and 8022 was empty after each
+teardown. Nothing was left running past the turn. The shared broker ledger grew
+10,956,800 → 11,124,736 bytes across the smoke and browser runs, which is the
+evidence the write path really ran; the 3,037-scenario tree leaves it
+byte-identical. No product code was fixed by this agent.
+
+Evidence: `test-evidence/*-2026-08-04.md` (16 files) and 20 screenshots. The
+2026-08-03 corpus is deleted, not carried.
+
+---
+
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **pass 20, FINAL CONFIRMATION, at `dev` @ `c428fe5`** (parent repo @ `67d0517`) — SUPERSEDED
 
 **Both gate-8 findings are CLOSED, re-verified by re-running the original
 mutations rather than by reading the fixes. All seven automated suites
