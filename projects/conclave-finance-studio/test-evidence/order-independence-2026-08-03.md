@@ -1,80 +1,74 @@
 # Test evidence — order independence
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
-**Entry point:** `CONCLAVE_ORDER=<mode> PYTHONPATH=<out-of-tree> .venv/bin/python -m pytest -o addopts= -p no:cacheprovider -p tagent_order -q`
-**Exit code:** 0 on every run
-**Runs: 8 whole-tree — 1 control + 6 permuted + 1 under the vacuous-pass instrumentation. 2,955 of 2,955 pass in every one.**
+**Orderings: 6 whole-tree runs — 6 × 2,977 passed, exit 0 each**
 
-The plugin lives **outside the repository**, so the tree stayed clean
-(`git status --porcelain` = 0 throughout). It does a **uniform global
-Fisher-Yates over the entire collected list** — not round-robin, not per-file —
-and fingerprints the realised order so the permutation is evidence rather than a
-claim.
+## The plugin is mine, and it is salted
 
-## The generator is salted, and the reason is a finding
+`tagent18_shuffle.py`, written for this pass, lives outside the project tree
+and is loaded with `-p`. The shuffle is seeded from
+`sha256("tagent18-9f3c1a7e-salt:" + seed)`.
 
-The obvious implementation — `random.Random(seed)` plus Fisher-Yates — produced
-`code-agent`'s **exact** fingerprints: `seed:1` gave `759308beb6c37d78` with 38
-same-file adjacencies, identical to the pass-17 table. That is useful
-corroboration (the recorded permutation is real) but it is not an independent
-check; it is the same run twice. The matrix was discarded and re-run with a
-salted RNG (`"test-agent/gate8/2026-08-03"`) walking the array from the other
-end, so every seeded permutation below differs from `code-agent`'s.
+**Why salted:** a suite could in principle be written to recognise a known
+plugin or a known seed. `grep -rl "tagent18" dev` and `grep -rl "9f3c1a7e" dev`
+both return **nothing**, so the token appears nowhere the build can see. The
+project's own ordering machinery was not used.
 
-| Ordering | Result | Exit | Wall | Same-file adjacencies | Order fingerprint | Ledger |
-|---|---|---|---|---|---|---|
-| file order (control) | 2,955 pass | 0 | 209.4s | 2,846 | — | unchanged |
-| `seed:1` (salted) | 2,955 pass | 0 | 243.3s | **28** | `9595c2e4e0f72c1c` | unchanged |
-| `seed:7` (salted) | 2,955 pass | 0 | 249.6s | **39** | `d929fa3e6a9f5d91` | unchanged |
-| `seed:42` (salted) | 2,955 pass | 0 | 250.2s | **32** | `45a3759ce39c82bb` | unchanged |
-| `seed:20260803` (salted) | 2,955 pass | 0 | 247.4s | **34** | `cf3222bf352fa738` | unchanged |
-| `reverse` | 2,955 pass | 0 | 215.5s | 2,846 | `fa4584ef39e7c77b` | unchanged |
-| `reverse` (2nd time) | 2,955 pass | 0 | 214.9s | 2,846 | `fa4584ef39e7c77b` | unchanged |
-| vacuous-pass instrumentation | 2,955 pass | 0 | 209.5s | 2,846 | — | unchanged |
-
-28-39 same-file adjacencies against 2,846 in file order is the signature of a
-uniform global shuffle: a round-robin interleave cannot produce it.
+Each run dumped its realised order; **all five dumps have distinct MD5s** and
+all differ from the canonical collection order, so no two runs exercised the
+same sequence.
 
 ---
 
-### Scenario: all 2,955 pass under six independent orderings
-- Status: EXECUTED
-- Input: the six rows above
-- Expected: 2,955 pass, exit 0, in every ordering
-- Actual: **2,955 pass, exit 0, in all six**
-- Result: PASS
-- Evidence: `2955 passed in 243.30s` / `249.61s` / `250.23s` / `247.39s` / `215.49s` / `214.86s`
+### Scenario: canonical order
+- Status: EXECUTED · Input: `pytest` with no reordering
+- Expected: 2,977 pass · Actual: **2,977 passed**, exit 0
+- Result: PASS · Evidence: MD5 of collected order `5acfc2cb…`
 
-### Scenario: `reverse` is repeatable, so a green is not an intermittent
-- Status: EXECUTED
-- Input: `reverse` run twice, fingerprints compared
-- Expected: identical fingerprint both times — the same permutation, twice
-- Actual: `fa4584ef39e7c77b` **both times**
-- Result: PASS
-- Evidence: two independent invocations, 215.49s and 214.86s, same fingerprint —
-  the permutation is pinned, so the pass is a property of the ordering rather
-  than of the run
+### Scenario: whole-tree REVERSE
+- Status: EXECUTED · Input: `TAGENT18_SEED=reverse`
+- Expected: 2,977 pass · Actual: **2,977 passed in 219.02s**, exit 0
+- Result: PASS · Evidence: order MD5 `14e865b5…`
+- Note: reverse is the ordering that found the `_surface()` clean-close
+  dependence in the previous pass, which `code-agent` fixed with
+  `U.fresh_state()` at the top of the orphan sweep's surface builder. It is
+  clean now.
 
-### Scenario: the developer's decision ledger is untouched in every ordering
-- Status: EXECUTED
-- Input: md5 of `dev/var/broker_db.sqlite3` captured before and after each run
-- Expected: byte-identical every time
-- Actual: `ledger_same=yes` on **all six**
-- Result: PASS
-- Evidence: the live-ledger guard installed by both conftests holds under
-  permutation, including under `seed:1` where the previous pass's mutation
-  showed a removed refcount produces 6 failures
+### Scenario: salted shuffle, seed 1
+- Status: EXECUTED · Actual: **2,977 passed in 270.20s**, exit 0
+- Result: PASS · Evidence: order MD5 `980a9177…`
 
-### Scenario: the permuted collection is the same 2,955 scenarios
+### Scenario: salted shuffle, seed 7
+- Status: EXECUTED · Actual: **2,977 passed in 264.71s**, exit 0
+- Result: PASS · Evidence: order MD5 `6d50a1ef…`
+
+### Scenario: salted shuffle, seed 42
+- Status: EXECUTED · Actual: **2,977 passed in 259.40s**, exit 0
+- Result: PASS · Evidence: order MD5 `f1409e2c…`
+
+### Scenario: salted shuffle, seed 20260803
+- Status: EXECUTED · Actual: **2,977 passed in 259.08s**, exit 0
+- Result: PASS · Evidence: order MD5 `10dafbf2…`
+
+### Scenario: every ordering collected exactly the same 2,977 scenarios
 - Status: EXECUTED
-- Input: `items=` recorded by the plugin on every run
-- Expected: 2,955 in each
-- Actual: **2,955 in all six**
+- Input: the five dumped orders plus the canonical one
+- Expected: 2,977 lines each, same set, different sequence
+- Actual: **2,977 lines in every dump; six distinct MD5s**
 - Result: PASS
-- Evidence: no ordering changed what was collected, only the order
+- Evidence: a shuffle that silently dropped scenarios would show as a shorter
+  dump, and none did
+
+### Scenario: the live decision ledger is untouched by any ordering
+- Status: EXECUTED
+- Input: `dev/var/broker_db.sqlite3` before and after each whole-tree run
+- Expected: byte-identical
+- Actual: **byte-identical after all six.** `live_ledger_guard`'s
+  `assert_nothing_was_refused` raised in none of them
+- Result: PASS

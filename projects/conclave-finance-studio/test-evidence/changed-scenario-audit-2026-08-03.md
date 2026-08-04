@@ -1,148 +1,131 @@
-# Test evidence — the changed-scenario audit (brief item 1)
+# Test evidence — changed-scenario audit (the test-count delta, named)
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`** ·
+previous run at `dev` @ `6bf8ed9`
 **Owner:** `test-agent`
 **Blocking:** yes
-**Status:** `EXECUTED` (read scenario by scenario against the diff, then
-confirmed by mutation where a claim was checkable that way)
+**Status:** `EXECUTED`
+**Method:** node IDs collected at both commits (a detached worktree at
+`6bf8ed9`, the same interpreter), sorted and diffed. Bodies compared with
+`git diff 6bf8ed9 1b1b56e -- backend/tests tests/suites`.
 
-The brief's single most important question: **did any observable-UI criterion's
-check get weakened to fit the new layout?** `code-agent` tabulates eight changed
-groups in `PROJECT_CONTEXT.md` and asserts none is a weakening. Each row was
-verified against `git diff 9d605b1..6bf8ed9` rather than against the table.
+| | count |
+|---|---|
+| previous total | **2,955** |
+| added | **+25** |
+| removed | **−3** |
+| current total | **2,977** |
+| changed (same node ID, changed body) | **3** |
 
-**Verdict: no weakening found in any of the eight. Two are recorded as
-conflicts rather than resolutions (see `functional-2026-08-03.md`), and one
-prose/assertion mismatch is noted.**
+2,955 + 25 − 3 = **2,977**. Matches the brief exactly.
+
+Files touched: `cssmatch.py` (new, 200 lines), `test_ui_no_orphaned_style_rule.py`
+(new, 246), `test_ui_boundaries.py` (+62), `test_ui_governance_screens.py` (+19),
+`test_ui_brand.py` (±1), `uihelpers.py` (+12), `test_unclaimed_criteria.py` (+126).
 
 ---
 
-### Scenario: row 1 — `test_ui_dossier`, "no links at all" → "exactly one link"
-- Input: `git diff` of `backend/tests/test_ui_dossier.py`
-- Expected: the fetch-nothing substance is a separate scenario and is untouched
-- Actual: `test_there_is_no_external_reference_of_any_kind` — which bans
-  `<link`, `<img`, `<script`, `@import`, `url(`, `srcset` — **does not appear in
-  the diff at all.** Untouched. The changed scenario became **two** scenarios,
-  and the new one adds a relative/same-origin check that did not exist.
-- Result: PASS (not a weakening)
-- Evidence: the diff shows `-1/+35` on the file: one assertion removed, two
-  scenarios added. Independently confirmed in a real browser — see R1 in
-  `rendered-ui-2026-08-03.md`: the served dossier saved to disk and opened as
-  `file://` issued **zero** requests off `file://`, rendered still styled
-  (`risk-band` background `rgb(246, 228, 227)`), and carried exactly one inert
-  anchor.
+## REMOVED — 3. A removed test is a coverage decision.
 
-### Scenario: row 2 — F26/F28/F33 re-pointed from `/exceptions` to the run report
-- Input: `git diff` of `test_f26_fidelity.py`, `test_ui_exceptions.py`,
-  `functional/test_f26_criteria.py`, `test_f28_criteria.py`, `test_f33_criteria.py`
-- Expected: every element that moved screens is still asserted visible, in the
-  same state, on its new screen; reachability of the new screen asserted too
-- Actual: every assertion body is character-identical apart from the fixture it
-  reads (`screen` → `run_report`). The parametrised reachability list went from
-  **3 ids to 6** (adds `fidelity-region`, `boundary-region`, `coding-region`).
-  A new scenario `test_the_queue_is_no_longer_the_union_of_every_criterion_that_named_it`
-  asserts the three are ABSENT from the queue, so the move is checked from both
-  ends. `test_the_run_report_is_reachable_from_the_entry_point_by_following_links`
-  asserts the traversal.
-- Result: PASS (strengthened)
-- Evidence: `test_the_exceptions_screen_is_reachable_from_the_entry_point` became
-  `test_the_run_report_is_reachable_from_the_entry_point` and asserts **both**
-  `assert "/exceptions" in reachable` **and** `assert U.RUN_REPORT in reachable`
-  — strictly more than before
+### Scenario: `test_AC_F5_02_every_agent_is_listed_with_identity_entitlements_and_version`
+- Status: EXECUTED (verified absent from the 2,977)
+- Was: `tests/suites/functional/test_unclaimed_criteria.py`
+- Why removed: it asserted `inventory == principals.DIRECTORY` — the projection
+  against its own source, **an equality that cannot fail for the reason the
+  criterion is about**. Gate 8 blocked on it
+- Replaced by: `test_the_inventory_needs_no_manual_registration_step`, which
+  keeps the same equality but explicitly narrows its `COVERS` line to the
+  registration clause and disclaims the criterion
+- Result: **removal justified.** Net effect on claimed coverage: `AC-F5-02` goes
+  from claimed-and-false to claimed-by-nothing
 
-### Scenario: row 3 — `test_ui_proposal`, approve-control scenarios re-pointed
-- Input: `git diff` of `backend/tests/test_ui_proposal.py`
-- Expected: `AC-F40-11`'s lines-before-control ordering and both supersession
-  removals moved with the control, none relaxed
-- Actual: `test_the_lines_precede_the_approve_control_in_reading_order` now reads
-  the approval screen, and the approval screen renders the lines too. Both
-  supersession scenarios gained assertions rather than moving:
-  `?superseded=1` now asserts `not approval_screen.has("approve-lines")` AND
-  `approval_screen.has("approval-blocked-by-run")` **in addition to** the two
-  original assertions on the proposal screen. `AC-F41-15`'s no-movement case now
-  pins **two** screens' markup byte-for-byte where it pinned one.
-- Result: PASS (strengthened)
-- Evidence: net `+53/-…` on the file with every original assertion retained;
-  `AC-F41-14` gained `approval-blocked-by-data`
+### Scenario: `test_AC_F5_03_a_lineage_result_STATES_that_it_is_complete_rather_than_sampled`
+- Status: EXECUTED (verified absent)
+- Why removed: it asserted `lineage["complete"] is True` for every agent while
+  seven dossiers exist and zero appear in any lineage — a partial list returned
+  labelled complete, which is what `AC-F5-05` forbids
+- Replaced by: `test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`
+- Result: **removal justified**
 
-### Scenario: row 4 — "`/` renders Ask" → "`/` links to Ask, one click away"
-- Input: `git diff` of `test_ui_ask.py`, `test_ui_ask_resolver.py`, `test_ux_journey.py`
-- Expected: "reached by following a link" is a stronger claim than "the browser
-  landed on it"
-- Actual: `test_the_entry_point_lands_on_ask` had 2 assertions; its successor has
-  5 — the entry point renders the queue, carries no `nl-input`, links `/ask`,
-  and `/ask` still carries `nl-input` and `aria-current="page"`. The resolver
-  scenario added `assert "/ask" in U.reachable_urls()`, which is a traversal
-  claim the old form did not make.
-- Result: PASS (strengthened)
-- Evidence: confirmed over HTTP against the served pilot — smoke S4
+### Scenario: `test_AC_F5_05_every_lineage_result_states_its_own_completeness`
+- Status: EXECUTED (verified absent)
+- Was: `backend/tests/test_ui_governance_screens.py`
+- Why removed: **renamed**, not deleted — it is now
+  `test_every_lineage_result_states_its_own_scope_and_completeness`, with a
+  docstring opening *"NOT a claim on `AC-F5-05`"* and a **stronger** body
+  (adds `data-scope` and `"Computed over"`)
+- Result: **a rename that drops a criterion claim and strengthens the
+  assertion.** This is the only one of the three that is not a net reduction
 
-### Scenario: row 5 — `review-queue` → `exception-queue`
-- Input: `git diff` of `test_ui_probe_surface.py`, `test_f12_probe_criteria.py`, `test_ux_flow.py`
-- Expected: the parallel `<ul>` was removed by the merge; the ordering and
-  row-shape claims survive against the list that remains
-- Actual: the merged queue carries **6 rows** where the review queue carried
-  fewer, so the row-shape and ordering claims are asserted over a strictly larger
-  population. New scenarios in `TestTheQueueIsThePage` add per-row assertions
-  (risk, amount, age, kind, severity rail, periods-not-wall-clock) that did not
-  exist on either list before.
-- Result: PASS (strengthened)
-- Evidence: `test_every_row_carries_risk_amount_age_and_kind` iterates every
-  `exception-row` and fails naming the item id
+## ADDED — 25.
 
-### Scenario: row 6 — the probe render-path check reads the AST instead of grepping source text
-- Input: `git diff` of `test_ui_probe_surface.py` (+77 lines)
-- Expected: the criterion is about what the CODE does, not what the prose says
-- Actual: the merged queue's own disclosure legitimately contains the word
-  "probe" (visible in `ux-queue-desktop-1280-2026-08-03.png` — "BEFORE YOU
-  START: THIS QUEUE CONTAINS PROBES"), so a source-text grep would now fail for
-  a reason unrelated to the criterion. An AST check over the render path is a
-  **stricter** test of the same property: it cannot be satisfied by renaming a
-  variable, which a grep can.
-- Result: PASS (not a weakening — the substitute is strictly harder to fool)
-- Evidence: `AC-F12-15`'s other three sites, the percentage-window regex, the
-  twelve-path sweep and the header sweep are all retained
+### Scenario: 19 in `backend/tests/test_ui_no_orphaned_style_rule.py`
+- Status: EXECUTED, all 19 pass
+- 5 parser (`every_selector_parses`, `selector_list_not_vacuous`,
+  `at_rule_refused`, `sibling_combinator_refused`, `unparsable_compound_raises`)
+- 8 matcher (`descendant_matches`, `descendant_not_sibling`,
+  `child_refuses_grandchild`, `multi_class_needs_all`, `tag_qualified`,
+  `attribute_value_compared`, `bare_attribute_presence`, `pseudo_element`)
+- 6 build (`every_declared_selector_matches`, `would_have_caught_the_defect`,
+  `no_selector_is_excused`, `both_themes_in_the_surface`,
+  `context_line_is_styled_at_all`, `context_line_is_a_full_width_line`)
+- Evidence: mutation-tested individually in `mutation-tests-2026-08-03.md`
+- Note: `code-agent`'s hand-off says "22 scenarios" for this checker. **19 are
+  in that file**; the other 3 of the 22 are the two alias scenarios and the
+  lineage-rendering scenario below. All 22 exist; the file count is 19
 
-### Scenario: row 7 — reachability allows declared aliases
-- Input: `git diff` of `test_ui_boundaries.py`
-- Expected: the allowance is read from product code, and each alias's target is
-  separately asserted reachable
-- Actual: the allowance reads `routes.SCREEN_ALIASES`; two new scenarios were
-  added (`test_every_alias_serves_a_screen_that_is_itself_reachable`,
-  `test_the_merged_queue_serves_the_same_screen_under_all_three_addresses`), and
-  `test_every_parameterised_screen_is_reached_by_following_a_real_link` gained
-  four new object-route assertions.
-- Result: PASS as written, **with a residual gap** — see
-  `mutation-tests-2026-08-03.md` M3. The claim "an alias cannot be added by
-  widening a test constant" is literally true; the property it secures is not
-  fully held.
-- Evidence: mutation-proved both ways
+### Scenario: 2 in `backend/tests/test_ui_boundaries.py`
+- `test_every_alias_really_serves_ITS_OWN_CANONICAL_SCREEN` — the guard
+- `test_the_alias_guard_rejects_a_forged_row` — its negative half
+- Status: EXECUTED, both pass; independently reproduced by mutation M7
+- Note: the old `test_the_merged_queue_serves_the_same_screen_under_all_three_addresses`
+  is **subsumed, not removed** — it survives with the same node ID, refactored
+  onto the shared `_screen_body` helper
 
-### Scenario: row 8 — `test_ui_approvals` gold selectors widened from three to five
-- Input: `git diff`, plus a mutation
-- Expected: same meaning — a human decision — under the brand's own colour law
-- Actual: `GOLD_RULES` is `(".btn.approve", ".seal", ".card.approved", ".pull",
-  ".pull-dot")` and the assertion is **set equality**, not containment, so the
-  set is still closed. The two added selectors are one concept (the Council
-  Mark's pull-line and its terminus dot). A separate scenario asserts the
-  colour law's negative half — `.thread` and `.core-dot` must not carry
-  `--gold`.
-- Result: PASS (widened but still closed; mutation-proved)
-- Evidence: mutation M4 — `.thread{stroke:var(--gold)}` failed **3** scenarios
-  including the set-equality one. Independently confirmed in a real browser:
-  R7 in `rendered-ui-2026-08-03.md` found 28 gold-painted elements across 12
-  renders and **every one** is `.pull`, `.pull-dot` or `.btn.approve`.
+### Scenario: 1 in `backend/tests/test_ui_governance_screens.py`
+- `test_every_lineage_result_states_its_own_scope_and_completeness` (the rename
+  target above)
+- Status: EXECUTED, passes; mutation-held by D7
 
-### Scenario: prose/assertion mismatch in row 8's docstring
-- Input: `backend/tests/test_ui_approvals.py::TestGoldIsUsedHereAndNowhereElse`
-- Expected: the docstring describes what the assertion checks
-- Actual: the docstring says "**THE COUNCIL MARK'S PULL-LINE IS THE FOURTH AND
-  LAST PLACE**" while `GOLD_RULES` has **five** entries
-- Result: PASS (not a defect — four *places*, the fourth implemented as two
-  selectors) but **recorded**, because "the docstring claims something the
-  assertion does not check" is the exact class of defect the previous pass
-  raised twice against this file's neighbours
-- Evidence: `GOLD_RULES = (".btn.approve", ".seal", ".card.approved", ".pull", ".pull-dot")`
+### Scenario: 3 in `tests/suites/functional/test_unclaimed_criteria.py`
+- `test_the_inventory_needs_no_manual_registration_step`
+- `test_AC_F5_02_IS_NOT_MET_agents_that_acted_are_absent_from_the_inventory`
+- `test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`
+- Status: EXECUTED, all three pass; mutation-held in both directions (D1–D9)
+
+## CHANGED — 3 (same node ID, changed body).
+
+### Scenario: `test_ui_brand.py::test_the_brand_layer_is_present_in_the_one_inlined_stylesheet`
+- Status: EXECUTED
+- Change: marker list `(".lockup", ".statstrip", ".section-icon", ".artifact")`
+  → `(… , ".opening")`
+- Assessment: **neutral, and explained** — `.artifact` was one of the four
+  orphaned selectors this pass removed, so a scenario asserting its presence
+  would have contradicted the orphan sweep. Still four markers; not a weakening
+
+### Scenario: `test_ui_governance_screens.py::test_AC_F5_04_a_version_that_touched_nothing_states_zero`
+- Status: EXECUTED
+- Change: `"Zero artefacts"` → `"Zero decisions in the decision ledger"`, plus a
+  **new** assertion `"Artefacts touched 0" in …`
+- Assessment: **strengthened**, and the string change follows the scope
+  relabelling
+
+### Scenario: `test_unclaimed_criteria.py::test_AC_F5_06_a_retired_agent_is_still_listed…`
+- Status: EXECUTED
+- Change: `assert retired["lineage"]["complete"] is True` replaced by
+  `artefact_count == len(artefacts)` and `scope == "decision_ledger"`
+- Assessment: **correctly narrowed.** `AC-F5-06`'s clause is *"its lineage still
+  resolves"*, not *"is complete"* — keeping the old line would have made this a
+  second carrier of the `AC-F5-05` claim the build cannot support. This is the
+  right kind of change and is exactly the kind a pass/fail count hides
+
+## The delta contains no unexplained drop
+- Status: EXECUTED
+- Expected: every removal accounted for
+- Actual: **3 removals, 3 accounted for** — two deliberate retirements of false
+  claims, one rename. No scenario disappeared without a successor or a stated
+  reason
+- Result: PASS

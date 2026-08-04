@@ -1,123 +1,132 @@
 # Test evidence — the deferred-substitution register cross-check
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
 
-**The standing question — *does any suite report a pass the register says cannot
-be true?* — returns YES for the first time in eight passes.**
+## The standing question
 
-The five declared criteria are clean. The YES comes from a route the register
-does not cover, surfaced by the pass-17 agent page: `AC-F5-02` and
-`AC-F5-03`/`-05`. Detail in `functional-2026-08-03.md`.
+> *Does any suite report a pass the register says cannot be true?*
+
+**It returns NO.** It returned **YES** last run, for the first time in seven
+passes, on `AC-F5-02`/`-03`/`-05`. Pass 18 closed that, and every one of the
+eight forbidden criteria is now claimed by nothing.
+
+**This is not a clean sheet.** Three findings sit *beside* the register rather
+than against it — the register is not contradicted by any of them, and all
+three are in `functional-2026-08-03.md`. Finding 1 is the one that should stop
+the gate: the disclosure register 34 credits was removed from one screen and
+left standing on the four screens that screen links to.
+
+**Method:** all 2,977 collected node IDs, plus every `COVERS` line in both test
+trees, scanned for each criterion ID in both hyphenated and underscored form.
 
 ---
 
-### Scenario: the register has 33 entries, 1–33, no gaps
+### Scenario: the register has 34 entries, 1–34, no gaps
 - Status: EXECUTED
-- Input: `PROJECT_CONTEXT.md`'s "Deferred-substitution register" section
-- Expected: 33 entries, numbered contiguously
-- Actual: **33, contiguous.** Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25 CLOSED;
-  1–5, 7 and 9 stand as recorded at pass 1/2c; 3 and 4 remain the two that
-  cannot quietly become "MVP1 ready"
+- Input: `PROJECT_CONTEXT.md` §"Deferred-substitution register"
+- Expected: 34 entries, contiguous
+- Actual: **34, contiguous 1–34.** Entry 34 is new since the last run
 - Result: PASS
-- Evidence: register closing paragraph, verified against the per-pass subsections
+- Evidence: entry numbers extracted from the table rows: `1 2 3 … 33 34`
 
 ### Scenario: `AC-F1-08` is claimed by nothing
 - Status: EXECUTED
-- Input: all 2,955 collected node IDs, plus every `COVERS` line
 - Expected: zero claims
-- Actual: **1 node ID contains the string, and it is self-denying** —
+- Actual: **1 node ID, and it is self-denying** —
   `test_export_integrity_contract.py::test_declaring_the_residual_without_naming_its_criterion_is_refused[retention-AC-F1-08]`,
   a parametrisation label on a scenario asserting the export is **refused**.
-  **0 `COVERS` joins.**
+  **0 `COVERS` joins**
 - Result: PASS
-- Evidence: also witnessed at runtime — smoke S16 confirms `/audit/export` names
-  `AC-F1-08` as unmet on the auditor's own screen
+- Evidence: also witnessed at runtime — smoke S16, `/audit/export` names it as
+  unmet on the auditor's own screen
 
 ### Scenario: `AC-F1-11` is claimed by nothing
 - Status: EXECUTED
-- Input: as above
 - Expected: zero claims
-- Actual: **1 node ID, the sibling parametrisation label
-  `[anchor-AC-F1-11]` on the same refusal scenario. 0 `COVERS` joins.**
+- Actual: **1 node ID, the sibling label `[anchor-AC-F1-11]` on the same
+  refusal scenario. 0 `COVERS` joins**
 - Result: PASS
 - Evidence: smoke S16 — both IDs named as unmet in the served page
 
 ### Scenario: `AC-REFUSAL-11` is claimed by nothing
-- Status: EXECUTED
-- Input: as above
-- Expected: zero claims
-- Actual: **0 node IDs, 0 `COVERS` joins**
-- Result: PASS
-- Evidence: register 9's narrowing at pass 12 holds — the RT05 pass-throughs are
-  asserted as pass-throughs in the red-team suite
+- Status: EXECUTED · Expected: zero · Actual: **0 node IDs, 0 `COVERS` joins**
+- Result: PASS · Evidence: register 9's pass-12 narrowing holds
 
 ### Scenario: `AC-F40-17` is claimed by nothing
-- Status: EXECUTED
-- Input: as above
-- Expected: zero claims
-- Actual: **0 node IDs, 0 `COVERS` joins**
-- Result: PASS
-- Evidence: register 28; `AC-F40-18` is built and separately evidenced —
-  smoke S15 returned `data-authorised-on="synthetic_attestation"`, a status
-  distinct from `no_drift`
+- Status: EXECUTED · Expected: zero · Actual: **0 node IDs, 0 `COVERS` joins**
+- Result: PASS · Evidence: register 28; `AC-F40-18` is separately evidenced —
+  smoke S15 returned `data-authorised-on="synthetic_attestation"`
 
 ### Scenario: `AC-F36-48` is claimed by nothing
-- Status: EXECUTED
-- Input: as above
-- Expected: zero claims
+- Status: EXECUTED · Expected: zero
 - Actual: **0 node IDs. 2 `COVERS` lines mention it and both deny themselves in
-  the same sentence** — `"COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48,
-  WHICH IS ITSELF DENIED"` (`test_abstention.py:331`, `:360`)
+  the same sentence** — *"COVERS ONLY THE COMPUTATION CLAUSE OF AC-F36-48,
+  WHICH IS ITSELF DENIED"* (`test_abstention.py:331`, `:360`)
+- Result: PASS · Evidence: register 27
+
+### Scenario: `AC-F5-02` is claimed by nothing — **the new one**
+- Status: EXECUTED
+- Expected: zero claims
+- Actual: **1 node ID, and it asserts the criterion is UNMET** —
+  `test_unclaimed_criteria.py::test_AC_F5_02_IS_NOT_MET_agents_that_acted_are_absent_from_the_inventory`.
+  **1 `COVERS` line, and it narrows itself explicitly**: *"COVERS ONLY THE
+  REGISTRATION CLAUSE OF AC-F5-02. It does NOT claim `AC-F5-02`, which this
+  build does not meet"*
 - Result: PASS
-- Evidence: register 27
+- Evidence: the two scenarios that DID claim it are gone — see
+  `changed-scenario-audit-2026-08-03.md`
 
-### Scenario: the 200 NEW node IDs were scanned with the same query
-- Status: EXECUTED
-- Input: the 200 node IDs added since `9d605b1`
-- Expected: none names any of the five
-- Actual: **zero hits**
+### Scenario: `AC-F5-03` is claimed by nothing
+- Status: EXECUTED · Expected: zero
+- Actual: **1 node ID, `test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`
+  — an assertion of unmet-ness. 0 `COVERS` joins**
 - Result: PASS
-- Evidence: the pass-17 UI work introduced no new claim on a declared criterion
 
-### Scenario: the register's OTHER unmet criteria are still unclaimed
-- Status: EXECUTED
-- Input: `AC-F41-08`, `AC-F12-05` (register 18, CLOSED at pass 12 — both now
-  legitimately claimable and claimed), `AC-F26-05`/`AC-F38-11` (register 6,
-  CLOSED at pass 11)
-- Expected: the closures are real, so claims on these are legitimate
-- Actual: legitimate; and the close-clock staleness is rendered on the served
-  surface — `Close day Day 3`, `1 close day(s) behind the close clock`
+### Scenario: `AC-F5-05` is claimed by nothing
+- Status: EXECUTED · Expected: zero
+- Actual: **0 node IDs, 0 `COVERS` joins.** The unit scenario that used to
+  carry the ID was renamed to
+  `test_every_lineage_result_states_its_own_scope_and_completeness` and its
+  docstring opens *"NOT a claim on `AC-F5-05`"*
 - Result: PASS
-- Evidence: visible in `ux-queue-desktop-1280-2026-08-03.png` masthead
 
-### Scenario: **FINDING** — `AC-F5-02` is reported PASS and the build cannot support it
+### Scenario: the 25 NEW node IDs were scanned with the same query
 - Status: EXECUTED
-- Input: `AC-F5-02`'s Given clause — *"an agent that has been deployed and has
-  **performed at least one action**"* — against `/inventory`
-- Expected: every agent that acted appears in the Inventory
-- Actual: **four of the five agents that authored findings in the pilot run are
-  absent from `/inventory`**, and the covering scenario passes because it
-  compares the inventory to `principals.DIRECTORY` — the projection against its
-  own source, an equality that cannot fail for this reason
-- Result: **FAIL**
-- Evidence: reproduced over HTTP against the served pilot as smoke **S12**.
-  This is not in the 33-entry register; it has no entry, and on the evidence it
-  needs one. It is the downstream half of the id disagreement `code-agent`
-  disclosed **on the agent page only**.
+- Input: the 25 scenarios added since `6bf8ed9`
+- Expected: none of them claims a forbidden criterion
+- Actual: **none.** The only forbidden-criterion strings in the new IDs are the
+  three `IS_NOT_MET` / `ARE_NOT_MET` names, which assert unmet-ness
+- Result: PASS
 
-### Scenario: **FINDING** — `AC-F5-03`/`-05` lineage completeness
+### Scenario: register 34's three "built instead" claims, checked one by one
 - Status: EXECUTED
-- Input: `AC-F5-05` — *"a partial list is never returned unlabelled"*
-- Expected: an unresolvable lineage is labelled incomplete and names what could
-  not be traversed
-- Actual: seven dossiers exist; **zero appear in any lineage**; the union across
-  all eleven inventory rows is 9 artefacts, none a dossier; **every row reports
-  `complete=True`**, and the covering scenario asserts exactly that
-- Result: **FAIL**
-- Evidence: see `functional-2026-08-03.md`
+- Expected: each is real and held by a scenario
+- Actual: **2 of 3 real and mutation-held; 1 held by nothing**
+  1. `/inventory` names the four, says `AC-F5-02` NOT met, unqualified sentence
+     gone from that screen — **real, mutation-held** (D3, D4)
+  2. every lineage row states scope + INCOMPLETE + untraversed classes —
+     **real, mutation-held** (D5, D6, D7, D8)
+  3. `/ges/inventory` returns `unregistered_actors` — **the field exists and
+     returns `[]` while four unregistered actors exist; no scenario in either
+     tree asserts it**
+- Result: **PARTIAL** — recorded as such, not rounded up
+- Evidence: `functional-2026-08-03.md` Finding 3
+
+### Scenario: register 16's `AC-F5-07` — the question `code-agent` asked
+- Status: EXECUTED
+- Input: mutation F7-M, stripping the criterion's two fields from every agent
+  row but the first
+- Expected: something in 2,977 scenarios notices
+- Actual: **nothing notices. 2,977 green**
+- Result: **FAIL — the criterion is unheld.** `AC-F5-07` is currently *listed
+  as met* on the strength of a scenario that inspects one member of a
+  population the criterion quantifies over with "each"
+- Evidence: `functional-2026-08-03.md` Finding 2. Register 16 records
+  `AC-F5-07` as CLOSED at the pass that built the six missing screens; this
+  finding does not reopen the screen question, it questions the check

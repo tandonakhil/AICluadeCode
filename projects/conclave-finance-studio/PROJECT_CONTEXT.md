@@ -1546,6 +1546,103 @@ absent afterwards:**
 
 ## Test Results
 
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-18 loop-back, at `dev` @ `1b1b56e`** (parent repo @ `2f9b373`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,977 of 2,977 scenarios
+passed at every suite entry point and in SIX whole-tree runs — canonical order,
+`reverse`, and four salted shuffles on this agent's own plugin, whose salt
+appears nowhere in the project tree. Zero skipped, zero vacuous, zero empty
+`parametrize`.** Structured per-scenario evidence:
+`test-evidence/*-2026-08-03.md` (14 files) plus 14 freshly captured Playwright
+screenshots. The entire superseded corpus was deleted and rewritten; every file
+names both commits and its presence on disk was verified after writing.
+
+**Test-count delta: 2,955 → 2,977 = +25 added, −3 removed, 3 changed.** The
+three removals are named individually in
+`test-evidence/changed-scenario-audit-2026-08-03.md` — two were the false
+`AC-F5-02`/`-03` claims gate 8 blocked on, one was a rename that drops a
+criterion claim and strengthens its body.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Owner | Blocking |
+|---|---|---|---|---|---|---|---|
+| unit / integration | `EXECUTED` | 0 | 2,302 | 2,302 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 355 | 355 | 0 | `functional-design-agent` | yes |
+| ux | `EXECUTED` | 0 | 194 | 194 | 0 | `ui-ux-designer` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | `responsible-ai-architect` | yes |
+| architecture | `EXECUTED` | 0 | 28 | 28 | 0 | `solution-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | `industry-expert` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | `security-architect` | yes |
+| **rendered-UI (Playwright)** | `EXECUTED` | 0 | 8 | 6 | **1** | `test-agent` | yes |
+| **smoke (served pilot, 8021)** | `EXECUTED` | 1 | 26 | 24 | **1** | `test-agent` | yes |
+
+The rendered-UI suite's eighth scenario is `INCONCLUSIVE`, not a pass: my gold
+predicate (`r > 150`) does not match the light token `#8A5A17`, so the sweep
+matched nothing and proves nothing. Recorded as inconclusive rather than as
+"0 violations". The smoke's S22 is `MIS-TARGETED`, also not a pass.
+
+**Both pass-18 fixes verified rather than accepted, by 19 mutations in a
+detached worktree.**
+
+- **The `.ctx` defect is fixed.** Re-measured myself in Chromium against the
+  served pilot: **167.00 px × 48.56 px at x=14.00, y=55.88, identical on six
+  screens at both 1280 and 1440**, `display:block`, parent `.lockup` with
+  `display:block`, `.lockup` children exactly `[lockup-row, ctx]`. (Pass 17's
+  defect measured 67.53 × 116.25.) Re-scoping the rule back to `.brand .ctx`
+  fails 2 scenarios; moving `.ctx` back inside the flex row fails 1.
+- **The orphan checker holds.** `NO_EXEMPTIONS` is empty, passed empty and
+  asserted empty — adding **any** exemption fails a scenario. The parser
+  **raises** on `@media`/`@import`/`@supports`/`@font-face` rather than
+  reporting "no orphans". Nine scenarios prove the matcher can say NO and are
+  mutation-confirmed in both directions. The regression scenario genuinely
+  reports a re-added `.brand .ctx` on the real stylesheet. The post-POST
+  re-traversal is real: removing it makes `.seal` and `.card.approved` orphans.
+- **`AC-F5-02`/`-03`/`-05` are falsifiable in both directions** — all nine
+  mutations caught, including *ids reconciled with the disclosure left behind*.
+- **The alias forgery guard holds.** My own M3(d), injected into product code,
+  is refused; so are the de-linked and self-alias variants.
+
+**Standing question — does any suite report a pass the register (34 entries)
+says cannot be true? NO**, for the first time since it returned YES last pass.
+All eight forbidden criteria — `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+`AC-F40-17`, `AC-F36-48`, and now `AC-F5-02`/`-03`/`-05` — are claimed by
+nothing.
+
+**Three findings sit beside the register, not against it. Two are blocking.**
+
+1. **BLOCKING — the disclosure was removed from one screen and left standing on
+   the four screens that screen links to.** All four
+   `/evidence/agent/<id>` pages for the absent agents render *"An agent that can
+   act is an agent that is listed."* in the subtitle under the `<h1>`, four
+   lines above *"This agent authored findings in this run and has no entry in
+   the principal registry under this id."* Register 34's wording (*"gone from
+   that screen"*) is literally true, and the same entry records that
+   `/inventory` links each absent agent to exactly these pages. The guarding
+   assertion is scoped to `/inventory` alone and there is exactly one such
+   assertion in the whole tree. **Same shape as the defect pass 18 fixed.**
+2. **BLOCKING — `AC-F5-07` has the same defect, and I agree with `code-agent`.**
+   Its scenario reads `agents[0]` for two strings while the criterion says
+   *"each agent"*. Mutation F7-M strips the fields from three of four agent
+   rows and **2,977 scenarios stay green**. Weaker than the `AC-F5-02` case in
+   one respect (the build satisfies it today, so the green is unheld rather
+   than untrue) and the same in the one that matters. Not touched, per
+   `code-agent`'s point that narrowing a criterion's claim is a Plan-gate call.
+3. **ADVISORY — `unregistered_actors` returns `[]` and is asserted by nothing.**
+   Register 34 offers it as the broker's own answer to the population question;
+   it is a set difference over the decision ledger, findings are not
+   ledger-recorded (that is `LINEAGE_UNTRAVERSED`'s own second entry), so it
+   **cannot become non-empty in this build**. `grep` finds no scenario naming
+   it. Register 33's convention for this shape is UNKNOWN, not none.
+
+**The human's pilot (pid 50367, port 8030) was verified alive before and after
+every invocation.** 8030/8031 were never probed. All processes were started and
+reaped inside a single command invocation each, killed by `killpg` on their own
+process group; no name-based sweep was run. `lsof` on 8021/8022 empty after
+every teardown. The smoke drives the real export path and grew the shared
+ledger 10,702,848 → 10,723,328 bytes; the test tree left it byte-identical
+across all six whole-tree runs.
+
+---
+
 ### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-17 UX redesign, at `dev` @ `6bf8ed9`** (parent repo @ `5268e9b`)
 
 **All seven automated suites EXECUTED, exit code 0, 2,955 of 2,955 scenarios

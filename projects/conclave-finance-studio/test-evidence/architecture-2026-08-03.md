@@ -1,50 +1,48 @@
 # Test evidence — architecture suite
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
-**Suite owner:** `solution-architect`
-**Executed by:** `test-agent`
-**Blocking:** yes
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
+**Suite owner:** `solution-architect` — **`test-agent` did not author these scenarios**;
+it executed them and reports the result
+**Blocking:** yes — `PROJECT_CONTEXT.md` Active Team records
+*"Test Policy: all suites blocking. No advisory exceptions."*
 **Status:** `EXECUTED`
-**Entry point:** `dev/tests/suites/architecture/run.sh`
+**Entry point:** `tests/suites/architecture/run.sh` → shared `_runner.sh`
 **Exit code:** 0
-**Scenarios: 28 — PASS 28, FAIL 0, SKIP 0**
+**Scenarios: 28 — PASS 28, FAIL 0**
 
-Test-count delta against `9d605b1`: **0 added, 0 removed, 0 changed.** The
-pass-17 redesign is confined to `app/ui/`; nothing in it touches the
-architectural conformance surface.
+**Test-count delta since `6bf8ed9` (28):** **0 added, 0 removed, 0 changed** — this suite is byte-identical to the previous run
+
+The suite is **not empty** — 28 scenarios collected and run. The shared runner
+exits 3 on a suite with no `test_*.py`; it did not.
 
 ---
 
-### Scenario: the suite runs at its own entry point
+### Scenario: the architecture suite runs to completion through its own entry point
 - Status: EXECUTED
-- Input: `dev/tests/suites/architecture/run.sh`
-- Expected: exit 0
-- Actual: exit 0
+- Input: `bash tests/suites/architecture/run.sh` at `dev` @ `1b1b56e`
+- Expected: exit 0, every scenario passing
+- Actual: **`EXECUTED — suite passed`**, exit 0, 28 passed
 - Result: PASS
-- Evidence: `28 passed in 2.64s`; `EXECUTED — suite passed`
+- Evidence: `tests/suites/architecture (1 file)` — `28 passed`
 
-### Scenario: ARCH-04 — the deployment topology is two processes over a socket
+### Scenario: the suite holds under six independent orderings
 - Status: EXECUTED
-- Input: the suite's own scenario, which starts `ges/run.py` as a real child
-  process on an ephemeral port and drives a broker decision over stdlib HTTP
-- Expected: a different pid holds the credential; the api-role test process is
-  refused it; the untokened caller gets 401 across the socket
-- Actual: passes
+- Input: the whole 2,977-scenario tree run under canonical order, reverse
+  order and four salted shuffles
+- Expected: 28/28 in every ordering
+- Actual: **all six orderings green**
 - Result: PASS
-- Evidence: the one executing witness for register 19; the residual named in
-  that entry (no suite can witness that an api-process module cannot
-  `import ges.executor`, because a suite runs in one interpreter) is unchanged
-  by this pass
+- Evidence: `order-independence-2026-08-03.md`
 
-### Scenario: register 19's residual is unchanged by the redesign
+### Scenario: the suite claims none of the criteria the register forbids
 - Status: EXECUTED
-- Input: the UI's import boundary, re-checked after 1,915 lines of new `app/ui/`
-- Expected: `app/ui/` still imports nothing from `ges`
-- Actual: the two AST-level scenarios still pass
+- Input: every node ID and every `COVERS` line in this suite, cross-checked
+  against the deferred-substitution register's 34 entries
+- Expected: zero claims on `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
+  `AC-F40-17`, `AC-F36-48`, `AC-F5-02`, `AC-F5-03`, `AC-F5-05`
+- Actual: **zero claims**
 - Result: PASS
-- Evidence: `app/ui/graph.py`, `chrome.py`, `routes.py` and the four new object
-  pages introduce no `ges` import; the new `test_ui_object_graph.py` resolves
-  hrefs through `app.ui.graph`, which is in-package
+- Evidence: `register-cross-check-2026-08-03.md`

@@ -1,127 +1,176 @@
 # Test evidence — functional suite
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
-**Suite owner:** `functional-agent`
-**Executed by:** `test-agent`
-**Blocking:** yes
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
+**Suite owner:** `functional-design-agent` / `functional-agent` —
+**`test-agent` did not author these scenarios**; it executed them, mutated them
+and reports the result
+**Blocking:** yes — `PROJECT_CONTEXT.md` Active Team: *"Test Policy: all suites
+blocking. No advisory exceptions."*
 **Status:** `EXECUTED`
-**Entry point:** `dev/tests/suites/functional/run.sh`
+**Entry point:** `tests/suites/functional/run.sh` → shared `_runner.sh`
 **Exit code:** 0
-**Scenarios: 354 — PASS 354, FAIL 0, SKIP 0**
+**Scenarios: 355 — PASS 355, FAIL 0**
 
-Test-count delta against `9d605b1`: **+5 added, −5 removed, 0 net.** All ten are
-the `/exceptions` → `/evidence/run/<id>` re-point across `test_f26_criteria`,
-`test_f28_criteria` and `test_f33_criteria`; each removed node ID has a
-successor asserting the same thing on the screen the module moved to. Verified
-scenario by scenario in `changed-scenario-audit-2026-08-03.md`.
+## Test-count delta since `6bf8ed9` (354)
+
+| | |
+|---|---|
+| **added** | **+3** |
+| **removed** | **−2** |
+| changed | 1 (`test_AC_F5_06...` — its `lineage["complete"] is True` assertion replaced) |
+| current | **355** |
+
+**Removed — a coverage decision, named here rather than left in a diff:**
+
+1. `test_AC_F5_02_every_agent_is_listed_with_identity_entitlements_and_version`
+2. `test_AC_F5_03_a_lineage_result_STATES_that_it_is_complete_rather_than_sampled`
+
+Both were the green scenarios gate 8 blocked on: the first asserted
+`inventory == principals.DIRECTORY`, a projection against its own source; the
+second asserted `lineage["complete"] is True` over rows that omit seven
+dossiers. **Their removal is the right call**, but it is a reduction in claimed
+coverage and the human should see it as one.
+
+**Added (+3):** `test_the_inventory_needs_no_manual_registration_step` (the
+narrowed registration clause only),
+`test_AC_F5_02_IS_NOT_MET_agents_that_acted_are_absent_from_the_inventory`,
+`test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`.
 
 ---
 
-### Scenario: the suite runs at its own entry point
+### Scenario: the functional suite runs to completion through its own entry point
 - Status: EXECUTED
-- Input: `dev/tests/suites/functional/run.sh`
-- Expected: exit 0, "EXECUTED — suite passed"
-- Actual: exit 0
+- Input: `bash tests/suites/functional/run.sh`
+- Expected: exit 0
+- Actual: **`EXECUTED — suite passed`**, 355 passed in 23.14s
 - Result: PASS
-- Evidence: `354 passed in 22.86s`
 
-### Scenario: CONFLICT 1 (a) — `test_ui_dossier`'s "no links at all" vs edge E8
-- Status: EXECUTED — **reported, not resolved**
-- Input: `ARCHITECTURE_KB` §9.4, `AC-F41-04`, and the changed scenario
-- Expected: confirm the fetch-nothing substance and `AC-F41-04`'s retained view
-  are genuinely untouched
-- Actual: **both confirmed untouched.**
-  - **Fetch-nothing:** `test_there_is_no_external_reference_of_any_kind` does not
-    appear in the diff. Independently re-proved in a real browser — the served
-    dossier saved to disk and opened as `file://` issued zero non-`file://`
-    requests and rendered still styled.
-  - **`AC-F41-04`'s retained view:** `state._retained_view` builds a `<section>`
-    with an `<h2>`, a `<table>` and a `<p>`. It contains **no anchor of any
-    kind**, and it is assembled separately from the screen renderer precisely so
-    a screen's chrome cannot leak into it. The exported artefact is unaffected
-    by the dossier screen's new back-reference.
-  - §9.4's three binding consequences are about the *evidential region* being a
-    pure function of `(review_payload, template_version)`, byte-determinism, and
-    inlined styles. **None of the three speaks to anchors on the dossier
-    screen.** An `<a>` is inert until clicked.
-- Result: PASS on substance; **the conflict stands open** — whether the dossier
-  SCREEN (as opposed to the retained view) should carry zero anchors is a ruling
-  for `functional-design-agent`, and is not decided here
-- Evidence: `_retained_view` source at `app/ui/state.py:2437`; rendered-UI R1
-
-### Scenario: CONFLICT 1 (b) — gold is narrower than `UX_KB` A2.8
-- Status: EXECUTED — **reported, not resolved**
-- Input: `UX_KB` A2.8 vs `chrome.STYLESHEET`
-- Expected: state the departure
-- Actual: the build paints gold on **five selectors only** —
-  `.btn.approve`, `.seal`, `.card.approved`, `.pull`, `.pull-dot` — asserted by
-  set **equality**. A2.8 additionally gives gold to `.goldline` (one
-  gold-underlined phrase per page-opening) and to the six section icons.
-  Neither is carried: `.goldline` is not in the stylesheet at all and the icons
-  take `--ink-3`. `code-agent`'s stated reason is the brand's own rule — gold
-  means *a human decided*, and a decorative headline underline is not a human
-  decision.
-- Result: the departure is **real, deliberate and disclosed**; not resolved here
-- Evidence: **`UX_KB` A2.8's own version row reads "Human request, 2026-08-03;
-  approval pending"** — the KB entry the build departs from is not yet approved,
-  which is material to whoever rules on it. Confirmed in a real browser: 28
-  gold-painted elements across 12 renders, all `.pull`/`.pull-dot`/`.btn.approve`.
-
-### Scenario: FINDING — `AC-F5-02` is reported PASS and the build cannot support it
+### Scenario: the three replacement checks are falsifiable in BOTH directions
 - Status: EXECUTED
-- Input: `tests/suites/functional/test_unclaimed_criteria.py:344`,
-  `test_AC_F5_02_every_agent_is_listed_with_identity_entitlements_and_version`
-- Expected: `AC-F5-02` — *"Given an agent that has been **deployed and has
-  performed at least one action**, When the Inventory is read, Then the agent
-  appears with its identity, its entitlements and its current version"*
-- Actual: the scenario asserts
-  `{a["principal_id"] for a in inventory["agents"]} == set(principals.DIRECTORY)`
-  — **the projection compared against its own source.** That equality is true by
-  construction and cannot fail for the reason the criterion is about. The
-  criterion's population is *agents that acted*, which the scenario never
-  consults.
-  **Five agents authored findings in the pilot run. Four of them do not appear
-  on `/inventory` at all**: `agent.crossperiod-surveillance`,
-  `agent.omission-detector`, `agent.anomaly-detect`, `agent.fidelity-check`.
-- Result: **FAIL** — the criterion is not satisfied and the suite reports it green
-- Evidence: authors `{crossperiod-surveillance: 3, omission-detector: 1,
-  coding-detect: 1, anomaly-detect: 1, fidelity-check: 1}`; `/inventory` rows
-  `{agent.anomaly_detector@1, agent.coding-detect, agent.omission_detector@1,
-  agent.threshold_widening@1, …}`. Reproduced over HTTP against the served
-  pilot — smoke **S12 FAIL**. This is the same id disagreement `code-agent`
-  disclosed on the agent page; the disclosure was added to
-  `/evidence/agent/<id>` and **not** to `/inventory`, whose own rendered prose
-  still reads *"An agent that can act is an agent that is listed."*
+- Input: nine mutations — ids reconciled, gap widened, disclosure removed,
+  sentence restored, `LINEAGE_UNTRAVERSED` emptied, `complete` hard-coded,
+  scope dropped, `data-complete` hard-coded, dossier index emptied
+- Expected: each mutation fails at least one scenario
+- Actual: **all nine caught.** In particular D1 — *ids reconciled, disclosure
+  left behind* — fails, which is the direction `code-agent` claimed and the one
+  that would otherwise let a fixed build keep a false "NOT MET" banner
+- Result: PASS
+- Evidence: `mutation-tests-2026-08-03.md` Part C
 
-### Scenario: FINDING — `AC-F5-03`/`-05` lineage completeness over the same gap
+### Scenario: `/inventory` no longer carries the unqualified claim
 - Status: EXECUTED
-- Input: `test_AC_F5_03_a_lineage_result_STATES_that_it_is_complete_rather_than_sampled`
-- Expected: `AC-F5-05` — *"a lineage query that cannot be computed completely is
-  labelled **incomplete** and names what could not be traversed; a partial list
-  is never returned unlabelled"*
-- Actual: the scenario asserts `lineage["complete"] is True` for **every** agent.
-  Seven dossiers exist in the pilot close. **Zero of them appear in any
-  lineage**; the union of artefacts across all eleven inventory rows is 9 and
-  none is a dossier. Every row still reports `complete=True`.
-- Result: **FAIL** — a partial list is being returned labelled complete
-- Evidence: `agent.omission_detector@1` reports 8 artefacts; the four agents
-  that authored the seven dossiers report 0 or are not listed. Downstream of the
-  same id disagreement.
+- Input: the served `/inventory` markup — in-process, over real HTTP, and in
+  Chromium
+- Expected: *"An agent that can act is an agent that is listed"* absent
+- Actual: **absent** in all three witnesses
+- Result: PASS
 
-### Scenario: register 16's closure claim over `AC-F5-07`
+### Scenario: every lineage row states scope and INCOMPLETE
 - Status: EXECUTED
-- Input: register entry 16, CLOSED at pass 4, claiming each of fifteen
-  observable-UI criteria "is asserted on the screen it names, in the state it
-  names"
-- Expected: `AC-F5-07` — *"the agent inventory is visible listing **each
-  agent**"*
-- Actual: `test_AC_F5_07_every_agent_is_listed_with_version_and_entitlements`
-  checks `agents[0]` for the words "Version" and "Entitlements". It never checks
-  the population either.
-- Result: **advisory** — the assertion is present and passes; it does not cover
-  the criterion's "each agent" clause on a build where four of five acting
-  agents are absent from the screen
-- Evidence: `test_ui_governance_screens.py:341`
+- Input: the 11 rendered `lineage-view` rows
+- Expected: every row `data-complete="false"`, `data-scope="decision_ledger"`,
+  naming its untraversed classes
+- Actual: **11 of 11**, and `untraversed` names both classes —
+  *"evidence dossier - produced by the close and not written to the decision
+  ledger…"* and *"finding - authored under a run author id, which in this build
+  is not the same string as any registered principal id"*
+- Result: PASS
+
+### Scenario: the broker returns `unregistered_actors`
+- Status: EXECUTED
+- Input: the inventory payload, measured in-process under the real fixtures
+- Expected: the field exists
+- Actual: **the field exists and its value is `[]`** — see Finding 3
+- Result: PASS on existence; the value is a finding, not a pass
+
+---
+
+## Finding 1 — **BLOCKING**: the disclosure was removed from one screen and left standing on the four screens that screen links to
+
+- Status: EXECUTED (three independent witnesses: in-process, real HTTP,
+  Chromium)
+- Input: `/evidence/agent/<id>` for each of the four agents `/inventory` names
+  as absent and links to
+- Expected: no surface repeats a claim the build records as NOT MET
+- Actual: **all four agent pages carry, in the subtitle directly under the
+  `<h1>`:** *"An agent that can act is an agent that is listed."* — and then,
+  four lines later on the same page: *"This agent authored findings in this run
+  and has no entry in the principal registry under this id."*
+- Result: **FAIL**
+- Evidence: `ui-agent-page-absent-agent-1280-2026-08-03.png`; smoke S12b;
+  rendered R7; `backend/app/ui/pages.py:4096`
+
+Why this matters, and what is and is not wrong:
+
+- Register 34's own words are *"the unqualified sentence … is gone **from that
+  screen**"* — literally true. **The register is not contradicted.**
+- The same entry records that `/inventory` *"names all four absent agents,
+  **links each to its agent page**"*. That link is the reader's path, and it
+  leads from a screen saying `AC-F5-02` is NOT met to four screens that each
+  assert the criterion's claim as a general truth.
+- The guarding scenario is `test_unclaimed_criteria.py:421` —
+  `assert "An agent that can act is an agent that is listed" not in document.markup`
+  — where `document` is `/inventory` **and only `/inventory`**. A `grep` across
+  both trees returns **exactly one hit**: no scenario asserts it anywhere else.
+- This is the *same shape* as the defect pass 18 fixed: a claim that is true of
+  the population a check happens to look at, and false of the population the
+  claim is about.
+
+Not fixed — reported, per this agent's guardrails.
+
+## Finding 2 — **BLOCKING**: `AC-F5-07` has the same defect, and I agree with `code-agent`
+
+`code-agent` raised this and declined to act, calling the narrowing of a
+criterion's claim a Plan-gate decision. **I agree it has the same defect.** I
+did not touch it. Measured rather than argued:
+
+- The criterion (`FUNCTIONAL_SPEC` §AC-F5-07) reads: *"the agent inventory is
+  visible listing **each** agent, its version and its entitlements"*.
+- `test_AC_F5_07_every_agent_is_listed_with_version_and_entitlements`
+  (`backend/tests/test_ui_governance_screens.py:341`) reads `agents[0]` and
+  checks for the two strings `"Version"` and `"Entitlements"`.
+- **Mutation F7-M:** relabel the fields to `"Ver."`/`"Rights"` for every agent
+  row **except the first**, so three of the four agent rows no longer carry
+  what the criterion names. **Result: 2,977 scenarios green** — 2,302 unit +
+  675 across all six SME suites. **Nothing anywhere notices.**
+
+Two honest distinctions from the `AC-F5-02` case, so the human weighs it right:
+
+1. It is **weaker, not false today**. All four agent rows currently do carry
+   both fields, measured. The green is *unheld*, not *untrue*.
+2. It is a **sampling** fault (`[0]` standing for "each"), not the tautology
+   fault (`projection == its own source`). The `AC-F5-02` scenario could not
+   fail for the reason the criterion was about; this one can — it just does not
+   look.
+
+The sibling scenario (`a_lineage_view_is_reachable_for_each_listed_version`)
+asserts `len(lineage) == len(inventory-row)`, 11 = 11, which counts rows and
+does not establish "reachable from that list" as the criterion words it.
+
+## Finding 3 — **ADVISORY (recorded; not blocking on its own)**: `unregistered_actors` returns `[]` and is asserted by nothing
+
+Register 34 lists three things "built instead". Two are real and
+mutation-held. The third is not held at all.
+
+- Measured: the inventory payload returns **`"unregistered_actors": []`** while
+  `run_agent_ids()` = 5 and four of those five are absent from the inventory.
+- Cause: it is computed as
+  `{d["principal_id"] for d in store.decisions()} - set(principals.DIRECTORY)`
+  — a set difference over the **decision ledger**. Findings are *not*
+  ledger-recorded; that is literally the second entry in
+  `LINEAGE_UNTRAVERSED`. **The field therefore cannot become non-empty in this
+  build, by construction.**
+- **`grep -rn "unregistered_actors" backend/tests tests/suites` returns
+  nothing.** No scenario asserts its value in either direction. It would stay
+  `[]` forever and no gate would notice.
+- Register 33 records this product's own convention for exactly this shape:
+  where the answer cannot be computed, the answer is **UNKNOWN, not none** —
+  *"the most dangerous rounding in the product if it is ever softened"*. A bare
+  `[]` from a source that structurally cannot hold the answer is that rounding.
+
+Register 34's sentence — *"the broker's own answer to the population question
+computed from its ledger"* — is accurate about the method, and on this build
+returns the wrong answer to the question it names.

@@ -1,155 +1,154 @@
 # Test evidence — rendered-UI verification (Playwright / Chromium)
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-17 UX redesign
+**Gate:** 8 · Test — re-run after the pass-18 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`6bf8ed9`** · parent repo @ **`5268e9b`**
+**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
 **Backend:** Playwright / **Chromium 148.0.7778.96**, driven against the
-**SERVED pilot on 8021** — a real HTTP origin, not `page.route()` interception
+**SERVED pilot on 8021** over a real socket — not `page.route()` interception,
+not `TestClient`
 **Exit code:** 0
-**Scenarios: 9 — PASS 8, FAIL 1**
+**Scenarios: 8 — PASS 6, FAIL 1, INCONCLUSIVE 1**
 
-RNTL is **not applicable**: MVP1 is desktop web only (`PROJECT_CONTEXT.md`
-header, `PLAN` §9.2 A2). Maestro remains unbuilt and unavailable.
+RNTL is **not applicable**: MVP1 is desktop web only. Maestro + simulator
+remains unbuilt and unavailable on this machine (2026-07-26 toolchain spike),
+so the deeper native backend is still future and nothing here depends on it.
 
-**Process lifecycle.** The pilot was started, driven and reaped inside **each
-single command invocation** — four times across this pass. `start_new_session=True`
-makes the launcher pid its own process-group id and teardown calls `os.killpg`
-on **that group and only that group**. No name-based sweep of any kind was run.
-The human's pilot (**pid 39289, port 8030**) was verified alive before and after
-every invocation, and 8030/8031 were never probed. `lsof` on 8021 and 8022
-returned empty after every teardown.
+**Coverage:** 6 screens × 2 viewports (1280, 1440) = **12 renders**, plus the
+four absent-agent pages and the inventory disclosure at full page. **14
+screenshots written.**
 
-Coverage: **6 screens × 2 viewports (1280, 1440) = 12 renders**, plus the
-dossier opened as a `file://` document. 13 screenshots written.
+## Process lifecycle
+
+The pilot was started, driven and reaped **inside one command invocation**.
+`start_new_session=True` makes the launcher its own process-group id; teardown
+calls `os.killpg` on **that group and only that group**. **No name-based sweep
+of any kind was run.**
+
+- the human's pilot, **pid 50367 on port 8030**: verified alive **before** and
+  **after** — `alive BEFORE: True`, `alive AFTER: True`
+- 8030 and 8031 were never probed, never connected to, never signalled
+- `lsof` on 8021 and 8022 after teardown: **empty**
 
 ---
 
-### Scenario: R1 — the dossier opens from a FILE, offline, and fetches nothing
+### Scenario: R1 — **the `.ctx` measurement, re-measured in Chromium**
 - Status: EXECUTED
-- Input: the served dossier bytes saved to disk, opened as `file://` in Chromium
-  with every network request recorded
-- Expected: no request leaves `file://`; the exhibit is still styled; exactly
-  one inert anchor
-- Actual: **one request, the document itself.** `risk-band` background resolved
-  to `rgb(246, 228, 227)` — still styled with no server. Anchors:
-  `["/review/ITEM-21400-CP"]`
-- Result: PASS
-- Evidence: `ux-dossier-offline-file-2026-08-03.png`. This is the independent
-  witness for conflict 1(a) — `ARCHITECTURE_KB` §9.4's fetch-nothing property
-  survives the eighth graph edge.
+- Input: `getBoundingClientRect()` + `getComputedStyle()` on `.lockup .ctx`,
+  on 6 screens × 2 viewports, against the served pilot
+- Expected: a full-width line under the lockup row, not a third flex item
+- Actual: **167.00 px × 48.56 px at x=14.00, y=55.88 — identical on all six
+  screens at BOTH viewports.**
+  - `display: block`; parent is `.lockup` with `parentDisplay: block`
+  - `.lockup` children are exactly `['lockup-row', 'ctx']`; `.lockup-row`
+    children are exactly `['glyph mark', 'wm']`
+  - `.lockup` box 195 × 102.44; `.lockup-row` box 167 × 34.88
+  - text `'Northwind Grid Holdings - 2026-06 - Day 3'`, laid out over
+    **3 visual lines**, widest line **139.12 px** inside the 167 px column
+  - computed: `12px`, `rgb(94, 100, 110)`, weight 500, `uppercase`,
+    letter-spacing `0.72px`, line-height `16.2px`, margin-top `7px`
+- Result: **PASS**
+- Evidence: `ui-queue-1280-2026-08-03.png` (visible top-left as
+  "NORTHWIND GRID HOLDINGS - 2026-06 - DAY 3"), and the same at
+  `ui-queue-1440`, `ui-approvals-*`, `ui-ask-*`, `ui-inventory-*`,
+  `ui-audit-*`, `ui-catalogue-*`.
+  **Independent confirmation of `code-agent`'s reported 167px × 48.6px.** For
+  contrast, the pass-17 defect measured **67.53 × 116.25** — a min-content flex
+  child. One correction to the phrasing: it is a full-width *block*, wrapping
+  to three lines; "a full-width line" is loose but the layout is right.
 
 ### Scenario: R2 — zero green elements under COMPUTED colour
 - Status: EXECUTED
-- Input: `getComputedStyle` over every visible element on 12 renders, checking
-  `color`, `backgroundColor`, `borderTopColor`, `fill` and `stroke`
-- Expected: no element resolves to a green colour anywhere
-- Actual: **0 green elements across all 12 renders**
+- Input: every visible element on 12 renders, testing computed `color` and
+  `backgroundColor` against `g > r+18 && g > b+18 && g > 70`
+- Expected: none
+- Actual: **0**
 - Result: PASS
-- Evidence: the check is on what the engine resolved, not on the token table
+- Evidence: `render_out.json` `"green": []` across all 12 renders
 
-### Scenario: R3 — no text below 0.05 effective (compounded) opacity
+### Scenario: R3 — no text below 0.5 COMPOUNDED opacity
 - Status: EXECUTED
-- Input: opacity multiplied up the full ancestor chain for every text-bearing
-  element, 12 renders
-- Expected: nothing readable-in-source but invisible-on-screen
-- Actual: **0 faint text nodes**
+- Input: for every leaf text node, the product of `opacity` up the whole
+  ancestor chain — the compounding-opacity class of defect
+- Expected: none faint
+- Actual: **0 across all 12 renders**
 - Result: PASS
-- Evidence: the compounding-opacity class the rendered-UI contract exists for
+- Evidence: `render_out.json` `"faint": []`
 
-### Scenario: R4 — minimum computed font size (advisory)
+### Scenario: R4 — no horizontal overflow at either viewport
 - Status: EXECUTED
-- Input: min computed `fontSize` over every text-bearing element
-- Expected: recorded, not asserted — UX-4/`AC-F41-03` is a *relative* check and
-  no rule sets an absolute minimum
-- Actual: **12.0px on all six screens at both viewports**
-- Result: PASS (advisory)
-- Evidence: **improved from 10.0px at the previous pass.** The carried advisory
-  for `ui-ux-designer` is materially better and is recorded as such.
-
-### Scenario: R5 — `AC-F41-03`: the riskiest figure is the largest computed text
-- Status: EXECUTED
-- Input: computed `fontSize` of `riskiest-figure` vs every other text element on
-  `/review/ITEM-21400-CP`
-- Expected: `riskiest-figure` is the maximum on the screen
-- Actual: **riskiest 40.0px = largest on screen 40.0px**, against a 28.0px `h1`
+- Input: `scrollWidth − clientWidth` on 12 renders
+- Expected: 0
+- Actual: **{0}** — a single distinct value across all 12
 - Result: PASS
-- Evidence: `ux-finding-desktop-1280-2026-08-03.png`
+- Evidence: `render_out.json` `meta[].overflowX`
 
-### Scenario: R6 — every object page names its object in its rendered `<h1>`
+### Scenario: R5 — every screen names its object in its rendered `<h1>`
 - Status: EXECUTED
-- Input: rendered `innerText` of the first `<h1>`, 12 renders
-- Expected: the finding names the finding — **never its approval state** (the
-  pass-17 commit `47735c9`); the run names the run; the agent names the agent
-- Actual: finding `"21400 GR/IR Clearing"`; run `"Run RUN-2026-06-0412"`; agent
-  `"agent.crossperiod-surveillance"`; approvals `"Approval - PROP-2026-06-0031"`;
-  queue `"My queue - 2026-06 Northwind Grid Holdings"`. **No approval vocabulary
-  in the finding's `<h1>` at either viewport.**
+- Input: the accessibility-relevant `h1` innerText on each screen
+- Expected: one per screen, naming the object
+- Actual: `/queue` → *"My queue - 2026-06 Northwind Grid Holdings"*;
+  `/approvals` → *"Approvals"*; `/ask` → *"What should the agent do?"*;
+  `/audit` → *"Audit - 2026-06 Northwind Grid Holdings"*; `/catalogue` →
+  *"Certified dataset catalogue"*; `/inventory` → *"Agent and principal
+  inventory"*. Landmarks `('nav', 'main')` on every render
 - Result: PASS
-- Evidence: full `h1` map across 12 renders in `scratchpad/rendered17_results.json`
+- Evidence: `render_out.json` `meta[].h1`, `meta[].landmarks`
 
-### Scenario: R7 — gold is painted only where the colour law allows
+### Scenario: R6 — the `/inventory` disclosure, as a reader actually sees it
 - Status: EXECUTED
-- Input: every element the browser painted in **exactly** the resolved `--gold`
-  token (`#8A5A17` → `rgb(138, 90, 23)`), read from the document itself
-- Expected: gold appears (non-vacuous), on the approval screen, and nowhere
-  outside `.btn.approve` / `.seal` / `.card.approved` / `.pull` / `.pull-dot`
-- Actual: **28 gold-painted elements across 12 renders. Every one is `.pull`
-  (stroke), `.pull-dot` (fill) or `.btn approve` (color + border). Zero
-  offenders.** The approve control is gold on `/approvals` at both viewports and
-  on no other screen.
+- Input: the rendered `/inventory` at 1280, reading the real DOM
+- Expected: four absent agents named, `AC-F5-02` stated NOT met, every lineage
+  row labelled, and the unqualified sentence gone
+- Actual: **all four named** (`agent.crossperiod-surveillance`,
+  `agent.omission-detector`, `agent.anomaly-detect`, `agent.fidelity-check`);
+  the notice reads *"This inventory is INCOMPLETE as a list of agents that have
+  acted… AC-F5-02 … is NOT met by this build and is recorded as unmet rather
+  than reported as satisfied"*; **11 of 11** `lineage-view` rows carry
+  `data-complete="false"` and `data-scope="decision_ledger"`; the unqualified
+  sentence is **absent**
 - Result: PASS
-- Evidence: this is the independent witness for the gold conflict — the unit
-  suite asserts the law by parsing `chrome.STYLESHEET` as **text**; this asserts
-  it on what Chromium actually painted. The scenario carries a **non-vacuity
-  guard** after its first form passed on an empty set (see
-  `mutation-tests-2026-08-03.md` M6).
+- Evidence: `ui-inventory-disclosure-1280-2026-08-03.png`
 
-### Scenario: R8 — screenshots captured as evidence
+### Scenario: R7 — **FINDING: the sentence removed from `/inventory` survives on the four pages `/inventory` links to**
 - Status: EXECUTED
-- Input: full-page screenshots, 6 screens × 2 viewports + the offline dossier
-- Expected: 13 files under `test-evidence/`
-- Actual: 13 written, all present on disk
-- Result: PASS
-- Evidence: `ux-{queue,approvals,run-report,finding,agent,readiness}-desktop-{1280,1440}-2026-08-03.png`
-  and `ux-dossier-offline-file-2026-08-03.png`
-
-### Scenario: R9 — FINDING: the sidebar context line is unstyled and lays out one word per line
-- Status: EXECUTED
-- Input: bounding-box measurement of every text-bearing element, 8 renders
-  across 4 screens × 2 viewports
-- Expected: the sidebar identity block lays out as a lockup
-- Actual: **the entity/period/close-day context line renders in a 67.5px-wide,
-  116.25px-tall box at x=140 — roughly one word per line — on EVERY screen at
-  BOTH viewports.**
-  Root cause, found by reading the stylesheet after the measurement: the rule is
-  scoped **`.brand .ctx`**. Pass 17's A2.8 identity layer replaced the `.brand`
-  block with `.lockup` — `chrome.lockup()`'s own docstring says *"Replaces the
-  plain `.brand` text block"* — but the `.ctx` selector was not re-scoped.
-  **`.lockup .ctx` has no rule**, so the span is an unstyled min-content flex
-  child of a `display:flex; align-items:center` row inside a ~160px sidebar.
+- Input: the four `/evidence/agent/<id>` pages — the ones the `/inventory`
+  disclosure links each absent agent to — rendered in Chromium, reading
+  `document.body.innerText`
+- Expected: none of the four repeats a claim the build records as unmet
+- Actual: **all four carry it.**
+  `{"agent.crossperiod-surveillance": {"unqualified": true, "discloses": true},
+  "agent.omission-detector": {...true, true}, "agent.anomaly-detect":
+  {...true, true}, "agent.fidelity-check": {...true, true}}`
+  The page reads, in the subtitle directly under the `<h1>`:
+  *"An agent that can act is an agent that is listed."*
+  — and then, four lines later:
+  *"This agent authored findings in this run and has no entry in the principal
+  registry under this id."*
 - Result: **FAIL**
-- Evidence: visible top-left in `ux-queue-desktop-1280-2026-08-03.png` and
-  `ux-approvals-desktop-1440-2026-08-03.png` as "Northwind / Grid / Holdings - /
-  2026-06 - / Day 3" stacked beside the Conclave wordmark. Measured:
-  `{"text": "Northwind Grid Holdings - 2026-06 - Day ", "cls": "ctx",
-  "w": 67.53, "h": 116.25, "x": 140.31, "y": 14}`, identical at 1280 and 1440.
-  **Invisible to every non-rendering check**: the class is emitted, the string
-  `.ctx` *does* exist in the stylesheet so a grep passes, the page returns 200
-  and contains the right text. `test_ui_brand.py`'s 32 new scenarios do not
-  catch it, and neither does the 194-scenario `ux` suite.
+- Evidence: `ui-agent-page-absent-agent-1280-2026-08-03.png`.
+  Register 34's wording is literally accurate — the sentence *is* gone "from
+  that screen" — but the same entry also records that `/inventory` **links each
+  absent agent to its agent page**, which is precisely the path that carries a
+  reader from the disclosure into its contradiction. The scenario that guards
+  this asserts `not in document.markup` for `/inventory` **only**
+  (`test_unclaimed_criteria.py:421`); no scenario anywhere asserts it for any
+  other surface. Full detail in `functional-2026-08-03.md` §"Finding 1".
 
-### Scenario: R10 — the "clipped pill" was this agent's misreading, not a defect
-- Status: EXECUTED
-- Input: the `PRESENT ANOMAL` pill in the queue screenshot looked truncated;
-  measured with a `Range` rect against the pill box rather than eyeballed
-- Expected: confirm or refute before reporting
-- Actual: **refuted.** `'Present anomaly'` paints **136.4px inside a 152.4px
-  box**, overflow −1.0px; every kind- and risk-pill on the queue has negative
-  overflow at both viewports. Nothing is clipped.
-- Result: PASS (no defect)
-- Evidence: recorded because a visual impression that measurement refutes is
-  worth recording — the same discipline that made R9 reportable
+### Scenario: R8 — the gold colour law
+- Status: **INCONCLUSIVE — NOT A PASS**
+- Input: computed `color`/`backgroundColor` tested against a gold predicate
+  `r > 150 && g > 110 && b < 110 && r >= g`
+- Expected: gold painted only where the colour law allows
+- Actual: **0 elements matched the predicate — and the predicate is wrong.**
+  The light-theme token is `gold: #8A5A17` = `rgb(138, 90, 23)`, which fails
+  `r > 150`. A sweep that matches nothing proves nothing
+- Result: **INCONCLUSIVE.** Recorded as inconclusive rather than as "0
+  violations found", which is the same vacuous-pass error this agent audits
+  other suites for
+- Evidence: `tokens.py:75 "gold": "#8A5A17"`. The colour law is the `ux`
+  suite's territory and its 194 scenarios are green (`ux-2026-08-03.md`); this
+  independent witness simply did not run correctly and is not offered as one
