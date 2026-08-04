@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 8 \u2014 Test (after the AC-F41-13 ruling was built)",
+  "position": "Gate 7 \u2014 pass 23 (advisory cleanup), then Gate 9 Verification",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -118,13 +118,13 @@
     {
       "n": 8,
       "name": "Test",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "batch_authorized",
       "date": "2026-08-04",
       "participants": [
         "test-agent"
       ],
-      "note": "CLOSED at dev@c428fe5. 2,988 scenarios, 9 suites, 0 failures, 6 orderings. 397 assert-bearing loops AST-instrumented with real iteration counts."
+      "note": "CLOSED at dev@7757e0d. 3,037 scenarios, 10 suites, 0 failures, 6 orderings. Reject verified by six clicks in Chromium with a negative control, not by posting codes. Drift check refuses the export at the route (500 vs 200)."
     },
     {
       "n": 9,
