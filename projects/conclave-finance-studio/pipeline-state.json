@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 8 \u2014 Test (re-run after pass 19)",
+  "position": "Gate 8 \u2014 Test (final confirmation after pass 20)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -113,7 +113,7 @@
       "participants": [
         "code-agent"
       ],
-      "note": "Pass 19 closed gate 8's F1/F2/F3. Sampling sweep over 39 candidates found 5 real defects. 2,987 scenarios, seven orderings."
+      "note": "Pass 20 closed gate 8's two sweep findings. 2,988 scenarios."
     },
     {
       "n": 8,

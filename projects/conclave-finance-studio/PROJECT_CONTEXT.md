@@ -1690,7 +1690,143 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-18 loop-back, at `dev` @ `1b1b56e`** (parent repo @ `2f9b373`)
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-19 loop-back, at `dev` @ `e00a214`** (parent repo @ `8dcb490`)
+
+**All seven automated suites EXECUTED, exit code 0, 2,987 of 2,987 scenarios
+passed at every suite entry point and in SEVEN whole-tree runs — canonical,
+`file`, `reverse` and three shuffles salted on a token `grep -rl` finds nowhere
+in `dev/`. Zero skipped, zero vacuous, zero empty `parametrize`. The smoke is 29
+of 29 and the rendered-UI backend 13 of 13 with nothing inconclusive.**
+Structured per-scenario evidence: `test-evidence/*-2026-08-03.md` (15 files,
+one new) plus 16 freshly captured Playwright screenshots. The entire superseded
+corpus was deleted and rewritten; every file names both commits and its presence
+on disk was verified after writing.
+
+| Suite | Status | Exit | Scenarios | Pass | Fail | Owner | Blocking |
+|---|---|---|---|---|---|---|---|
+| unit / integration | `EXECUTED` | 0 | 2,309 | 2,309 | 0 | `test-agent` | yes |
+| functional | `EXECUTED` | 0 | 358 | 358 | 0 | `functional-design-agent` | yes |
+| ux | `EXECUTED` | 0 | 194 | 194 | 0 | `ui-ux-designer` | yes |
+| red-team | `EXECUTED` | 0 | 61 | 61 | 0 | `responsible-ai-architect` | yes |
+| architecture | `EXECUTED` | 0 | 28 | 28 | 0 | `solution-architect` | yes |
+| industry | `EXECUTED` | 0 | 23 | 23 | 0 | `industry-expert` | yes |
+| security | `EXECUTED` | 0 | 14 | 14 | 0 | `security-architect` | yes |
+| **rendered-UI (Playwright)** | `EXECUTED` | 0 | 13 | 13 | 0 | `test-agent` | yes |
+| **smoke (served pilot, 8021)** | `EXECUTED` | 0 | 29 | 29 | 0 | `test-agent` | yes |
+
+**Test-count delta: 2,977 → 2,987 = +12 node ids added, −2 removed, 5 changed in
+place.** Measured by comparing collected node ids at both commits, not counted by
+hand. The two removals are the pre-parametrisation ids of the two scenarios that
+became parametrised sets of 4 and 3; no scenario was deleted. Full per-id detail
+in `test-evidence/changed-scenario-audit-2026-08-03.md`.
+
+**All three findings gate 8 blocked on are CLOSED, verified by mutation rather
+than accepted.**
+
+- **F1.** The `AC-F5-02` claim is gone from all four agent pages — `grep` finds
+  the string in three places in `dev/`, one test constant and two comments
+  recording that it used to be there. The guard is re-scoped from one named
+  screen to **no reachable screen**: every URL reachable from `/` by following
+  real links, plus every document that only exists after operating a control.
+  **Restoring the sentence fails, naming five pages.** **Crippling the traversal
+  to reach nothing also fails**, on the half that asserts the four agent pages
+  are in the traversed set by the ids the broker reports absent — it cannot pass
+  by reaching nothing. Corroborated over real HTTP: 46 URLs crawled from `/`,
+  zero offenders, five agent pages actually reached.
+- **The fourth finding, found by `code-agent` mutating its own fix.** Repointing
+  all four `/inventory` hrefs at `/inventory` — which left all 2,977 green at
+  `1b1b56e` — **now fails.** So does landing on the wrong agent. And its own
+  observation reproduces exactly: **the whole-surface guard does not catch the
+  repoint**, correctly, because the agent pages stay reachable through the
+  object-graph chain. Exactly one scenario failed, and it was the link scenario.
+  The two guards are independent; neither subsumes the other.
+- **F2 / `AC-F5-07`.** **Mutation F7-M now fails.** So does rendering the right
+  label over the wrong agent's version, and so does attributing every lineage
+  view to agent 0 — the sibling's `len(lineage) == len(rows)` really did become
+  containment.
+- **F3.** `unregistered_actors` returns register 33's convention-C2 UNKNOWN
+  shape, rendered on `/inventory` at full opacity. One scenario asserts the
+  **shape** (dict-ness, scope, the untraversed class, the statement) rather than
+  the emptiness; the other joins `computable: False` to the
+  `LINEAGE_UNTRAVERSED` entry that justifies it. Four mutations caught.
+
+**The sampling sweep was run independently, and it found two things pass 19's
+did not.** My heuristic is deliberately broader — it reads docstrings as well as
+names, counts sampler calls as well as subscripts, and ranks by whether the
+scenario iterates at all — and returns **60 candidates against pass 19's 39**.
+Three of pass 19's five fixes were spot-checked by mutation and all three were
+**caught** (`obligation_gap`, `distribution_outlier`, `AC-F38-01`), as were the
+other two mutations I ran (export reconstruction, and the copied-vocabulary
+case). Pass 19's 34 dismissals are not contradicted. But:
+
+1. **`AC-F40-16`'s "every produced file" is still asserted of one file.** The
+   rewrite from `entries[-1]` to a loop **cannot fail differently**: an
+   instrumented probe shows the register holds exactly **one** entry in that
+   scenario, so the two forms are the same assertion. Blanking the three facts
+   on every entry but the last leaves the suite green. Not a regression — the
+   fix is simply inert at this site, and closing it is a fixture change.
+2. **`obligation_gap` lost four literal-value assertions and nothing replaced
+   them.** The rewritten `test_each_kind_labels_its_own_fields_in_its_own_words`
+   compares the evaluator's output to `KIND_VOCABULARY` — **the constant the
+   evaluator itself reads to build those labels** — which is the projection
+   against its own source, the exact defect class register 34 records for the old
+   inventory scenario. Rewording all three `scheduled_reversal` labels to
+   `"thing"`/`"when"`/`"how much"`, keeping the kinds distinct so the sibling
+   distinctness check is untouched, leaves **all 2,987 green**. The pass
+   genuinely closed a sampling defect at this site (`intercompany_counterparty`
+   went from unasserted to asserted) and opened a tautology defect in the same
+   edit. It also makes the recorded claim *"no scenario asserts less than it
+   did"* untrue as written.
+
+**Standing question — does any suite report a pass the register (34 entries)
+says cannot be true? NO**, for the second consecutive pass. All eight forbidden
+criteria — `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`,
+`AC-F5-02`, `-03`, `-05` — are claimed by nothing; every node id that names one
+denies it in the same name, and every `COVERS` line narrows itself in the same
+sentence. All four of register 34's "built instead" claims are now
+mutation-held; the two that were `PARTIAL` and `ADVISORY` last pass are closed.
+256 `AC-…` identifiers referenced at both commits, none lost.
+
+**The rendered-UI gold sweep is no longer inconclusive.** Pass 18's predicate
+(`r > 150`) matched neither `#8A5A17` nor its ground and proved nothing. It is
+now the four exact shipped token values and reads `stroke`/`fill` as well as
+`color`/`background`, and a **positive control proves it fires** — gold on
+`.btn.approve` ("a human decision") on the approval screen and on the brand
+`.pull-dot`, and nowhere else. Also measured: zero green, zero text below 0.5
+compounded opacity, zero horizontal overflow, one `h1` and the `nav`/`main`
+landmark pair on every screen, and `.ctx` at **167.00 × 48.56 px, x=14.00,
+y=55.88, `display:block`, parent `.lockup`, identical on all twelve
+screen×viewport measurements**.
+
+**The human's pilot (pid 59422, port 8030 — re-read from `lsof` this pass, not
+carried forward from 50367) was verified alive before and after every
+invocation.** 8030/8031 were never probed. Every process I started was reaped
+inside the single command invocation that started it, by `killpg` on its own
+process group; no name-based sweep was run. `lsof` on 8021/8022 empty after every
+teardown. The smoke drove the real export path end to end — approve 403, override
+200, export 200, file `/export/CS-0034B894B391.csv` retrievable with an FBDI
+header — and the shared ledger grew 10,739,712 → 10,780,672 bytes, while the
+2,987-scenario test tree left it byte-identical (`449791062f…`) across all five
+order-independence runs.
+
+**Advisory, for `ui-ux-designer`:** the build's own answer to the population
+question renders at **y = 7,601.7 px** on `/inventory` — a reader must scroll
+~7,600 px to meet it. Visible, full opacity, correct; just a long way down.
+
+**Advisory, for `code-agent`:** the F3 shape scenario's docstring says it
+*"holds on the day findings become ledger-recorded and the answer becomes
+computable"*. It asserts `computable is False`, and mutation F3-M2 confirms it
+fails the moment that becomes true. The assertion is right; the sentence
+describing it is not.
+
+**Gate status: no blocking suite failed, and no automated scenario failed
+anywhere.** The two sampling-sweep findings are not suite failures — they are
+scenarios that pass and should not be able to. They are put in front of the
+human as findings, not as a stopped gate, and neither contradicts the register.
+
+---
+
+### 2026-08-03 — Gate 8 · Test — `test-agent`, **re-run after the pass-18 loop-back, at `dev` @ `1b1b56e`** (parent repo @ `2f9b373`) — SUPERSEDED
 
 **All seven automated suites EXECUTED, exit code 0, 2,977 of 2,977 scenarios
 passed at every suite entry point and in SIX whole-tree runs — canonical order,

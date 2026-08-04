@@ -1,48 +1,43 @@
 # Test evidence — architecture suite
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-18 loop-back
+**Gate:** 8 · Test — re-run after the pass-19 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
-**Suite owner:** `solution-architect` — **`test-agent` did not author these scenarios**;
-it executed them and reports the result
-**Blocking:** yes — `PROJECT_CONTEXT.md` Active Team records
-*"Test Policy: all suites blocking. No advisory exceptions."*
+**Commit under test:** `dev` @ **`e00a214`** · parent repo @ **`8dcb490`**
+**Owner:** `solution-architect` (executed by `test-agent`)
+**Blocking:** yes (project Test Policy: all suites blocking, no advisory exceptions)
 **Status:** `EXECUTED`
-**Entry point:** `tests/suites/architecture/run.sh` → shared `_runner.sh`
-**Exit code:** 0
-**Scenarios: 28 — PASS 28, FAIL 0**
 
-**Test-count delta since `6bf8ed9` (28):** **0 added, 0 removed, 0 changed** — this suite is byte-identical to the previous run
+## Result
 
-The suite is **not empty** — 28 scenarios collected and run. The shared runner
-exits 3 on a suite with no `test_*.py`; it did not.
+**28 scenarios, 28 pass, 0 fail, 0 skip, exit 0.**
+Entry point: `bash tests/suites/architecture/run.sh` (delegates to `tests/suites/_runner.sh`,
+which returns 3 for an empty suite and 4 for cannot-execute — neither occurred).
+Interpreter `dev/.venv/bin/python`. Re-run again inside six whole-tree runs.
+
+**Test-count delta vs `1b1b56e`: 28 → 28, unchanged.**
 
 ---
 
-### Scenario: the architecture suite runs to completion through its own entry point
+### Scenario: the suite entry point executes
 - Status: EXECUTED
-- Input: `bash tests/suites/architecture/run.sh` at `dev` @ `1b1b56e`
-- Expected: exit 0, every scenario passing
-- Actual: **`EXECUTED — suite passed`**, exit 0, 28 passed
+- Input: `bash tests/suites/architecture/run.sh`
+- Expected: exit 0
+- Actual: **exit 0, 28 ran, 0 failed**
 - Result: PASS
-- Evidence: `tests/suites/architecture (1 file)` — `28 passed`
+- Evidence: `scratchpad/p19/suite-architecture.txt`; collected node ids under
+  `tests/suites/architecture/` = 28, matching the executed count exactly
 
-### Scenario: the suite holds under six independent orderings
+### Scenario: the suite is not empty and not silently shrinking
 - Status: EXECUTED
-- Input: the whole 2,977-scenario tree run under canonical order, reverse
-  order and four salted shuffles
-- Expected: 28/28 in every ordering
-- Actual: **all six orderings green**
+- Expected: a non-zero scenario count, and any drop explained
+- Actual: **28 scenarios. 28 → 28, unchanged**
+- Result: PASS
+
+### Scenario: the suite passes under five independent collection orderings
+- Status: EXECUTED
+- Input: test-agent's own out-of-tree salted plugin, five orderings
+- Expected: identical node-id set, all pass
+- Actual: **identical set (`sort | md5` = `15e22b1a…` on all five), all pass**
 - Result: PASS
 - Evidence: `order-independence-2026-08-03.md`
-
-### Scenario: the suite claims none of the criteria the register forbids
-- Status: EXECUTED
-- Input: every node ID and every `COVERS` line in this suite, cross-checked
-  against the deferred-substitution register's 34 entries
-- Expected: zero claims on `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`,
-  `AC-F40-17`, `AC-F36-48`, `AC-F5-02`, `AC-F5-03`, `AC-F5-05`
-- Actual: **zero claims**
-- Result: PASS
-- Evidence: `register-cross-check-2026-08-03.md`

@@ -1,131 +1,82 @@
-# Test evidence — changed-scenario audit (the test-count delta, named)
+# Test evidence — changed-scenario audit (added / removed / changed, named)
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-18 loop-back
+**Gate:** 8 · Test — re-run after the pass-19 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`** ·
-previous run at `dev` @ `6bf8ed9`
+**Baseline:** `dev` @ `1b1b56e` (2,977) → **head `dev` @ `e00a214` (2,987)**
+**Parent repo:** `8dcb490`
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
-**Method:** node IDs collected at both commits (a detached worktree at
-`6bf8ed9`, the same interpreter), sorted and diffed. Bodies compared with
-`git diff 6bf8ed9 1b1b56e -- backend/tests tests/suites`.
 
-| | count |
-|---|---|
-| previous total | **2,955** |
-| added | **+25** |
-| removed | **−3** |
-| current total | **2,977** |
-| changed (same node ID, changed body) | **3** |
+**Method.** Node ids collected at both commits with the same interpreter
+(`--collect-only -q -o addopts=`), the baseline in a detached worktree, and
+compared with `comm`. Not counted by hand, and not taken from the commit
+messages.
 
-2,955 + 25 − 3 = **2,977**. Matches the brief exactly.
-
-Files touched: `cssmatch.py` (new, 200 lines), `test_ui_no_orphaned_style_rule.py`
-(new, 246), `test_ui_boundaries.py` (+62), `test_ui_governance_screens.py` (+19),
-`test_ui_brand.py` (±1), `uihelpers.py` (+12), `test_unclaimed_criteria.py` (+126).
+**+12 added, −2 removed, 5 changed in place. Net +10.**
 
 ---
 
-## REMOVED — 3. A removed test is a coverage decision.
-
-### Scenario: `test_AC_F5_02_every_agent_is_listed_with_identity_entitlements_and_version`
-- Status: EXECUTED (verified absent from the 2,977)
-- Was: `tests/suites/functional/test_unclaimed_criteria.py`
-- Why removed: it asserted `inventory == principals.DIRECTORY` — the projection
-  against its own source, **an equality that cannot fail for the reason the
-  criterion is about**. Gate 8 blocked on it
-- Replaced by: `test_the_inventory_needs_no_manual_registration_step`, which
-  keeps the same equality but explicitly narrows its `COVERS` line to the
-  registration clause and disclaims the criterion
-- Result: **removal justified.** Net effect on claimed coverage: `AC-F5-02` goes
-  from claimed-and-false to claimed-by-nothing
-
-### Scenario: `test_AC_F5_03_a_lineage_result_STATES_that_it_is_complete_rather_than_sampled`
-- Status: EXECUTED (verified absent)
-- Why removed: it asserted `lineage["complete"] is True` for every agent while
-  seven dossiers exist and zero appear in any lineage — a partial list returned
-  labelled complete, which is what `AC-F5-05` forbids
-- Replaced by: `test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`
-- Result: **removal justified**
-
-### Scenario: `test_AC_F5_05_every_lineage_result_states_its_own_completeness`
-- Status: EXECUTED (verified absent)
-- Was: `backend/tests/test_ui_governance_screens.py`
-- Why removed: **renamed**, not deleted — it is now
-  `test_every_lineage_result_states_its_own_scope_and_completeness`, with a
-  docstring opening *"NOT a claim on `AC-F5-05`"* and a **stronger** body
-  (adds `data-scope` and `"Computed over"`)
-- Result: **a rename that drops a criterion claim and strengthens the
-  assertion.** This is the only one of the three that is not a net reduction
-
-## ADDED — 25.
-
-### Scenario: 19 in `backend/tests/test_ui_no_orphaned_style_rule.py`
-- Status: EXECUTED, all 19 pass
-- 5 parser (`every_selector_parses`, `selector_list_not_vacuous`,
-  `at_rule_refused`, `sibling_combinator_refused`, `unparsable_compound_raises`)
-- 8 matcher (`descendant_matches`, `descendant_not_sibling`,
-  `child_refuses_grandchild`, `multi_class_needs_all`, `tag_qualified`,
-  `attribute_value_compared`, `bare_attribute_presence`, `pseudo_element`)
-- 6 build (`every_declared_selector_matches`, `would_have_caught_the_defect`,
-  `no_selector_is_excused`, `both_themes_in_the_surface`,
-  `context_line_is_styled_at_all`, `context_line_is_a_full_width_line`)
-- Evidence: mutation-tested individually in `mutation-tests-2026-08-03.md`
-- Note: `code-agent`'s hand-off says "22 scenarios" for this checker. **19 are
-  in that file**; the other 3 of the 22 are the two alias scenarios and the
-  lineage-rendering scenario below. All 22 exist; the file count is 19
-
-### Scenario: 2 in `backend/tests/test_ui_boundaries.py`
-- `test_every_alias_really_serves_ITS_OWN_CANONICAL_SCREEN` — the guard
-- `test_the_alias_guard_rejects_a_forged_row` — its negative half
-- Status: EXECUTED, both pass; independently reproduced by mutation M7
-- Note: the old `test_the_merged_queue_serves_the_same_screen_under_all_three_addresses`
-  is **subsumed, not removed** — it survives with the same node ID, refactored
-  onto the shared `_screen_body` helper
-
-### Scenario: 1 in `backend/tests/test_ui_governance_screens.py`
-- `test_every_lineage_result_states_its_own_scope_and_completeness` (the rename
-  target above)
-- Status: EXECUTED, passes; mutation-held by D7
-
-### Scenario: 3 in `tests/suites/functional/test_unclaimed_criteria.py`
-- `test_the_inventory_needs_no_manual_registration_step`
-- `test_AC_F5_02_IS_NOT_MET_agents_that_acted_are_absent_from_the_inventory`
-- `test_AC_F5_03_and_05_ARE_NOT_MET_no_dossier_appears_in_any_lineage`
-- Status: EXECUTED, all three pass; mutation-held in both directions (D1–D9)
-
-## CHANGED — 3 (same node ID, changed body).
-
-### Scenario: `test_ui_brand.py::test_the_brand_layer_is_present_in_the_one_inlined_stylesheet`
+### Scenario: the two removals are parametrisations, not deletions
 - Status: EXECUTED
-- Change: marker list `(".lockup", ".statstrip", ".section-icon", ".artifact")`
-  → `(… , ".opening")`
-- Assessment: **neutral, and explained** — `.artifact` was one of the four
-  orphaned selectors this pass removed, so a scenario asserting its presence
-  would have contradicted the orphan sweep. Still four markers; not a weakening
+- Input: `comm -23 base.ids head.ids`
+- Expected: each removal accounted for
+- Actual: **exactly two, both bare ids whose parametrised successors are in the
+  added set** —
+  `test_evaluator_primitives.py::test_every_anomaly_states_the_threshold_in_force`
+  → `[1000] [1] [200.01] [49.99]`;
+  `test_obligation_gap.py::test_each_kind_labels_its_own_fields_in_its_own_words`
+  → `[scheduled_reversal] [interface_feed_entry] [intercompany_counterparty]`
+- Result: PASS — **no scenario was deleted in this pass**
 
-### Scenario: `test_ui_governance_screens.py::test_AC_F5_04_a_version_that_touched_nothing_states_zero`
+### Scenario: the twelve additions are each traceable to a stated purpose
 - Status: EXECUTED
-- Change: `"Zero artefacts"` → `"Zero decisions in the decision ledger"`, plus a
-  **new** assertion `"Artefacts touched 0" in …`
-- Assessment: **strengthened**, and the string change follows the scope
-  relabelling
+- Actual: 4 threshold parametrisations (both directions, both edges);
+  3 obligation-kind parametrisations; 1 label-distinctness scenario;
+  1 `AC-F38-01` every-card scenario; 1 whole-surface disclosure guard;
+  2 `unregistered_actors` scenarios
+- Result: PASS
 
-### Scenario: `test_unclaimed_criteria.py::test_AC_F5_06_a_retired_agent_is_still_listed…`
+### Scenario: the five changed-in-place scenarios — do they assert MORE?
 - Status: EXECUTED
-- Change: `assert retired["lineage"]["complete"] is True` replaced by
-  `artefact_count == len(artefacts)` and `scope == "decision_ledger"`
-- Assessment: **correctly narrowed.** `AC-F5-06`'s clause is *"its lineage still
-  resolves"*, not *"is complete"* — keeping the old line would have made this a
-  second carrier of the `AC-F5-05` claim the build cannot support. This is the
-  right kind of change and is exactly the kind a pass/fail count hides
+- Input: `git diff 1b1b56e..e00a214` on the five bodies, plus a mutation each
+- Expected: strictly more, per the pass-19 claim *"no scenario asserts less than
+  it did"*
+- Actual: **four yes, one no.**
 
-## The delta contains no unexplained drop
+| Scenario | Verdict | Mutation |
+|---|---|---|
+| `test_AC_F5_07_every_agent_is_listed_with_version_and_entitlements` | MORE — every row, labels **and** values, joined to the broker payload | F7-M caught; M6 caught |
+| `test_AC_F5_07_a_lineage_view_is_reachable_for_each_listed_version` | MORE — counting became containment | M5 caught |
+| `test_AC_F5_02_IS_NOT_MET_agents_that_acted_are_absent_from_the_inventory` | MORE — the four links are now followed and their landing asserted | M3 caught; M3b caught |
+| `test_a_whole_export_carries_every_reconstruction_field` | MORE — two dossiers with different values, every field on both | S5 caught |
+| `test_AC_F40_16_every_produced_file_is_in_the_register_with_its_three_facts` | **NEITHER more nor less in effect** — the register holds one entry, so the loop and `entries[-1]` are the same assertion | S3 **NOT caught** |
+
+- Result: **PARTIAL** — recorded as such, not rounded up. See
+  `sampling-sweep-2026-08-03.md`, Finding A
+
+### Scenario: does any scenario assert LESS than it did?
 - Status: EXECUTED
-- Expected: every removal accounted for
-- Actual: **3 removals, 3 accounted for** — two deliberate retirements of false
-  claims, one rename. No scenario disappeared without a successor or a stated
-  reason
+- Input: the four removed literal-value assertions in `test_obligation_gap.py`
+- Expected: none, per the recorded claim
+- Actual: **one does.**
+  `test_each_kind_labels_its_own_fields_in_its_own_words` lost
+  `== "expected reversal period"`, `== "unreversed amount"`, `== "stopped feed"`,
+  `== "amount that did not post"` and replaced them with a comparison against the
+  constant the implementation itself reads
+- Result: **FAIL** — the claim *"no scenario asserts less than it did"* is not
+  true as written. Mutation-demonstrated: S1b reworded three labels to
+  `"thing"/"when"/"how much"` and **2,987 stayed green**. Detail in
+  `sampling-sweep-2026-08-03.md`, Finding B
+
+### Scenario: no criterion claim was dropped
+- Status: EXECUTED
+- Actual: **256 `AC-…` identifiers referenced at both commits, 0 lost, 0 gained**
+- Result: PASS
+
+### Scenario: no test file was deleted
+- Status: EXECUTED
+- Input: `git diff --stat 1b1b56e..e00a214`
+- Actual: **8 files touched, all modified, none deleted, none added**
 - Result: PASS

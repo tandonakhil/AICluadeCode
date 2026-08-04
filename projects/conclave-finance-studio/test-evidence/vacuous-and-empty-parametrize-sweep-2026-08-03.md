@@ -1,75 +1,73 @@
-# Test evidence — vacuous-pass and empty-`parametrize` sweeps
+# Test evidence — vacuous-pass and empty-`parametrize` sweep
 
 **Project:** conclave-finance-studio
-**Gate:** 8 · Test — re-run after the pass-18 loop-back
+**Gate:** 8 · Test — re-run after the pass-19 loop-back
 **Date:** 2026-08-03
-**Commit under test:** `dev` @ **`1b1b56e`** · parent repo @ **`2f9b373`**
+**Commit under test:** `dev` @ **`e00a214`** · parent repo @ **`8dcb490`**
 **Owner:** `test-agent`
 **Blocking:** yes
 **Status:** `EXECUTED`
-**Method:** AST sweep over all **110** test files in both trees, then manual
-reading of every candidate, then a paired-`pytest.raises` check on every helper
-a candidate delegates its assertion to.
+
+AST sweep over every `test_*.py` in `backend/tests` and `tests/suites`.
+Script `scratchpad/sweeps18.py`, output `scratchpad/p19/sweeps.out`.
 
 ---
 
-### Scenario: empty `@pytest.mark.parametrize` argvalues
+### Scenario: no `parametrize` collects zero cases
 - Status: EXECUTED
-- Input: every `parametrize` decorator whose argvalues is a literal list/tuple
-- Expected: none empty — an empty list collects **zero** cases and reports as a
-  pass, and `pytest` says nothing about it
-- Actual: **NONE**
+- Input: every `@pytest.mark.parametrize` argvalues expression, static and then
+  cross-checked against the collected node ids
+- Expected: none empty — an empty argvalues list collects zero cases and reports
+  as a pass with pytest saying nothing about it
+- Actual: **NONE.** And the collected count reconciles exactly:
+  2,309 + 358 + 194 + 61 + 28 + 23 + 14 = 2,987
 - Result: PASS
-- Evidence: `sweeps18.json` `"empty_parametrize": []`
+- Evidence: `sweeps.out` §1 — `NONE`. The build also defends this itself:
+  `test_the_vocabulary_is_the_three_sub_types_and_has_not_silently_emptied`
+  exists specifically so the `KIND_VOCABULARY` parametrisation cannot become
+  vacuous
 
-### Scenario: test functions with no `assert`, no `raises`, no `fail`
+### Scenario: no test function can pass without being able to fail
 - Status: EXECUTED
-- Input: AST walk of every `test*` function in both trees
-- Expected: any such function must delegate its assertion to a helper that
-  can raise — and that helper must itself have a scenario proving it raises
-- Actual: **13 candidates. All 13 delegate. All 13 delegates are proven
-  falsifiable by a paired `pytest.raises` scenario. Zero vacuous passes.**
-- Result: PASS
-- Evidence, one row per candidate:
+- Input: functions with no `assert`, no `raise`, no `pytest.raises/warns`, no
+  `fail/xfail/skip`
+- Expected: any hit must delegate to a helper that itself asserts or raises
+- Actual: **13 candidates, all 13 delegate.** Read in full:
 
-| candidate | delegates to | proven falsifiable by |
-|---|---|---|
-| `test_abstention.py::test_ordinary_settings_pass` | `ab.assert_no_abstention_control` | `test_abstention.py:414` (raises), `red-team:972` |
-| `test_credential_boundary.py::test_api_startup_guard_passes_on_a_clean_environment` | `credentials.assert_api_process_holds_no_credentials` | `test_credential_boundary.py:121` |
-| `test_credential_boundary.py::test_api_startup_guard_ignores_an_empty_value` | same | `test_credential_boundary.py:129` |
-| `test_f12_precision.py::test_a_payload_carrying_no_precision_at_all…` | `p.validate_published_figure` | `test_f12_precision.py:132/134/136` |
-| `test_f12_precision.py::test_every_render_passes_its_own_boundary_check` | same | as above |
-| `test_harness_rendered_numbers.py::test_the_multi_surface_form_passes_on_clean_surfaces` | `R.any_band_is_not_readable` | `test_harness_rendered_numbers.py:142` |
-| `test_primitive_peer_coding.py::test_every_number_the_coding_leg_emits_is_hashable_evidence` | `canonical.content_hash` (refuses floats) | `test_canonical.py` raises-on-float |
-| `test_surveillance_primitives.py::test_every_number_the_narrative_leg_emits_is_hashable_evidence` | same | same |
-| `test_ui_chrome.py::test_importing_chrome_has_already_asserted_no_green` | `tokens.assert_no_green` | `test_ui_tokens.py:41` (planted `#22C55E`) |
-| `test_ui_dossier.py::test_every_item_in_the_pilot_close_has_a_reachable_dossier` | `U.fetch` | `uihelpers.py:192` — `assert response.status_code == expect` |
-| `test_ui_no_orphaned_style_rule.py::test_every_selector_in_the_stylesheet_parses` | `cssmatch.compile_selector` | mutation M2 / M3d′ — proven to raise |
-| `test_ui_probe_surface.py::test_AC_F12_15_the_reviewer_facing_surfaces…` | `rendered_numbers.band_is_not_readable` | `test_harness_rendered_numbers.py:92/136` |
-| `test_ui_tokens.py::test_neither_shipped_palette_contains_a_green` | `tokens.assert_no_green` | `test_ui_tokens.py:41` |
+| Candidate | Delegates to |
+|---|---|
+| `test_ordinary_settings_pass` | `ab.assert_no_abstention_control(...)` |
+| `test_api_startup_guard_passes_on_a_clean_environment` | `credentials.assert_api_process_holds_no_credentials()` |
+| `test_api_startup_guard_ignores_an_empty_value` | same |
+| `test_a_payload_carrying_no_precision_at_all_is_not_the_boundarys_business` | `p.validate_published_figure(...)` |
+| `test_every_render_passes_its_own_boundary_check` | same, over `LABEL_SOURCES × SURFACES` |
+| `test_the_multi_surface_form_passes_on_clean_surfaces` | `R.any_band_is_not_readable(...)` |
+| `test_every_number_the_coding_leg_emits_is_hashable_evidence` | `canonical.content_hash(...)` — refuses floats |
+| `test_every_number_the_narrative_leg_emits_is_hashable_evidence` | same |
+| `test_importing_chrome_has_already_asserted_no_green` | `tokens.assert_no_green()` |
+| `test_every_item_in_the_pilot_close_has_a_reachable_dossier` | `U.fetch()` — asserts status 200 |
+| `test_every_selector_in_the_stylesheet_parses` | `cssmatch.compile_selector()` — raises if unimplemented |
+| `test_AC_F12_15_the_reviewer_facing_surfaces_do_not_expose_the_band_as_a_number` | `rendered_numbers.band_is_not_readable(...)` over a 3-element literal tuple |
+| `test_neither_shipped_palette_contains_a_green` | `tokens.assert_no_green()` |
 
-### Scenario: assertions inside a loop over a possibly-empty iterable
+- Result: PASS — **zero vacuous scenarios**
+
+### Scenario: loops over possibly-empty iterables
 - Status: EXECUTED
-- Input: every `for` containing an `assert`, where the iterable is a bare local
-  name not first asserted truthy in the same function
-- Expected: reported for review, not treated as a defect
-- Actual: **36 occurrences**, spread across 19 files. Every one loops over a
-  module-level constant (`GUARDRAILS`, `NEW_QUERIES`, `_POAR_COLUMNS`,
-  `CARRIED_SYMBOLS`, `PRECISION_TESTIDS`, `EVIDENCE_TABLES`) or a locally
-  constructed literal (`cases`, `params`, `paths`), none of which can be empty
-  at runtime without the module failing to import
-- Result: **REVIEW — no defect found.** Recorded so the count is visible rather
-  than silently swallowed; a future pass that turns one of those constants into
-  a computed value should re-read this list
-- Evidence: `sweeps18.json` `"unguarded_loops"` — full 36-row list
+- Expected: reported as REVIEW, not as defect — many are guarded elsewhere
+- Actual: **25 flagged.** Every one iterates either a module-level literal
+  constant (`CARRIED_SYMBOLS`, `_POAR_COLUMNS`, `EVIDENCE_TABLES`) or a
+  collection the same function first asserts non-empty. Two of the 25 are the
+  pass-19 additions (`AC-F38-01`'s cards, `AC-F5-07`'s agent rows) and **both**
+  assert the population against the broker's payload before looping —
+  `assert payload, "no agent in the inventory payload, so the criterion is
+  untested"` and `assert {cards} == set(rows)`
+- Result: PASS (review complete, no defect)
 
-### Scenario: the sweeps are themselves falsifiable
+### Scenario: a suite with zero scenarios would be reported as such
 - Status: EXECUTED
-- Input: the three defect classes the sweeps look for
-- Expected: each sweep finds a planted instance
-- Actual: the vacuous sweep's own output is the proof — it correctly identified
-  13 no-assert functions, which is a non-empty result from a real scan rather
-  than an empty result from a scan that never ran. The empty-`parametrize`
-  sweep returned empty; its non-vacuity rests on the same AST walk that
-  produced 36 loop hits and 13 vacuous hits from the same traversal
+- Input: `tests/suites/_runner.sh` exit-code contract
+- Expected: exit 3 for an empty suite, 4 for cannot-execute — never 0
+- Actual: **no suite returned 3 or 4.** All six returned 0 with a non-zero
+  scenario count
 - Result: PASS
