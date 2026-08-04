@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 7 \u2014 pass 23 (advisory cleanup), then Gate 9 Verification",
+  "position": "Gate 9 \u2014 Verification (final audit)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -129,9 +129,9 @@
     {
       "n": 9,
       "name": "Verify",
-      "status": "pending",
+      "status": "active",
       "approval": "pending",
-      "date": "2026-08-03",
+      "date": "2026-08-04",
       "participants": [
         "verification-agent"
       ],
