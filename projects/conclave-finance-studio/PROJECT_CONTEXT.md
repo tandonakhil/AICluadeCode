@@ -1313,6 +1313,83 @@ undecided.
      server started — the human's pilot on 8030 was left running and
      untouched.
 
+- **2026-08-04 — Gate 7 pass 21: `functional-design-agent`'s §28 rulings, built.
+  Judgement calls by `code-agent`.** Six commits (`f1a6c07`, `397757d`,
+  `87e6cca`, `ced2701`, `27b832d`, `afe9e88`), one per coherent unit. **All four
+  new criteria are MET; nothing was left as a disclosed unmet criterion.** One
+  register entry is BROADENED (34, to carry `AC-F5-07`) and none opened or
+  closed. 2,988 → **2,996** scenarios, all green in six orderings.
+  1. **`AC-F41-22` — the retired ID is written nowhere in either tree, not even
+     in a docstring.** The scenario that bore it was a faithful test of the
+     approved design and is kept, re-pointed, and **folded together with its two
+     `TestNoApproveControlHere` siblings**, which asserted the fourth element's
+     *absence* while it asserted three of four — so a by-ID mapper scored a
+     four-element conjunction off a strict subset. *Judgement call:* the
+     retirement note in the module docstring names **no ID at all**. Gate 9
+     joins criterion to check by grepping for the ID, and a retired ID in a
+     comment scores as a claim; a reader is sent to `FUNCTIONAL_SPEC` §28.1
+     instead. `AC-F41-22` also adds the two clauses the original never made
+     assertable — none of the three elements behind a disclosure, and no
+     approving control **at any permission level**, checked across both personas
+     over every awaiting finding screen reachable from `/`, with both
+     eligibility values required present so a traversal reaching only ineligible
+     items cannot pass it for the wrong reason.
+  2. **`AC-F41-23` — the detection evidence renders on the approval screen.** It
+     was reachable only through `approval-finding-link`, so the approver decided
+     from the journal lines (what would be *posted*) plus somebody else's
+     summary of why the artefact exists. *Judgement call:* the **risk band was
+     deliberately not brought across**. It carries the single largest type in
+     the product and that size is a per-screen uniqueness invariant, so
+     importing it would be a typography decision made by a criterion about
+     evidence. The **same component** renders on both screens, and the scenario
+     compares the two cell for cell **against a second render of the finding
+     screen**, never against the model both are built from.
+  3. **A real defect, found while building item 3, fixed in its own commit.**
+     `components.rejection_reasons` rendered each radio's value as the **row
+     index** while the store admits only the six codes its `CHECK` constraint is
+     built from — so **`AC-F41-06`'s structured-reject control has never
+     completed a rejection from a browser**. Nothing noticed because every
+     scenario that appeared to drive it posted a code *by hand*
+     (`{"rejection_reason": "already_handled"}`), a value no rendered form in
+     this product has ever carried: the control was credited by checks that
+     never used it. The `(code, label)` pairs now come from the store's own
+     tuple, `state.py`'s second list of the same six labels is gone, and a
+     scenario posts **what the radio says**, for all six, reading the field name
+     off the rendered input.
+  4. **`AC-F41-24` — BUILT, not disclosed unmet, and the lifecycle boundary was
+     not crossed.** What renders beside the approve control is `AC-F41-06`'s
+     structured rejection: same endpoint, same closed list, same store call that
+     already carried `proposal_id`. No new state, no new route, no lifecycle.
+     The screen says in as many words that what becomes of a rejected proposal
+     is not decided by this build, and the scenario asserts the rejection is
+     *recorded* and stops there. The override is refused by a scenario that
+     names it: it is a path **to** approval with a second authoriser, so
+     offering it would satisfy the wording while inverting the claim.
+     *Judgement call, disclosed rather than asserted away:* approving is one
+     interaction and rejecting is two, because `AC-F41-06` requires a structured
+     reason. `AC-F41-24` speaks to **reachability**, which is what is asserted;
+     the asymmetry is written into the scenario so a later reader meets it
+     rather than inferring an equality the check does not claim.
+  5. **`AC-F5-08` — MET; `AC-F5-07` — recorded NOT MET, and the forbidden set is
+     nine.** See register 34's pass-21 broadening for the full record. Both
+     halves of the ruling are carried: the four authorship-only agents get real
+     rows with "not recorded" values that name the registry gap, and the two
+     scenarios that claimed `AC-F5-07` lose the ID, as do the product docstring
+     and the test-file section header that also carried it as a bare claim.
+     *Judgement call:* **no lineage view is rendered for those rows.** A
+     decision-ledger traversal for a principal the ledger has never seen returns
+     zero, and a zero in the same component as a real result reads as "this
+     agent touched nothing" — false about an agent that authored findings, in
+     the one place a reader would check.
+  6. **What this pass did NOT do.** Neither of `plan-agent`'s two questions was
+     touched: the principal-registry gap is not closed, and no lifecycle was
+     invented for a proposal rejected at the approval screen. **Nine** forbidden
+     criteria are claimed nowhere. No guardrail moved to the UI, no free-form
+     SQL or SQL-typed parameter, no Oracle posting credential, no
+     journal-submission library, no suite stubbed green, no exemption table, no
+     dependency installed, `prod/` untouched, and no server started — the
+     human's pilot on 8030 was left running and untouched.
+
 ## Current Status
 
 ### Screen architecture after pass 17 (`UX_KB` Part A2 built)
@@ -1341,6 +1418,19 @@ Objects, each with one canonical page naming it in its `<h1>`: the finding
 `/` renders the queue, not Ask. **The one Approve control in the product is on
 `/approvals/<proposal>` and nowhere else**, which is counted by walking the
 whole reachable surface.
+
+**Amended at pass 21 — what `/approvals/<proposal>` carries.** The approval
+screen is no longer *only* the act. It renders **the detection evidence the
+proposal rests on** (`AC-F41-23`, the same component the finding screen uses,
+not a second summary of it) and **a non-approving terminal action beside the
+approve control** (`AC-F41-24`, `AC-F41-06`'s structured rejection, rendered
+where the approving happens). Both are consequences of one finding: gate 5
+removed approve from the finding screen and pass 17 gave the act its own
+screen, on which **approve was again the only visible terminal action** — the
+hazard was relocated rather than removed. The finding screen's *absence* of an
+approve control is unchanged and is now specified rather than merely honoured
+(`AC-F41-22`). `/inventory` additionally lists the agents it knows only by
+authorship, with each unheld value naming the registry gap (`AC-F5-08`).
 
 Gate 7 · Code — MVP1 in staged passes against **262** acceptance criteria.
 
@@ -3418,11 +3508,58 @@ outgrown.
   absent agent's page — was held by no scenario and is now followed and
   asserted. All three parts of that list are mutation-held as of pass 19.
 
-**Thirty-four entries as of pass 18. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
+### Entry 34 BROADENED at gate 7 pass 21 — `AC-F5-07` joins it
+
+**No entry is opened, closed or narrowed. One criterion is added to an existing
+entry, because it fails for a cause already recorded there and a second entry
+would make one gap look like two.**
+
+`functional-design-agent`'s ruling (`FUNCTIONAL_SPEC` §28.2) settles what
+`AC-F5-07`'s *each agent* quantifies over: **the agents that have ACTED**, the
+same population as `AC-F5-02`, not the registry the Inventory projects. Reading
+it as "each **registered** agent" makes the criterion satisfiable by the
+projection of the registry onto itself — the tautology gate 8 already found in
+`AC-F5-02`'s own scenario, relocated one criterion to the right — and that was
+exactly the population `test_AC_F5_07_every_agent_is_listed_with_version_and_
+entitlements` asserted over.
+
+So entry 34's unmet set reads **`AC-F5-02`, `AC-F5-03`, `AC-F5-05` and now
+`AC-F5-07`**, all four for one cause: the run's author ids and the registry's
+principal ids are not the same strings. **Two criteria failing for one cause is
+the normal case and neither is narrowed.** The forbidden set is **nine**, not
+eight: `AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`,
+`AC-F5-02`, `-03`, `-05`, **`-07`**.
+
+**What was built instead, and it is `AC-F5-08` rather than a disclosure.** The
+four agents known only by authorship were named in a *paragraph* on
+`/inventory` and had no place in the listing. Each now has an inventory row,
+under the identity it authored as, and for version, entitlements and status
+states that the value is **not recorded** and names the registry gap that makes
+it missing — never omitted, blank, dashed, or carrying a neighbour's value, and
+each of those four renderings is refused by a mutation-held assertion. No
+lineage view is rendered for those rows: a decision-ledger traversal for a
+principal the ledger has never seen returns zero, and a zero in the same
+component as a real result reads as *"this agent touched nothing"*, which is
+false about an agent that authored findings. **`AC-F5-08` is MET. It does not
+make `AC-F5-07` met, and the screen itself says so** rather than letting a
+fuller listing imply it.
+
+Two joins that would have scored `AC-F5-07` satisfied are removed: the bare ID
+opened `pages.inventory`'s own docstring as an unqualified claim — the same
+shape as the unqualified `AC-F5-02` sentence gate 8 found on this screen, one
+layer down in the source — and the test file's section header read
+"Inventory — `AC-F5-07`". The disclosure scenario is written in the established
+`_IS_NOT_MET_` shape and fails **in either direction**, including the day the
+ids are reconciled and the disclosure is left standing.
+
+**Closing it is still a registry change, not a rendering one**, and it is
+`plan-agent`'s (`FUNCTIONAL_SPEC` §28.6.1).
+
+**Thirty-four entries as of pass 21. Entries 6, 8, 10, 11, 13, 14, 16, 18 and 25
 are CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3 and
 4 are still the two that cannot quietly become "MVP1 ready". Entry 34 is the
-newest and is the first opened by a gate-8 finding rather than by `code-agent`'s
-own disclosure.**
+newest, is the first opened by a gate-8 finding rather than by `code-agent`'s
+own disclosure, and was broadened at pass 21 to carry `AC-F5-07`.**
 
 **On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
 claiming closure with no covering check is the same defect class as an
