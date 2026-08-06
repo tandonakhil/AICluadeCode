@@ -50,6 +50,53 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-05 — Correction (orchestrator): what the human actually approved, and what I inferred
+
+Gate 10's E1 is correct and the gap is mine. The exact sequence:
+
+1. **2026-08-02** — I asked, as one question: *"Does the proposed information
+   architecture replace the current 12-screen flat nav?"* The human answered
+   **"Show me more first."** That is a deferral, not an approval.
+2. I did not re-ask it. I built a fuller prototype and Figma mockups from Part A2.
+3. **2026-08-03** — on the mockups the human said **"looks good proceed with
+   build and finish MVP1."**
+4. I treated (3) as approval of the A2.2 IA and built it.
+
+**What is defensible:** the human saw the merged queue, the Approvals screen and
+the journey maps — the substance of the IA — and told me to build and finish.
+
+**What is not:** I never returned to the deferred question, so no answer to
+*"does A2.2 replace the nav"* exists in the record. `UX_KB`'s three Part A2 rows
+say "approval pending" and are **accurate**; it is the Decisions Log and
+`FUNCTIONAL_SPEC` §28.1 that assert "the human-approved pass-17 IA" on the
+strength of my inference. `FUNCTIONAL_SPEC` §28.1's retirement of `AC-F41-13`
+rests on it.
+
+**Not being back-filled.** I am not editing the record to say the approval was
+given. It reads as it happened: **approval inferred from "proceed with build",
+never asked directly.** If the human wants it made explicit, it is one question.
+
+### 2026-08-05 — Correction (orchestrator): "Part A2 built" overstated it
+
+Gate 10's E3. `PROJECT_CONTEXT.md`'s heading *"Screen architecture after pass 17
+(`UX_KB` Part A2 built)"* is wrong. **Two of Part A2's named destinations do not
+exist**: the **Close cockpit** (A2.2's *default landing*) and the **Period
+record**. Neither string appears anywhere in `dev/`, no ruling deferred them, no
+register entry disclosed them, no criterion re-points them.
+
+`UX_KB` is internally consistent about this — A2.3 records J3 as **Unstartable**
+and A2.6 lists the Period record under **"A — blocks a whole journey"**. It is my
+heading that overstated, and pass 17's six judgement calls that did not mention
+the omission. Corrected below to "Part A2 partially built"; **journeys J3 and J4
+remain unwalkable in the shipped pilot.**
+
+Also recorded: pass 17's commit message says *"The IA from `UX_KB` A2.2:
+Work / Govern / Evidence"*, but Work/Govern/Evidence is **§4's** grouping — the
+one A2.2's own heading says it replaces. What was built is closer to §4 than to
+A2.2. `ui-ux-designer`'s lane to reconcile.
+
+
+
 ### 2026-08-05 — `[override]` · gate 9 Verification · granted by the human (Akhil Tandon)
 
 **Overridden AC IDs — all nine, named individually:**
@@ -1548,7 +1595,7 @@ free prose.
 
 ## Current Status
 
-### Screen architecture after pass 17 (`UX_KB` Part A2 built)
+### Screen architecture after pass 17 (`UX_KB` Part A2 **partially** built — the Close cockpit and Period record do not exist; J3 and J4 unwalkable)
 
 The interface is an OBJECT GRAPH with a four-group navigation over it, replacing
 twelve top-level screens in two groups. `app/ui/graph.py` declares the eight
