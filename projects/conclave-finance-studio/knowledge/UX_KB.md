@@ -81,7 +81,7 @@ Four mechanisms, all of which the criteria already support:
 | **Volume reduction, made visible** | N detected → M routed is the masthead of Exceptions | `AC-F41-09` |
 | **Effort scales with risk** | Highest band requires typed, unlistable input; lowest is a single resolution click | `AC-F35-05` (as a floor, not a ceiling) |
 | **Riskiest element, not clearest narrative** | Review's first band, largest type, never collapsible | `AC-F41-03` |
-| **Override-rate + probe monitoring** | Monitors, per agent and per user | `AC-F41-07`, `AC-F12-08`, `AC-F41-08` |
+| **Override-rate + probe monitoring** | Monitors — override rate per agent and per user; probe outcomes **aggregate only**, never per named person | `AC-F41-07`, ~~`AC-F12-08`~~ → `AC-F12-10` (RETIRED 2026-07-31 — see §5.9's editorial marker), `AC-F41-08` |
 
 ---
 
@@ -198,6 +198,13 @@ every name and every route. I group them three ways:
 | **Work** | Ask · Exceptions · Review · Dispositions | The staff accountant's night |
 | **Govern** | Monitors · Catalogue · Inventory | The controller's week |
 | **Evidence** | Audit · Refusals | What leaves the building |
+
+> **Editorial marker (gate 10).** A2.2 proposes an IA that replaces this
+> section, and the 2026-08-02 change-history row calls §4 *superseded*. That is
+> true of the **proposal** and not of the **product**: the shipped pilot's nav
+> groups are **Work / Govern / Evidence — this section's grouping**, filled with
+> A2.2's demotions and merges. A2.2's flat four-item shape is not built. See
+> A2.2a for the full reconciliation. Neither grouping is human-approved.
 
 **Refusals sits under Evidence, at top level, not in a settings drawer.** It is
 an artefact a controller takes to an audit committee. Burying it makes a
@@ -498,13 +505,55 @@ Figures are ink. Only *escalations* take risk colour.
 Zero override rates render as an **explicit `0.0%` with its denominator**,
 never omitted and never blank (`AC-F36-19`).
 
-The per-user table (`AC-F41-07`, `AC-F12-08`) is designed to make one pattern
+The per-user table (`AC-F41-07`, `AC-F12-10`) is designed to make one pattern
 readable without pre-judging it: 48 items at 38 seconds each, narrative opened
-9% of the time, 1 of 3 probes caught. **No colour is applied to that row.** The
-controller reads it and makes the judgement; the product does not pre-judge a
-colleague in a system whose audit trail is already, per `DOMAIN_KB` §6.3, a
-liability-allocation device pointed at the most junior person in the chain. But
-the row is *readable*, which it is not in any product on the market today.
+9% of the time. **No colour is applied to that row.** The controller reads it and
+makes the judgement; the product does not pre-judge a colleague in a system
+whose audit trail is already, per `DOMAIN_KB` §6.3, a liability-allocation
+device pointed at the most junior person in the chain. But the row is
+*readable*, which it is not in any product on the market today.
+
+Probe outcomes are **not** in that row. They render aggregated by queue, agent,
+account and queue-load only, with the G-PROBE-3 note stated on the screen.
+
+> **Editorial marker (gate 10) — `AC-F12-08` is RETIRED, and one clause of the
+> original design intent above was overridden, not merely re-numbered.**
+>
+> Retired 2026-07-31 (pass 2), replaced by `AC-F12-10`;
+> `FUNCTIONAL_SPEC` §8 (`AC-F12-08` body, struck) and §27.6 (`AC-F12-10`).
+>
+> **What I originally designed, preserved here because it was a real intent and
+> deleting it would hide why the current screen looks as it does.** This
+> paragraph read *"1 of 3 probes caught"* as a column of the per-named-user
+> table. The intent was continuous with the rest of §5.9: a controller who can
+> see that a reviewer's probe misses cluster in the last hour of a 48-item night
+> is reading a **routing and workload** fact, and my argument was that the
+> uncoloured, un-pre-judged presentation defended against the misreading —
+> exactly the §5.9 argument for showing an unflattering hit rate rather than
+> hiding it.
+>
+> **Why it does not survive.** `RESPONSIBLE_AI_KB` §1.3 G-PROBE-3 prohibits *any*
+> per-named-person probe score, ranking or trend exposed to anyone in that
+> person's management chain — and the Monitors screen is definitionally a
+> management-chain surface, so presentation discipline cannot rescue it. The
+> orchestrator's 2026-07-31 gate-6 ruling 4 settles it the same way: aggregate
+> only. `RESPONSIBLE_AI_KB` §8 disagreement D1 is where this was argued out, and
+> `responsible-ai-agent` won it. I record that as a **correct override of my
+> design**, not a technicality: the harm G-PROBE-3 prevents does not depend on
+> whether the number is coloured.
+>
+> **What survives unchanged.** Override rate per agent, per user and per period —
+> that was never the contested part, and it lives on in `AC-F12-10` and
+> `AC-F41-07`. The uncoloured-figures rule, the explicit-zero rule and the
+> hit-rate masthead are all untouched.
+>
+> **The build is on the correct side of this already** — `pages._probe_panel` is
+> aggregate-only over a closed key list and renders the G-PROBE-3 note. This
+> marker corrects the *record*, which cited a retired ID in the live tense three
+> times and described a per-user probe column the product does not and must not
+> have. A live-tense reference to a retired ID is how a retired ID gets
+> re-adopted; a live-tense description of a prohibited surface is worse, because
+> a future implementer could build it from this file in good faith.
 
 Cross-period escalations (`AC-F9-08`) show which leg raised them, and a
 **narrative-only escalation is a first-class row**, not a sub-property of the
@@ -556,7 +605,7 @@ are listed alongside (`AC-REFUSAL-07`).
 | **Review** | `AC-F35-09`, `AC-F36-18`, `AC-F40-11`, `AC-F41-01`–`06`, ~~`AC-F41-13`~~ (RETIRED 2026-08-03 — `FUNCTIONAL_SPEC` §28.1; now `AC-F41-22`/`-23`/`-24`) | §7 risk band, in-force panel, six-button resolution row, structured reject; §9 journal lines |
 | **Dispositions** | `AC-F32-09`, `AC-F35-07` | §12 open-items table with missed vs within-horizon; zero-open state |
 | **Catalogue** | `AC-F38-01`, `AC-F38-12`, `AC-F38-13` | §13 full-attribute table, failed tie-out row, no-certified-datasets state |
-| **Monitors** | `AC-F9-08`, `AC-F12-08`, `AC-F32-10`, `AC-F36-19`, `AC-F41-07` | §14 hit-rate masthead, tiles incl. explicit zero, per-user table, escalations |
+| **Monitors** | `AC-F9-08`, ~~`AC-F12-08`~~ (RETIRED 2026-07-31 — `FUNCTIONAL_SPEC` §8/§27.6; now `AC-F12-10`), `AC-F32-10`, `AC-F36-19`, `AC-F41-07` | §14 hit-rate masthead, tiles incl. explicit zero, per-user **override-rate** table, **aggregate-only** probe panel, escalations |
 | **Inventory** | `AC-F5-07` | §15 agent table incl. retired agent lineage |
 | **Audit** | `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-04` | §15 dossier detail, export controls, refusal event log |
 | **Refusals** | `AC-REFUSAL-01`, `AC-REFUSAL-02` | §16 four A-cards plus the deferred contrast |
@@ -823,34 +872,103 @@ selector, making every other agent's readiness unreachable by any means.
 
 ## A2.2 · Design intent — the IA that replaces §4
 
+> **STATUS MARKER (gate 10). This section is a design proposal. It is not a
+> description of the shipped pilot, and two of its destinations do not exist.**
+>
+> Every row below now carries a **Shipped?** cell. Read those before reading
+> anything else here: a reader who takes A2.2 for a map of the running build will
+> go looking for a **Close** landing screen and a **Period record**, and neither
+> string appears anywhere in `dev/`. `PROJECT_CONTEXT.md` briefly recorded
+> "Part A2 built"; the orchestrator has corrected that to *partially built*, with
+> **J3 and J4 unwalkable in the shipped pilot**. This marker makes the design
+> record say the same thing, so the two cannot drift apart again.
+>
+> This is a status marker, not a redesign. Nothing below is withdrawn: the
+> unshipped items remain the proposal, and A2.6 already carries them as
+> **severity A — blocks a whole journey**.
+
 **Organising principle: the close period is the object, the queue is the verb,
 and everything else is evidence reached from a thing rather than from a menu.**
 
 Primary navigation, four items, task-ordered:
 
-| # | Item | Answers |
-|---|---|---|
-| 1 | **Close** (new) | "Where is this close and what does it need from me tonight?" Default landing, per-persona call-list. Replaces landing on Ask — a doer does not begin the night by writing a query. |
-| 2 | **My queue** | "What am I working?" Merges the work half of Exceptions with all of Review. |
-| 3 | **Approvals** (new) | "What awaits my deliberate act, and what does approving actually do?" |
-| 4 | **Ask** | Detect mode (staff) and Inquire mode (FP&A). |
-| — | **Evidence** (section) | Period record · Runs & dossiers · Agents & datasets · What we refuse to do. |
+| # | Item | Answers | Shipped? |
+|---|---|---|---|
+| 1 | **Close** (new) | "Where is this close and what does it need from me tonight?" Default landing, per-persona call-list. Replaces landing on Ask — a doer does not begin the night by writing a query. | **NOT BUILT.** No such route, screen or nav entry in `dev/`. The pilot has no per-persona landing and no close cockpit. A2.6 severity **A** (large). |
+| 2 | **My queue** | "What am I working?" Merges the work half of Exceptions with all of Review. | **BUILT**, as `/queue`, under the nav group **Work**. `/exceptions` and `/review` still resolve to it, deliberately, because many criteria name those addresses. |
+| 3 | **Approvals** (new) | "What awaits my deliberate act, and what does approving actually do?" | **BUILT**, as `/approvals`, under **Work**. |
+| 4 | **Ask** | Detect mode (staff) and Inquire mode (FP&A). | **PARTIALLY BUILT.** `/ask` ships under **Work**; Detect mode only. **Inquire mode and the FP&A persona are not built** — J4 remains net-new scope awaiting a ruling, not a design decision (A2.3, A2.6 severity **A**). |
+| — | **Evidence** (section) | Period record · Runs & dossiers · Agents & datasets · What we refuse to do. | **PARTIALLY BUILT.** Runs & dossiers (`/audit`), Agents & datasets (`/inventory`) and What we refuse to do (`/refusals`) ship under **Evidence**. **Period record is NOT BUILT** — no period-parameterised surface exists anywhere, which is exactly why A2.3 records J3 as *Unstartable*. A2.6 severity **A** (large). |
+
+**The two destinations named here that do not exist are `Close` and
+`Period record`.** Both were load-bearing to a journey, and both are still
+open gaps rather than abandoned intent.
 
 Demotions and dissolutions, with reasons:
 
-| Screen | Becomes | Why |
-|---|---|---|
-| `/dispositions` | Dissolved — a queue filter, a Close row, a Period-record table | Its whole content is one row. A forward prediction is worth something when it *comes back*, so its home is where you stand when it does. |
-| `/readiness` | Deleted from nav — a property of an agent | One row of a table that should have many, promoted to a permanent slot. |
-| `/inventory`, `/catalogue`, `/monitors` | Under Evidence, plus in-context routes | Nobody navigates *to* an inventory; they arrive from a thing they were looking at. |
-| `/my-probe-history` | Identity menu | Per-person, private by design, empty most of the time. A permanent top-level slot also subtly advertises a surveillance affordance A24 refuses to have. |
-| `/refusals` | **Kept in global nav**, under Evidence | §5.11's argument holds: burying a refusal makes it look like an omission. Evidence is not a settings drawer. |
-| F26 fidelity, boundary checks, F33, backtest, second held-out period | `/evidence/run/<id>` | Properties of a **run**, not of my night's work. Give the run an object and the queue becomes a queue. |
+| Screen | Becomes | Why | Shipped? |
+|---|---|---|---|
+| `/dispositions` | Dissolved — a queue filter, a Close row, a Period-record table | Its whole content is one row. A forward prediction is worth something when it *comes back*, so its home is where you stand when it does. | **PARTIALLY.** Off the top level and reachable from the queue and the item that carries it. The Close row and the Period-record table are **not built**, because neither destination exists. |
+| `/readiness` | Deleted from nav — a property of an agent | One row of a table that should have many, promoted to a permanent slot. | **BUILT** — off the nav, reached from the agent object. |
+| `/inventory`, `/catalogue`, `/monitors` | Under Evidence, plus in-context routes | Nobody navigates *to* an inventory; they arrive from a thing they were looking at. | **DIVERGED.** All three are off the primary task path as intended, but **`/catalogue` and `/monitors` ship under a third group, `Govern`, not under Evidence** — see the grouping note below. `/inventory` ships under Evidence as "Agents & datasets". |
+| `/my-probe-history` | Identity menu | Per-person, private by design, empty most of the time. A permanent top-level slot also subtly advertises a surveillance affordance A24 refuses to have. | **BUILT** — identity block below the persona switch. |
+| `/refusals` | **Kept in global nav**, under Evidence | §5.11's argument holds: burying a refusal makes it look like an omission. Evidence is not a settings drawer. | **BUILT**, under Evidence, as "What we refuse to do". |
+| F26 fidelity, boundary checks, F33, backtest, second held-out period | `/evidence/run/<id>` | Properties of a **run**, not of my night's work. Give the run an object and the queue becomes a queue. | **NOT VERIFIED HERE.** The run object is A2.6 severity **B**; this row's status is `code-agent`'s to confirm, and I am not claiming it either way. |
 
 **The single rule that removes most dead ends:** every object gets one canonical
 page; every page names its object in its `<h1>`; every reference to an object is
 a link to it. Objects: period, run, finding, dossier, agent, dataset,
 resolution, approval.
+
+### A2.2a · Which grouping the build actually has — §4's, not A2.2's
+
+Recorded at gate 10 because pass 17's commit message credits *"the IA from
+`UX_KB` A2.2: Work / Govern / Evidence"*, and **Work / Govern / Evidence is
+§4's grouping — the one this section's own heading says it replaces.** A2.2
+proposes no `Govern` group at all, and assigns Catalogue and Monitors to
+Evidence. As the owner of this file, my adjudication:
+
+| | §4 | A2.2 (this section) | **What `chrome.NAV` ships** |
+|---|---|---|---|
+| Groups | Work / Govern / Evidence | Four flat task-ordered items + an Evidence section. **No Govern group.** | **Work / Govern / Evidence** |
+| Work | Ask · Exceptions · Review · Dispositions | — (Close · My queue · Approvals · Ask, flat) | queue · approvals · ask |
+| Govern | Monitors · Catalogue · Inventory | — (no such group) | catalogue · monitors |
+| Evidence | Audit · Refusals | Period record · Runs & dossiers · Agents & datasets · What we refuse to do | audit · inventory · refusals |
+
+**The shipped container is §4's three-group shape. The shipped contents are
+largely A2.2's decisions** — the Exceptions/Review merge into `/queue`, the new
+`/approvals`, Ask demoted out of the landing slot, and `/readiness`,
+`/my-probe-history` and `/dispositions` taken off the top level. So the honest
+description is neither "A2.2 was built" nor "A2.2 was ignored": **A2.2's
+demotions and merges shipped inside §4's grouping.** The commit message's
+attribution is wrong on the grouping and right on the movements.
+
+**Was the difference deliberate or simply not built?** Both, in separate parts,
+and I am not going to blur them:
+
+1. **The `Govern` group is not-built rather than rejected.** A2.2 folds
+   Catalogue and Monitors into Evidence on the argument that nobody navigates
+   *to* an inventory. The build keeps them as a distinct governance group. I find
+   no design record — here, in a commit, or in the Decisions Log — that argues
+   against A2.2's fold, so I record this as **A2.2 not carried through, not
+   A2.2 overruled**.
+2. **The flat four-item nav is not-built, necessarily, because `Close` is not
+   built.** A2.2's flat shape is built around Close as the default landing. With
+   Close absent there is no flat shape to ship, and grouping the three surviving
+   items under a `Work` heading is a reasonable fallback rather than a rejection
+   of A2.2. Build Close and the question genuinely reopens.
+3. **Keeping Refusals in global nav is deliberate and agreed** — §4, A2.2 and
+   the build all say the same thing, and `chrome.NAV`'s comment cites §5.11.
+
+**My position, for whoever rules on it:** the shipped Work / Govern / Evidence
+grouping is defensible and I am **not** asking for it to be unwound. The three
+governance surfaces really are a different mode of use from the night's work,
+and §4 had that right. What I still hold is the *Close-first, task-ordered*
+claim — which cannot be evaluated until Close exists. Until then, **§4's
+grouping is the accurate description of the product and A2.2's is an
+unrealised proposal**, and this file should not be read the other way round.
+Neither grouping is human-approved: see the change-history rows, which read
+*"approval pending"* and are accurate.
 
 ## A2.3 · The four journeys
 
@@ -1224,6 +1342,7 @@ _(no entries — no production usage)_
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-05 | 1.3.1 | PATCH — **gate-10 record correction, no design change.** E2: `AC-F12-08` was cited live in three places (§1.2 mechanisms table, §5.9, §6 traceability) though retired 2026-07-31 and replaced by `AC-F12-10`; corrected, with a §5.9 editorial marker that **preserves rather than deletes** the original per-user probe-column intent and records `RESPONSIBLE_AI_KB` G-PROBE-3 / gate-6 ruling 4 as a correct override of it. The per-user *probe* figure is removed from the design record; per-user *override rate* is untouched. The build was already aggregate-only — this was a documentation defect, not a product one. E3: A2.2 gains a status marker and a **Shipped?** column per row, naming **Close** and **Period record** as NOT BUILT; new **A2.2a** reconciles the grouping — what shipped is **§4's** Work/Govern/Evidence, not A2.2's flat four, with A2.2's demotions and merges inside it — and §4 gains a matching marker. Nothing in `dev/`, `design-review/`, `FUNCTIONAL_SPEC.md` or `PROJECT_CONTEXT.md` touched. **The Part A2 approval-pending rows below are unchanged and remain accurate.** | `review-agent` gate-10 escalations E2/E3, adjudicated by this file's owner; no new human approval sought or implied |
 | 2026-08-03 | 1.3.0 | MINOR — **A2.8, identity carried forward.** Logo (wordmark + Council Mark, incl. the Tier-3 signature and seal row reused for their original meaning), page-opening pattern graded by visit frequency, six section icons mapped 1:1, artifact card, gold underline. Corrects two A2.7 errors: the invented gold-disc app icon broke the Council Mark's own colour law, and the artifact card was sans where marketing is serif. New `brand.css` + `brand-assets.html`; applied to the four branded screens. Records what was left behind (`#conclaveNet`, `motion.css`, Tier-2 glyph, `.cta`, all six `/who` accents incl. the green) and what cannot come across (the question-and-answer spine). | Human request, 2026-08-03; approval pending |
 | 2026-08-02 | 1.2.0 | MINOR — **A2.7, visual pass "Paper & Seal, at close".** Conclave brand (read from `conclave-marketing/dev/.../site.css`, not a summary) + Apple pro-app discipline, in a new `apple.css`. Records that the **brand's green is not a status colour** — it is one of six team-family accents on the marketing `/who` page — and is therefore **dropped entirely rather than substituted**, with the no-green rule intact. Applies the typography ruling as built fact: staleness 10.5px → 15px, nav 10px → 15px, qualifier-to-assertion ratio 4.0× → 2.7×. Journey maps redrawn as designed artefacts. Four screens restyled, fifteen not — disclosed. | Human request, 2026-08-02; approval pending |
 | 2026-08-02 | 1.1.0 | MINOR — **Part A2, navigation & journey redesign.** Parallel design thread requested by the human after using the running pilot. Adds: four end-to-end journey maps (J1–J4, two of them currently unwalkable and one unstartable); a four-item task-ordered IA replacing §4's eleven-item flat nav, with demotions for `/readiness`, `/inventory`, `/catalogue`, `/monitors`, `/my-probe-history` and dissolution of `/dispositions`; a verdict that none of the six binding constraints causes the unusability, with the "no Approve button" constraint's unbuilt positive half identified as the highest-value gap; a **FAIL** call on the 10px navigation / 10.5px provenance typography with a proposed floor criterion; and a gap list. §4 is superseded by A2.2 but retained for the record. Rendered clickable prototype at `design-review/redesign-2026-08-02/index.html`; gate-5 record untouched. `DesignSync` re-confirmed unavailable — no library push. | Human request, 2026-08-02; approval pending |
