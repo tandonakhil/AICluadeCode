@@ -50,6 +50,46 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-05 — Gate 10 · `solution-architect`'s four rulings (register effects)
+
+Full reasoning in `ARCHITECTURE_KB.md` §25. Register effects, recorded here
+because that file is not its to edit:
+
+| Entry | Effect |
+|---|---|
+| **19** — pilot transport | **NARROWED, NOT CLOSED.** Closes when T1/T2 are verifiable in a deploy artefact and T3 executes — none possible on a single-host pilot |
+| **30** — uncalibrated threshold | **OPEN**, re-scoped *upward*: the disclosure is now an architectural rule binding every future primitive, not one module's property |
+| **35** (new) — style-inlining | **OPENED** as its own numbered entry at its request, so gate 9's audit can see it |
+| **1** — mTLS | unchanged, re-linked as T1–T3's peer: both gate the same event and should reach the human **once, together** |
+| **2** — SQLite | unchanged; its test consequence (ARCH-06 unwritten) is now disclosed rather than invisible behind a green suite |
+
+**Rulings:** §18.1 was stale and is amended — and the consequential sweep found
+**two more stale absence-assertions** (§20.1, §18.3) that were fixed rather than
+left while correcting the first. Both primitives **join §7.3** — thirteen now;
+`obligation_gap` is not a parameterisation of `expectation_gap` because the input
+contracts differ, and not split into three because they share the whole
+computation and differ only in vocabulary. The pilot transport is **sufficient
+for the pilot** and gated for the tenant by T1/T2/T3. The export **must be
+style-inlined** — decided not on the 280 KB but because the size emphasis lives
+only in the stylesheet, so in the export's copy `AC-F41-03` is not harder to
+check, **there is nothing to check against** — and `AC-F1-04`'s reader is defined
+as the one party who cannot open `/dossier/<id>`.
+
+### 2026-08-05 — GAP raised against the 2026-08-05 `[override]`, for the human
+
+`solution-architect`, §25.3.3. **None of the override's five claim prohibitions
+covers the fact that the running pilot's trust boundary is a *module* boundary.**
+`ARCHITECTURE_KB` §3.2 calls that boundary the thing the entire product claim
+reduces to.
+
+The pilot strip discloses it per screen — which is why this is a **gap, not a
+defect**. But the prohibition list is what travels to people who never see a
+screen. A sixth prohibition is drafted in §25.3.3 and awaits the human.
+`security-architect` asked to co-sign, since it is on the boundary they jointly
+own.
+
+
+
 ### 2026-08-05 — Gate 7 · Code — `code-agent`, **pass 24** (gate 10's three request-changes items), `dev` @ `c8470d9`
 
 `review-agent`'s wiring sweep found four orphans the existing net cannot see.

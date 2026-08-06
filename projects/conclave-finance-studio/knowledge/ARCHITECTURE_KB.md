@@ -5,7 +5,21 @@ Owner: `solution-architect` · Gate 6 · Architecture (joint owner with
 Created 2026-07-31 · **Status: proposed under standing authorization
 (`batch_authorized`), awaiting joint presentation with `security-architect`**
 
-**Write set for this pass, declared:**
+**Write set for pass 2 (gate 10 review-and-rule, 2026-08-05), declared:**
+
+1. `projects/conclave-finance-studio/knowledge/ARCHITECTURE_KB.md` — this file
+   (**`Edit` only**; it exists, so `Write` is off the table for this path).
+   Sections amended: §3.2 (deployment gate for the pilot transport), §7.3 (two
+   primitives ruled in), §9.4 (the export's rendered view), §18.1 (**stale —
+   now resolved**), §20.1 (**execution status: the suite was re-run for real**),
+   new §25 (the four gate-10 rulings + Impact Analysis), §24 (change history).
+
+**Nothing in `dev/` is touched by this pass** — it is a review-and-rule pass;
+where a ruling implies work, the owning agent is named and the work is theirs.
+`PROJECT_CONTEXT.md`'s register is likewise not edited by me; §25.6 states which
+entries each ruling closes, narrows or leaves open, for the orchestrator to record.
+
+**Write set for pass 1 (2026-07-31), declared:**
 
 1. `projects/conclave-finance-studio/knowledge/ARCHITECTURE_KB.md` — this file (new).
 
@@ -187,6 +201,16 @@ claim — obligations E, M, and `AC-F36-04` — reduces to this one boundary.
 read credential and the ERP control-read credential**, which do exist. That is
 deliberate: the boundary must be load-bearing and tested before the posting
 credential arrives in phase 2, or its first real use will be its first test.
+
+**Amended 2026-08-05 (gate 10 ruling 3, §25.3) — the pilot transport, and the
+gate before the first tenant.** `backend/pilot_transport.py` puts the broker
+inside the api process, so **in the running pilot this boundary is a module
+boundary, not a process boundary.** That is acceptable for a pilot on the
+conditions in §25.3.1 and unacceptable for any tenant deployment. §25.3.2 states
+the precondition as three conjunctive deploy-time gates — the operative one being
+that **the `ges` package is not on the api host's disk**, which converts the
+residual nobody can witness in one interpreter into something a deployment can be
+checked for. Register entry 19 is narrowed by this ruling and does **not** close.
 
 This is jointly owned with `security-architect` — see §22.
 
@@ -511,7 +535,13 @@ Three properties matter and each is checkable:
    over a different population is a different control (`DOMAIN_KB` §10.8(2)) and
    the dossier records which.
 
-### 7.3 The registered evaluator primitives (MVP1)
+### 7.3 The registered evaluator primitives (MVP1) — **thirteen as of gate 10**
+
+**Amended 2026-08-05 (gate 10 ruling 2, §25.2).** This list held eleven at pass 1.
+`code-agent` built two more, declared them in `UNSPECIFIED_BUT_BUILT` rather than
+quietly widening my list, and referred them here. **Both join §7.3. Neither is
+folded into an existing primitive.** They are rows 12 and 13 below and are marked
+as such; the reasoning, and what `code-agent` must now change, is in §25.2.
 
 | Primitive | Computation | Detectors it serves |
 |---|---|---|
@@ -526,6 +556,19 @@ Three properties matter and each is checkable:
 | `text_recurrence` | successive explanations on the same key exceed a similarity bound | F9 leg (ii) |
 | `peer_coding_divergence` | posting's coding disagrees with comparable postings | F33 |
 | `distribution_outlier` | movement outside the account's historical range | F42 |
+| **12. `obligation_gap`** *(added gate 10)* | a **declared** obligation with no discharging posting within tolerance. Declaration-derived, not history-derived. Three closed obligation kinds — `scheduled_reversal`, stopped-feed, `intercompany_counterparty` — sharing one computation and differing only in the vocabulary each finding carries | F29 sub-types 2, 3, 4 (`AC-F29-02`/`-03`/`-04`) |
+| **13. `journal_attribute_outlier`** *(added gate 10)* | scores a journal against a **closed attribute set** and returns *which attributes* made it an outlier. Attribution, not a distance scalar. **Thresholds are DECLARED, not calibrated** — see the standing rule below | F42 (`AC-F42-02`) |
+
+**Standing rule, introduced at gate 10 with primitive 13 and binding on every
+future primitive (§25.2).** A primitive whose thresholds are *declared* rather
+than *calibrated against measured performance on real data* must carry an
+explicit calibration denial in two places: at its module header, and **on every
+finding it emits** — stating the threshold in force, its inclusivity, the closed
+set it scored, and that no likelihood, precision or false-positive rate is
+claimed. `journal_attribute_outlier` already does this and is the reference
+implementation. The rule is stated here rather than left as a property of one
+module because the fourteenth primitive is the one that will arrive uncalibrated
+and silent, and a reader who meets only the finding must still meet the denial.
 
 **F9 leg (ii) is a registered primitive, not a field on leg (i).** `DOMAIN_KB`
 §9 predicts it will be dropped as an implementation detail. Making it a
@@ -843,6 +886,32 @@ Three consequences, all binding on `code-agent`:
 3. Because styles are inlined, gate 5's strengthened `AC-F41-03` (riskiest
    element at the largest computed font size) is checkable *in the retained
    artefact*, offline, years later — not only in a live browser.
+
+**Amended 2026-08-05 (gate 10 ruling 4, §25.4) — "the retained artefact" is two
+artefacts, and only one of them is style-inlined.**
+
+`code-agent` flagged the divergence rather than letting it pass, and it is a real
+one:
+
+| Artefact | Produced by | Style-inlined? |
+|---|---|---|
+| The `/dossier/<id>` exhibit | `chrome.page(..., chrome_on=False)`, which emits `<style>` with `chrome.stylesheet()` | **Yes** |
+| The **export's** per-dossier `rendered_view` | `app.ui.retained.render()` → a bare `tree.render()`, written straight into the export at `app/evidence/export.py` | **No** |
+
+**Ruling: inline it in the export copy too. The consequence-3 claim above stands
+as written and the build must meet it.** The deciding fact is not the 280 KB —
+it is that the size emphasis exists *only* in the stylesheet
+(`.riskband .big{font-size:__RISK__px}`), so the export's copy carries no
+font-size information at all and `AC-F41-03` is not merely hard to check there,
+it is **unverifiable in principle**. `AC-F1-04`'s reader is by definition the one
+who cannot open `/dossier/<id>`, so satisfying gate 5's binding decision only on
+the live surface satisfies it for everyone except the person it was for.
+
+The ruling is bounded so it stays buildable — the four constraints are in §25.4,
+and the work is `code-agent`'s with `test-agent` extending ARCH-16. This is
+**not a hold on the shipped pilot**, whose exports carry synthetic-fixture data
+under the pilot strip; it is a precondition on the first export handed to a real
+auditor.
 
 A PNG rendering is generated at auditor-export time for convenience and is
 labelled **derived**; the HTML plus its hash is the evidence.
@@ -1254,13 +1323,61 @@ code.
 
 ## 18 · What I could not settle, and two new findings
 
-### 18.1 FINDING — supersession by *data* has no acceptance criterion (for `functional-design-agent`)
+### 18.1 ~~FINDING~~ **RESOLVED 2026-08-05 (gate 10)** — supersession by *data* now has two criteria, and they are built and executing
+
+> **This finding was stale, not merely disclosed, and `review-agent` was right to
+> say so.** The text below asserted an *absence* — "nothing at the Test gate
+> would catch it being dropped" — that another KB and the build have since
+> filled. A KB that keeps asserting a gap somebody else closed is worse than one
+> that never raised it: a reader trusts the assertion and stops looking. The
+> original text is retained verbatim below because the request it made is what
+> was answered, and striking it would hide that the mechanism worked. **What is
+> no longer true is marked.**
+>
+> **What closed it.** `functional-design-agent` issued exactly the requested
+> shape — `AC-F41-14` (block, naming the dataset and the newer as-of) and
+> `AC-F41-15` (**the negative half**: a newer watermark on a dataset the run did
+> *not* bind must not block and must show no notice), `FUNCTIONAL_SPEC` §27.1.
+> `-15` was not requested by me and is the better half of the pair: without it a
+> build passes `-14` by blocking every pending approval whenever any warehouse
+> object moves, which on a nightly warehouse means the control is switched off
+> within a week.
+>
+> **How it is built** (`code-agent`): computation in `dev/backend/ges/supersession.py`
+> over §5.5's `run_dataset_binding`, with no global "the warehouse moved" flag
+> anywhere — the module states that omission as deliberate, and it is the design.
+> Enforcement is **not** in that module and **not** in the UI: it is bundle rule
+> `scope.no_bound_dataset_superseded_by_later_data`, `mode: enforce`,
+> `override_eligible: false`, whose two context fields `/ges/decide` resolves
+> server-side from the GES registry and discards if a caller supplies them. The
+> screen's `approval-blocked-by-data` element is *display* of a fact the broker
+> already enforced; deleting it does not make the approval succeed.
+>
+> **Why the Test gate now catches it being dropped — including the negative half.**
+> The rule carries `fixtures: {firing, non_firing}`, and §8.2 makes fixture
+> evaluation part of **bundle compilation**. `AC-F41-15`'s case *is* the
+> `non_firing` fixture. So the negative half is verified at compile time on every
+> build, not only when somebody remembers to run a scenario — which is a stronger
+> position than the one this finding asked for. Watermarks are compared as
+> instants and an unparseable one raises rather than comparing false.
+>
+> **Verified by me at gate 10** by reading the criteria, the module, the bundle
+> rule and the UI element — not by accepting the report. `test_supersession_by_data.py`
+> exists in the functional suite; I do not own that suite and do not claim its result.
+>
+> **Consequence for the architecture: none.** §5.5 described this behaviour
+> correctly all along; what was missing was the criterion, and it is no longer
+> missing. No design change follows.
+
+**Original text, 2026-07-31 — retained as history. The struck sentence is the
+one that is now false.**
 
 `AC-F41-12` covers a run superseded by a **later run**. §5.5 establishes that the
 more common real case is a run superseded by **later data** — the warehouse
 watermark moves after a run completes but before its proposal is approved. The
-architecture handles it identically, but no criterion asserts it, so nothing at
-the Test gate would catch it being dropped.
+architecture handles it identically, but no criterion asserts it, so ~~nothing at
+the Test gate would catch it being dropped~~ **[FALSE as of `AC-F41-14`/`-15`;
+see the resolution block above]**.
 
 **Requested**: a new ID from `functional-design-agent`, in the shape —
 
@@ -1290,7 +1407,18 @@ most of the reason to want it. **This does not block anything in MVP1**; it is a
 constraint recorded now so F24 is re-decided with it visible. Mobile
 *read/monitor/notify* (F23) is unaffected — it retains nothing evidential.
 
-### 18.3 Carried forward, needing a criterion — the routing budget
+### 18.3 ~~Carried forward, needing a criterion~~ **SUPERSEDED 2026-08-05** — the routing budget
+
+> **No longer open.** `AC-F41-16` (items beyond the cap are not routed; the run
+> states the cap was reached, for which reviewer, and how many were held) and
+> `AC-F41-17` (raising the cap is a controller-only control event carrying a
+> decision ID, prior and new cap and the night; rejected at every other
+> permission level including administrator) exist in `FUNCTIONAL_SPEC` §27.1.
+> The sentence "it is currently unenforced at the Test gate" is false. Corrected
+> in the same sweep as §18.1 rather than left as a second stale absence — see
+> §25.1.
+
+**Original text, 2026-07-31 — retained as history:**
 
 Gate 5 decision (b) accepted a per-reviewer-per-night routing budget and
 `UX_KB` §9.2 flagged that no criterion makes volume *bounded*. §16.3(4)
@@ -1363,10 +1491,48 @@ acquires a build target, this Impact Analysis is re-run before it does.
 
 ## 20 · The architecture test suite (owned by `solution-architect`)
 
-### 20.1 Execution status — STATIC ONLY, NOT EXECUTED
+### 20.1 Execution status — **EXECUTED (re-run for real, 2026-08-05)**
 
-**The entry point `projects/conclave-finance-studio/dev/tests/suites/architecture/run.sh`
-does not exist.** There is no `dev/` directory in this project as of 2026-07-31;
+**This section was stale in the same way §18.1 was, and is corrected here.** The
+standing commitment below — that a suite once reported "could not execute" is
+re-run for real and never waved through on the strength of a static pass — was
+discharged at gate 10.
+
+**Run at gate 10, by me, `dev` @ `142c734`+:**
+
+```
+bash projects/conclave-finance-studio/dev/tests/suites/architecture/run.sh
+── suite: architecture ──
+interpreter: dev/.venv/bin/python
+scenarios:   1 file(s)
+............................                          [100%]
+EXECUTED — suite passed          exit 0
+```
+
+**28 scenarios, 0 failures, exit 0** (exit `0` = EXECUTED/all passed per
+`tests/suites/_runner.sh`; `3` and `4` are not passes). The suite started no
+long-lived process of its own: `ARCH_04` starts `ges/run.py` as a **child**,
+reaps it in a `finally`, and fails loudly rather than skipping if GES does not
+bind. Nothing in `dev/` was modified and nothing was installed.
+
+**What the 28 cover, stated honestly against §20.2's twenty specified scenarios.**
+Executed: ARCH-02 (4), ARCH-04 (2, including the two-process topology witness and
+the 401 on the socket), ARCH-05 (3), ARCH-08 (4), ARCH-09, ARCH-10 (2), ARCH-11
+(2), ARCH-15 (3), ARCH-18 (2), plus the api-never-imports-ges static check and two
+guards that the suite's own GES app cannot write to the live decision ledger.
+**Not present as architecture-suite scenarios: ARCH-01, ARCH-03, ARCH-06, ARCH-07,
+ARCH-12, ARCH-13, ARCH-14, ARCH-16, ARCH-17, ARCH-19, ARCH-20.** Several are
+covered by other suites (`functional`, `security`, `industry`) and I do not claim
+their results as mine; **ARCH-06 (blast-radius concurrency under retry-on-
+serialization-failure) is the one §19.3 said no other suite would write, and it is
+still not written** — register entry 2 records that the `SERIALIZABLE` transaction
+it would exercise has no SQLite equivalent and is not built, so the scenario has
+nothing to assert against today. That is a disclosed gap, not a pass.
+
+**Prior status, retained as history — no longer true:**
+
+~~**The entry point `projects/conclave-finance-studio/dev/tests/suites/architecture/run.sh`
+does not exist.**~~ There is no `dev/` directory in this project as of 2026-07-31;
 `code-agent` has not run. Every scenario below is therefore
 **`STATIC ONLY — NOT EXECUTED`**, and none may be reported as passing.
 
@@ -1514,8 +1680,374 @@ different.
 
 ---
 
+## 25 · Gate 10 rulings (Architecture pass 2, 2026-08-05)
+
+Placed before §24 so the change history stays last. Four items were held for an
+architect's ruling rather than a builder's decision. Each is ruled here, and each
+names the agent who owns any work that follows — **I do none of it myself.**
+
+### 25.0 Completeness check — binding decisions checked against, for this pass
+
+Per my contract I re-read `PROJECT_CONTEXT.md`'s Decisions Log **in full**, not
+only the gate-10 brief. §1 records the pass-1 check and every entry in it still
+holds. **Binding decisions recorded since my last pass**, and how this pass
+satisfies each:
+
+| Binding decision since pass 1 | How this pass satisfies it |
+|---|---|
+| **2026-08-05 — `[override]` at gate 9, all nine AC IDs named, human chose to ship the pilot now** | Not re-litigated: shipping is the human's call and it is made. None of my four rulings reverses it and none holds the pilot. Rulings 3 and 4 are written as **preconditions on the first tenant / first real auditor export**, not as pilot blockers, which is the only shape consistent with a decision to ship now. Ruling 3 does, however, find that the override's claim-prohibition list is **incomplete** — §25.3.3. |
+| **2026-08-05 — the override does NOT close the four closeable F5 criteria; they ship unbuilt with `/inventory` disclosing it** | Untouched. ARCH-19/ARCH-20 remain unwritten in my suite and §20.1 now says so explicitly rather than letting a green 28 imply coverage. I do not fold them into any pass count. |
+| **2026-08-05 — "Claims the pilot must not make", unchanged by the override** | Honoured, and extended: §25.3.3 proposes a sixth prohibition. I do not add it myself — the list is the human's, held in the Decisions Log. |
+| **2026-08-05 — orchestrator correction: `UX_KB` Part A2 only *partially* built; the Close cockpit and Period record do not exist; J3/J4 unwalkable** | Checked for collision with ruling 4, which touches the export's rendered view. No collision: the retained region composes from `pages.approval_evidential_region`, which exists and is walkable. Ruling 4 adds no screen. |
+| **2026-08-05 — orchestrator correction on what "approval pending" may say on a KB face** | This file's header still reads *proposed under standing authorization, awaiting joint presentation with `security-architect`*. Accurate and unchanged: gate 6 was closed jointly, and §25 is a pass-2 amendment presented for the same joint sign-off. I have not upgraded the header's status on my own authority. |
+| **2026-07-31 — Test Policy: all suites blocking, no advisory exceptions** | §20.1 reports a real execution with a real exit code and names eleven §20.2 scenarios that are **not** in the suite, rather than reporting 28 green as coverage of twenty. |
+| **2026-07-31 — MVP1 desktop web only; three surfaces → `solution-architect` non-droppable, Impact Analysis mandatory** | §25.5, enumerating all six surfaces from §19.1 — reached and not-reached, each with falsifiable reasoning. |
+
+**Conflicts with a binding decision: none.** One **gap** found against a binding
+decision, raised not resolved: §25.3.3.
+
+---
+
+### 25.1 Ruling — §18.1 is amended, and the lesson is bigger than the entry
+
+**Ruled: amend, and mark the false sentence rather than deleting it.** Done in
+§18.1. `review-agent`'s distinction is the right one and I am adopting it as a
+standing habit for this file: **a KB assertion of an absence has a shelf life,
+and it is my job to expire it, not the job of whoever fills the gap.**
+`functional-design-agent` issued `AC-F41-14`/`-15`, `code-agent` built it, and
+neither had any reason to come and edit my file. The finding was the mechanism
+working; leaving it standing afterwards was the mechanism failing.
+
+Two things I checked rather than accepted, because a stale finding replaced by an
+unverified closure is no improvement: the enforcement point is the **bundle rule**
+`scope.no_bound_dataset_superseded_by_later_data` (`mode: enforce`,
+`override_eligible: false`, context resolved server-side and caller values
+discarded), not the UI element; and `AC-F41-15`'s negative case is the rule's
+declared `non_firing` fixture, so §8.2's compile-time fixture evaluation verifies
+the negative half on **every build**. That is stronger than what §18.1 asked for,
+and it is worth naming why: the criterion that stops the control over-blocking is
+verified by the same mechanism that verifies the control fires, so a build cannot
+keep one and lose the other.
+
+**Work implied: none.** No agent owes anything.
+
+**Consequential sweep I owe and am doing here:** §20.1 asserted the same shape of
+absence ("the entry point does not exist… STATIC ONLY — NOT EXECUTED") and was
+equally stale. It is corrected in the same pass. I checked §18.2, §18.3 and §18.4
+for the same defect: §18.2 (F24 vs. the rendered view) is still true and still
+open; §18.3 (routing budget) is **now closed by `AC-F41-16`/`-17`, which exist in
+`FUNCTIONAL_SPEC` §27.1** — I am marking it below rather than leaving a second
+stale absence behind while fixing the first; §18.4's two items are genuinely open.
+
+**§18.3 is superseded.** `AC-F41-16` bounds the routed volume and names the
+reviewer and the held count; `AC-F41-17` makes raising the cap a controller-only
+control event with a decision ID. The sentence "it is currently unenforced at the
+Test gate" is no longer true. The pilot additionally sets `PILOT_ROUTING_CAP = 3`
+against a product default of 12 specifically so the at-cap state is reachable by a
+reader of the running pilot — a pilot configuration, correctly placed in
+`pilot_transport.py` with the pilot's other compromises rather than changed in
+`ges.routing.DEFAULT_CAP`. I endorse that placement.
+
+---
+
+### 25.2 Ruling — both primitives join §7.3; neither is folded
+
+**Ruled: `obligation_gap` becomes primitive 12 and `journal_attribute_outlier`
+becomes primitive 13.** §7.3 is amended. Neither is folded into an existing
+primitive, and `obligation_gap` is **not** split into three.
+
+First, the mechanism worked and should be said so plainly: `code-agent` built two
+primitives my list did not contain, and instead of widening my list or hiding them,
+declared them in a named `UNSPECIFIED_BUT_BUILT` tuple under a **set-equality**
+check that refuses a registered-but-undeclared primitive. That is the correct
+behaviour for a builder meeting the edge of a design, and the reason this ruling
+is a five-minute decision instead of an archaeology exercise.
+
+**Why `obligation_gap` is a primitive and not a parameterisation of `expectation_gap`.**
+The two have different *input contracts*, not different parameters.
+`expectation_gap` derives an expectation from **history** — present in N of the
+last M periods, absent now. `obligation_gap` derives it from a **declaration** —
+a journal said a reversal was owed. Three consequences make the distinction
+structural rather than stylistic, and each is falsifiable:
+
+1. A first-ever reversal, flagged in its first period, has **no history at all**
+   and is still owed. `expectation_gap` cannot see it at any `required_hit_ratio`.
+2. A quarterly settlement feed posts in four periods of twelve. Loosening
+   `required_hit_ratio` until `expectation_gap` catches its omission reports it
+   as missing in the eight periods where nothing was owed — a detector that is
+   wrong in eight periods to be right in one.
+3. An intercompany counterparty posting is owed **the moment the first side
+   posts**. There is no prior period to look at.
+
+`code-agent` reports reaching this by trying `expectation_gap` first, on the
+fixture. That is the right order and it is the evidence I am ruling on.
+
+**Why it stays one primitive covering three kinds, rather than three.** The three
+share the whole computation — *for each declared obligation: not yet due → note;
+discharged within tolerance → nothing; else → omission* — and differ only in the
+vocabulary a finding carries and in where the declaration came from. Splitting
+them would be three copies of one computation, which is precisely the failure
+§7.1 exists to prevent: §7.1's honest bound is *a new detector is configuration,
+a new primitive is code*, and three primitives that differ by a vocabulary table
+would make that bound a fiction in the other direction. `intercompany_counterparty`
+adds *which side posted and which did not* — an **output field on a two-sided
+obligation**, not a second computation. The `KIND_VOCABULARY` mapping is closed
+and an unknown kind fails the run rather than emitting a generic summary; that
+closure is what makes one primitive safe here, and it must stay closed.
+
+**Why `journal_attribute_outlier` is not a parameterisation of `distribution_outlier`.**
+`AC-F42-02` requires the journal **and the attributes that made it an outlier** to
+be named. `distribution_outlier` computes a distance from an account's historical
+range and returns a scalar verdict; no parameterisation of a distance computation
+yields an attribution. The output *shape* differs, not the threshold — and output
+shape is exactly where a primitive boundary belongs, because it is what a detector
+manifest cannot change.
+
+**The calibration caveat travels with it into §7.3, and generalises.** Promoting
+this primitive **does not calibrate it**: `min_attributes: 3` and
+`rarity_ceiling: 0.05` are declared, and no likelihood, precision or false-positive
+rate is claimed for it. Register entry 30 stays open. What I have added is the
+standing rule in §7.3 — the calibration denial must sit on the module header **and
+on every emitted finding**. `journal_attribute_outlier` already satisfies it and
+is the reference implementation. The rule is in the KB rather than in one module
+because the failure it prevents is the *fourteenth* primitive arriving uncalibrated
+and quiet, and because a reader who meets only a finding must still meet the denial.
+
+**Work implied — owner `code-agent`, one commit, not urgent and not a pilot blocker:**
+
+1. `SPECIFIED` becomes **thirteen** names, in the order §7.3 now lists them.
+2. `UNSPECIFIED_BUT_BUILT` becomes **empty** — and, exactly as was done when
+   `SPECIFIED_BUT_NOT_IMPLEMENTED` was emptied, the tuple and its set-equality
+   check **stay**, with a test asserting both that it is empty *and* that a
+   planted registered-but-undeclared primitive is still refused. Emptying a
+   declaration must not quietly remove the check that made the declaration
+   meaningful. This is the single most important half of this work item.
+3. The header comment naming me as the gate-10 reviewer is replaced by a pointer
+   to this section, so the file does not keep asking for a ruling that exists.
+
+**Work implied — owner `test-agent`:** no new scenario. The existing set-equality
+check covers it once `SPECIFIED` is updated; a green suite after step 2 is the
+evidence.
+
+---
+
+### 25.3 Ruling — the pilot transport: sufficient for the pilot, gated for the tenant
+
+Register entry 19. I am stating this as a gate, not a preference, as asked.
+
+#### 25.3.1 For the pilot: SUFFICIENT — and it is conditional, not free
+
+**Ruled sufficient**, on five conditions that all currently hold and none of which
+may be relaxed without returning here:
+
+1. It **refuses to install under `CONCLAVE_ENV=production`**.
+2. It is **one named file, outside the `app` package**, with the loss stated in
+   its own first paragraph — `grep -l "^from ges" backend/app` still returns only
+   `run.py`.
+3. The **api-never-imports-ges** static check still executes and still passes
+   (verified in my §20.1 run).
+4. **`ARCH_04` is a real topology witness**, and this is what moved the entry from
+   "disclosed" to "narrowed": it starts `ges/run.py` as a child on an ephemeral
+   port, asserts a *different pid* holds the credential while the test process
+   (role `api`) is refused it, drives a real broker decision over stdlib HTTP on a
+   TCP socket — no `TestClient` — and a companion asserts 401 for an untokened
+   caller. Both executed in my §20.1 run. Gate 8's finding that the prior checks
+   *would have passed with the boundary gone entirely* is what makes this witness
+   load-bearing rather than decorative.
+5. Every screen rendering a broker fact obtained through it **says so, in words**,
+   in the pilot strip.
+
+The reasoning: a pilot's job is to be operated and read, on one host, over
+synthetic fixture data, by people who know what they are looking at. Against that
+job, a module boundary whose collapse is declared in five places and whose
+deployed alternative has an executing witness is a proportionate trade. It would
+not be proportionate for one hour of real tenant data.
+
+#### 25.3.2 Before the first tenant deployment: THREE CONJUNCTIVE GATES
+
+The residual is stated exactly right in the register — *no suite can witness that
+an api-process module cannot `import ges.executor`, because a suite runs in one
+interpreter with both packages on one `sys.path`*. **The answer is not a better
+test. It is that a deployment is not one interpreter.** These three gates convert
+an unwitnessable property into a checkable one. All three must hold; any one
+failing means the boundary is a convention again.
+
+> **GATE T1 — the `ges` package is not on the api host's disk.** The api role's
+> deployment artefact is built without it, and a **deploy-time** check in the api
+> image asserts `import ges` raises `ModuleNotFoundError`. This is the operative
+> gate: it makes the property true by construction rather than by agreement, and
+> it is checkable in the artefact by anyone, including an auditor. A prompt-
+> injected tool cannot import a package that is not there.
+>
+> **GATE T2 — `backend/pilot_transport.py` is absent from the api image**, not
+> merely refused at runtime. `CONCLAVE_ENV` is read *inside the process the
+> boundary is supposed to protect*; a runtime refusal is a check the attacker's
+> process performs on itself. Absence is not.
+>
+> **GATE T3 — at least one full approval is exercised end-to-end over
+> `LoopbackHttp`** by a suite, so the transport that ships is the transport that
+> is tested. Today `ARCH_04` witnesses the topology and drives a broker decision
+> over the socket, while the `ux` suite drives approvals **in-process**; no
+> scenario drives a complete approval over the socket. That is the last place the
+> two configurations can diverge unobserved.
+
+**Owners.** T1 and T2: `deploy-agent`, with `code-agent` for the packaging split.
+T3: `test-agent` with `code-agent`. **None of this is mine to build**, and none of
+it is buildable in a single-host pilot — which is why entry 19 cannot close now
+and should not be made to look closeable.
+
+**Relationship to register entry 1** (mTLS on loopback, replaced by a shared token
++ 127.0.0.1 bind, "must be reversed before any non-single-host deployment"). T1–T3
+are its peers, not its subset: entry 1 secures the *channel* between two processes,
+T1–T3 establish that there *are* two processes. Both are preconditions on the same
+event and should be presented to the human together, once, as the deployment gate —
+not discovered one at a time during a tenant onboarding.
+
+**Register entry 19: NARROWED again, NOT CLOSED.** It closes when T1 and T2 are
+verifiable in a real deploy artefact and T3 is executing.
+
+#### 25.3.3 A gap in the override's claim-prohibition list — raised, not resolved
+
+The 2026-08-05 override records five claims the pilot must not make. Checking my
+ruling against them, **none of the five covers the fact that the running pilot's
+analysis/execution split is a module boundary.** That is a claim the product's
+own architecture makes loudly — §3.2 calls this one boundary the thing the entire
+product claim reduces to — and a pilot audience that has read the architecture
+will reasonably assume it is in force unless told otherwise.
+
+The pilot strip discloses it per-screen, which is real and is why this is a gap
+rather than a defect. But the claim-prohibition list is the artefact that travels
+to people who never see a screen. **Proposed sixth prohibition, for the human via
+the orchestrator — I am not writing it into the Decisions Log myself:**
+
+> *No claim that the analysis/execution trust boundary is enforced as a process
+> boundary. In the pilot's single-command configuration it is a module boundary:
+> a prompt-injected tool in the api process could reach `ges.executor` by import
+> alone. The two-process topology is built and has an executing test witness; it
+> is not what the pilot runs.*
+
+`security-architect` should co-sign this or say why not — it is on the boundary we
+jointly own (§22), and it is exactly the kind of item my contract says to surface
+rather than resolve quietly.
+
+---
+
+### 25.4 Ruling — inline the stylesheet in the export's rendered view
+
+**Ruled: inline it, and §9.4's claim stands.** Not a deliberate divergence.
+§9.4 is amended with the two-artefact table and this ruling.
+
+`code-agent` was right to decline and right about why: *"genuinely a change to
+what an export contains"* is a scope judgement, not a build judgement, and
+bringing it here is the behaviour I want. But the 280 KB is not what decides it.
+280 KB on an auditor deliverable that is already a complete evidential record is
+not a cost worth a defect.
+
+**What decides it** is that the size emphasis lives **only** in the stylesheet —
+`.riskband .big{font-size:__RISK__px}`. The markup carries a class name and no
+size. So in the export's copy, gate 5's strengthened `AC-F41-03` (riskiest element
+at the largest computed font size) is not "harder to check": there is **nothing to
+check against**. And `AC-F1-04`'s reader is defined as *a party with no application
+login* — the one person who cannot open `/dossier/<id>`. Satisfying a binding gate-5
+decision only on the surface that reader cannot reach satisfies it for everyone
+except them.
+
+Two supporting reasons, neither sufficient alone:
+
+- Two artefacts both called "the retained view", differing in whether they render
+  as shown, is the same class of drift `retained.py` was rewritten to eliminate.
+  Its `unclassified()` check catches a *card* that diverges and would not catch
+  this, because this divergence is not in the tree.
+- `AC-F41-04`'s own text — *what the approver saw* — is not obviously satisfied by
+  a document in which the riskiest element is typographically indistinguishable
+  from the rest. `AC-F41-04` does not *require* inlining, as `code-agent` correctly
+  noted; §9.4 does, and §9.4 is the reason gate 5 accepted the strengthening.
+
+**Four constraints, so this stays buildable and does not create a worse defect.**
+Owner `code-agent`; constraint 3 is the one that would bite.
+
+1. **The block is inlined per dossier, not hoisted to one export-level copy.**
+   Duplication is the point: each `rendered_view` must be independently openable
+   when extracted, which is what §9.4 means by self-contained and what the
+   auditor's actual workflow does. A shared block makes every view non-self-
+   contained to save 260 KB.
+2. **Byte-identical across dossiers in one export**, with the stylesheet's SHA-256
+   recorded once in the export's integrity section, so a reader can verify every
+   copy is the same block without diffing 14 of them.
+3. **The retained hash must be of the bytes that ship.** `AC-F41-04` retains the
+   HTML bytes *and their SHA-256*. If the hash is computed pre-inlining and the
+   export carries post-inlining bytes, the export contains an artefact whose hash
+   does not match its own recorded hash — strictly worse than either current
+   state. Verify this before anything else.
+4. **`check_no_active_content` runs on the shipped bytes, after inlining.**
+   `ACTIVE_CONTENT_PATTERNS` forbids `<link`, `url(`, `@import`, `<img` and
+   `srcset` and does **not** forbid `<style>` — so an inlined block passes only
+   because `chrome.stylesheet()` genuinely contains no `url(` and no absolute URL.
+   That is a property of today's stylesheet, not a guarantee, and the check must
+   be what enforces it rather than this paragraph. `retained.render()`'s separate
+   anchor refusal is unaffected: a `<style>` element is not an `<a>`.
+
+**Timing.** Not a hold on the shipped pilot — its exports carry synthetic-fixture
+data under the pilot strip, and no real auditor is relying on them. **Precondition
+on the first export handed to a real auditor**, which is the same event as the
+first tenant deployment.
+
+**Work implied — `code-agent`:** constraints 1–4. **`test-agent`:** ARCH-16
+(rendered-view determinism) extends to assert the export copy contains the
+`<style>` block, that the block is byte-identical across dossiers, and that its
+digest matches the one recorded in the integrity section. Until that scenario
+exists, ARCH-16 remains unwritten and §20.1 continues to say so.
+
+---
+
+### 25.5 IMPACT ANALYSIS — Architecture pass 2 (gate 10 rulings)
+
+Mandatory per my contract, enumerating **every surface the project has** from
+§19.1's register — not only the surfaces these rulings happen to touch. Six rows,
+each reached or not, each with reasoning a reader can falsify. A surface omitted
+without justification blocks this gate; none is omitted.
+
+| # | Surface | Reached by pass 2? | Reasoning — falsifiable |
+|---|---|---|---|
+| **S1** | **Desktop web** | **NOT REACHED** | No ruling adds, removes or re-composes a screen. Ruling 4 changes the **export's** copy of the rendered view; the live `/dossier/<id>` exhibit and `/approvals/<proposal>` are already style-inlined via `chrome.page` and are **unchanged in both markup and CSS**. Ruling 1 is documentation of behaviour already built and rendering (`approval-blocked-by-data`). Rulings 2 and 3 touch no renderer. **Falsify by** finding any element of `pages.approval_detail` or `pages.approval_evidential_region` whose tree or class set changes as a consequence of §25.1–§25.4 — there should be none. |
+| **S2** | **Backend HTTP API (`api` and `ges`)** | **REACHED — by ruling 3 only, and only as a future constraint** | Rulings 1, 2 and 4 change no route, request schema or response shape: ruling 1 documents an existing `/ges/decide` context resolution, ruling 2 changes only which tuple two already-registered primitives are named in (`REGISTERED` is untouched, so no detector run changes), ruling 4 is confined to the export writer. Ruling 3 reaches this surface because gates T1–T3 change **how the two processes are packaged and how the api reaches GES in a deployed topology** — no wire contract changes, but the transport that serves it does. Nothing lands in the pilot. **Falsify by** finding a route schema, status code or auth requirement altered by any of the four rulings. |
+| **S3** | **Data / export pipeline (Oracle Journal Import file)** | **NOT REACHED** | The Journal Import file is produced by `ges/journal_export.py` under §10's FBDI column contract and contains **no rendered view and no HTML at all**. Ruling 4 is confined to `app/evidence/export.py`'s per-dossier `rendered_view` field in the **F1 auditor export**, which is a different artefact with a different consumer. **Falsify by** showing that the FBDI file's column set, source/category values, or reference-column stamping changes under any ruling here — it does not. |
+| **S4** | **Evidential deliverables (F1 auditor export, dossiers, CUEC checklist, published obligations)** | **REACHED — this is the primary surface of ruling 4, and secondarily of ruling 2** | Ruling 4 changes **what the export file contains**: every per-dossier `rendered_view` gains a ~20 KB inlined `<style>` block, the file grows by ~280 KB, and the integrity section gains a stylesheet digest. Ruling 2 reaches it more narrowly — findings from primitives 12 and 13 flow into dossiers, and §7.3's new standing rule requires the calibration denial to be **on every emitted finding**, so a dossier carrying a `journal_attribute_outlier` finding must carry the denial with it. **Falsify by** finding an export or dossier whose bytes are unchanged after constraints 1–4 are built. |
+| **S5** | **Mobile web** | **NOT REACHED** | Still no MVP1 build target, and more usefully: the two rulings that could plausibly constrain it are neutral for it. Ruling 4's inlined `<style>` is displayable verbatim by any browser including a mobile one — inlining **removes** a dependency (an external stylesheet fetch) rather than adding one, so it strictly widens where the artefact renders. Ruling 3's T1–T3 are deployment-topology gates on the server side and are invisible to any client. **Falsify by** showing an inlined declaration in `chrome.stylesheet()` that requires a desktop viewport to resolve, or a gate in §25.3.2 that assumes a client type. |
+| **S6** | **Native mobile (F23 read/monitor, F24 approval)** | **NOT REACHED — and ruling 4 *strengthens* §18.2's constraint on it** | No MVP1 build target. F23 is unaffected for S5's reason: it inherits GES enforcement and retains nothing evidential. **F24 is made harder, not easier, and that is worth recording now**: §18.2 already found that a native client rendering its own approval screen produces a different artefact from the retained view. Ruling 4 makes the retained artefact's **styling** part of what must be reproduced, so "render the same JSON natively" now diverges on typography as well as structure. The only viable F24 remains a webview displaying the server-rendered artefact. **Falsify by** designing a native renderer that reproduces `.riskband .big`'s computed size from the payload alone — it cannot, because the payload carries no size. |
+
+#### 25.5.1 What must be re-tested, per reached surface
+
+Concrete enough for `test-agent` and the suite owners to act on. **Surfaces whose
+evidence the Test gate must show for this pass: S2 and S4.** S1, S3, S5 and S6
+require no new evidence, for the reasons above; if any acquires a build target or
+if ruling 3's T1–T3 land, this Impact Analysis is re-run first.
+
+| Surface | Suite(s) | What must be shown |
+|---|---|---|
+| **S2 Backend API** | `architecture` (**mine**), `security` (`security-architect`) | **Nothing new until T1–T3 land in a deployment** — and that is the point of saying so rather than listing a placeholder. When they do: a check **in the api image** that `import ges` raises `ModuleNotFoundError`; a check that `backend/pilot_transport.py` is absent from that image; and **T3 — one complete approval driven end-to-end over `LoopbackHttp`**, which is the scenario that does not exist today. Until then, `ARCH_04`'s two topology scenarios are the whole of the evidence and §20.1 says exactly that. |
+| **S4 Evidential deliverables** | `architecture` (**mine**, ARCH-16), `industry`, `functional` | **ARCH-16 must be written and executed** — it is currently unwritten (§20.1). It must assert, on a real export: (a) each per-dossier `rendered_view` contains a `<style>` block; (b) the block is **byte-identical** across every dossier in the export; (c) its SHA-256 matches the digest recorded in the export's integrity section; (d) **the retained view's recorded hash is the hash of the shipped bytes** — constraint 3, the one that would produce a worse defect if got wrong; (e) `check_no_active_content` passes on the post-inlining bytes; (f) determinism — same payload + template ⇒ byte-identical HTML, stylesheet included. Separately, for ruling 2: a dossier carrying a `journal_attribute_outlier` finding must carry the **calibration denial on the finding**, not only in the module header. |
+
+---
+
+### 25.6 What these rulings do to the deferred-substitution register
+
+Stated for the orchestrator to record; **I do not edit `PROJECT_CONTEXT.md`.**
+
+| Entry | Effect | Why |
+|---|---|---|
+| **19** — pilot transport collapses the trust boundary | **NARROWED, NOT CLOSED** | Ruled sufficient for the pilot on five standing conditions (§25.3.1), and the precondition for first tenant deployment is now written as three conjunctive gates T1–T3 (§25.3.2) rather than as an open residual. It closes when T1/T2 are verifiable in a deploy artefact and T3 executes — none of which is possible on a single-host pilot. Owners: `deploy-agent`, `code-agent`, `test-agent`. |
+| **30** — `journal_attribute_outlier` threshold declared, not calibrated | **LEFT OPEN, and re-scoped upward** | Promoting the primitive into §7.3 does not calibrate it, and it must not be read as doing so. What changed is that the disclosure obligation is now an **architectural rule binding every future primitive** (§7.3), not a property of one module. Closing it still needs real close data — register 21/24. |
+| **The style-inlining residual** (§9.4 vs. the export) | **NARROWED to a named work item with an owner and a trigger** | Ruled: inline it, four constraints, `code-agent` + `test-agent` (§25.4). Not a pilot blocker; a precondition on the first real-auditor export. It should be carried as its own numbered register entry rather than as a loose residual, so gate 9's audit can see it. |
+| **1** — mTLS on loopback | **UNCHANGED, but re-linked** | §25.3.2 records it as T1–T3's peer: both are preconditions on the same event, and they should reach the human as one deployment gate rather than one at a time during onboarding. |
+| **2** — SQLite triggers, no `SERIALIZABLE` | **UNCHANGED, and its test consequence is now disclosed** | §20.1 records that ARCH-06 (blast-radius concurrency under retry-on-serialization-failure) is unwritten *because* the transaction it would exercise is not built. Previously the suite was simply green without it. |
+| **No new register entry is opened by these rulings.** | | Ruling 1 closes a stale KB assertion; ruling 2 ratifies what was already built and declared. Neither introduces a new gap between spec and build. |
+
+---
+
 ## 24 · Change history
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-05 | 1.1.0 | **Architecture pass 2 — gate 10 review-and-rule (§25).** Four items ruled. (1) **§18.1 was stale, not disclosed**, and is amended: supersession-by-data now has `AC-F41-14`/`-15`, is built in `ges/supersession.py`, is enforced by bundle rule `scope.no_bound_dataset_superseded_by_later_data` (`override_eligible: false`, context resolved server-side), and its **negative half is the rule's `non_firing` fixture**, so §8.2's compile-time fixture evaluation verifies it on every build. The consequential sweep also corrects **§20.1** (same defect) and **§18.3** (routing budget — superseded by `AC-F41-16`/`-17`). (2) **§7.3 grows from eleven primitives to thirteen**: `obligation_gap` (declaration-derived, not history-derived; stays **one** primitive over three closed obligation kinds) and `journal_attribute_outlier` (attribution, not a distance scalar) both join; neither is folded. New **standing calibration-denial rule** binding every future primitive. (3) **Register 19 / §3.2**: the pilot transport is ruled **sufficient for the pilot** on five standing conditions, and the precondition for first tenant deployment is stated as **three conjunctive gates T1–T3** — the `ges` package absent from the api image, `pilot_transport.py` absent from that image, and one full approval exercised over `LoopbackHttp`. Narrowed, not closed. A **gap in the override's claim-prohibition list** is raised for the human (§25.3.3). (4) **§9.4**: the export's per-dossier `rendered_view` **must be style-inlined** — the size emphasis exists only in the stylesheet, so `AC-F41-03` is unverifiable in the artefact the auditor actually receives; four constraints, `code-agent` + `test-agent`, precondition on the first real-auditor export, not a pilot blocker. **§20.1 execution status changed from `STATIC ONLY — NOT EXECUTED` to EXECUTED**: the suite was re-run for real per the standing commitment — 28 scenarios, 0 failures, exit 0 — and eleven §20.2 scenarios are now named as **not present**, including ARCH-06 and ARCH-16. **Impact Analysis §25.5** enumerates all six surfaces; S2 and S4 reached, S1/S3/S5/S6 not reached with falsifiable reasons. No `dev/` file was modified by this pass. | Gate 10 review, 2026-08-05; joint presentation with `security-architect` owed for §25.3.3 |
 | 2026-07-31 | 1.0.0 | Initial Architecture pass for MVP1. Five-plane component model with the api↔GES process boundary as the single trust boundary (§3); warehouse-lag resolved via run pinning, close-clock staleness and Point-of-Action Revalidation (§5); certified semantic layer with SQL made unroutable rather than filtered (§6); detector runtime as manifests over eleven registered evaluator primitives (§7); guardrail broker with compiled hash-addressed bundles, compile-time predicate schema binding and transactionally co-committed blast-radius state (§8); evidence store as Postgres + hash chain + KMS-signed anchors + 7-year Object-Lock archive, with server-rendered self-contained rendered views (§9); export path and CUEC model (§10); coverage as a closed sum type (§11). Twelve judgement calls registered (§17). `PLAN` §9.3's per-action-vs-policy-cold question **decided** (§16). Two new findings raised (§18.1 supersession-by-data has no criterion; §18.2 F24 native mobile approval is incompatible with the rendered-view mechanism). **Impact Analysis §19** establishes a six-surface register; four surfaces reached, two not reached with falsifiable reasons. Architecture suite specified, **STATIC ONLY — NOT EXECUTED** (§20.1). Four items handed to `security-architect` for joint presentation (§22). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 6 joint sign-off with `security-architect` pending |
