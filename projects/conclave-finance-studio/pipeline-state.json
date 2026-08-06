@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 9 \u2014 Verification: 256/265, awaiting human decision on the nine",
+  "position": "Gate 10 \u2014 Review",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -130,18 +130,22 @@
       "n": 9,
       "name": "Verify",
       "status": "warn",
-      "approval": "awaiting",
-      "date": "2026-08-04",
+      "approval": "approved_override",
+      "date": "2026-08-05",
       "participants": [
         "verification-agent"
       ],
-      "note": "256/265 VERIFIED, 0 FAILED, 0 CONTRADICTED, 9 NOT VERIFIED -- all disclosed, all dependency- or scope-bound. Blocks because disclosure is not evidence. Disposition is the human's decision; verification-agent proposes no override."
+      "note": "256/265 VERIFIED, 0 FAILED, 0 CONTRADICTED. Human granted [override] on all nine NOT VERIFIED criteria 2026-08-05, named individually in the Decisions Log. Four were closeable and ship unbuilt; five are dependency-bound."
     },
     {
       "n": 10,
       "name": "Review",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-08-05",
+      "participants": [
+        "review-agent"
+      ]
     },
     {
       "n": 11,
@@ -198,7 +202,7 @@
       "reason": "AC-F41-13 contradicted. functional-design-agent ruled: a split element set is not a relocation. AC-F41-13 retired in place; AC-F41-22/-23/-24 and AC-F5-08 issued. Spec now 267 issued / 265 live / 2 retired."
     }
   ],
-  "updated": "2026-08-04",
+  "updated": "2026-08-05",
   "updated_by": "orchestrator",
   "route_changes": [
     {

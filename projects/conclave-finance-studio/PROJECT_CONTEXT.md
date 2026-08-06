@@ -50,6 +50,47 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-05 — `[override]` · gate 9 Verification · granted by the human (Akhil Tandon)
+
+**Overridden AC IDs — all nine, named individually:**
+`AC-F1-08`, `AC-F1-11`, `AC-REFUSAL-11`, `AC-F40-17`, `AC-F36-48`,
+`AC-F5-02`, `AC-F5-03`, `AC-F5-05`, `AC-F5-07`.
+
+**Decision:** override all nine and proceed to Review and Deploy as a pilot.
+Asked with the alternative of building four of them first; the human chose to
+ship now.
+
+**Reason as given:** ship the MVP1 pilot now rather than hold deployment for
+work that does not change what the pilot demonstrates.
+
+**What the override does NOT do, recorded so it cannot be read as closure:**
+
+- It does not make any of the nine met. `verification-agent` audited 265 live
+  criteria and returned **256 VERIFIED, 0 FAILED, 0 CONTRADICTED, 9 NOT
+  VERIFIED**. Each of the nine still carries a self-denying, mutation-reachable
+  check that fails in either direction, and none is folded into any pass count.
+- **Four of the nine were closeable here and are being shipped unbuilt.**
+  `AC-F5-02`/`-03`/`-05`/`-07` need one change — the F5 registration path
+  issuing principals in the id space the runs author under. No external
+  dependency. Consequence in the shipped pilot: **four agents that act do not
+  appear in `/inventory` with real versions or entitlements**, and no dossier is
+  reachable from any lineage. `/inventory` states this on its own face and every
+  lineage row renders INCOMPLETE with its scope — that disclosure is what makes
+  shipping defensible, and it is not the same as the criteria being met.
+- The other five are dependency-bound and could not have been closed in this
+  build at all: `AC-F1-11` a key custodian, `AC-F1-08` an object store with a
+  retention lock, `AC-F40-17` a live Oracle tenant, `AC-F36-48` a period of real
+  close data, `AC-REFUSAL-11` a non-heuristic A20 route.
+
+**Claims the pilot must not make**, unchanged by this override: no seven-year
+immutable retention; no tamper-evidence against a party with application-level
+write access (tamper-*detection* against accidental modification is real); no
+CUEC drift detection; no calibrated abstention band; and A20 holds absolutely
+where an emission carries a disposition on a size-shaped ground, heuristically in
+free prose.
+
+
+
 - **2026-07-30 — Intake.** Gathered one question per turn in the console, per
   the standing rule recorded that same day. Full record: `INTAKE.md`.
 - **2026-07-30 — Product shape: BOTH.** Pre-built close agents *and* a builder
