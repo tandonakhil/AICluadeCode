@@ -2445,7 +2445,193 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-08-06 — Gate 11 · POST-DEPLOY SMOKE — `test-agent`, `dev` @ `c68ad84`
+### 2026-08-06 — Gate 11 · POST-DEPLOY SMOKE **RE-RUN** — `test-agent`, `dev` @ `b447a11` (pass 26)
+
+**Everything passes. Both smoke failures are closed, verified by mutation rather
+than accepted, and gate 11 has nothing left holding it open from this agent.**
+
+`3,158 / 3,158` on the whole tree in **six orderings**, `21 / 21` on the served
+smoke, `10 / 10` clean-checkout and startup guards, `11 / 11` rendered-UI,
+`22 / 22` on the mutation verification of pass 26's three claims. **0 failures
+anywhere.**
+
+#### Per-suite breakdown — every suite marked, never merged, all blocking
+
+| Suite | Owner | Status | Result | Δ vs. `c68ad84` | Blocking |
+|---|---|---|---|---|---|
+| unit / integration (`backend/tests`) | `test-agent` | **`EXECUTED`** | **2,447 / 2,447** | **+35** | yes |
+| functional | `functional-design-agent` | **`EXECUTED`** | **365 / 365** | 0 | yes |
+| UX | `ui-ux-designer` | **`EXECUTED`** | **194 / 194** | 0 | yes |
+| red-team | `responsible-ai-architect` | **`EXECUTED`** | **61 / 61** | 0 | yes |
+| security | `security-architect` | **`EXECUTED`** | **40 / 40** | **+18** | yes |
+| architecture | `solution-architect` | **`EXECUTED`** | **28 / 28** | 0 | yes |
+| industry | `industry-expert` | **`EXECUTED`** | **23 / 23** | 0 | yes |
+| **whole tree** | — | **`EXECUTED`** | **3,158 / 3,158** | **+53** | yes |
+| **post-deploy smoke (served pilot, 8021)** | `test-agent` | **`EXECUTED`** | **21 / 21** | **the 2 FAILs are CLOSED** | **yes** |
+| mutation verification of pass 26 | `test-agent` | **`EXECUTED`** | **22 / 22** | new suite | yes |
+| clean-checkout + startup guards | `test-agent` | **`EXECUTED`** | **10 / 10** | +1 | yes |
+| rendered-UI (Playwright / Chromium, web) | `test-agent` | **`EXECUTED`** | **11 / 11** | re-run, **not** carried forward | yes |
+| rendered-UI (RNTL, native) | — | **N/A** | no React Native surface in MVP1 | — | — |
+| rendered-UI (Maestro + simulator) | — | **NOT BUILT** | no simulator on this machine (2026-07-26 spike, unchanged) | — | — |
+
+**No suite is `STATIC ONLY`, none is `PARTIAL`, and none is empty.** Test Policy
+is all-suites-blocking with no advisory exceptions, and every blocking suite
+was actually executed, so every blocking obligation is met rather than assumed.
+The seven suite totals sum to 3,158 exactly — no scenario counted twice, none
+outside a suite.
+
+**Six orderings, all 3,158:** file order, reversed, and seeds 1 / 7 / 42 /
+20260731. The ordering harness lives **outside `dev/`**; it is verification for
+this pass, not a change to the project's test configuration.
+
+#### Test-count delta — measured by node id, not counted
+
+**3,105 → 3,158: +55 added, −2 removed, net +53.** Collected
+`pytest --collect-only` node ids at `c68ad84` in a scratch clone and at
+`b447a11`, sorted and diffed. Matches `code-agent`'s claim, and the +35 / +18
+suite split reconciles to it. **Both removals are named**: they are the
+`...all_three...` → `...all_four...` renames in
+`test_export_integrity_contract.py`, each superseded by a **strictly broader**
+successor in the same file. No coverage dropped, no unexplained drop.
+
+**Four tests changed body under the same node id**, and two of them deserve
+naming rather than absorbing into "changed": `test_ui_chrome` and
+`test_ui_dossier` each had a scenario **inverted, not deleted** — they used to
+assert `'pilot-strip' not in markup`. Both **passed for twenty-five passes while
+asserting the defect**. Inverting an assertion is normally a coverage red flag,
+so it is surfaced here; each carries its old text and reason in its docstring.
+
+#### Fix 1 — the provenance disclosure, verified by re-running the mutations
+
+Pass 26 claims four refusals at construction. **I ran nine** — the four claimed
+plus five shapes of my own, because a contract that refuses the weakenings
+somebody thought of and admits the ones they did not is not a contract. **All
+nine refused**, including `register_entry: 19` (a plausible *wrong* register) and
+`register_entry: "15"` (right number, wrong type). `unmet_criterion` is `null`,
+`register_entry` is `15`, and there is **no invented AC id** anywhere in the
+section or its statement — the residual reference is a register entry, exactly
+as the transport section's is.
+
+**The decisive check is not that the new scenarios pass — it is that they FAIL
+on the old build.** The identical smoke harness, unchanged, was run against a
+served pilot at `c68ad84`, taking only its phrase list from the new build:
+**17 pass, 4 FAIL** (G4b, G11, G14, G14b), exhibit at 33,305 bytes and export at
+84,106 bytes with **zero** occurrences of all four phrases — the same byte counts
+recorded in the original gate-11 run, which joins the two runs to the same
+artefact. A check that cannot fail is not a check.
+
+#### Fix 2 — my own substring warning, and the proof it now bites
+
+`REQUIRED_PHRASES` is four multi-word phrases and nothing asserts on `fixture`.
+I weakened a phrase to a bare substring **four different ways** in a scratch
+clone — `fixture`, `FIXTURE`, `gl_balances`, `vFIXTURE-2026.06.03-a` — and the
+parametrised guard **failed in both files every time**, including
+case-insensitively. The positive controls kept passing throughout, which is the
+point: the weakening is caught by the guard, not incidentally by something else.
+
+**One observation, not a failure.** The version-identifier guard is in both
+files as claimed. The *prose/token* guard (`>= 3 words`) is in `backend/tests/`
+only, so a one-word weakening that is **not** a substring of the version is
+caught by one file rather than two. Recorded for `code-agent`; the claim as
+stated is true.
+
+#### Fix 3 — both hand-kept lists are genuinely derived
+
+Verified by adding a **fifth** section to `REQUIRED_INTEGRITY_SECTIONS` in a
+scratch clone. The `(section, key)` parametrisation went **12 → 15** with no
+edit to the test file, and the refusal **message** went from
+`anchor, provenance, retention, transport` to `anchor, fifthweakening,
+provenance, retention, transport`. All three of `provenance`'s keys are
+witnessed at baseline — under the old nine-literal list they would not have
+been, which confirms the defect pass 26 says it found. The join in the other
+direction still bites: a section declared with no producer fails 15 scenarios
+rather than passing silently.
+
+#### The rest of the smoke, on a fresh instance on 8021
+
+Twelve routes and `/health` 200; the aliases byte-identical; the pilot strip and
+the topology strip on all ten screens **and now on the shell-off exhibit**; the
+exhibit still drops its navigation (a statement about the figures is not
+navigation); `/inventory`'s disclosures; the staff-403 → controller-403 →
+override-200 → export-200 chain with a balanced Journal Import file; **four**
+integrity sections in the evidence export. **The negative control holds: the
+same person twice as second authoriser is refused (403), and the two distinct
+authorisers are accepted (200)** — the control was exercised *before* the
+accepted pair, so the acceptance is not what made the refusal look meaningful.
+
+**Rendered-UI, re-run and not carried forward.** Pass 26's claim is about what a
+reader *sees*, and HTML containing a sentence is not that claim. Chromium 148 at
+1280 and 1440: the exhibit's strip is visible, in the viewport, unoccluded,
+non-zero box, `visibility: visible`, **effective opacity 1.0 walked up the whole
+ancestor chain** (the compounding-opacity class of defect), all four phrases
+present in `inner_text` — the text the browser rendered — and reachable in the
+ARIA snapshot and by user-visible-text query. No control inside the strip
+dismisses it. Screenshots at both widths.
+
+#### Two harness defects I found in my own work, both corrected and recorded
+
+Neither was a build finding, and both are recorded rather than quietly fixed.
+
+1. **C2** ran `git check-ignore var` on a clone where `var/` does not exist.
+   `.gitignore:37` is `var/` — a **directory-only** pattern — and git cannot
+   classify a path it cannot see as a directory. `var/` and
+   `var/warehouse.sqlite3` both return 0, and `git ls-tree -r HEAD` has zero
+   `var/` paths.
+2. **C6** repeated the previous run's sequencing shape one step out. The lazy
+   creation of `warehouse.sqlite3` is real, but `/queue` and `/audit` are not
+   requests that read it. Re-sampled after each of ten routes, the creating
+   request is named exactly: **`GET /monitors`**. `broker_db.sqlite3` is created
+   at startup.
+
+A third note, on reading the counts: an early invocation of mine appeared to
+show the suite producing **no summary line**, which reads like a run aborting
+silently at exit 0. It was neither — `pytest.ini` already sets `addopts = -q`,
+so an explicit `-q` makes it `-qq` and pytest suppresses the summary below
+verbosity −1. Recorded because 3,158 is the number this gate turns on.
+
+#### What I did NOT do, and what is owed
+
+- **`ARCH-16` was NOT written.** `solution-architect` re-ruled the
+  style-inlining item: `AC-F41-03` is a **screen** criterion by its own text,
+  the risk band is correctly absent from the artefact, and register 35 stays
+  open for **legibility**, not for `AC-F41-03`. Its instruction — **ARCH-16 must
+  not assert `AC-F41-03` against this artefact** — is followed. The scenario is
+  **owed** to the architecture suite and named as such. The item is not
+  re-opened; `G12` re-measures and deliberately does not re-litigate.
+- **No failing test was fixed by me**, no suite stubbed, no scenario skipped.
+- Register 15 stays **open**; nothing here closes it and
+  `REAL_LEDGER_SOURCED` is `False`, held by a scenario.
+- The nine overridden criteria are claimed nowhere; **`AC-F41-13` and
+  `AC-F12-08` remain at 0 occurrences in `dev/`**, re-checked at `b447a11`.
+- None of the five claim prohibitions is breached by anything reported here.
+  Claim prohibition 6 stays **declined**; the list is five.
+
+#### Process lifecycle
+
+The human's pilot — **port 8030, pid re-read from `lsof` at the start of every
+invocation and never carried forward** — was alive before and alive after, and
+was **never probed and never signalled**. `lsof -nP -iTCP:8030 -sTCP:LISTEN -t`
+was used to isolate the server from the browser client, as instructed. Five
+pilots and one Chromium were started on 8021/8022 across this pass, each reaped
+by process group **inside the single invocation that started it**; 8021 and 8022
+are free and no `headless_shell` survives. `CONCLAVE_VAR_DIR` again pointed at a
+**copy** of `dev/var` so this pass could not write into the SQLite files the
+human's live session is reading — a disclosed departure from `deploy-agent`'s
+run, made to protect that session. **`dev/` is unmodified (`git status` clean at
+`b447a11`); `prod/` was not touched.** All mutations were applied to scratch
+clones and reverted.
+
+**Verdict: PASS. No blocking suite fails, no blocking suite went unexecuted, and
+the two findings that stopped this gate are closed on evidence that fails
+against the build that had them.**
+
+**Evidence:** `test-evidence/smoke-test-2026-08-06.md` (re-run 2 + the
+discrimination run against `c68ad84`), `mutation-verification-2026-08-06.md`
+(new), `clean-checkout-2026-08-06.md` (re-run 2),
+`rendered-ui-2026-08-06.md` (re-run 2), `unit-integration-2026-08-06.md`
+(re-run 2), and `ui-dossier-provenance-strip-{1280,1440}-2026-08-06.png`.
+
+### 2026-08-06 — Gate 11 · POST-DEPLOY SMOKE — `test-agent`, `dev` @ `c68ad84` — SUPERSEDED by the re-run above
 
 **The handoff `deploy-agent` reported as owed is now closed. It found two
 things, and both are real.**

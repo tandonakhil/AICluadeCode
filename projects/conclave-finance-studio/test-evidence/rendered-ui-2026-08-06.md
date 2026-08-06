@@ -140,3 +140,157 @@ Referred to `functional-design-agent` and `solution-architect`.
 {"riskiest_figure_present": 0, "distinct_computed_font_sizes": [24, 16], "elements_measured": 133, "note": "the live exhibit renders 7 distinct sizes with a 40px maximum; the artefact renders 2"}
 ```
 
+
+---
+
+# RE-RUN 2 — rendered UI at `dev` @ `b447a11` (pass 26), Playwright / Chromium 148
+
+**Commit under test:** `b447a11` · **Owner:** `test-agent` · **Blocking:** yes
+**Status:** `EXECUTED` · **Result: 11 scenarios, 11 pass, 0 FAIL.**
+**Backend:** Playwright / Chromium (web). RNTL (native) is **N/A** — this build
+has no React Native surface. Maestro + simulator remains **NOT BUILT**.
+
+**Re-run, not carried forward from the earlier run in this file.** Pass 26
+changed what the exhibit renders, so a rendered-UI verdict recorded before it
+describes a different tree.
+
+**Why this suite matters for THIS fix specifically.** Pass 26's claim is about
+what a reader **sees** on the shell-off exhibit. HTML containing the sentence is
+not that claim: a strip can be in the DOM and be `display:none`, be occluded by
+a later element, be scrolled out, or be invisible through **compounded** parent
+opacity. Each scenario therefore reads the browser's own computed values,
+including effective opacity walked up the whole ancestor chain, and asserts the
+four phrases against `inner_text` — **the text the browser rendered**, not the
+markup it was given. Two viewports, 1280 and 1440.
+
+**Process lifecycle:** the pilot and the browser were both started and both torn
+down inside the single command invocation, the pilot reaped by process group.
+Nothing was left running. `CONCLAVE_VAR_DIR` pointed at a copy of `dev/var`.
+
+## The scenarios
+
+### Scenario: R6-1280 - THE FIX IN A REAL BROWSER: the shell-off exhibit's provenance strip is VISIBLE and READABLE at 1280px - computed, not asserted from source
+- Status: EXECUTED
+- Input: goto /dossier/DOS-2026-06-0412-01 at 1280px; read computed styles, effective (compounded) opacity, occlusion, viewport position and the rendered inner_text
+- Expected: visible, effective opacity > 0.5, not occluded, in viewport, non-zero box, all four phrases in the TEXT THE BROWSER RENDERED
+- Actual: visible=True eff_opacity=1.000 occluded=False in_viewport=True box_h=56.3 style={"display": "block", "visibility": "visible", "opacity": "1", "color": "rgb(74, 79, 88)", "backgroundColor": "rgb(241, 241, 239)", "fontSize": "13px"} phrases={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+rendered text: Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger.
+```
+
+### Scenario: R7-1280 - the exhibit's provenance disclosure is reachable in the ARIA SNAPSHOT and by user-visible-text query at 1280px, not only in the DOM
+- Status: EXECUTED
+- Input: body.aria_snapshot() and get_by_text(phrase) on /dossier/DOS-2026-06-0412-01
+- Expected: every required phrase in the aria snapshot AND visible to a text query
+- Actual: aria={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true} visible_text={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+- main:
+  - text: Entity Northwind Grid Holdings Period 2026-06 Close day Day 3 Data 1 close day(s) behind the close clock
+  - group: What "1 close day(s) behind the close clock" means, and where these figures came from
+  - text: Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a postin
+```
+
+### Scenario: R8-1280 - screenshot of the shell-off exhibit at 1280px
+- Status: EXECUTED
+- Input: page.screenshot on /dossier/DOS-2026-06-0412-01
+- Expected: an image is written
+- Actual: written: ui-dossier-provenance-strip-1280-2026-08-06.png (198842 bytes)
+- Result: PASS
+- Evidence: /Users/tandonakhil/Documents/AI Projects/AICluadeCode/projects/conclave-finance-studio/test-evidence/ui-dossier-provenance-strip-1280-2026-08-06.png
+
+### Scenario: R1-1280 - transport-topology-state renders visibly on /queue at 1280px, computed not asserted
+- Status: EXECUTED
+- Input: goto /queue at 1280px
+- Expected: visible, effective opacity > 0.5
+- Actual: visible=True eff_opacity=1.000
+- Result: PASS
+- Evidence:
+
+```
+Pilot topology - the guardrail broker is running inside this process. Every broker fact on this screen - each eligibility, decision, refusal and routing answer - was obtained over the in-process trans
+```
+
+### Scenario: R2-1280 - pilot-strip renders visibly on /queue at 1280px and the screen and the exhibit say the SAME sentence
+- Status: EXECUTED
+- Input: goto /queue at 1280px
+- Expected: visible, effective opacity > 0.5, all four phrases
+- Actual: visible=True eff_opacity=1.000 phrases={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger.
+```
+
+### Scenario: R6-1440 - THE FIX IN A REAL BROWSER: the shell-off exhibit's provenance strip is VISIBLE and READABLE at 1440px - computed, not asserted from source
+- Status: EXECUTED
+- Input: goto /dossier/DOS-2026-06-0412-01 at 1440px; read computed styles, effective (compounded) opacity, occlusion, viewport position and the rendered inner_text
+- Expected: visible, effective opacity > 0.5, not occluded, in viewport, non-zero box, all four phrases in the TEXT THE BROWSER RENDERED
+- Actual: visible=True eff_opacity=1.000 occluded=False in_viewport=True box_h=56.3 style={"display": "block", "visibility": "visible", "opacity": "1", "color": "rgb(74, 79, 88)", "backgroundColor": "rgb(241, 241, 239)", "fontSize": "13px"} phrases={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+rendered text: Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger.
+```
+
+### Scenario: R7-1440 - the exhibit's provenance disclosure is reachable in the ARIA SNAPSHOT and by user-visible-text query at 1440px, not only in the DOM
+- Status: EXECUTED
+- Input: body.aria_snapshot() and get_by_text(phrase) on /dossier/DOS-2026-06-0412-01
+- Expected: every required phrase in the aria snapshot AND visible to a text query
+- Actual: aria={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true} visible_text={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+- main:
+  - text: Entity Northwind Grid Holdings Period 2026-06 Close day Day 3 Data 1 close day(s) behind the close clock
+  - group: What "1 close day(s) behind the close clock" means, and where these figures came from
+  - text: Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a postin
+```
+
+### Scenario: R8-1440 - screenshot of the shell-off exhibit at 1440px
+- Status: EXECUTED
+- Input: page.screenshot on /dossier/DOS-2026-06-0412-01
+- Expected: an image is written
+- Actual: written: ui-dossier-provenance-strip-1440-2026-08-06.png (202090 bytes)
+- Result: PASS
+- Evidence: /Users/tandonakhil/Documents/AI Projects/AICluadeCode/projects/conclave-finance-studio/test-evidence/ui-dossier-provenance-strip-1440-2026-08-06.png
+
+### Scenario: R1-1440 - transport-topology-state renders visibly on /queue at 1440px, computed not asserted
+- Status: EXECUTED
+- Input: goto /queue at 1440px
+- Expected: visible, effective opacity > 0.5
+- Actual: visible=True eff_opacity=1.000
+- Result: PASS
+- Evidence:
+
+```
+Pilot topology - the guardrail broker is running inside this process. Every broker fact on this screen - each eligibility, decision, refusal and routing answer - was obtained over the in-process trans
+```
+
+### Scenario: R2-1440 - pilot-strip renders visibly on /queue at 1440px and the screen and the exhibit say the SAME sentence
+- Status: EXECUTED
+- Input: goto /queue at 1440px
+- Expected: visible, effective opacity > 0.5, all four phrases
+- Actual: visible=True eff_opacity=1.000 phrases={"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence:
+
+```
+Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger.
+```
+
+### Scenario: R9 - no control inside the exhibit's provenance strip dismisses it - a disclosure the reader can turn off is not a disclosure
+- Status: EXECUTED
+- Input: count interactive descendants of pilot-strip on the exhibit
+- Expected: zero
+- Actual: interactive_descendants=0
+- Result: PASS
+- Evidence: 

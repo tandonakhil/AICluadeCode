@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 11 \u2014 Deploy",
+  "position": "MVP1 complete \u2014 all 11 gates. Current Status awaiting the human.",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -151,13 +151,14 @@
     {
       "n": 11,
       "name": "Deploy",
-      "status": "active",
-      "approval": "pending",
+      "status": "done",
+      "approval": "awaiting",
       "date": "2026-08-06",
       "participants": [
         "deploy-agent",
         "test-agent"
-      ]
+      ],
+      "note": "Deploy succeeded; smoke 21/21 with both prior failures closed, verified by running the identical harness against the OLD build and watching it fail 4. 3,158 scenarios, 12 suites, 6 orderings. Current Status change to 'deployed' awaits the human."
     }
   ],
   "loop_backs": [

@@ -905,3 +905,439 @@ STATUS,LEDGER_ID,USER_JE_SOURCE_NAME,USER_JE_CATEGORY_NAME,ACCOUNTING_DATE,CURRE
 - Actual: not_recorded=24 AC-F5-07_named=True placeholders=[]
 - Result: PASS
 - Evidence: {"not_recorded_count": 24, "AC_F5_07_named": true}
+
+---
+
+# RE-RUN 2 — gate 11 post-deploy smoke at `dev` @ `b447a11` (pass 26)
+
+**Commit under test:** `b447a11` (was `c68ad84`)
+**Owner:** `test-agent` · **Blocking:** yes · **Status:** `EXECUTED`
+**Result: 21 scenarios, 21 pass, 0 FAIL.** The two failures recorded above
+(G4b, G14) are **CLOSED**.
+
+Driven over stdlib HTTP against a real served pilot on 8021, started and reaped
+by process group inside the single command invocation that started it. No
+`TestClient`, no ASGI shortcut. `CONCLAVE_VAR_DIR` again pointed at a **copy**
+of `dev/var` so this run could not write into the SQLite files the human's
+browser session on 8030 is reading.
+
+**The disclosure is asserted as PROSE, never as the substring `fixture`.** Every
+scan strips the dataset-version identifier (`gl_balances vFIXTURE-2026.06.03-a`
+and any `vFIXTURE-*` form) before counting, and then counts the four multi-word
+phrases in `provenance.REQUIRED_PHRASES`. **G4c is the negative control on my
+own check** — the identifier alone satisfies none of the four.
+
+## The scenarios
+
+### Scenario: G2 - /health returns 200 with the payload deploy-agent recorded
+- Status: EXECUTED
+- Input: GET /health
+- Expected: 200, status ok, env pilot, holds_credentials false
+- Actual: {"status": "ok", "env": "pilot", "tenant": "tenant-demo", "holds_credentials": false, "ges_base_url": "http://127.0.0.1:8022"}
+- Result: PASS
+- Evidence: {"status":"ok","env":"pilot","tenant":"tenant-demo","holds_credentials":false,"ges_base_url":"http://127.0.0.1:8022"}
+
+### Scenario: G1 - the twelve routes deploy-agent walked all serve 200
+- Status: EXECUTED
+- Input: GET each of ten screens plus two aliases
+- Expected: 200 on every one
+- Actual: {"/": 200, "/queue": 200, "/approvals": 200, "/ask": 200, "/catalogue": 200, "/monitors": 200, "/audit": 200, "/inventory": 200, "/refusals": 200, "/my-probe-history": 200, "/exceptions": 200, "/review": 200}
+- Result: PASS
+- Evidence:
+
+```
+{"/": 200, "/queue": 200, "/approvals": 200, "/ask": 200, "/catalogue": 200, "/monitors": 200, "/audit": 200, "/inventory": 200, "/refusals": 200, "/my-probe-history": 200, "/exceptions": 200, "/review": 200}
+```
+
+### Scenario: G3 - /exceptions and /review are byte-identical to /queue
+- Status: EXECUTED
+- Input: compare served bytes
+- Expected: identical to /queue
+- Actual: {"/exceptions": [true, 37335], "/review": [true, 37335]}
+- Result: PASS
+- Evidence: queue=37335 bytes
+
+### Scenario: G4 - the register-15 pilot strip is on all ten navigable screens, asserted as prose after stripping the version identifier
+- Status: EXECUTED
+- Input: scan each screen for all four REQUIRED_PHRASES
+- Expected: every phrase present on every screen
+- Actual: {"/": 1, "/queue": 1, "/approvals": 1, "/ask": 1, "/catalogue": 1, "/monitors": 1, "/audit": 1, "/inventory": 1, "/refusals": 1, "/my-probe-history": 1}
+- Result: PASS
+- Evidence:
+
+```
+["synthetic fixture data", "synthetic close fixture", "not from an Oracle-sourced warehouse", "cannot support a posting or an assurance conclusion about a real ledger"]
+```
+
+### Scenario: G4b - THE FIX: the shell-off /dossier exhibit discloses that its figures are not a real ledger
+- Status: EXECUTED
+- Input: GET /dossier/DOS-2026-06-0412-01, strip the version identifier, count each phrase
+- Expected: 200 and every required phrase present at least once
+- Actual: status=200 bytes=33587 hits={"synthetic fixture data": 1, "synthetic close fixture": 1, "not from an Oracle-sourced warehouse": 1, "cannot support a posting or an assurance conclusion about a real ledger": 1} (bare 'fixture' occurrences before stripping: 4)
+- Result: PASS
+- Evidence:
+
+```
+{"synthetic fixture data": 1, "synthetic close fixture": 1, "not from an Oracle-sourced warehouse": 1, "cannot support a posting or an assurance conclusion about a real ledger": 1}
+```
+
+### Scenario: G4c - NEGATIVE CONTROL on this check: the version identifier alone satisfies none of the four phrases
+- Status: EXECUTED
+- Input: count each phrase inside 'gl_balances vFIXTURE-2026.06.03-a'
+- Expected: zero for all four
+- Actual: {"synthetic fixture data": 0, "synthetic close fixture": 0, "not from an Oracle-sourced warehouse": 0, "cannot support a posting or an assurance conclusion about a real ledger": 0}
+- Result: PASS
+- Evidence: this is the check that stops the 2026-08-06 false pass recurring
+
+### Scenario: G5b - the topology strip is still on the shell-off exhibit (pass 25's 5(c), topology half, unchanged)
+- Status: EXECUTED
+- Input: scan /dossier/DOS-2026-06-0412-01 for the topology disclosure
+- Expected: present
+- Actual: transport-topology-state=1, 'module boundary'=1
+- Result: PASS
+- Evidence: 
+
+### Scenario: G4d - the exhibit still drops the navigation with the shell - a statement about the figures is not navigation
+- Status: EXECUTED
+- Input: count <nav elements on the exhibit vs on /queue
+- Expected: 0 on the exhibit
+- Actual: exhibit=0 queue=1
+- Result: PASS
+- Evidence: 
+
+### Scenario: G5 - the topology strip is on all ten navigable screens
+- Status: EXECUTED
+- Input: scan each screen
+- Expected: present on all ten
+- Actual: {"/": true, "/queue": true, "/approvals": true, "/ask": true, "/catalogue": true, "/monitors": true, "/audit": true, "/inventory": true, "/refusals": true, "/my-probe-history": true}
+- Result: PASS
+- Evidence: 
+
+### Scenario: G6 - /inventory names the four absent agents and records AC-F5-02 and AC-F5-07 NOT met
+- Status: EXECUTED
+- Input: GET /inventory
+- Expected: four agent ids present, both criteria named unmet
+- Actual: {"agents": {"agent.crossperiod-surveillance": true, "agent.omission-detector": true, "agent.anomaly-detect": true, "agent.fidelity-check": true}, "AC-F5-02": true, "AC-F5-07": true}
+- Result: PASS
+- Evidence: 
+
+### Scenario: G7 - approve as staff accountant is refused 403 not_in_capability_allowlist, and NO override control is rendered
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/approve as persona=staff
+- Expected: 403, allowlist reason, no override form at all
+- Actual: status=403 allowlist=True override_form=False
+- Result: PASS
+- Evidence: 
+
+### Scenario: G8 - approve as controller is refused 403 approval_value_above_ceiling and the override IS offered, two authorisers, closed reason list
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/approve as persona=controller
+- Expected: 403, ceiling reason, rule named, override form, >=2 distinct authoriser options each side, closed reason list
+- Actual: status=403 ceiling=True rule=True action=['/proposal/PROP-2026-06-0031/override?decision_id=019fd94f6a7b-8debc3259a3a43f3b8ca'] a=['user.a.reyes', 'user.s.haddad'] b=['user.a.reyes', 'user.s.haddad'] reasons=['documented_control_exception', 'known_data_defect_upstream', 'material_close_deadline', 'regulatory_instruction']
+- Result: PASS
+- Evidence: ["documented_control_exception", "known_data_defect_upstream", "material_close_deadline", "regulatory_instruction"]
+
+### Scenario: G8b - the staff refusal and the controller refusal are different reasons and only the controller's is override-eligible
+- Status: EXECUTED
+- Input: compare the two 403 bodies
+- Expected: different codes; staff not override-eligible
+- Actual: staff_allowlist=True controller_ceiling=True staff_override_ctl=False controller_override_ctl=True
+- Result: PASS
+- Evidence: 
+
+### Scenario: G9b - NEGATIVE CONTROL: the same person twice is refused as second authoriser
+- Status: EXECUTED
+- Input: POST the override with authoriser_a == authoriser_b == user.a.reyes
+- Expected: refused, not 200
+- Actual: status=403
+- Result: PASS
+- Evidence:
+
+```
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>Override refused - Conclave Finance Studio</title><style>:root{--accent:#1D4ED8;--accent-bg:
+```
+
+### Scenario: G9 - override with two DISTINCT authorisers is accepted 200
+- Status: EXECUTED
+- Input: POST the override read off its own radios: a=user.a.reyes b=user.s.haddad
+- Expected: 200, approval recorded
+- Actual: status=200 approved_text=True
+- Result: PASS
+- Evidence: {"authoriser_a": "user.a.reyes", "authoriser_b": "user.s.haddad", "reason_code": "documented_control_exception"}
+
+### Scenario: G10 - export returns 200 and produces a BALANCED Journal Import file
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/export then GET the produced file
+- Expected: 200; file retrievable; sum(Dr) == sum(Cr), non-zero
+- Actual: export=200 groups=['CS-7C51B8EC0C27'] data_lines=2 Dr=86340.0 Cr=86340.0 balanced=True
+- Result: PASS
+- Evidence:
+
+```
+{"group": ["CS-7C51B8EC0C27"], "header": ["STATUS", "LEDGER_ID", "USER_JE_SOURCE_NAME", "USER_JE_CATEGORY_NAME", "ACCOUNTING_DATE", "CURRENCY_CODE", "DATE_CREATED", "ACTUAL_FLAG"], "entered_dr": 86340.0, "entered_cr": 86340.0}
+```
+
+### Scenario: G10b - the Journal Import CSV is the ERP artefact and carries no integrity sections
+- Status: EXECUTED
+- Input: scan the produced CSV
+- Expected: no evidence_integrity, no AC ids
+- Actual: evidence_integrity=0 AC-=0
+- Result: PASS
+- Evidence: 
+
+### Scenario: G11 - the served evidence export carries ALL FOUR integrity sections, each naming what it does not meet
+- Status: EXECUTED
+- Input: GET /audit/export/file
+- Expected: 200; sections anchor/retention/transport/provenance; AC-F1-11, AC-F1-08, register 19, register 15
+- Actual: status=200 bytes=85045 sections={"anchor": {"unmet_criterion": "AC-F1-11", "register_entry": 3}, "provenance": {"unmet_criterion": null, "register_entry": 15}, "retention": {"unmet_criterion": "AC-F1-08", "register_entry": 4}, "transport": {"unmet_criterion": null, "register_entry": 19}}
+- Result: PASS
+- Evidence:
+
+```
+{"anchor": {"unmet_criterion": "AC-F1-11", "register_entry": 3}, "provenance": {"unmet_criterion": null, "register_entry": 15}, "retention": {"unmet_criterion": "AC-F1-08", "register_entry": 4}, "transport": {"unmet_criterion": null, "register_entry": 19}}
+```
+
+### Scenario: G14 - THE FIX: the served evidence export discloses that its figures are not a real ledger, with unmet_criterion null and register 15
+- Status: EXECUTED
+- Input: GET /audit/export/file, strip the version identifier, count each phrase
+- Expected: every phrase present; unmet_criterion null; register_entry 15; no invented AC id in the statement
+- Actual: hits={"synthetic fixture data": 1, "synthetic close fixture": 1, "not from an Oracle-sourced warehouse": 1, "cannot support a posting or an assurance conclusion about a real ledger": 1} unmet_criterion=None register_entry=15 AC-in-statement=False
+- Result: PASS
+- Evidence:
+
+```
+{"dataset_version": "gl_balances vFIXTURE-2026.06.03-a", "real_ledger_sourced": false, "register_entry": 15, "statement": "THE FIGURES IN THIS ARTEFACT ARE NOT A REAL LEDGER. Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger. What this evidence therefore supports: that the pipeline ran, what it detected, what the broker was asked, what it answered and who approved. What it does NOT support: any statement of fact about a real en
+```
+
+### Scenario: G14b - the export states it THROUGH the integrity contract, not as free prose beside it
+- Status: EXECUTED
+- Input: look for the phrases inside evidence_integrity.provenance.statement rather than anywhere in the file
+- Expected: every phrase inside the contract-carried statement
+- Actual: {"synthetic fixture data": true, "synthetic close fixture": true, "not from an Oracle-sourced warehouse": true, "cannot support a posting or an assurance conclusion about a real ledger": true}
+- Result: PASS
+- Evidence: 
+
+### Scenario: G12 - the export's rendered views still carry ZERO style blocks (register 35 observation, re-measured, NOT re-litigated)
+- Status: EXECUTED
+- Input: count <style occurrences in the export artefact
+- Expected: recorded as an observation only
+- Actual: style_blocks=0 rendered_view_fields=6
+- Result: PASS
+- Evidence:
+
+```
+solution-architect re-ruled this at gate 10; AC-F41-03 is a SCREEN criterion and ARCH-16 must not assert it against this artefact. Register 35 stays open for LEGIBILITY. Recorded, not asserted.
+```
+
+## DISCRIMINATION CHECK — the same harness run against the PRE-FIX build
+
+A passing check proves nothing unless it can fail. The identical harness was run
+unchanged against a served pilot at **`c68ad84`** (the pre-fix commit), taking
+the phrase list from the post-fix build so only the SERVED CODE differed.
+
+**Result there: 21 scenarios, 17 pass, 4 FAIL** — G4b, G11, G14 and G14b, with
+the exhibit at 33,305 bytes and the export at 84,106 bytes and **zero**
+occurrences of all four phrases in each. Those are the same byte counts recorded
+in the original gate-11 run above, which is the join proving this is the same
+artefact and the same defect.
+
+Note the recorded detail on the pre-fix exhibit: **`bare 'fixture' occurrences
+before stripping: 2`.** An unstripped substring check would have counted those
+two and reported green. That is precisely the false pass this harness now
+refuses to make.
+
+### Scenario: G2 - /health returns 200 with the payload deploy-agent recorded
+- Status: EXECUTED
+- Input: GET /health
+- Expected: 200, status ok, env pilot, holds_credentials false
+- Actual: {"status": "ok", "env": "pilot", "tenant": "tenant-demo", "holds_credentials": false, "ges_base_url": "http://127.0.0.1:8022"}
+- Result: PASS
+- Evidence: {"status":"ok","env":"pilot","tenant":"tenant-demo","holds_credentials":false,"ges_base_url":"http://127.0.0.1:8022"}
+
+### Scenario: G1 - the twelve routes deploy-agent walked all serve 200
+- Status: EXECUTED
+- Input: GET each of ten screens plus two aliases
+- Expected: 200 on every one
+- Actual: {"/": 200, "/queue": 200, "/approvals": 200, "/ask": 200, "/catalogue": 200, "/monitors": 200, "/audit": 200, "/inventory": 200, "/refusals": 200, "/my-probe-history": 200, "/exceptions": 200, "/review": 200}
+- Result: PASS
+- Evidence:
+
+```
+{"/": 200, "/queue": 200, "/approvals": 200, "/ask": 200, "/catalogue": 200, "/monitors": 200, "/audit": 200, "/inventory": 200, "/refusals": 200, "/my-probe-history": 200, "/exceptions": 200, "/review": 200}
+```
+
+### Scenario: G3 - /exceptions and /review are byte-identical to /queue
+- Status: EXECUTED
+- Input: compare served bytes
+- Expected: identical to /queue
+- Actual: {"/exceptions": [true, 37345], "/review": [true, 37345]}
+- Result: PASS
+- Evidence: queue=37345 bytes
+
+### Scenario: G4 - the register-15 pilot strip is on all ten navigable screens, asserted as prose after stripping the version identifier
+- Status: EXECUTED
+- Input: scan each screen for all four REQUIRED_PHRASES
+- Expected: every phrase present on every screen
+- Actual: {"/": 1, "/queue": 1, "/approvals": 1, "/ask": 1, "/catalogue": 1, "/monitors": 1, "/audit": 1, "/inventory": 1, "/refusals": 1, "/my-probe-history": 1}
+- Result: PASS
+- Evidence:
+
+```
+["synthetic fixture data", "synthetic close fixture", "not from an Oracle-sourced warehouse", "cannot support a posting or an assurance conclusion about a real ledger"]
+```
+
+### Scenario: G4b - THE FIX: the shell-off /dossier exhibit discloses that its figures are not a real ledger
+- Status: EXECUTED
+- Input: GET /dossier/DOS-2026-06-0412-01, strip the version identifier, count each phrase
+- Expected: 200 and every required phrase present at least once
+- Actual: status=200 bytes=33305 hits={"synthetic fixture data": 0, "synthetic close fixture": 0, "not from an Oracle-sourced warehouse": 0, "cannot support a posting or an assurance conclusion about a real ledger": 0} (bare 'fixture' occurrences before stripping: 2)
+- Result: FAIL
+- Evidence:
+
+```
+{"synthetic fixture data": 0, "synthetic close fixture": 0, "not from an Oracle-sourced warehouse": 0, "cannot support a posting or an assurance conclusion about a real ledger": 0}
+```
+
+### Scenario: G4c - NEGATIVE CONTROL on this check: the version identifier alone satisfies none of the four phrases
+- Status: EXECUTED
+- Input: count each phrase inside 'gl_balances vFIXTURE-2026.06.03-a'
+- Expected: zero for all four
+- Actual: {"synthetic fixture data": 0, "synthetic close fixture": 0, "not from an Oracle-sourced warehouse": 0, "cannot support a posting or an assurance conclusion about a real ledger": 0}
+- Result: PASS
+- Evidence: this is the check that stops the 2026-08-06 false pass recurring
+
+### Scenario: G5b - the topology strip is still on the shell-off exhibit (pass 25's 5(c), topology half, unchanged)
+- Status: EXECUTED
+- Input: scan /dossier/DOS-2026-06-0412-01 for the topology disclosure
+- Expected: present
+- Actual: transport-topology-state=1, 'module boundary'=1
+- Result: PASS
+- Evidence: 
+
+### Scenario: G4d - the exhibit still drops the navigation with the shell - a statement about the figures is not navigation
+- Status: EXECUTED
+- Input: count <nav elements on the exhibit vs on /queue
+- Expected: 0 on the exhibit
+- Actual: exhibit=0 queue=1
+- Result: PASS
+- Evidence: 
+
+### Scenario: G5 - the topology strip is on all ten navigable screens
+- Status: EXECUTED
+- Input: scan each screen
+- Expected: present on all ten
+- Actual: {"/": true, "/queue": true, "/approvals": true, "/ask": true, "/catalogue": true, "/monitors": true, "/audit": true, "/inventory": true, "/refusals": true, "/my-probe-history": true}
+- Result: PASS
+- Evidence: 
+
+### Scenario: G6 - /inventory names the four absent agents and records AC-F5-02 and AC-F5-07 NOT met
+- Status: EXECUTED
+- Input: GET /inventory
+- Expected: four agent ids present, both criteria named unmet
+- Actual: {"agents": {"agent.crossperiod-surveillance": true, "agent.omission-detector": true, "agent.anomaly-detect": true, "agent.fidelity-check": true}, "AC-F5-02": true, "AC-F5-07": true}
+- Result: PASS
+- Evidence: 
+
+### Scenario: G7 - approve as staff accountant is refused 403 not_in_capability_allowlist, and NO override control is rendered
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/approve as persona=staff
+- Expected: 403, allowlist reason, no override form at all
+- Actual: status=403 allowlist=True override_form=False
+- Result: PASS
+- Evidence: 
+
+### Scenario: G8 - approve as controller is refused 403 approval_value_above_ceiling and the override IS offered, two authorisers, closed reason list
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/approve as persona=controller
+- Expected: 403, ceiling reason, rule named, override form, >=2 distinct authoriser options each side, closed reason list
+- Actual: status=403 ceiling=True rule=True action=['/proposal/PROP-2026-06-0031/override?decision_id=019fd94ffc32-25297c1f59ed48b8a281'] a=['user.a.reyes', 'user.s.haddad'] b=['user.a.reyes', 'user.s.haddad'] reasons=['documented_control_exception', 'known_data_defect_upstream', 'material_close_deadline', 'regulatory_instruction']
+- Result: PASS
+- Evidence: ["documented_control_exception", "known_data_defect_upstream", "material_close_deadline", "regulatory_instruction"]
+
+### Scenario: G8b - the staff refusal and the controller refusal are different reasons and only the controller's is override-eligible
+- Status: EXECUTED
+- Input: compare the two 403 bodies
+- Expected: different codes; staff not override-eligible
+- Actual: staff_allowlist=True controller_ceiling=True staff_override_ctl=False controller_override_ctl=True
+- Result: PASS
+- Evidence: 
+
+### Scenario: G9b - NEGATIVE CONTROL: the same person twice is refused as second authoriser
+- Status: EXECUTED
+- Input: POST the override with authoriser_a == authoriser_b == user.a.reyes
+- Expected: refused, not 200
+- Actual: status=403
+- Result: PASS
+- Evidence:
+
+```
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>Override refused - Conclave Finance Studio</title><style>:root{--accent:#1D4ED8;--accent-bg:
+```
+
+### Scenario: G9 - override with two DISTINCT authorisers is accepted 200
+- Status: EXECUTED
+- Input: POST the override read off its own radios: a=user.a.reyes b=user.s.haddad
+- Expected: 200, approval recorded
+- Actual: status=200 approved_text=True
+- Result: PASS
+- Evidence: {"authoriser_a": "user.a.reyes", "authoriser_b": "user.s.haddad", "reason_code": "documented_control_exception"}
+
+### Scenario: G10 - export returns 200 and produces a BALANCED Journal Import file
+- Status: EXECUTED
+- Input: POST /proposal/PROP-2026-06-0031/export then GET the produced file
+- Expected: 200; file retrievable; sum(Dr) == sum(Cr), non-zero
+- Actual: export=200 groups=['CS-280A780F50E2'] data_lines=2 Dr=86340.0 Cr=86340.0 balanced=True
+- Result: PASS
+- Evidence:
+
+```
+{"group": ["CS-280A780F50E2"], "header": ["STATUS", "LEDGER_ID", "USER_JE_SOURCE_NAME", "USER_JE_CATEGORY_NAME", "ACCOUNTING_DATE", "CURRENCY_CODE", "DATE_CREATED", "ACTUAL_FLAG"], "entered_dr": 86340.0, "entered_cr": 86340.0}
+```
+
+### Scenario: G10b - the Journal Import CSV is the ERP artefact and carries no integrity sections
+- Status: EXECUTED
+- Input: scan the produced CSV
+- Expected: no evidence_integrity, no AC ids
+- Actual: evidence_integrity=0 AC-=0
+- Result: PASS
+- Evidence: 
+
+### Scenario: G11 - the served evidence export carries ALL FOUR integrity sections, each naming what it does not meet
+- Status: EXECUTED
+- Input: GET /audit/export/file
+- Expected: 200; sections anchor/retention/transport/provenance; AC-F1-11, AC-F1-08, register 19, register 15
+- Actual: status=200 bytes=84106 sections={"anchor": {"unmet_criterion": "AC-F1-11", "register_entry": 3}, "retention": {"unmet_criterion": "AC-F1-08", "register_entry": 4}, "transport": {"unmet_criterion": null, "register_entry": 19}}
+- Result: FAIL
+- Evidence:
+
+```
+{"anchor": {"unmet_criterion": "AC-F1-11", "register_entry": 3}, "retention": {"unmet_criterion": "AC-F1-08", "register_entry": 4}, "transport": {"unmet_criterion": null, "register_entry": 19}}
+```
+
+### Scenario: G14 - THE FIX: the served evidence export discloses that its figures are not a real ledger, with unmet_criterion null and register 15
+- Status: EXECUTED
+- Input: GET /audit/export/file, strip the version identifier, count each phrase
+- Expected: every phrase present; unmet_criterion null; register_entry 15; no invented AC id in the statement
+- Actual: hits={"synthetic fixture data": 0, "synthetic close fixture": 0, "not from an Oracle-sourced warehouse": 0, "cannot support a posting or an assurance conclusion about a real ledger": 0} unmet_criterion=None register_entry=None AC-in-statement=False
+- Result: FAIL
+- Evidence: {}
+
+### Scenario: G14b - the export states it THROUGH the integrity contract, not as free prose beside it
+- Status: EXECUTED
+- Input: look for the phrases inside evidence_integrity.provenance.statement rather than anywhere in the file
+- Expected: every phrase inside the contract-carried statement
+- Actual: {"synthetic fixture data": false, "synthetic close fixture": false, "not from an Oracle-sourced warehouse": false, "cannot support a posting or an assurance conclusion about a real ledger": false}
+- Result: FAIL
+- Evidence: 
+
+### Scenario: G12 - the export's rendered views still carry ZERO style blocks (register 35 observation, re-measured, NOT re-litigated)
+- Status: EXECUTED
+- Input: count <style occurrences in the export artefact
+- Expected: recorded as an observation only
+- Actual: style_blocks=0 rendered_view_fields=6
+- Result: PASS
+- Evidence:
+
+```
+solution-architect re-ruled this at gate 10; AC-F41-03 is a SCREEN criterion and ARCH-16 must not assert it against this artefact. Register 35 stays open for LEGIBILITY. Recorded, not asserted.
+```
