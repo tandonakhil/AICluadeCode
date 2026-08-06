@@ -153,6 +153,83 @@ All four are closed and, more importantly, the class is now checked.
    overridden criteria are claimed nowhere and `AC-F41-13`/`AC-F12-08` remain
    at 0 occurrences in `dev/`.
 
+### 2026-08-05 — Gate 7 · Code — `code-agent`, **pass 25** (the trust boundary was disclosed nowhere), `dev` @ `c68ad84`
+
+`security-architect`'s gate 10 pass found the pilot's collapsed trust boundary
+stated on **no surface at all** (`SECURITY_KB` §13.5). Four commits, one per
+item, 3,105 scenarios.
+
+1. **D1 — the screen says it.** `ARCHITECTURE_KB` §25.3.1 records five
+   conditions "that all currently hold"; condition 5 — *every screen rendering
+   a broker fact obtained through it says so, in words* — **did not**, and
+   `ges_gateway.py`'s own header made the same false claim. `pilot_strip()` was
+   about synthetic **fixture data** — provenance, not topology — and
+   `is_pilot_transport()` had no call site in `app/`.
+   `chrome.transport_topology_strip()` is the call site, rendered by
+   `page_tree` so every screen carries it by construction, **including the
+   shell-off dossier exhibit**. It decides nothing: one boolean in, one
+   sentence out, no control branches on it, the broker's answer is identical
+   either way.
+2. **D2 — the export says it, through the SAME contract.**
+   `REQUIRED_INTEGRITY_SECTIONS` had `anchor` (`AC-F1-11`) and `retention`
+   (`AC-F1-08`) and no transport section, so the artefact built for the reader
+   with no login stated two of three weakenings and omitted the one §3.2 says
+   the whole claim reduces to. Added `transport`
+   (`process_boundary_enforced` / `statement` / `register_entry`), produced by
+   `ges_gateway.transport_status()`.
+3. **T4 — `backend/pilot.py` asserts the credential guard.** It never set
+   `CONCLAVE_PROCESS_ROLE` and never called
+   `assert_api_process_holds_no_credentials()`, though it is the one entry
+   point putting both halves of the boundary in one process. Now refuses with
+   exit 3, identical to `app/run.py`, before anything is built.
+4. **The orphan check is widened to `app/`** (pass 24 item (c), which recorded
+   the widening as the human's call). It runs clean.
+5. **Judgement calls this pass made.**
+   (a) **The residual clause was RESTATED, not exempted.** The transport
+   weakening has **no acceptance criterion of its own** — register 19 and §3.2
+   carry it and nothing has an ID — so `residual_criterion` (an AC id in
+   `unmet_criterion`) became `residual_reference` (a named key holding a
+   required value). Anchor and retention are byte-unchanged by it. The
+   alternative, exempting the new section from the clause, is a one-row
+   exemption table. **Whether a criterion should exist is
+   `functional-design-agent`'s ruling and was not taken here** —
+   `unmet_criterion` is `null` in the transport section and a scenario asserts
+   it stays that way, because inventing an AC id would put a criterion into an
+   auditor's file that no criteria document contains.
+   (b) **`is_pilot_transport()` now fails TOWARDS disclosure.** `http()` raises
+   when `in-process` is requested and nothing is bound; letting that escape a
+   disclosure would make the one build obliged to carry it the one build that
+   cannot render.
+   (c) **The topology strip renders on the shell-off exhibit too**, unlike the
+   data-provenance strip. `/dossier/{id}` is a served screen carrying broker
+   facts and is the surface read last and longest. The retained artefact path
+   does not go through `page_tree`, so exports are unaffected.
+   (d) **Screens vs. downloads are split by the response's own content-type**,
+   never by a list of URLs. `/audit/export/file` is not an HTML screen; its
+   obligation is D2's, and it is asserted as such.
+6. **The finding this pass produced that the brief did not contain.**
+   **Widening the orphan check would NOT have caught D1**, and the file now
+   says so. `pyrefs` matches by name, and `is_pilot_transport` is also the
+   class attribute both transports declare — read as
+   `transport.is_pilot_transport` by the architecture suite. The accessor was
+   masked by its own protocol. `TestTheScannerIsMaskedByASameNamedAttribute`
+   plants the shape and **requires the miss**, with a control and a live-tree
+   assertion, so the hole is witnessed rather than believed away. What holds
+   D1 down is `test_transport_disclosure.py` in both trees, which asserts the
+   **call** rather than the name.
+7. **Counts and orders.** 3,105 scenarios (3,060 + 45), all passing, in six
+   orders: file, reversed, seeds 1 / 7 / 42 / 20260731. Deleting the strip's
+   call site fails 7 scenarios; the export contract failed loudly at three
+   call sites until each gained the section.
+8. **What this pass did NOT do.** No guardrail moved to the UI — the
+   disclosure decides nothing. No free-form SQL or SQL-typed parameter, no
+   Oracle posting credential, no journal-submission library, no suite stubbed
+   green, no exemption table, no green, no dependency installed, `prod/`
+   untouched, no server started or stopped — **the human's pilot on 8030 was
+   left running and untouched, and is serving pre-pass-25 code until they
+   restart it.** The nine overridden criteria are claimed nowhere and
+   `AC-F41-13`/`AC-F12-08` remain at 0 occurrences in `dev/`.
+
 ### 2026-08-05 — Correction (orchestrator): what the human actually approved, and what I inferred
 
 Gate 10's E1 is correct and the gap is mine. The exact sequence:
@@ -4013,6 +4090,22 @@ are CLOSED. Entries 1–5, 7 and 9 stand as recorded at pass 1 and 2c; entries 3
 4 are still the two that cannot quietly become "MVP1 ready". Entry 34 is the
 newest, is the first opened by a gate-8 finding rather than by `code-agent`'s
 own disclosure, and was broadened at pass 21 to carry `AC-F5-07`.**
+
+**On register 19 at gate 7 pass 25 — no entry opened, closed or narrowed; one
+recorded condition is made true.** `ARCHITECTURE_KB` §25.3.1 ruled the pilot's
+collapsed trust boundary sufficient **on five conditions all recorded as
+holding**. `security-architect` checked them and **condition 5 did not hold**:
+the disclosure it names had no call site anywhere in `app/`, and both
+`ges_gateway.py`'s header and §25.3.1 asserted otherwise. That agent
+deliberately left it unfixed so the evidence survived. It is fixed at pass 25 —
+`chrome.transport_topology_strip()` on every served screen, and a `transport`
+section inside every auditor export for the reader `AC-F1-04` defines as having
+no screen at all. **Entry 19 remains NARROWED, NOT CLOSED**, on exactly the
+terms gate 10 set (T1/T2 in a deploy artefact, T3 executing, plus T4 — the
+last of which is discharged at pass 25). The generalisable point, recorded
+because it is the reason this one survived ten passes: **a condition a ruling
+is conditional on needs a check that can fail on it**, and this one was prose
+in two files.
 
 **On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
 claiming closure with no covering check is the same defect class as an
