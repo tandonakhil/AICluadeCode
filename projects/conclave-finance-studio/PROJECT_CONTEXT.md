@@ -50,6 +50,117 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-06 — Gate 11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `c68ad84`
+
+**Deploy succeeded.** Run command is the template/README one:
+`CONCLAVE_ENV=pilot .venv/bin/python backend/pilot.py`.
+
+**Ports assigned and recorded (stable across redeploys):** `API_PORT=8021`,
+`GES_PORT=8022` — the defaults in `common/settings.py` and `.env.example`.
+**8030/8031 are NOT this agent's** — that is the human's own pilot instance,
+running pre-pass-25 code until they restart it. It was left running and
+untouched; killing was by PID re-read from `lsof` on each attempt, never by
+name.
+
+**Served URL and health check — the record required by `deploy-agent` v1.1.0:**
+
+| Field | Value |
+|---|---|
+| Served URL | `http://127.0.0.1:8021/` |
+| Health endpoint hit | `GET /health` |
+| Response | `200` — `{"status":"ok","env":"pilot","tenant":"tenant-demo","holds_credentials":false,"ges_base_url":"http://127.0.0.1:8022"}` |
+| Checked at | 2026-08-06 15:10 CDT (working tree) and 15:14 CDT (clean clone) |
+| Result | **PASS**, both runs |
+
+`holds_credentials: false` is the true answer for this build: the pilot is the
+api process with the broker collapsed into it, and the broker holds no
+credential of its own.
+
+**Navigation walked from `/`, all 200:** Work (`/queue`, `/approvals`, `/ask`),
+Govern (`/catalogue`, `/monitors`), Evidence (`/audit`, `/inventory`,
+`/refusals`), plus `/my-probe-history`. Declared aliases `/exceptions` and
+`/review` serve and are byte-identical to `/queue` (37,345 bytes each).
+`/dossier/{id}` — the shell-off exhibit — also serves.
+
+**The three disclosures are LIVE on the running instance**, checked against the
+served HTML rather than the source:
+
+1. **Pilot strip** (data provenance) — present. *"Pilot build — synthetic
+   fixture data. Figures on this screen come from the twelve-period synthetic
+   close fixture, not from an Oracle-sourced warehouse. They cannot support a
+   posting or an assurance conclusion about a real ledger."*
+2. **Topology strip** — present on **all ten** navigable screens and on the
+   shell-off dossier. *"Pilot topology — the guardrail broker is running inside
+   this process… the trust boundary between this interface and the broker is a
+   module boundary in this build… There is no control that hides this."*
+   This is pass 25's D1 confirmed as served output.
+3. **`/inventory`** — names the four agents absent from the registry
+   (`agent.crossperiod-surveillance`, `agent.omission-detector`,
+   `agent.anomaly-detect`, `agent.fidelity-check`) and states `AC-F5-02` is
+   **NOT met** by this build and *"recorded as unmet rather than reported as
+   satisfied."* It additionally records `AC-F5-07` NOT MET for the same cause.
+
+**Export path verified end to end (approve → override → export):**
+
+- `POST /proposal/PROP-2026-06-0031/approve` as **staff accountant** → **403**,
+  broker reason `not_in_capability_allowlist`, and the screen states the denial
+  is **not override-eligible** and renders **no** override control (not a
+  disabled one). The SoD control is live.
+- Same POST as **controller** → **403**, reason
+  `approval_value_above_ceiling`, rule `quant.approval_value_ceiling`,
+  threshold $150,000.00 inclusive. Override IS offered here, two authorisers
+  required, closed reason list.
+- `POST …/override` with two distinct authorisers + `material_close_deadline`
+  → **200**, "Approved for export", approval recorded under an override id.
+- `POST …/export` → **200**. Journal Import **file** produced (group
+  `CS-B2EC8B0161E2`, 2 lines, balanced 86,340.00 Dr/Cr), downloadable at
+  `/export/{group}.csv` as `text/csv`. The screen states nothing in this build
+  submits it, and that the CUEC probe authorised it on a **synthetic
+  attestation**, not a probed tenant.
+- **The three integrity sections are in the produced evidence export**
+  (`GET /audit/export/file` → 200, `application/json`, 84,106 bytes,
+  `conclave-f1-export-202606.json`), under `evidence_integrity`, each naming
+  what it does not meet:
+  - `anchor` — `unmet_criterion: "AC-F1-11"`, register 3, stub signer
+  - `retention` — `unmet_criterion: "AC-F1-08"`, register 4, stamp not enforcement
+  - `transport` — `unmet_criterion: null`, register 19, statement carries the
+    weakening explicitly *"THIS WEAKENING HAS NO ACCEPTANCE CRITERION OF ITS
+    OWN"* — which is pass 25's judgement call (a) holding as built, not a gap.
+
+**Note on artefact identity:** the Journal Import CSV is the ERP artefact and
+carries no integrity sections; the three sections live in the **evidence**
+export. Both were produced and both were checked.
+
+**Clean-checkout reproduction — PASSED.** `dev` was cloned to a scratch
+directory and the pilot run from the clone. `var/` is gitignored and absent
+from a fresh checkout; the pilot **creates** `var/warehouse.sqlite3` and
+`var/broker_db.sqlite3` itself on first run. All twelve routes 200, `/health`
+200, and the full approve → override → export chain reproduced (group
+`CS-E739A3B82B3E`, same three integrity sections). A human needs only
+`python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt`.
+
+**Startup guards verified on the deployed artefact:**
+`GES_WAREHOUSE_PASSWORD` in the environment → **exit 3** with the T4 refusal
+message; `CONCLAVE_ENV=production` → **exit 2** with the topology refusal. Both
+refuse before uvicorn binds.
+
+**Cleanup:** both instances this agent started were reaped by PID within the
+invocation that started them. `lsof` confirms 8021 and 8022 free, and 8030
+still LISTEN on PID 30526 — the human's, untouched.
+
+**NOT done here, and outstanding:**
+- **Current Status is NOT changed to `deployed (dev, local)`** — that is the
+  human's gate approval to give, not this agent's to set.
+- **`test-agent`'s post-deploy smoke test has NOT been run.** This agent had no
+  means to invoke a subagent in this invocation; the handoff is owed and is
+  reported to the orchestrator rather than silently skipped or substituted with
+  this agent running the suites itself.
+- **`pipeline-state.json` records `served_url: http://127.0.0.1:8030/`**, which
+  is the human's instance and not a deploy-agent artefact. Flagged for the
+  orchestrator rather than edited here.
+- **No promotion to `prod/`.** `dev/` was not modified.
+
+
 ### 2026-08-06 — Claim prohibition 6 DECLINED by the human. The list stays at five.
 
 Asked as one question with the drafted wording in front of them. **The human
@@ -2233,6 +2344,136 @@ absent afterwards:**
 `AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
+
+### 2026-08-06 — Gate 11 · POST-DEPLOY SMOKE — `test-agent`, `dev` @ `c68ad84`
+
+**The handoff `deploy-agent` reported as owed is now closed. It found two
+things, and both are real.**
+
+Everything `deploy-agent` recorded on 2026-08-06 is **confirmed** — twelve routes,
+`/health`, the aliases, the topology strip, `/inventory`'s disclosures, the whole
+approve → override → export chain, the three integrity sections, the
+clean-checkout reproduction and both startup guards. Two smoke scenarios **FAIL**,
+and neither is a contradiction of `deploy-agent`: both are a disclosure gap on
+the two **artefacts**, which nothing in the pipeline had previously asserted.
+
+#### Per-suite breakdown — every suite marked, never merged
+
+| Suite | Owner | Status | Result | Δ vs. 2026-08-04 | Blocking |
+|---|---|---|---|---|---|
+| unit / integration (`backend/tests`) | `test-agent` | **`EXECUTED`** | **2,412 / 2,412** | **+60** | yes |
+| functional | `functional-design-agent` | **`EXECUTED`** | **365 / 365** | 0 | yes |
+| UX | `ui-ux-designer` | **`EXECUTED`** | **194 / 194** | 0 | yes |
+| red-team | `responsible-ai-architect` | **`EXECUTED`** | **61 / 61** | 0 | yes |
+| architecture | `solution-architect` | **`EXECUTED`** | **28 / 28** | 0 | yes |
+| industry | `industry-expert` | **`EXECUTED`** | **23 / 23** | 0 | yes |
+| security | `security-architect` | **`EXECUTED`** | **22 / 22** | **+8** | yes |
+| **whole tree** | — | **`EXECUTED`** | **3,105 / 3,105** | **+68** | yes |
+| **post-deploy smoke (served pilot, 8021)** | `test-agent` | **`EXECUTED`** | **58 / 60 — 2 FAIL** | +22 | **yes** |
+| clean-checkout + startup guards | `test-agent` | **`EXECUTED`** | **9 / 9** | new suite | yes |
+| rendered-UI (Playwright / Chromium, web) | `test-agent` | **`EXECUTED`** | **8 / 8** | re-run, not carried forward | yes |
+| rendered-UI (RNTL, native) | — | **N/A** | no React Native surface in MVP1 | — | — |
+| rendered-UI (Maestro + simulator) | — | **NOT BUILT** | no simulator on this machine (2026-07-26 spike, unchanged) | — | — |
+
+No suite is `STATIC ONLY` and none is empty. **Test Policy is all-suites-blocking
+with no advisory exceptions**, so the two smoke failures stop the gate for the
+human's decision.
+
+#### Test-count delta — measured by node id, not counted
+
+**3,037 → 3,105: +71 added, −3 removed, net +68.** Measured by collecting
+`pytest --collect-only` node ids at `7757e0d` and at `c68ad84` in a scratch clone
+and diffing them. All three removals are named in
+`test-evidence/unit-integration-2026-08-06.md`, all sit in
+`test_export_integrity_contract.py`, and each is superseded by a **strictly
+broader** replacement in the same file — the two-section parametrisations became
+three-section ones when pass 25's D2 added the `transport` weakening, and
+"names both criteria" became "names all three residuals". No silent replacement,
+no unexplained drop.
+
+#### The two failures — the disclosure that is on every screen and on neither artefact
+
+Register 15's pilot strip states *"Pilot build — synthetic fixture data … They
+cannot support a posting or an assurance conclusion about a real ledger."* It is
+on **all ten navigable screens** (G4, PASS). It is on **neither artefact**:
+
+- **G4b FAIL — the shell-off `/dossier/<id>` exhibit.** 33,305 bytes, zero
+  occurrences of *synthetic*, *fixture*, *cannot support a posting* or
+  *assurance conclusion*. `chrome.py:1047` withholds `pilot_strip` from the
+  exhibit on the recorded ground that *"the exhibit carries its own"* data
+  provenance. It does not. What it carries is `provenance()` — dataset version,
+  data-as-of, close-clock staleness — which says how stale the data is and which
+  version it is, never that it is not a real ledger.
+- **G14 FAIL — the 84,106-byte evidence export.** Same four phrases, zero
+  occurrences. Its own `statement` distinguishes probe items as *"not findings
+  about this ledger"*, which reads as though the remaining six **are**.
+
+The only occurrences of the substring `fixture` on either artefact are inside the
+dataset-version identifier `gl_balances vFIXTURE-2026.06.03-a`. **The first draft
+of both scenarios passed on exactly that substring** and was corrected — recorded
+in full in the evidence file, because a green that papered over the finding is
+what this gate exists to catch.
+
+**Why this matters more than its size.** These are the two artefacts read by the
+party `AC-F1-04` defines as having no application login — the one reader who
+cannot see the screens where the disclosure lives. It is the same shape as pass
+25's D1 (a disclosure asserted to exist, existing only on the shell) and the same
+shape as `AC-F5-02`, one surface across. **Not fixed here** — that is
+`code-agent`'s to build after human review, and whether the exhibit and the
+export owe this disclosure at all is `functional-design-agent`'s ruling.
+
+#### The two things `deploy-agent` flagged — both independently checked
+
+1. **The export is not style-inlined — CONFIRMED, with a correction and a
+   consequence `deploy-agent` could not have seen.** 0 `<style>` blocks stands.
+   The class count is **624** across the six `rendered_view` fields;
+   `deploy-agent`'s 1,248 double-counts because `approver_view` and
+   `rendered_view` are the same bytes. Same artefact, same direction.
+   **The substantive claim — `AC-F41-03` not checkable in the artefact — is
+   confirmed, but NOT by the mechanism §25.4 names.** §25.4 reasons that the
+   artefact *"carries a class name and no size"*. It carries **neither**: the
+   risk band is absent from the export's `rendered_view` entirely, because that
+   view is derived from the approval screen and pass 21 deliberately did not
+   bring the risk band across. Proven in Chromium — the live exhibit renders
+   `riskiest-figure` at **40px**, the sole element at the page maximum, across
+   six distinct sizes; the artefact opened as a local file has **no
+   `riskiest-figure` at all** and renders 133 elements at just two computed sizes
+   (24px/16px, browser defaults). **Consequence for `solution-architect`:
+   inlining the stylesheet — the ruled remedy — would not make `AC-F41-03`
+   checkable in this artefact, because the element it is about is not there to
+   size.** Separately observed and referred rather than asserted: without the
+   stylesheet the artefact renders every label and value concatenated —
+   `Amount312,480.00`, `Authoragent.crossperiod-surveillance` — which is a
+   legibility defect in an evidential record that no acceptance criterion
+   currently covers.
+2. **Clean-checkout reproduction — CONFIRMED, 9/9.** Cloned `dev` @ `c68ad84` to
+   scratch; `var/` gitignored and absent; twelve routes and `/health` 200; the
+   full staff-403 → controller-403 → override-200 → export-200 chain reproduced
+   with a balanced file; the same three integrity sections with
+   `register_entry` 3/4/19. Startup guards: credential in env → **exit 3**,
+   `CONCLAVE_ENV=production` → **exit 2**, both with nothing ever listening on
+   8021, and neither creating `var/`. **One refinement to `deploy-agent`'s
+   wording:** the pilot creates `broker_db.sqlite3` at startup and
+   `warehouse.sqlite3` **lazily, on the first request that reads it** — `/health`
+   does not. My first draft sampled `var/` at first-serve, reported a FAIL, and
+   was a harness sequencing defect; it now samples twice so the lazy creation is
+   visible rather than smoothed away.
+
+#### Process lifecycle
+
+The human's pilot — **pid 30526, port 8030** — was alive before and alive after,
+never probed and never signalled; the pid was re-read from `lsof` at the start of
+every invocation and never carried forward. Four pilots and one Chromium were
+started on 8021/8022 across this pass, each reaped by process group inside the
+invocation that started it; `lsof` shows **8021 and 8022 free**. `CONCLAVE_VAR_DIR`
+was pointed at a **copy** of `dev/var` so this pass could not write into the two
+SQLite files the human's live browser session is reading — a disclosed departure
+from `deploy-agent`'s run, made to protect that session. `dev/` was not modified
+and `prod/` was not touched.
+
+**Evidence:** `test-evidence/smoke-test-2026-08-06.md`,
+`clean-checkout-2026-08-06.md`, `rendered-ui-2026-08-06.md`,
+`unit-integration-2026-08-06.md`, and four screenshots dated 2026-08-06.
 
 ### 2026-08-04 — Gate 8 · Test — `test-agent`, **pass 22 re-run, after the `AC-F41-13` ruling was built, at `dev` @ `7757e0d`** (parent repo @ `299369e`)
 

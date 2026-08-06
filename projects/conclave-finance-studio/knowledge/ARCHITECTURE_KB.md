@@ -883,9 +883,17 @@ Three consequences, all binding on `code-agent`:
 2. **Determinism is testable**: same payload + same template ⇒ byte-identical
    HTML (ARCH-16). If it is not byte-identical, the retained artefact is not the
    thing that was shown.
-3. Because styles are inlined, gate 5's strengthened `AC-F41-03` (riskiest
+3. ~~Because styles are inlined, gate 5's strengthened `AC-F41-03` (riskiest
    element at the largest computed font size) is checkable *in the retained
-   artefact*, offline, years later — not only in a live browser.
+   artefact*, offline, years later — not only in a live browser.~~
+   **WITHDRAWN 2026-08-06. This sentence was wrong when I wrote it on
+   2026-07-31, and wrong for a reason that has nothing to do with styling —
+   see §25.4bis. `AC-F41-03` is a *Review screen* criterion; the retained
+   rendered view is of the *approval* screen. I asserted a property of one
+   screen was checkable in an artefact of a different screen.** The replacement
+   consequence is: *the retained artefact reproduces what the approver was
+   shown, and the approver was not shown the risk band, so the artefact does
+   not carry it and must not.*
 
 **Amended 2026-08-05 (gate 10 ruling 4, §25.4) — "the retained artefact" is two
 artefacts, and only one of them is style-inlined.**
@@ -898,20 +906,20 @@ one:
 | The `/dossier/<id>` exhibit | `chrome.page(..., chrome_on=False)`, which emits `<style>` with `chrome.stylesheet()` | **Yes** |
 | The **export's** per-dossier `rendered_view` | `app.ui.retained.render()` → a bare `tree.render()`, written straight into the export at `app/evidence/export.py` | **No** |
 
-**Ruling: inline it in the export copy too. The consequence-3 claim above stands
+~~**Ruling: inline it in the export copy too. The consequence-3 claim above stands
 as written and the build must meet it.** The deciding fact is not the 280 KB —
 it is that the size emphasis exists *only* in the stylesheet
 (`.riskband .big{font-size:__RISK__px}`), so the export's copy carries no
 font-size information at all and `AC-F41-03` is not merely hard to check there,
-it is **unverifiable in principle**. `AC-F1-04`'s reader is by definition the one
-who cannot open `/dossier/<id>`, so satisfying gate 5's binding decision only on
-the live surface satisfies it for everyone except the person it was for.
+it is **unverifiable in principle**.~~
 
-The ruling is bounded so it stays buildable — the four constraints are in §25.4,
-and the work is `code-agent`'s with `test-agent` extending ARCH-16. This is
-**not a hold on the shipped pilot**, whose exports carry synthetic-fixture data
-under the pilot strip; it is a precondition on the first export handed to a real
-auditor.
+**SUPERSEDED 2026-08-06 (gate 11) — this reasoning was falsified in a browser.**
+The artefact carries **neither** the size nor the element: `riskiest-figure` is
+absent from it entirely, because the retained region derives from the *approval*
+screen and the risk band lives on Review. Inlining the stylesheet would not have
+made `AC-F41-03` checkable here, because the element it is about is not present
+to size. The outcome — inline it — survives; **the reason does not, and the
+reason is what a future reader would have relied on.** Re-ruled at §25.4bis.
 
 A PNG rendering is generated at auditor-export time for convenience and is
 labelled **derived**; the HTML plus its hash is the evidence.
@@ -1478,7 +1486,7 @@ whose evidence the Test gate must show:
 
 | Surface | Suite(s) | What must be shown |
 |---|---|---|
-| **S1 Desktop web** | `ux` (`ui-ux-designer`), `functional` | `UX_KB` §8.2's UX-1…UX-14 **executed, not static**. Specifically: UX-6/UX-7 (70% vs 100% textual difference; "no exceptions" unrenderable) must be run against the real `Conclusion` renderer, not a fixture — that is the point of §11. Plus gate 5's strengthened `AC-F41-03`: riskiest element at the largest computed font size, asserted **on the retained rendered artefact** as well as live (§9.4). Plus `AC-F38-11` — no figure renders without dataset version, provenance and close-clock staleness. |
+| **S1 Desktop web** | `ux` (`ui-ux-designer`), `functional` | `UX_KB` §8.2's UX-1…UX-14 **executed, not static**. Specifically: UX-6/UX-7 (70% vs 100% textual difference; "no exceptions" unrenderable) must be run against the real `Conclusion` renderer, not a fixture — that is the point of §11. Plus gate 5's strengthened `AC-F41-03`: riskiest element at the largest computed font size — ~~asserted **on the retained rendered artefact** as well as live (§9.4)~~ **CORRECTED 2026-08-06: asserted on the *Review screen*, which is the only surface the criterion and `UX_KB` UX-4 scope it to. It is NOT assertable on the retained rendered view, which is an artefact of the approval screen and does not contain the risk band. See §25.4bis.2.** Plus `AC-F38-11` — no figure renders without dataset version, provenance and close-clock staleness. |
 | **S2 Backend API** | `architecture` (**mine**, §20), `security` (`security-architect`) | ARCH-01…ARCH-07 and ARCH-15…ARCH-18. Above all: **the direct-API bypass test (`AC-F36-03`) must be executed against the running `api` and `ges`, not asserted from source** — a UI-bypass test that reads code proves nothing about the surface. Plus credential-isolation (`AC-F36-04`), fail-closed (`AC-F36-17`), and the concurrency test ARCH-06, which no other suite will write. |
 | **S3 Data / export pipeline** | `architecture`, `industry` (`industry-expert`), `functional` | ARCH-12, ARCH-13. The Journal Import file must be validated against the Oracle FBDI column contract by a schema check, not by eyeballing a sample. Refusal paths must each be exercised with their decision ID: no approval, stale CUEC, blast-radius cap, POAR divergence. `AC-F40-02` — no posting credential resolvable — asserted at runtime in the deployed process, not by grep. |
 | **S4 Evidential deliverables** | `architecture`, `industry`, `security` | ARCH-08…ARCH-11. The auditor export must be opened and verified **by a process with no application access and no database credential** — hashes recomputed with standard tools against the shipped anchors. `AC-F1-02` (mutation fails *and* is recorded) must be exercised against the real role grants, because a test against a mocked store tests nothing about the grant. `AC-F1-08`'s oldest-dossier completeness must be exercised through the schema-versioned reader against a v1 payload. |
@@ -2000,6 +2008,173 @@ exists, ARCH-16 remains unwritten and §20.1 continues to say so.
 
 ---
 
+### 25.4bis RE-RULING 2026-08-06 (gate 11) — §25.4's premise was false. The outcome stands; the reason is replaced
+
+`test-agent` verified §25.4's deciding argument in Chromium and falsified it.
+Routed back rather than built on. **This section replaces §25.4's reasoning.
+Where the two conflict, this one governs.**
+
+#### 25.4bis.1 What was actually wrong — and it was mine, from pass 1
+
+I ruled that inlining the stylesheet would make `AC-F41-03` checkable in the
+export's artefact, because the size lived only in CSS. Measured:
+
+| | live `/dossier/<id>` | the export's artefact, opened **as a file** |
+|---|---|---|
+| `riskiest-figure` | present, **40px**, sole element at the page maximum | **absent entirely** |
+| distinct computed sizes | six | **two** (24/16px — browser defaults) |
+
+So the artefact carries neither the size nor the element. **Inlining could not
+have closed the gap it was ruled to close.**
+
+**The error is older and deeper than styling, and it is mine, not
+`code-agent`'s and not pass 21's.** Reading the criteria rather than my own
+summary of them:
+
+- **`AC-F41-03`** — *"**When the Review screen is rendered**, that element is
+  rendered outside any collapsed or expandable region and appears ahead of the
+  proposal's supporting narrative in the reading order."* `UX_KB` UX-4 scopes
+  gate 5's strengthening the same way: *"first in DOM order **on Review** …
+  at the largest computed font size **on the screen**."*
+- **`AC-F41-04`** — *"the stored rendered view **for that approval**"*.
+
+**These are two different screens.** The retained region is
+`pages.approval_evidential_region`, composed for `/approvals/<proposal_id>`;
+the risk band renders in `pages.review`, `pages.dossier` and the finding screen,
+and **never on the approval screen at all.** §9.4 consequence 3 asserted a
+Review-screen property was checkable in an approval-screen artefact, and that
+was untrue on 2026-07-31, before styling entered the question. At gate 10 I then
+reasoned from `.riskband .big` — a CSS rule that only ever applies to a
+component this document does not contain. The gate-10 argument was internally
+consistent and about the wrong document.
+
+This is the §18.1 failure mode with me as the author rather than the reader: a
+KB sentence asserting a property, believed downstream because it was in the KB,
+which nobody could falsify without opening a browser. It cost `code-agent` a
+declined work item and `test-agent` a verification pass. **The standard I
+applied to §18.1 applies here: the sentence is struck where it stands (§9.4),
+not quietly rewritten.**
+
+#### 25.4bis.2 Ruling on `AC-F41-03` — option 3. It is a screen criterion, by its own text
+
+**Ruled: `AC-F41-03` is a Review-screen criterion by design, and the retained
+rendered view carries the evidence without the emphasis.** Recorded, not
+worked around.
+
+**Option 2 — importing the risk band into the retained region — is refused, on
+three grounds, and pass 21's judgement is upheld rather than reopened.**
+
+1. **It would put a fact in the artefact that the approver was not shown.** The
+   approver on `/approvals/<proposal_id>` never sees the risk band. An artefact
+   whose job is to reproduce *what was displayed at approval time* does not
+   improve by gaining something that was not. `pages.py` already names this
+   exact failure in the opposite direction — retaining the threshold without
+   showing it would have been *"an artefact carrying a fact the approver was
+   not shown, which is the same defect from the opposite direction."* Option 2
+   commits that defect deliberately. **This is the decisive ground.**
+2. **It is a typography decision driven by a criterion about evidence.** Pass
+   21's recorded reason — the band carries the single largest type in the
+   product and that size is a *per-screen uniqueness invariant* — is better
+   architecture than the sentence of mine it contradicted. Importing it would
+   put the product's largest type onto the screen that carries the **approve
+   control**, changing what dominates the moment of decision. That is
+   `ui-ux-designer`'s call and `UX_KB`'s invariant, and it must not be made as
+   a side effect of an architecture ruling about file formats.
+3. **Nothing evidential is missing.** The retained region already carries the
+   amount, the finding, the four-period evidence table with the recurring
+   wording, the threshold, the bundle version, the dataset version and as-of,
+   the coverage figure and the exact journal lines. The risk band is a
+   *ranking and emphasis of facts the artefact already contains in full*.
+   Emphasis is the right thing for a screen to add and for an evidence record
+   to omit.
+
+**And the emphasis is not lost from the product.** `pages.dossier` — the
+`/dossier/<id>` exhibit — renders `C.risk_band` **with the stylesheet inlined**,
+measured at 40px and sole element at the page maximum. The composition that
+carries the riskiest element at maximum size exists and is style-inlined; it is
+simply not the same composition as the retained rendered view. Anyone reading
+option 3 as "the emphasis went away" should read this paragraph.
+
+**Owner of any spec consequence: `functional-design-agent`.** If `AC-F41-03`'s
+screen scoping should be stated in `FUNCTIONAL_SPEC` rather than inferred from
+its Given/When, that is their lane and their ID. I am not issuing it — the same
+line I drew at §18.1, and the mechanism worked there.
+
+#### 25.4bis.3 Ruling on inlining — option 1, on a reason that survives contact with the artefact
+
+**Ruled: still inline it. The four constraints in §25.4 stand unchanged. The
+reason is replaced.**
+
+I opened the artefact rather than reasoning about it
+(`test-evidence/ui-export-artefact-unstyled-1280-2026-08-06.png`). Unstyled,
+every label is glued to its value:
+
+```
+Amount312,480.00
+Authoragent.crossperiod-surveillance
+Applicable threshold$150,000.00, inclusive
+Guardrail bundlelev14 - 9f3a71c2
+Coverage of this run70% - partial
+Dataset versiongl_balances vFIXTURE-2026.06.03-a
+```
+
+The separation was carried by `.lbl`'s block display. Without the stylesheet it
+is gone, on **133 elements at two computed sizes**.
+
+**Why this justifies the work even though it looked uncovered by any criterion.**
+`AC-F41-04` requires the retained view to *"reproduce what was displayed at
+approval time, **including the figures, the threshold and the bundle version**."*
+`Applicable threshold$150,000.00, inclusive` and `Guardrail bundlelev14 - 9f3a71c2`
+are not reproductions of what was displayed — the label/value boundary was
+displayed and is not reproduced, and those are two of the three things the
+criterion names explicitly. So this sits **closer to criterion-covered than
+"stylistic"**, and the honest statement is: it is my reading of `AC-F41-04`, and
+whether the criterion reaches legibility is `functional-design-agent`'s to
+confirm. The ruling does not depend on winning that argument.
+
+What the ruling does depend on, and what I am willing to defend alone:
+
+- **It is a correctness hazard, not an aesthetic one.** `Coverage of this
+  run70% - partial` is one misparse from a wrong coverage figure, in a
+  seven-year record, read by `AC-F1-04`'s party who has **no application login
+  and no one to ask**. Wherever a label ends in text and a value begins with a
+  digit, glued rendering is genuinely ambiguous. That is the wrong class of
+  risk to leave in an S4 deliverable to save a stylesheet.
+- **The cost is smaller than the number I ruled on, and that number was wrong
+  twice.** The corrected count is **624**, not 1,248 — `approver_view` and
+  `rendered_view` are the same bytes, and deliberately so:
+  `test_the_rendered_view_and_the_approver_view_are_the_same_artefact` asserts
+  they cannot diverge, because `approver_view` is `AC-F1-05`'s reconstruction
+  field and `rendered_view` is `AC-F41-04`'s retained view. That duplication is
+  designed and should stay. **`code-agent` re-measures the added bytes against
+  the real stylesheet and the real dossier count before building** — I have now
+  been handed a wrong figure twice and will not carry a third into the KB.
+
+**§25.4's four constraints are unaffected** by this re-ruling, because none of
+them rested on the falsified premise: per-dossier inlining rather than hoisting
+(each view independently openable); byte-identical across dossiers with the
+digest recorded once; **the retained SHA-256 must be of the shipped bytes**; and
+`check_no_active_content` run post-inlining. Constraint 3 remains the one that
+would create a worse defect if got wrong.
+
+#### 25.4bis.4 What this does *not* fix, stated so it is not read as fixed
+
+Inlining makes the artefact **legible**. It does not make `AC-F41-03` checkable
+in it, and after §25.4bis.2 nothing is expected to. Any future test asserting
+`AC-F41-03` against the export's artefact is asserting the wrong thing about the
+wrong document and should fail review.
+
+Separately: `test-agent`'s gate-11 smoke found the **pilot-provenance disclosure
+missing from both artefacts**, which `code-agent` is already fixing. I did not
+rule on it and it is not mine, but it is the more serious of the two findings
+and I want the ordering recorded — an artefact that does not say it was built
+from synthetic fixture data is a worse defect than one whose labels are glued.
+The human declined claim prohibition 6 on 2026-08-06 **on the basis that the
+substance is disclosed on the surfaces a reader meets**, which makes that fix
+load-bearing for a decision that has already been taken.
+
+---
+
 ### 25.5 IMPACT ANALYSIS — Architecture pass 2 (gate 10 rulings)
 
 Mandatory per my contract, enumerating **every surface the project has** from
@@ -2012,9 +2187,9 @@ without justification blocks this gate; none is omitted.
 | **S1** | **Desktop web** | **NOT REACHED** | No ruling adds, removes or re-composes a screen. Ruling 4 changes the **export's** copy of the rendered view; the live `/dossier/<id>` exhibit and `/approvals/<proposal>` are already style-inlined via `chrome.page` and are **unchanged in both markup and CSS**. Ruling 1 is documentation of behaviour already built and rendering (`approval-blocked-by-data`). Rulings 2 and 3 touch no renderer. **Falsify by** finding any element of `pages.approval_detail` or `pages.approval_evidential_region` whose tree or class set changes as a consequence of §25.1–§25.4 — there should be none. |
 | **S2** | **Backend HTTP API (`api` and `ges`)** | **REACHED — by ruling 3 only, and only as a future constraint** | Rulings 1, 2 and 4 change no route, request schema or response shape: ruling 1 documents an existing `/ges/decide` context resolution, ruling 2 changes only which tuple two already-registered primitives are named in (`REGISTERED` is untouched, so no detector run changes), ruling 4 is confined to the export writer. Ruling 3 reaches this surface because gates T1–T3 change **how the two processes are packaged and how the api reaches GES in a deployed topology** — no wire contract changes, but the transport that serves it does. Nothing lands in the pilot. **Falsify by** finding a route schema, status code or auth requirement altered by any of the four rulings. |
 | **S3** | **Data / export pipeline (Oracle Journal Import file)** | **NOT REACHED** | The Journal Import file is produced by `ges/journal_export.py` under §10's FBDI column contract and contains **no rendered view and no HTML at all**. Ruling 4 is confined to `app/evidence/export.py`'s per-dossier `rendered_view` field in the **F1 auditor export**, which is a different artefact with a different consumer. **Falsify by** showing that the FBDI file's column set, source/category values, or reference-column stamping changes under any ruling here — it does not. |
-| **S4** | **Evidential deliverables (F1 auditor export, dossiers, CUEC checklist, published obligations)** | **REACHED — this is the primary surface of ruling 4, and secondarily of ruling 2** | Ruling 4 changes **what the export file contains**: every per-dossier `rendered_view` gains a ~20 KB inlined `<style>` block, the file grows by ~280 KB, and the integrity section gains a stylesheet digest. Ruling 2 reaches it more narrowly — findings from primitives 12 and 13 flow into dossiers, and §7.3's new standing rule requires the calibration denial to be **on every emitted finding**, so a dossier carrying a `journal_attribute_outlier` finding must carry the denial with it. **Falsify by** finding an export or dossier whose bytes are unchanged after constraints 1–4 are built. |
+| **S4** | **Evidential deliverables (F1 auditor export, dossiers, CUEC checklist, published obligations)** | **REACHED — this is the primary surface of ruling 4, and secondarily of ruling 2** | Ruling 4 changes **what the export file contains**: every per-dossier `rendered_view` (and the `approver_view` that is asserted identical to it) gains an inlined `<style>` block, and the integrity section gains a stylesheet digest. **The size figure is deliberately not stated here** — I was given 280 KB, then 624-vs-1,248 classes, and have been wrong once already; `code-agent` measures it against the real stylesheet and real dossier count before building (§25.4bis.3). What it does **not** change: the artefact still does not contain the risk band, and `AC-F41-03` is still not checkable in it (§25.4bis.2). Ruling 2 reaches it more narrowly — findings from primitives 12 and 13 flow into dossiers, and §7.3's new standing rule requires the calibration denial to be **on every emitted finding**, so a dossier carrying a `journal_attribute_outlier` finding must carry the denial with it. **Falsify by** finding an export or dossier whose bytes are unchanged after constraints 1–4 are built. |
 | **S5** | **Mobile web** | **NOT REACHED** | Still no MVP1 build target, and more usefully: the two rulings that could plausibly constrain it are neutral for it. Ruling 4's inlined `<style>` is displayable verbatim by any browser including a mobile one — inlining **removes** a dependency (an external stylesheet fetch) rather than adding one, so it strictly widens where the artefact renders. Ruling 3's T1–T3 are deployment-topology gates on the server side and are invisible to any client. **Falsify by** showing an inlined declaration in `chrome.stylesheet()` that requires a desktop viewport to resolve, or a gate in §25.3.2 that assumes a client type. |
-| **S6** | **Native mobile (F23 read/monitor, F24 approval)** | **NOT REACHED — and ruling 4 *strengthens* §18.2's constraint on it** | No MVP1 build target. F23 is unaffected for S5's reason: it inherits GES enforcement and retains nothing evidential. **F24 is made harder, not easier, and that is worth recording now**: §18.2 already found that a native client rendering its own approval screen produces a different artefact from the retained view. Ruling 4 makes the retained artefact's **styling** part of what must be reproduced, so "render the same JSON natively" now diverges on typography as well as structure. The only viable F24 remains a webview displaying the server-rendered artefact. **Falsify by** designing a native renderer that reproduces `.riskband .big`'s computed size from the payload alone — it cannot, because the payload carries no size. |
+| **S6** | **Native mobile (F23 read/monitor, F24 approval)** | **NOT REACHED — and ruling 4 *strengthens* §18.2's constraint on it** | No MVP1 build target. F23 is unaffected for S5's reason: it inherits GES enforcement and retains nothing evidential. **F24 is made harder, not easier, and that is worth recording now**: §18.2 already found that a native client rendering its own approval screen produces a different artefact from the retained view. Ruling 4 makes the retained artefact's **styling** part of what must be reproduced, so "render the same JSON natively" now diverges on typography as well as structure. The only viable F24 remains a webview displaying the server-rendered artefact. **Falsifier corrected 2026-08-06** — it previously cited `.riskband .big`, which is not in this artefact at all (§25.4bis.1). The correct falsifier: design a native renderer that reproduces the artefact's **label/value separation** from the payload alone. It cannot — the payload carries `.lbl` class names, not layout, which is the same fact that makes the unstyled export illegible. |
 
 #### 25.5.1 What must be re-tested, per reached surface
 
@@ -2038,7 +2213,8 @@ Stated for the orchestrator to record; **I do not edit `PROJECT_CONTEXT.md`.**
 |---|---|---|
 | **19** — pilot transport collapses the trust boundary | **NARROWED, NOT CLOSED** | Ruled sufficient for the pilot on five standing conditions (§25.3.1), and the precondition for first tenant deployment is now written as three conjunctive gates T1–T3 (§25.3.2) rather than as an open residual. It closes when T1/T2 are verifiable in a deploy artefact and T3 executes — none of which is possible on a single-host pilot. Owners: `deploy-agent`, `code-agent`, `test-agent`. |
 | **30** — `journal_attribute_outlier` threshold declared, not calibrated | **LEFT OPEN, and re-scoped upward** | Promoting the primitive into §7.3 does not calibrate it, and it must not be read as doing so. What changed is that the disclosure obligation is now an **architectural rule binding every future primitive** (§7.3), not a property of one module. Closing it still needs real close data — register 21/24. |
-| **The style-inlining residual** (§9.4 vs. the export) | **NARROWED to a named work item with an owner and a trigger** | Ruled: inline it, four constraints, `code-agent` + `test-agent` (§25.4). Not a pilot blocker; a precondition on the first real-auditor export. It should be carried as its own numbered register entry rather than as a loose residual, so gate 9's audit can see it. |
+| **35** — style-inlining (opened at gate 10 from the §9.4 residual) | **RESTATED 2026-08-06, still open, still one work item** — see the row below, which supersedes this one | Ruled at gate 10: inline it, four constraints, `code-agent` + `test-agent` (§25.4). Not a pilot blocker; a precondition on the first real-auditor export. |
+| **35 — as it now reads (supersedes the row above)** | **OPEN. Same remedy, different justification, and one thing it was thought to close that it does not.** | **Restated per §25.4bis.** *(i)* The remedy is unchanged: inline `chrome.stylesheet()` into each per-dossier retained view, under §25.4's four constraints. *(ii)* **The reason is now legibility, not `AC-F41-03`.** Unstyled, the artefact glues every label to its value (`Amount312,480.00`, `Coverage of this run70% - partial`) across 133 elements at two computed sizes — a misparse hazard in a seven-year record read by a party with no login and no one to ask, and arguably a failure of `AC-F41-04`'s own "reproduces … the figures, the threshold and the bundle version". *(iii)* **What entry 35 does NOT close, recorded so it is not read as closing it:** `AC-F41-03` is **not** made checkable in this artefact by inlining, because the risk band is absent from it entirely — the retained region derives from the approval screen and the band lives on Review. That is ruled correct and permanent (§25.4bis.2), not a gap. *(iv)* The byte cost is **unmeasured**; the two figures supplied so far were both wrong, and `code-agent` measures it before building. Owners: `code-agent` (build), `test-agent` (ARCH-16). |
 | **1** — mTLS on loopback | **UNCHANGED, but re-linked** | §25.3.2 records it as T1–T3's peer: both are preconditions on the same event, and they should reach the human as one deployment gate rather than one at a time during onboarding. |
 | **2** — SQLite triggers, no `SERIALIZABLE` | **UNCHANGED, and its test consequence is now disclosed** | §20.1 records that ARCH-06 (blast-radius concurrency under retry-on-serialization-failure) is unwritten *because* the transaction it would exercise is not built. Previously the suite was simply green without it. |
 | **No new register entry is opened by these rulings.** | | Ruling 1 closes a stale KB assertion; ruling 2 ratifies what was already built and declared. Neither introduces a new gap between spec and build. |
@@ -2049,5 +2225,6 @@ Stated for the orchestrator to record; **I do not edit `PROJECT_CONTEXT.md`.**
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-06 | 1.2.0 | **Gate 11 re-ruling of §25.4 / register 35 (§25.4bis), after `test-agent` falsified its premise in Chromium.** The export's artefact carries **neither** the riskiest-element size nor the element: `riskiest-figure` is absent, because the retained region derives from the **approval** screen while the risk band lives on **Review**. **The root error is mine and predates styling** — §9.4 consequence 3 (2026-07-31) asserted a Review-screen property was checkable in an approval-screen artefact; `AC-F41-03`'s own Given/When says *"when the Review screen is rendered"* and `UX_KB` UX-4 scopes the strengthening the same way. §9.4 consequence 3 is **struck where it stands**, not rewritten. **Rulings: (a) option 3 on `AC-F41-03`** — it is a screen criterion by design, the retained view carries the evidence without the emphasis; **option 2 (importing the risk band) is refused** because it would put in the artefact a fact the approver was never shown — the defect `pages.py` already names from the opposite direction — and because pass 21's per-screen-uniqueness typography judgement is upheld as better architecture than the sentence of mine it contradicted. The emphasis is not lost from the product: `pages.dossier` renders the band style-inlined at 40px. **(b) Option 1 on inlining — still inline, on a replaced reason**: legibility. Unstyled, 133 elements at two computed sizes with every label glued to its value (`Coverage of this run70% - partial`), a misparse hazard in an S4 deliverable read by a party with no login. §25.4's four constraints are unchanged; the byte cost is **unmeasured and to be measured by `code-agent`**, both figures supplied so far having been wrong. Corrected in the same sweep: §19.3's S1 row (which asserted `AC-F41-03` against the retained artefact), §25.5's S4 size claim and S6 falsifier. **Register 35: OPEN, restated — same remedy, different justification, and explicitly not closing `AC-F41-03`.** No `dev/` file modified. | Gate 11 smoke, `test-agent` verification 2026-08-06; routed back by the orchestrator rather than built on |
 | 2026-08-05 | 1.1.0 | **Architecture pass 2 — gate 10 review-and-rule (§25).** Four items ruled. (1) **§18.1 was stale, not disclosed**, and is amended: supersession-by-data now has `AC-F41-14`/`-15`, is built in `ges/supersession.py`, is enforced by bundle rule `scope.no_bound_dataset_superseded_by_later_data` (`override_eligible: false`, context resolved server-side), and its **negative half is the rule's `non_firing` fixture**, so §8.2's compile-time fixture evaluation verifies it on every build. The consequential sweep also corrects **§20.1** (same defect) and **§18.3** (routing budget — superseded by `AC-F41-16`/`-17`). (2) **§7.3 grows from eleven primitives to thirteen**: `obligation_gap` (declaration-derived, not history-derived; stays **one** primitive over three closed obligation kinds) and `journal_attribute_outlier` (attribution, not a distance scalar) both join; neither is folded. New **standing calibration-denial rule** binding every future primitive. (3) **Register 19 / §3.2**: the pilot transport is ruled **sufficient for the pilot** on five standing conditions, and the precondition for first tenant deployment is stated as **three conjunctive gates T1–T3** — the `ges` package absent from the api image, `pilot_transport.py` absent from that image, and one full approval exercised over `LoopbackHttp`. Narrowed, not closed. A **gap in the override's claim-prohibition list** is raised for the human (§25.3.3). (4) **§9.4**: the export's per-dossier `rendered_view` **must be style-inlined** — the size emphasis exists only in the stylesheet, so `AC-F41-03` is unverifiable in the artefact the auditor actually receives; four constraints, `code-agent` + `test-agent`, precondition on the first real-auditor export, not a pilot blocker. **§20.1 execution status changed from `STATIC ONLY — NOT EXECUTED` to EXECUTED**: the suite was re-run for real per the standing commitment — 28 scenarios, 0 failures, exit 0 — and eleven §20.2 scenarios are now named as **not present**, including ARCH-06 and ARCH-16. **Impact Analysis §25.5** enumerates all six surfaces; S2 and S4 reached, S1/S3/S5/S6 not reached with falsifiable reasons. No `dev/` file was modified by this pass. | Gate 10 review, 2026-08-05; joint presentation with `security-architect` owed for §25.3.3 |
 | 2026-07-31 | 1.0.0 | Initial Architecture pass for MVP1. Five-plane component model with the api↔GES process boundary as the single trust boundary (§3); warehouse-lag resolved via run pinning, close-clock staleness and Point-of-Action Revalidation (§5); certified semantic layer with SQL made unroutable rather than filtered (§6); detector runtime as manifests over eleven registered evaluator primitives (§7); guardrail broker with compiled hash-addressed bundles, compile-time predicate schema binding and transactionally co-committed blast-radius state (§8); evidence store as Postgres + hash chain + KMS-signed anchors + 7-year Object-Lock archive, with server-rendered self-contained rendered views (§9); export path and CUEC model (§10); coverage as a closed sum type (§11). Twelve judgement calls registered (§17). `PLAN` §9.3's per-action-vs-policy-cold question **decided** (§16). Two new findings raised (§18.1 supersession-by-data has no criterion; §18.2 F24 native mobile approval is incompatible with the rendered-view mechanism). **Impact Analysis §19** establishes a six-surface register; four surfaces reached, two not reached with falsifiable reasons. Architecture suite specified, **STATIC ONLY — NOT EXECUTED** (§20.1). Four items handed to `security-architect` for joint presentation (§22). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 6 joint sign-off with `security-architect` pending |
