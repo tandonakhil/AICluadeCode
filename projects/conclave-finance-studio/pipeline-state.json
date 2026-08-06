@@ -140,12 +140,13 @@
     {
       "n": 10,
       "name": "Review",
-      "status": "active",
-      "approval": "pending",
+      "status": "warn",
+      "approval": "awaiting",
       "date": "2026-08-05",
       "participants": [
         "review-agent"
-      ]
+      ],
+      "note": "review-agent: request-changes on 3 code items (closed by pass 24) + escalate on 4 record contradictions. E1 and E3 are the orchestrator's and are corrected in the Decisions Log; E2 (AC-F12-08 cited live in UX_KB) and E4 (ARCHITECTURE_KB 18.1 stale) routed to their owners."
     },
     {
       "n": 11,
