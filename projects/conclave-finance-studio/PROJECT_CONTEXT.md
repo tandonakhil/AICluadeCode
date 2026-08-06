@@ -50,6 +50,69 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-05 — Gate 7 · Code — `code-agent`, **pass 24** (gate 10's three request-changes items), `dev` @ `c8470d9`
+
+`review-agent`'s wiring sweep found four orphans the existing net cannot see.
+All four are closed and, more importantly, the class is now checked.
+
+1. **Routed, not deleted (R1).** `graph.dossier_href` was referenced by
+   nothing while `components.py:364`, `pages.py:1248` and `pages.py:4117`
+   spelled `/dossier/{}` themselves. All three now call the helper. Preferred
+   over deletion because the other five href helpers hold the invariant the
+   module's comment claims; the comment now also records that this one did not,
+   and points at the check that will notice. Every rendered href is
+   byte-identical — no screen changed.
+2. **Deleted (R2, R3).** `graph.edges_from` had zero references anywhere.
+   `f33.backtest.LabelSetUnavailable` was raised/caught/exported/tested by
+   nothing and its docstring promised "Never swallowed" about a path that did
+   not exist; a comment stands where the class did, naming `labels=None` ->
+   `BacktestCouldNotRun` as the mechanism that really carries the outcome, so
+   the deletion cannot be read as the guarantee having moved.
+3. **Dropped (R4).** `chrome.page_tree`'s unread `title` parameter, from the
+   function, `page()` and seven call sites in `test_ui_chrome.py`.
+4. **The real deliverable — the orphan check.** `backend/tests/pyrefs.py` and
+   `backend/tests/test_ui_no_orphaned_helper.py`, 22 scenarios. Fails when a
+   public module-level definition in `app/ui/` is referenced by nothing in the
+   tree. No exemption table — and stronger than "unexemptied": `pyrefs` accepts
+   no allowance argument and has no parameter that could become one, asserted
+   reflectively. It can say NO first: twelve controls plant each shape (bare
+   name and attribute count; unused import and string mention do not; a
+   self-recursive-only function is still an orphan), two more reconstruct the
+   real defects and require them reported, and the scanner's own coverage is
+   falsifiable (200+ files, parse failures refused not skipped, 150+
+   definitions found).
+5. **Judgement calls this pass made.**
+   (a) **Decorated definitions are not judged by the scanner**, because a
+   decorator holds the reference. That could have become a blanket excuse, so
+   it is discharged as an obligation instead: each of the 23 unreferenced route
+   handlers is resolved from its module and must be found as an endpoint really
+   mounted on `app.main.app`.
+   (b) **Reference roots are the whole repository**, not `app` + `backend/tests`.
+   The narrower scan accused `ges_gateway.PilotInProcessHttp` of being dead when
+   it is referenced from `backend/pilot_transport.py` and the architecture
+   suite. The check is coarse in one direction only by design: name-based
+   matching can miss an orphan and cannot invent one.
+   (c) **Scope is `app/ui/` only**, which is where the review found the
+   orphans. Its three real holes — dead mutually-recursive clusters, name
+   collisions masking an orphan (`routes.resolve` is masked by
+   `common.resolution.resolve` today), and non-UI packages — are named in the
+   module header rather than left to be found. **Consequence, stated plainly:
+   `LabelSetUnavailable` sat in `app/f33/` and this check would not have caught
+   it.** Widening `PACKAGE` is one string; running the same scan over all of
+   `app/` today reports exactly one definition to look at
+   (`ges_gateway.PilotInProcessHttp`, live but referenced only from outside
+   `app/`), and widening was not taken here because it is scope the human did
+   not brief.
+6. **Counts and orders.** 3,060 scenarios collected (3,038 + 22), all passing,
+   exit 0 in six orders: file, reversed, and seeds 1 / 7 / 42 / 20260731.
+7. **What this pass did NOT do.** No screen changed. No guardrail moved to the
+   UI, no free-form SQL or SQL-typed parameter, no Oracle posting credential,
+   no journal-submission library, no suite stubbed green, no exemption table,
+   no dependency installed, `prod/` untouched, no server started or stopped —
+   the human's pilot on 8030 was left running and untouched. The nine
+   overridden criteria are claimed nowhere and `AC-F41-13`/`AC-F12-08` remain
+   at 0 occurrences in `dev/`.
+
 ### 2026-08-05 — Correction (orchestrator): what the human actually approved, and what I inferred
 
 Gate 10's E1 is correct and the gap is mine. The exact sequence:
