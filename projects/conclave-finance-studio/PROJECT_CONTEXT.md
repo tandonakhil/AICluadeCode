@@ -161,6 +161,106 @@ still LISTEN on PID 30526 — the human's, untouched.
 - **No promotion to `prod/`.** `dev/` was not modified.
 
 
+### 2026-08-06 — Gate 7 · Code — `code-agent`, **pass 26** (the two artefacts said nothing about their own figures), `dev` @ `b447a11`
+
+Gate 11's post-deploy smoke found two failures, both the same shape as pass
+25's D1 one weakening further out. Register 15's disclosure — *"synthetic
+fixture data … cannot support a posting or an assurance conclusion about a real
+ledger"* — was on all ten screens and on **neither artefact**. Two commits, one
+per item. **3,158 scenarios** (3,105 + 53), all passing.
+
+1. **The exhibit says it.** `chrome.page_tree` withheld `pilot_strip` from the
+   shell-off branch because *"the exhibit carries its own"* data provenance.
+   **It does not.** It carries `chrome.provenance()` — entity, period, close
+   day, dataset version, as-of and staleness — which says how **old** the
+   figures are and never that they are **not a real ledger**. Both now render
+   on both branches. The navigation still drops with the shell; a statement
+   about what the figures are is not navigation.
+2. **The export says it, through the SAME contract as the other three.**
+   `REQUIRED_INTEGRITY_SECTIONS` gains a fourth section, `provenance`
+   (`real_ledger_sourced` / `statement` / `register_entry`), produced by the
+   new `app/evidence/provenance.py`. **The pilot has four structural
+   weakenings, not three.** The file previously stated three careful facts
+   about how well the evidence was ANCHORED, RETAINED and OBTAINED, and
+   nothing about what the evidence was **of**.
+
+3. **Provenance went INTO the integrity contract, not beside it** — the
+   question asked at the brief. Free prose in an export is a sentence any edit
+   can drop with nothing failing, which is the state the transport disclosure
+   was in on the screen before pass 25 and the state this one was in nowhere at
+   all. A section is compelled at construction, and four mutations are refused
+   there: section removed; residual declared without naming register 15;
+   residual declared with an empty sentence; presence-only
+   `{"real_ledger_sourced": false}`.
+4. **It needed NO new contract machinery, which is pass 25's generalisation
+   validated by its first reuse.** That pass restated `residual_criterion` as
+   `residual_reference` rather than exempting the transport section. Like the
+   transport, the synthetic fixture has **no acceptance criterion of its own** —
+   no criterion says the figures must come from a real warehouse, because that
+   is a substitution the pilot made rather than a requirement it failed — so its
+   reference is register 15 in `register_entry`. One clause, four sections, no
+   exemption and no invented AC id. **Whether a criterion should exist stays
+   `functional-design-agent`'s ruling**; `unmet_criterion` is `null` and a
+   scenario holds it there.
+5. **Judgement calls this pass made.**
+   (a) **Pass 25 item 5(c) is REVERSED, with cause, and named rather than
+   quietly outgrown.** That item recorded as a decision that the topology strip
+   renders on the shell-off exhibit *"unlike the data-provenance strip"*. The
+   distinction was wrong: it rests on the exhibit carrying its own provenance,
+   which it does not. The topology half of 5(c) stands unchanged.
+   (b) **The wording moved to one home.** `app/evidence/provenance.py` holds
+   the sentence; `chrome.pilot_strip` renders it and the export section
+   contains it verbatim, with a scenario asserting the containment. This defect
+   is the argument for that: `pilot_strip` was the **only** home for
+   twenty-five passes, so the two artefacts that never called it were never
+   noticed to be missing it — there was no shared thing for them to be missing.
+   (c) **Two scenarios that ASSERTED the defect are inverted, not deleted** —
+   `test_ui_chrome`'s `'data-testid="pilot-strip"' not in markup` and
+   `test_ui_dossier`'s `not screen.has("pilot-strip")`. Both passed for
+   twenty-five passes and both were what would have failed had anybody fixed
+   this by accident. The old text and the reason are in each docstring.
+   (d) **Two hand-kept lists found while adding the fourth section, both
+   removed rather than extended.** `test_export_integrity_contract`'s nine
+   `(section, key)` literals — every other parametrised scenario there is
+   driven from the contract and picked the new section up automatically, so
+   this one would have left three keys unwitnessed while the file still read as
+   exhaustive; and the refusal **message**, which enumerated the three
+   weakenings, so adding the fourth left the check that exists to stop
+   hand-kept lists describing three of four.
+6. **The check on the checks, because a green here proved nothing once.**
+   `test-agent`'s first draft of both artefact scenarios **passed against the
+   defective build**, on the substring `fixture` — which occurs in this build
+   only inside the dataset version `gl_balances vFIXTURE-2026.06.03-a`. It was
+   caught by reading the recorded evidence rather than the verdict. **Nothing
+   asserts on a bare substring a version string can satisfy.**
+   `provenance.REQUIRED_PHRASES` is four multi-word phrases, and the guard is
+   itself a parametrised scenario in **two** files: the fooling identifier is
+   asserted to satisfy no phrase, so a future weakening fails on the day it is
+   made rather than on the day somebody re-reads a green suite.
+7. **What each new check fails on.** Before the fix, at `c68ad84`: the four
+   exhibit-phrase scenarios and the four export-phrase scenarios each fail on
+   their own phrase; the contract scenario fails `KeyError: 'provenance'`; the
+   four-section scenario fails naming the missing member. After commit 1 and
+   before commit 2, the exhibit half passed and the export half still failed —
+   the two halves are in separate commits for that reason, so neither commit
+   lands a red suite.
+8. **Counts and orders.** 3,158 scenarios in six orders: file, reversed, seeds
+   1 / 7 / 42 / 20260731. The ordering harness lives **outside `dev/`** — it is
+   verification for this pass, not a change to the project's test
+   configuration.
+9. **A finding recorded, not acted on.** §25.4's reasoning for register 35 does
+   not hold; see the register section. Routed to `solution-architect`.
+10. **What this pass did NOT do.** No guardrail moved to the UI — **a
+    disclosure is not a guardrail**, nothing branches on any value added here
+    and the broker's answer is identical either way. No free-form SQL and no
+    SQL-typed parameter, no Oracle posting credential, no journal-submission
+    library, no suite stubbed green, no exemption table, no green anywhere, no
+    dependency installed, `prod/` untouched. The nine overridden criteria are
+    claimed nowhere; `AC-F41-13`/`AC-F12-08` remain at 0 occurrences in `dev/`.
+    **No server was started or stopped — the human's pilot (pid 30526, port
+    8030) was left running and untouched, and serves pre-pass-26 code until
+    they restart it.**
+
 ### 2026-08-06 — Claim prohibition 6 DECLINED by the human. The list stays at five.
 
 Asked as one question with the drafted wording in front of them. **The human
@@ -4394,6 +4494,49 @@ last of which is discharged at pass 25). The generalisable point, recorded
 because it is the reason this one survived ten passes: **a condition a ruling
 is conditional on needs a check that can fail on it**, and this one was prose
 in two files.
+
+**On register 15 at gate 7 pass 26 — no entry opened, closed or narrowed; one
+recorded mitigation is made true on two surfaces it never reached.** Entry 15's
+mitigation reads *"every screen carries a non-dismissable pilot strip saying so
+in words"*, and every screen did. It was true and it was not enough: **the two
+ARTEFACTS carried it on neither**. The `/dossier/{id}` exhibit (33,305 bytes)
+and the F1 auditor export (84,106 bytes) each had **zero** occurrences of
+*synthetic*, *cannot support a posting* or *assurance conclusion*, and both are
+read by the party `AC-F1-04` defines as having **no application login and no
+access to the running system** — the one reader who cannot go and look at a
+screen. Fixed at pass 26: `chrome.pilot_strip` renders on the shell-off exhibit,
+and `provenance` is a fourth section of `export.REQUIRED_INTEGRITY_SECTIONS`.
+**Entry 15 remains OPEN and is not narrowed** — the findings are still fixture
+literals; what changed is where the disclosure of that reaches.
+
+The generalisable point, and it is the same one register 19 produced one pass
+earlier: **a mitigation stated as "every screen" is a claim about screens, and
+this system's most consequential readers are handed FILES.** Both weakenings
+were disclosed on ten screens and in no artefact, and both were found by a gate
+rather than by a check. What holds them down now is that each is a section of a
+contract validated at construction, not a sentence somewhere.
+
+**On register 35 (style-inlining) at pass 26 — a finding for
+`solution-architect`, recorded here and NOT ACTED ON.** `test-agent` confirmed
+the export is not style-inlined, and found that **§25.4's reasoning does not
+hold**. §25.4 says the artefact *"carries a class name and no size"*. It carries
+**neither**: the risk band is absent from the export's `rendered_view` entirely,
+because that view derives from the approval screen and pass 21 deliberately did
+not bring it across. Proven in Chromium — the live exhibit renders
+`riskiest-figure` at 40px as the sole page-max element; the artefact has **no
+`riskiest-figure` at all** and renders 133 elements at two computed sizes.
+
+> **Inlining the stylesheet would not make `AC-F41-03` checkable in this
+> artefact, because the element it is about is not there to size.**
+
+The ruling's *conclusion* (inline the stylesheet) may still be right for other
+reasons — legibility among them: without the stylesheet the artefact renders
+labels and values concatenated (`Amount312,480.00`). But the *premise* it was
+decided on is false, so it should be re-decided rather than executed.
+**Routed back to `solution-architect` by the orchestrator; `code-agent` built
+nothing against it.** Correction for the record: the class count is **624**, not
+1,248 — `deploy-agent` counted the JSON blob where `approver_view` and
+`rendered_view` are the same bytes.
 
 **On register 16 and `AC-REFUSAL-13`.** Gate 9 was right that a register entry
 claiming closure with no covering check is the same defect class as an
