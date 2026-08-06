@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 10 \u2014 Review",
+  "position": "Gate 10 \u2014 Review: awaiting the human on claim prohibition 6",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -146,7 +146,7 @@
       "participants": [
         "review-agent"
       ],
-      "note": "review-agent: request-changes on 3 code items (closed by pass 24) + escalate on 4 record contradictions. E1 and E3 are the orchestrator's and are corrected in the Decisions Log; E2 (AC-F12-08 cited live in UX_KB) and E4 (ARCHITECTURE_KB 18.1 stale) routed to their owners."
+      "note": "Code items closed (pass 24). KB escalations closed by their owners. Four architect rulings + security co-sign delivered. Awaiting the human on proposed claim prohibition 6."
     },
     {
       "n": 11,

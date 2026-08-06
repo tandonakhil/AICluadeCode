@@ -1590,8 +1590,266 @@ Presented jointly with `solution-architect`'s pass. My position:
 
 ---
 
-## 13 · Change history
+## 13 · Gate 10 ruling (2026-08-05) — the sixth claim prohibition, and the T-gates
+
+Ruling pass, at the orchestrator's request, on `solution-architect`'s
+`ARCHITECTURE_KB` §25.3.3. The analysis/execution boundary is jointly owned
+(§10.1 constraint 1, §2.3), so this is mine to co-sign or refuse.
+
+### 13.0 Completeness check — binding decisions since v1.0.0
+
+Re-read `PROJECT_CONTEXT.md`'s Decisions Log in full. Binding decisions
+recorded since my last pass, and how this ruling stands against each:
+
+| Binding decision | This ruling |
+|---|---|
+| **2026-08-05 `[override]`, nine `NOT VERIFIED` criteria, ship as pilot** | Not reopened. None of the nine is claimed met here. This ruling adds to the override's claim-prohibition list, which the override itself declares "unchanged by this override" — an addition is therefore in scope for the human, not for me to enact. I do not write it into the Decisions Log. |
+| **The five claim prohibitions** | All five survive verbatim. §13.2's sixth is additive; it overlaps none of them. Prohibition 2 (no tamper-evidence against a party with application-level write access) is the nearest neighbour and is about the *evidence store*, not the *broker*; a reader cannot derive the boundary statement from it. |
+| **2026-08-05 gate 10 — register 19 NARROWED NOT CLOSED, closes on T1/T2/T3** | Endorsed in §13.3, with one added conjunct (T4). |
+| **2026-08-05 gate 10 — register 1 (mTLS) unchanged, re-linked as T1–T3's peer** | Agreed, §13.4, and I strengthen the reason. |
+| **2026-08-05 gate 10 — export must be style-inlined** | Compatible. §13.5's export disclosure is a payload/integrity-section requirement, not a stylesheet one, and `AC-F1-10`'s no-active-content rule is untouched. |
+| **2026-08-05 gate 10 — register 30 re-scoped upward (uncalibrated threshold binds every future primitive)** | Untouched by this ruling. |
+| **2026-08-05 orchestrator correction — IA approval inferred, not asked** | No security control in this file depends on the pass-17 IA. §13.5's finding is about a *disclosure* that must appear on screens and in the export; it is IA-independent and survives whichever IA the human confirms. |
+| **2026-08-05 orchestrator correction — Part A2 partially built; J3/J4 unwalkable** | No security scenario in §9 traverses J3 or J4. No conflict. |
+| **2026-08-05 pass 24 — orphan check, scoped to `app/ui/` only** | Directly relevant, and §13.5 D1 is an instance the scope excludes. Recorded there rather than as a separate complaint. |
+| **Test Policy: all suites blocking, no advisory exceptions** | Honoured. §13.5's three findings are labelled **static review, not suite-executed** — see §13.6. I have not presented an unexecuted check as a passing one. |
+
+**Conflict with a binding decision: none.** One disagreement with
+`solution-architect` is flagged in §13.5 and it is a disagreement about
+*classification*, not about direction.
+
+### 13.1 Decision — CO-SIGNED, with the wording amended
+
+The five prohibitions are **not** sufficient, and the gap `solution-architect`
+identifies is real. I co-sign a sixth prohibition. My reason is not the one
+given in §25.3.3, and the difference matters.
+
+§25.3.3 argues the gap is that the prohibition list travels where screens do
+not. That is true. But it rests on a premise I checked and could not confirm:
+that the pilot strip discloses the collapsed boundary per screen. **It does
+not** — see §13.5 D1. The pilot strip discloses *data provenance* (synthetic
+fixture, cannot support a posting or an assurance conclusion) and says nothing
+about topology, and `ges_gateway.is_pilot_transport()` — the accessor that
+exists so a screen can say so — has **no call site in the application**.
+
+So the sixth prohibition is needed for a stronger reason than §25.3.3 gives:
+it is not that the disclosure exists on screens and fails to travel. It is that
+**the disclosure of this particular weakening does not currently exist on any
+surface at all** — not on a screen, not in the export payload, not in the
+prohibition list. The three places a reader could meet it are three misses.
+
+### 13.2 The wording I would put in front of the human
+
+Longer than `solution-architect`'s draft by two sentences, and both additions
+are load-bearing: the first states what remains true so the prohibition cannot
+be read as retracting more than it does, the second closes the credential
+inference a reader will otherwise make from §2 of this file.
+
+> **Prohibition 6 — the trust boundary.** No claim that the analysis/execution
+> trust boundary is enforced as a **process** boundary. In the pilot's
+> single-command configuration (`backend/pilot.py`) it is a **module** boundary:
+> the guardrail broker runs inside the api process, and a prompt-injected tool
+> in that process could reach `ges.executor` by `import` alone. Relatedly, no
+> claim that the pilot demonstrates the credential boundary: the rule that a
+> credential resolves only inside the `ges` process is enforced by that process
+> reading its own `CONCLAVE_PROCESS_ROLE`, so in a single process it is
+> self-asserted rather than enforced.
+>
+> **What remains true and is not withdrawn by this prohibition.** The guardrails
+> themselves are enforced at the broker, not in the interface, and every
+> terminal control on the surface goes through it. No Oracle posting credential
+> exists in any MVP1 environment and no journal-submission library is a
+> dependency (`AC-F40-02`). The pilot process holds no declared credential at
+> all — its warehouse is the synthetic fixture, opened without a credential — so
+> nothing was exposed; what is absent is the *enforcement*, not the secret. The
+> two-process topology is built and has an executing test witness that starts
+> the broker as a separate OS process, asserts a different pid holds the
+> credential while the api role is refused it, and drives a real broker decision
+> over a TCP socket. It is not what the pilot runs.
+
+Three notes on why it is worded that way.
+
+1. **"could reach `ges.executor` by `import` alone" is kept from the original
+   draft and is exactly right.** I checked: `backend/pilot_transport.py` is the
+   sole composition root, it lives outside the `app` package, and the static
+   "the api package never imports `ges`" check still holds — which is precisely
+   why the residual is invisible to every suite that runs in one interpreter.
+2. **The credential sentence is mine and I insist on it.** `ges/credentials.py`
+   decides `in_ges_process()` by reading an environment variable *inside the
+   process being constrained*. That is the same objection `solution-architect`
+   raises against `CONCLAVE_ENV` in T2 — "a check the attacker's process
+   performs on itself" — applied to the credential rule, and it is the sentence
+   a reader of `SECURITY_KB` §2.3 ("the broker is the only enforcement point,
+   and the only credential holder") will otherwise assume the pilot demonstrates.
+   `AC-F36-04` is not falsified by this: nothing resolves in the pilot, because
+   the pilot process declares no role at all. The claim I am prohibiting is the
+   *demonstration*, not the criterion.
+3. **"nothing was exposed" is stated deliberately.** A prohibition that reads
+   like an incident report will be over-corrected for by whoever receives it.
+   The honest shape is: no secret was at risk, the mechanism that would protect
+   one is not in force.
+
+### 13.3 Ruling on T1 / T2 / T3 — all three endorsed as security gates, plus a T4
+
+**T1 — the `ges` package is not on the api host's disk.** Endorsed, and it is
+the operative one for me too. It is the only one of the three that changes the
+property from *asserted* to *true by construction*, and it is checkable by a
+party with no source access — which matters because §4.7's auditor is defined
+as someone with no application login. A control an auditor can verify from the
+artefact is worth more than one they must take on trust.
+
+**T2 — `pilot_transport.py` absent from the api image, not merely refused at
+runtime.** Endorsed, and the reasoning is correct and generalisable: a runtime
+refusal executed by the process it constrains is a control that fails to the
+attacker's advantage the moment the attacker has code execution in that
+process. Note that T2 is *strictly weaker than T1 and still necessary*: T1
+removes the callee, T2 removes the composition root. Neither subsumes the
+other, because a future file could collapse the boundary without being
+`pilot_transport.py`, and T1 is what stops that class. Keep both.
+
+**T3 — one complete approval end-to-end over `LoopbackHttp`.** Endorsed, and I
+would raise its priority above where §25.3.2 places it. I read the current
+`ARCH_04`: it drives a broker `decide` over the socket and asserts the outcome
+is one of `allow`/`deny`/`abstain` — it does not require `allow`, and it does
+not carry the approval through the workflow write path to a recorded decision.
+Meanwhile every approval the suites actually exercise runs in-process. So the
+two configurations diverge unobserved at exactly the step that produces a
+binding record. T3 is not tidiness; it is the last unwitnessed seam on the
+write path.
+
+**T4 — added, and it is mine: the pilot process must be unable to hold a
+credential.** `backend/pilot.py` never sets `CONCLAVE_PROCESS_ROLE` and never
+calls `assert_api_process_holds_no_credentials()`. That guard exists
+(`ges/credentials.py`), it is called by `app/run.py` before uvicorn binds, and
+it is **not** called by the one entry point that puts both halves of the
+boundary in a single process — the entry point that most needs it. Today this
+is inert (the pilot uses the synthetic warehouse and holds no declared
+credential), which is why it is a hardening item and not a defect. It stops
+being inert the first time someone runs the pilot from a shell that has
+exported a warehouse credential for another purpose. **T4: `backend/pilot.py`
+calls `assert_api_process_holds_no_credentials()` at startup and refuses to
+serve if any declared or forbidden credential name is present in its
+environment.** Owner `code-agent`; it is roughly one call, and unlike T1–T3 it
+is buildable in a single-host pilot today.
+
+Register entry 19 should close on **T1 ∧ T2 ∧ T3**, unchanged. T4 is a pilot
+hardening item and is not a condition on entry 19 — it is a condition on
+§25.3.1's "sufficient for the pilot" ruling, which is where I would attach it.
+
+### 13.4 Ruling on the mTLS pairing — agree, and the reason is stronger than stated
+
+`solution-architect` says register 1 (mTLS on loopback, currently a shared
+token plus a 127.0.0.1 bind) is T1–T3's **peer, not its subset**, and that both
+should reach the human once, together. **Agreed.**
+
+The reason given — entry 1 secures the channel, T1–T3 establish there are two
+processes — is correct but understates it. The security-side reason is that
+**each is worthless in the failure mode the other prevents, and the combination
+has a specific perverse ordering.** Satisfy T1–T3 without entry 1 and you have
+built a real network hop protected by a bearer token, which is a *worse*
+posture than the module boundary against a host-local attacker who can read the
+token from the environment: the collapsed pilot at least never put the
+credential on a wire. Satisfy entry 1 without T1–T3 and you have mutually
+authenticated a channel between a process and itself.
+
+So they are not merely presented together — they are **conjunctive**, and
+staging them creates a window in which the deployment is arguably less safe
+than the pilot. That is the sentence I would want in front of the human, and it
+is the reason I would refuse a plan that lands T1–T3 in one release and entry 1
+in the next.
+
+One presentation constraint, since a joint item can still be presented badly:
+it must reach the human as **one gate with five conjuncts (T1, T2, T3, T4,
+entry 1)**, each individually falsifiable, and not as a paragraph of narrative
+that a reader can approve as a whole. Four of the five are `deploy-agent`'s and
+`code-agent`'s to build; none is mine.
+
+### 13.5 Findings this pass produced that neither architect raised
+
+**D1 — DEFECT, and it invalidates the premise of "gap, not defect".**
+`ARCHITECTURE_KB` §25.3.1 lists as condition 5 that "every screen rendering a
+broker fact obtained through it says so, in words, in the pilot strip", and
+records all five conditions as currently holding. Condition 5 does not hold.
+`app/ui/chrome.py:pilot_strip()` takes `state` and ignores it; its text is
+fixed and is entirely about synthetic fixture data. `ges_gateway.py`'s own
+docstring makes the same claim ("every screen ... says so in words"), and
+`ges_gateway.is_pilot_transport()` is referenced by nothing in `app/` — the
+only other occurrences in the tree are two stub classes in UI tests that set
+`is_pilot_transport = False`. **The disclosure `solution-architect`'s "gap, not
+defect" classification depends on has no call site.** I therefore disagree with
+the classification: this is a gap *and* a defect, and the defect is the reason
+the gap is worse than described. Owner `code-agent`. I am not fixing it —
+fixing it would destroy the evidence that the five conditions were recorded as
+holding when one did not.
+
+Worth naming without blame: this is exactly the orphan class pass 24 built a
+checker for, and pass 24's judgement call (c) scoped that checker to `app/ui/`.
+`ges_gateway` is `app/`, not `app/ui/`. Pass 24 even recorded that widening the
+scan to all of `app/` reports exactly one definition to look at —
+`ges_gateway.PilotInProcessHttp` — and stopped one line short of the accessor
+beside it. The consequence pass 24 anticipated in the abstract
+(`LabelSetUnavailable` would not have been caught) has a second, live instance,
+and this one is a security disclosure.
+
+**D2 — the export does not carry the disclosure either, and there is an exact
+mechanism for it that is already built and already tested.**
+`app/evidence/export.py`'s `REQUIRED_INTEGRITY_SECTIONS` is a declared contract
+requiring that where a weaker state is declared, the disclosure **names its
+unmet criterion** — with the stated rationale that "the auditor reading this
+file has no application login to go and look with (`AC-F1-04`)". Two sections
+exist: `anchor` (`AC-F1-11`) and `retention` (`AC-F1-08`). There is **no
+section for the transport or the topology.** So the artefact purpose-built for
+the reader who never sees a screen states two of the pilot's three structural
+weakenings and omits the third — and the omitted one is the boundary §3.2 says
+the entire product claim reduces to.
+
+This is the more durable answer to `solution-architect`'s own concern. A
+prohibition list is a document that travels only as long as someone remembers
+to carry it; a `transport` integrity section travels *inside every export*, is
+enforced by an existing contract test, and cannot be forgotten by a person.
+**Recommendation: add a third required integrity section** — keys
+`process_boundary_enforced` (false in the pilot), `statement`, and the
+residual reference. Note the residual reference cannot be an AC ID: unlike the
+anchor and retention residuals, the process boundary has **no acceptance
+criterion of its own** — it is carried only by register entry 19 and by
+`ARCHITECTURE_KB` §3.2. That absence is itself a finding, and it is the reason
+this weakening was the one that slipped through three disclosure surfaces while
+the other two did not. Owners: `functional-design-agent` for whether a
+criterion should exist; `code-agent` for the section.
+
+**D3 — see T4 in §13.3.** `backend/pilot.py` bypasses the startup credential
+guard.
+
+None of D1–D3 changes my co-signature. D1 strengthens the case for the
+prohibition; D2 says the prohibition alone is the weaker of two available
+remedies and both should be taken.
+
+### 13.6 Execution status of this pass — stated plainly
+
+**Static review. No suite was executed by me this pass, and D1–D3 are
+static-source findings, not test results.** They are checkable by reading four
+named files and do not require execution to be true, but they have not been
+witnessed by an executing scenario and I do not present them as having been.
+
+The security suite entry point `dev/tests/suites/security/run.sh` **exists**
+(it did not at gate 6, where §8 recorded that nothing was executed), and
+`test-evidence/security-2026-08-04.md` records it executing. That evidence
+predates `code-agent`'s pass 24 (`dev` @ `c8470d9`); re-running it against the
+current tree is `test-agent`'s aggregation at the Test gate, and I did not run
+it here because this is a ruling pass and the human is operating the pilot on
+8030. **`dev/` was not modified by this pass and no process was started or
+stopped.**
+
+One suite-coverage gap for whoever owns the follow-up: no security scenario
+asserts that the transport in force is disclosed. D1 survived because the
+disclosure was never something a check could fail on. If D1 is fixed, the fix
+needs a scenario that fails when the accessor loses its call site again.
+
+---
+
+## 14 · Change history
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-05 | 1.1.0 | MINOR — §13 added, gate 10 ruling pass. **Co-signs a sixth claim prohibition** on the analysis/execution trust boundary, with amended wording adding the credential-boundary clause and an explicit "what remains true" paragraph. Endorses T1/T2/T3 as security gates, **adds T4** (`backend/pilot.py` must call `assert_api_process_holds_no_credentials()`), and agrees register 1 (mTLS) is T1–T3's conjunctive peer with a strengthened reason for refusing to stage them. Three findings recorded: **D1** — no screen discloses the collapsed transport (`ges_gateway.is_pilot_transport()` has no call site), which contradicts `ARCHITECTURE_KB` §25.3.1 condition 5 and is a **classification disagreement** with `solution-architect`; **D2** — the export's `REQUIRED_INTEGRITY_SECTIONS` has no transport section, and the process boundary has no acceptance criterion to name; **D3** — the pilot entry point bypasses the startup credential guard. Static review; no suite executed, `dev/` unmodified. | Gate 10 ruling pass at the orchestrator's request, against `ARCHITECTURE_KB` §25.3.3; the sixth prohibition itself awaits the human |
 | 2026-07-31 | 1.0.0 | Initial security architecture. Authentication & authorization design incl. the authorship-closure SoD engine (`author ≠ approver ≠ invoker`); credential architecture and the MVP1 posting boundary; obligation S CUEC register, probes and drift detection; retention, WORM and three-layer tamper-evidence; disposition of all nineteen obligations A–S; an eight-vector threat model; input-validation boundaries; and a 24-scenario security suite design. Five calls recorded under the standing authorization, four new requirements flagged, two disagreements left open for the human. | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 6 human review pending |
