@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Gate 10 \u2014 Review: awaiting the human on claim prohibition 6",
+  "position": "Gate 11 \u2014 Deploy",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -140,19 +140,24 @@
     {
       "n": 10,
       "name": "Review",
-      "status": "warn",
-      "approval": "awaiting",
-      "date": "2026-08-05",
+      "status": "done",
+      "approval": "approved_override",
+      "date": "2026-08-06",
       "participants": [
         "review-agent"
       ],
-      "note": "Code items closed (pass 24). KB escalations closed by their owners. Four architect rulings + security co-sign delivered. Awaiting the human on proposed claim prohibition 6."
+      "note": "review-agent: request-changes on 3 code items (closed, pass 24) + escalate on 4 record contradictions (E1/E3 orchestrator's, corrected; E2 ui-ux-designer, E4 solution-architect, both closed). Four architect rulings delivered; security co-signed. Human DECLINED proposed claim prohibition 6 on 2026-08-06 -- list stays at five, substance now disclosed on screen and in every export."
     },
     {
       "n": 11,
       "name": "Deploy",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "pending",
+      "date": "2026-08-06",
+      "participants": [
+        "deploy-agent",
+        "test-agent"
+      ]
     }
   ],
   "loop_backs": [
@@ -203,7 +208,7 @@
       "reason": "AC-F41-13 contradicted. functional-design-agent ruled: a split element set is not a relocation. AC-F41-13 retired in place; AC-F41-22/-23/-24 and AC-F5-08 issued. Spec now 267 issued / 265 live / 2 retired."
     }
   ],
-  "updated": "2026-08-05",
+  "updated": "2026-08-06",
   "updated_by": "orchestrator",
   "route_changes": [
     {

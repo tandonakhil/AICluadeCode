@@ -50,6 +50,53 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-06 — Claim prohibition 6 DECLINED by the human. The list stays at five.
+
+Asked as one question with the drafted wording in front of them. **The human
+chose "the five are enough."** Recorded as their decision.
+
+**Both architects recommended adopting it.** `solution-architect` raised it
+(§25.3.3); `security-architect` co-signed and strengthened it. Their
+recommendation stands on the record unaltered — a declined recommendation is not
+a withdrawn one, and if this is revisited the argument should be read as they
+made it, not as a summary of why it was declined.
+
+**Why the decision is defensible on the facts as they now are.** When
+`solution-architect` raised it, the collapsed boundary was disclosed **nowhere** —
+`security-architect` checked the premise and found `pilot_strip` says data
+provenance, not topology, and `is_pilot_transport()` had no call site in `app/`
+at all. That is no longer true. As of pass 25:
+
+- **every screen** carries `transport_topology_strip` — *"the guardrail broker is
+  running inside this process. There is no control that hides this."* It fails
+  *towards* disclosure, and a recording-double scenario catches the subtle
+  regression where the sentence survives and stops being about the transport in
+  force;
+- **every export** carries a `transport` section through the same
+  `REQUIRED_INTEGRITY_SECTIONS` contract as `anchor` and `retention` — so the
+  reader `AC-F1-04` defines as having no application login meets it in the
+  artefact.
+
+So the substance is now disclosed on both surfaces a reader actually meets. What
+the prohibition would have added is coverage of the third surface — a deck, a
+qualification pack, an audit-committee note — which no code can enforce.
+
+**The residual risk, stated plainly rather than argued away.** The prohibition
+list is what travels to people who never see a screen or open an export. Nothing
+in the build prevents someone describing the pilot as enforcing a process
+boundary. `ARCHITECTURE_KB` §3.2 says that boundary is what the entire product
+claim reduces to, and `security-architect` added that the pilot does not
+*demonstrate* the credential boundary either, because the rule is enforced by the
+process reading its own environment variable.
+
+**Unchanged by this decision:** the five existing prohibitions; register 19
+(narrowed, not closed); T1–T4 and register 1 as conjunctive gates before first
+tenant deployment; and `functional-design-agent`'s open ruling on whether the
+process boundary should have an acceptance criterion of its own — which is the
+root cause of it having slipped past three disclosure surfaces.
+
+
+
 ### 2026-08-05 — Gate 10 · `solution-architect`'s four rulings (register effects)
 
 Full reasoning in `ARCHITECTURE_KB.md` §25. Register effects, recorded here
