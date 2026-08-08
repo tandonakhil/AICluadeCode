@@ -1109,9 +1109,13 @@ Zero counts are printed explicitly for **every** reason in the closed set — a 
 is stated, never an omitted section (`AC-F10-06`, `AC-F43-03`). One adapter failing
 does not stop the others, and the run is then not `SUCCEEDED` (`AC-F42-08`).
 
-`corpus_as_of` is the `finished_at` of the most recent `SUCCEEDED` run, read by
-the web surface from the ops store; a `FAILED` or `PARTIAL` run never advances it
-(`AC-F39-05`). `python -m app.jobs.healthcheck` reports a silent-stop condition
+`corpus_as_of` is the `finished_at` of the most recent `SUCCEEDED`-or-`PARTIAL`
+run, read by the web surface from the ops store; a `FAILED` run, or one that
+never finished, never advances it (`AC-F39-05`, amended `ASM-26` — a real
+corpus quarantines something on essentially every run, so gating on
+`SUCCEEDED` alone left the corpus permanently undateable and the surface
+refusing every question forever). `python -m app.jobs.healthcheck` reports a
+silent-stop condition
 and exits non-zero when the last run of **any** status is older than twice the
 schedule interval (`AC-F43-07`). Scheduling is `launchd` via
 `deploy/com.rca.ingest.plist.template` — we ship a template and a command, not a

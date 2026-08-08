@@ -148,8 +148,8 @@ match the file names in `design-review/`.
 | 08 | **Refusal — question unresolvable** | `REFUSED_PARSE_FAILED` | refusal panel, slot-by-slot resolved/unresolved block | `AC-F38-07`, `AC-F28-04`, `ASM-11` |
 | 09 | **System failure** + **verification-failure refusal** + side-by-side | provenance store unavailable / `REFUSED_VERIFICATION_FAILED` | `.syserror-panel` (the only red), refusal panel | `AC-F35-06`, `AC-F38-06`, `AC-F34-06`, `AC-F28-03` |
 | 10 | **Freshness banner — 4 states** | ingest-run state | `.rca-freshness` default / `--stale` / `--never`, plus the never-dated refusal | `AC-F39-01…06`, `RCA-R13` |
-| 11 | **Ingest run report** + gate-failure variant | job completion | run status, run stats, quarantine table with explicit zeros, quarantined items with evidence, extraction gaps, health check | `AC-F43-01…08`, `IND-10/11`, `RCA-R11` |
-| 12 | **System sheet** | — | the 14×6 encoding, greyscale proof, colour tokens with ratios, type scale, component inventory, accessibility rules | `AC-F36-03`, `AC-F48-01…05` |
+| 11 | **Ingest run report** + gate-failure variant — **headless, no browser route ships**; `AC-F43-*` is satisfied by `app/jobs/report.py`'s JSON/text output, not by an HTTP screen | job completion | run status, run stats, quarantine table with explicit zeros, quarantined items with evidence, extraction gaps, health check | `AC-F43-01…08`, `IND-10/11`, `RCA-R11` |
+| 12 | **System sheet** | — | the 16×6 encoding, greyscale proof, colour tokens with ratios, type scale, component inventory, accessibility rules | `AC-F36-03`, `AC-F48-01…05` |
 
 **Coverage of UI-bearing MVP1 features**: `F34` (03–08), `F35` (01–09), `F36`
 (03, 04, 05, 12), `F37` (03–08), `F38` (06–10), `F39` (01–11), `F40` (03, 04),
@@ -212,7 +212,7 @@ Three layout decisions carry weight:
 Authority here is two-dimensional: a final order *recites* what was requested,
 and rebuttal testimony *quotes* prior orders. So the card must carry both axes
 simultaneously — 84 combinations. A design with 84 treatments is not a design,
-it is a legend nobody reads. A design with one colour ramp over 14 values is
+it is a legend nobody reads. A design with one colour ramp over 16 values is
 worse: it fails greyscale, fails colour-blind users, and fails the
 non-negotiable rule that authority is never carried by colour alone.
 
@@ -221,7 +221,7 @@ carry the full precision as text on every instance.**
 
 ### 5.1 Axis 1 — `document_type` → 4 tiers, rendered as a countable spine
 
-The fourteen values are already ranked 1–14 in `DOMAIN_KB` §2.3. What an analyst
+The sixteen values are already ranked 1–16 in `DOMAIN_KB` §2.3 (widened from the original 14 at the Code gate to add `PROCEDURAL_ORDER`/`WITHDRAWAL_NOTICE`, both appended at the bottom of the rank so no existing rank changed). What an analyst
 is actually scanning for is a four-way question: *is this an outcome, a
 recommendation, an ask, or argument?* So the ranking is bucketed:
 
@@ -244,10 +244,10 @@ left edge with N filled. It is:
   not a design change.
 
 The exact enum value and its numeric rank are always printed as text on the
-card (`Final Order` · `document_type rank 1 of 14 · outcome document`), so the
+card (`Final Order` · `document_type rank 1 of 16 · outcome document`), so the
 bucketing loses nothing (`AC-F36-03`, `AC-F48-01`).
 
-`ASM-UX-3` · *Assumption*: **not all fourteen types need equal visual weight**,
+`ASM-UX-3` · *Assumption*: **not all sixteen types need equal visual weight**,
 and the four-way bucketing is the right cut. It follows the enum's own
 authority ranking rather than inventing a taxonomy, and the tier boundaries
 land exactly where the schema invariants already are — tier 4 is precisely the
@@ -473,9 +473,12 @@ did-not-complete case which reuses `--stale`.
 
 - Stale states state the **age in days**, not only the date. "2 June" does not
   compute to "over two months" at a glance mid-task; "66 days old" does.
-- A failed or partial run **never advances the as-of date** (`AC-F39-05`). The
-  banner reports the last successful run and mentions the newer unsuccessful
-  one separately.
+- A **failed** run (or an unfinished one) never advances the as-of date
+  (`AC-F39-05`, amended `ASM-26`). A **`PARTIAL`** run *does* advance it — the
+  literal original reading (partial withholds too) made the corpus
+  permanently undateable, since a real corpus quarantines something on
+  essentially every run. The banner reports the last `SUCCEEDED`-or-`PARTIAL`
+  run and mentions a newer `FAILED` one separately.
 - The never-succeeded state is dashed and hatched so it does not read as a date
   at all, and it is **load-bearing**: the surface refuses to answer over a
   corpus it cannot date (`AC-F39-04`, `FDA-5`), and that refusal is rendered.

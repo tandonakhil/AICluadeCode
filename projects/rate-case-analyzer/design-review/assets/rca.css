@@ -324,7 +324,7 @@ code, .mono { font-family: var(--font-mono); font-size: .875em; }
 /* ---------- 9. Citation card (F36) ----------------------------------- */
 /* The 14 x 6 encoding. See UX_KB §5.
    - document_type -> 4 authority tiers, shown as a countable spine (1-4
-     filled segments) + the full enum label as text + "rank N of 14".
+     filled segments) + the full enum label as text + "rank N of 16".
    - claim_status  -> 3 chip families (OUTCOME / POSITION / ABSENT), each
      printing the full enum value AND a plain-English gloss. */
 

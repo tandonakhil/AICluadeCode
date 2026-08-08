@@ -1273,3 +1273,127 @@ since *"make all assumptions, don't ask any questions"* **is** a batch
 authorisation, as distinct from `not_asked`, which exists to flag a gate that
 closed without an approval it owed. Verified by the running dashboard rather
 than by inspection.
+
+## Gate 10 · Review — request-changes + escalate, 2026-08-08
+
+`review-agent` returned **`request-changes` (4 code findings) + `escalate` (1
+cross-KB contradiction)**. Wiring sweep: **PASS**, 13/13 templates reachable,
+0 unrendered components. `design-review/11-run-report.html` having no browser
+route ruled an **acceptable disclosed gap, not a wiring failure** — nothing was
+built and left unmounted; the run report is genuinely headless per `UX_KB.md`
+§2.3, and `AC-F43-*` are surface-neutral.
+
+**F-1 (HIGH)** — `documents_ingested` counted quarantined and gate-dropped
+documents as ingested, computed in phase 1 before any quarantine/gate ran.
+Under **ASM-26's own "normal steady state"** (a real corpus quarantines
+something almost every run), this made the healthy no-op signature
+**unreachable** — defeating the exact distinction the gate-9 loop-back was
+accepted to build. Not caught by any of the 899 tests, because every fixture
+in `test_incremental_ingest.py` was quarantine-free.
+
+**Finding #6 (MED)** — seeded rows' empty `content_hash` rendered as
+`[replaced]`, indistinguishable from a genuine mass republication.
+
+**F-2/F-3/F-4 (LOW/MED)** — magic tuple indices in the load-bearing predicate;
+a false "migrate" claim in a docstring; `corpus` defaulted on the write path
+against `PLAN.md` §3.3's explicit rule.
+
+**`code-agent` fixed all five** (commits `7e3a491`, `f6bbc48`). Headline fix:
+an accounting ledger where every document gets exactly one disposition —
+`ingested | unchanged | quarantined | gated | abandoned` — and `IngestRun`
+**refuses to exist** unless `documents_seen` equals their sum, the same
+`CoverageLedger.seal()` discipline already enforced on the answer surface,
+now enforced on the job surface too. New `change="backfilled"` kind closes
+finding #6. **899 → 926 tests.**
+
+Three things found by running, not asked for: `scripts/seed-data.sh reset`
+never deleted the ops store despite its own banner claiming it did (three
+passes' worth of schema additions were silently missing from the live file);
+`rm -f` left `-wal`/`-shm` sidecars, causing a bare `disk I/O error`; and a
+persistently-quarantined document forces its case to fully reassemble on
+**every** run forever, reported but not fixed (needs durable quarantine
+memory, a design change, not a Code-pass edit).
+
+**E-1 — escalated, not resolved**: `document_type` is **14** in `DOMAIN_KB.md`
+and `FUNCTIONAL_SPEC.md`'s `AC-F3-05` (a blocking, gate-9-counted criterion),
+but **16** in shipped code, since gate 7's second pass added
+`PROCEDURAL_ORDER`/`WITHDRAWAL_NOTICE` to close a different gap. The visible
+consequence: the product renders `"rank N of 16"`; every approved design
+screen and `UX_KB.md` still say `"of 14"`; and `rca.css`'s stale `"of 14"`
+comment is **locked** by the `ARCH-14` byte-identity check, so it can only be
+corrected in both places at once. **Not adjudicated here** — `review-agent`
+ranks no KB over another by design, and this needs a human or `mas-architect`
+-level call on whether the criterion or the enum is wrong. Recorded as an
+open item; not resolved by this run.
+
+**F-5/F-6/F-7 — record-reconciliation, not escalations**, because in each
+case a decision was already taken and only propagation failed: `ASM-26` was
+ruled and accepted but four artifacts (`FUNCTIONAL_SPEC.md`, `UX_KB.md`,
+`ARCHITECTURE_KB.md`, `design-review/10`) still assert the literal, superseded
+rule; the claim-schema drift from `PLAN.md` §4.5 is wider than `ASM-29`
+states (a `parameter` substitution that preserved the enum's cardinality,
+invisible to any check anyone would think to write); `UX_KB.md`'s screen-11
+row doesn't mark itself as shipping without a browser route. **Not corrected
+in this pass** — flagged for a documentation-only follow-up; none block Deploy.
+
+## Post-review: three defects found on the running app, 2026-08-08
+
+The human hit a real error live: a compose-call `ModelUnavailable` rendered as
+*"an answer was composed and then discarded"* — false, since the compose call
+never ran. Fixing it surfaced two more defects underneath, none caught by the
+926 tests because nothing exercised these exact paths. Fixed directly by the
+orchestrator (commit `506ac86`), outside the agent pipeline, given the
+narrow, well-evidenced scope.
+
+1. **`RefusalKind.VERIFICATION_FAILED` misused for `ModelUnavailable` at
+   compose.** New `RefusalKind.MODEL_UNAVAILABLE` /
+   `QueryOutcome.REFUSED_MODEL_UNAVAILABLE` with honest copy. The
+   `CompositionMalformed` site correctly keeps `VERIFICATION_FAILED` (`ASA-6`,
+   deliberate — the model did respond, just invalidly); left alone.
+2. **`render_system_failure()` never set `"freshness"`**, and `base.html`'s
+   app bar dereferences `freshness.css_class` unconditionally on every screen
+   (`AC-F39-01`). Any real `SystemFailure` was a bare 500 with no user-facing
+   message — worse than the failure it was reporting. `corpus_as_of` now
+   threads through `render()` so the failure branch can still render the app
+   bar truthfully.
+3. **`OpsStore.write_query_record` committed *outside* its own lock** — two
+   threads sharing the one connection could interleave a second `execute()`
+   before the first's `commit()`, raising "database is locked" against
+   itself. Root cause underneath: `OpsStore` hand-rolled its connection and
+   had silently dropped the WAL mode and `busy_timeout` that
+   `sqlite_engine._connect`'s documented setup already carries — needed for
+   real **cross-process** contention too, since the ingest job and the web
+   server are separate processes writing the same file (`SEC-W1`). Added both
+   to `OpsStore` and to the shared `_connect()` (benefiting the two corpus
+   stores as well).
+
+**A fourth defect surfaced while fixing the third**: adding
+`REFUSED_MODEL_UNAVAILABLE` changed `query_record`'s CHECK constraint without
+touching a column name, so `assert_schema_current`'s column-presence check
+— built for exactly this class of problem — **could not catch it**: a store
+predating the change opened clean, then the next write raised a raw `CHECK
+constraint failed`. Extended `assert_schema_current` to also compare declared
+vs. live CHECK-constraint *value sets*, missing-only, preserving its existing
+philosophy (extra/widened values are left alone deliberately — a conformance
+check would break forward-compatible stores).
+
+Six new tests exercise these paths through the **real Jinja environment and a
+real `TestClient`**, not just the `render()` dict — exactly the gap that let
+both rendering defects through undetected. **926 → 932 tests, 8 suites,
+all green.**
+
+**Operational note, not a code defect**: `./scripts/seed-data.sh reload` wipes
+the ops store's run history without re-establishing a dated corpus, even
+though `corpus/synthetic/MANIFEST.json` carries its own `corpus_as_of`. Worked
+around by running `app.jobs.ingest` once after reload. Flagged as a genuine
+open design question — should the corpus-of-record loader write a synthetic
+run record from its manifest's stated as-of date, or should the app always
+require a real job run to establish dating — not resolved unilaterally here.
+
+## Current Status
+
+Both apps running: **http://127.0.0.1:8477/** (product, real corpus, dated)
+and **http://127.0.0.1:8041/** (design review). 932 tests green across 8
+suites. Gate 10 · Review's code findings are closed; **E-1 (document_type
+14-vs-16) remains open**, carried to the human for a ruling rather than
+adjudicated. Gate 11 · Deploy next.

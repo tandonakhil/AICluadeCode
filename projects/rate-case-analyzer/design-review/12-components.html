@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>12 · Components, tokens and the 14×6 authority encoding · Rate Case Analyzer design review</title>
+<title>12 · Components, tokens and the 16×6 authority encoding · Rate Case Analyzer design review</title>
 <link rel="stylesheet" href="assets/rca.css">
 <style>
   .gs { filter: grayscale(1) contrast(1.05); }
@@ -20,7 +20,7 @@
 
 <nav class="dr-bar" aria-label="Design review navigation">
   <a href="index.html">← Design review index</a>
-  <span class="dr-crumb">12 / 12 · Components, tokens, and the 14×6 encoding</span>
+  <span class="dr-crumb">12 / 12 · Components, tokens, and the 16×6 encoding</span>
   <span class="dr-crumb">The reference sheet code-agent implements against</span>
 </nav>
 
@@ -28,7 +28,7 @@
   <div class="dr-note">
     <h2>What you are looking at</h2>
     <p>The system sheet. Everything on screens 01–11 is assembled from what is on this page. If a future feature needs a visual treatment that is not here, that is a design decision to be made, not improvised.</p>
-    <p>The section that matters most is <strong>the 14×6 encoding</strong>. There are fourteen document types and six claim statuses, and a naïve design would need eighty-four distinct treatments — which is not a design, it is a legend nobody reads. The resolution is to collapse each axis into a small number of visually distinct <em>weights</em>, and to carry the full precision as text on every instance.</p>
+    <p>The section that matters most is <strong>the 16×6 encoding</strong>. There are sixteen document types and six claim statuses, and a naïve design would need ninety-six distinct treatments — which is not a design, it is a legend nobody reads. The resolution is to collapse each axis into a small number of visually distinct <em>weights</em>, and to carry the full precision as text on every instance.</p>
   </div>
 </div>
 
@@ -38,7 +38,7 @@
   <h2 class="dr-sectionhead">The 14 × 6 problem, and how it is solved</h2>
 
   <h3>Axis 1 · <code>document_type</code> — 14 ranked values → 4 authority tiers, shown as a countable spine</h3>
-  <p style="max-width:78ch;">The fourteen values are already ranked 1–14 by the domain KB. Not all fourteen need equal visual weight: what an analyst is actually scanning for is <em>"is this an outcome, a recommendation, an ask, or argument?"</em> — a four-way distinction. So the ranking is bucketed into four tiers rendered as a vertical spine of four segments with N filled. It is countable, it survives greyscale, it survives being read aloud ("authority tier 4 of 4"), and it needs no colour. The exact enum value and its rank are printed as text on every card, so nothing is lost (<code>AC-F36-03</code>).</p>
+  <p style="max-width:78ch;">The sixteen values are already ranked 1–16 by the domain KB. Not all sixteen need equal visual weight: what an analyst is actually scanning for is <em>"is this an outcome, a recommendation, an ask, or argument?"</em> — a four-way distinction. So the ranking is bucketed into four tiers rendered as a vertical spine of four segments with N filled. It is countable, it survives greyscale, it survives being read aloud ("authority tier 4 of 4"), and it needs no colour. The exact enum value and its rank are printed as text on every card, so nothing is lost (<code>AC-F36-03</code>).</p>
 
   <ul class="tierlist" style="margin-top:1rem;">
     <li>
@@ -140,7 +140,7 @@
       <div>
         <div class="citation-card__head">
           <span class="doctype-label">Final Order</span>
-          <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+          <span class="doctype-rank">document_type rank 1 of 16 · outcome document</span>
           <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
         </div>
         <h3 class="citation-title">Opinion and Order, <i>Pa. PUC v. PPL Electric Utilities Corporation</i></h3>
@@ -157,7 +157,7 @@
       <div>
         <div class="citation-card__head">
           <span class="doctype-label">Utility Direct Testimony</span>
-          <span class="doctype-rank">document_type rank 9 of 14 · party filing</span>
+          <span class="doctype-rank">document_type rank 9 of 16 · party filing</span>
           <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED<span class="status-chip__gloss">— what the utility asked for; not granted</span></span>
         </div>
         <h3 class="citation-title">Direct Testimony of D. A. D'Ascendis on behalf of PECO Energy Company</h3>
@@ -174,7 +174,7 @@
       <div>
         <div class="citation-card__head">
           <span class="doctype-label">Approved Settlement</span>
-          <span class="doctype-rank">document_type rank 3 of 14 · outcome document</span>
+          <span class="doctype-rank">document_type rank 3 of 16 · outcome document</span>
           <span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED<span class="status-chip__gloss">— the settlement does not state this figure</span></span>
         </div>
         <h3 class="citation-title">Joint Petition for Settlement, as approved — <i>Pa. PUC v. PECO Energy Company</i></h3>

@@ -262,10 +262,38 @@ UI-bearing: **no**. Criteria: 8.
 ### AC-F3-05
 - **Given** the enum module as shipped
 - **When** the `document_type` enum is enumerated
-- **Then** it contains exactly the 14 values of `DOMAIN_KB.md` §2.3 with
-  `authority_rank` 1–14 assigned exactly as that table assigns them
-  (`FINAL_ORDER` = 1 … `BRIEF` = 14), and `claim_status` contains exactly the six
+- **Then** it contains exactly the 16 values below with `authority_rank` 1–16
+  assigned exactly as listed, and `claim_status` contains exactly the six
   values of §2.4
+
+  ```
+  1  FINAL_ORDER              9  UTILITY_DIRECT_TESTIMONY
+  2  ORDER_ON_REHEARING       10 UTILITY_REBUTTAL_TESTIMONY
+  3  APPROVED_SETTLEMENT      11 INTERVENOR_TESTIMONY
+  4  COMPLIANCE_FILING        12 EXHIBIT_SCHEDULE
+  5  RECOMMENDED_DECISION     13 BRIEF
+  6  ALJ_INITIAL_DECISION     14 APPLICATION
+  7  PROPOSED_SETTLEMENT      15 PROCEDURAL_ORDER
+  8  STAFF_TESTIMONY          16 WITHDRAWAL_NOTICE
+  ```
+
+  **Corrected 2026-08-08 (orchestrator ruling on Review gate finding E-1).**
+  This criterion previously asserted 14 values matching `DOMAIN_KB.md` §2.3's
+  *original* proposed table verbatim. `review-agent` found the criterion false
+  of shipped code — 16 values, not 14 — and escalated rather than adjudicating,
+  since ranking one KB over another is not its lane. Ruling: **the shipped
+  enum is correct; the criterion is what was stale.** The composition drifted
+  across the Code gate's passes beyond the single widening (`PROCEDURAL_ORDER`/
+  `WITHDRAWAL_NOTICE`, added deliberately for `RCA-R13`, documented in
+  `app/enums/document.py`'s own docstring) that this project's record had
+  previously acknowledged. Full reconciliation against `DOMAIN_KB.md` §2.3,
+  including the two values present in the original proposal but absent from
+  shipped code (`DATA_REQUEST_RESPONSE`, `HEARING_TRANSCRIPT`), is recorded as
+  an addendum to `DOMAIN_KB.md` §2.3 rather than silently rewritten into the
+  original table — that reconciliation is domain judgment belonging to
+  `functional-agent`'s lane, not a mechanical correction, and forcing it here
+  risks exactly the unreviewed-redesign failure `ASM-29` was written to avoid
+  for the claim schema's analogous drift.
 
 ### AC-F3-06
 - **Given** the enum module as shipped
@@ -760,13 +788,13 @@ UI-bearing: **no** (its output is rendered by `F36`). Criteria: 8.
 UI-bearing: **no**. Criteria: 8.
 
 ### AC-F12-01
-- **Given** each of the fixture documents covering all 14 `document_type` values
+- **Given** each of the fixture documents covering all 16 `document_type` values
 - **When** classification runs
 - **Then** each is assigned the correct value from the closed enum and its
-  `authority_rank` equals the rank in `DOMAIN_KB.md` §2.3
+  `authority_rank` equals the rank in `AC-F3-05`
 
 ### AC-F12-02
-- **Given** a document the classifier cannot assign to any of the 14 values
+- **Given** a document the classifier cannot assign to any of the 16 values
 - **When** classification runs
 - **Then** ingest of that document fails loudly, a `QuarantineRecord` with reason
   `ENUM_VALIDATION_FAILURE` is written, and no chunk from it is stored — it is
@@ -2214,11 +2242,23 @@ UI-bearing: **yes**. Criteria: 6.
   assumption `FDA-5`) — the surface never answers over a corpus it cannot date
 
 ### AC-F39-05 `[UI]`
-- **Given** the most recent run has `status = FAILED` or `PARTIAL` and an earlier
-  run succeeded
+- **Given** the most recent run has `status = FAILED` and an earlier run
+  succeeded or was `PARTIAL`
 - **When** the freshness banner renders
-- **Then** it shows the earlier successful run's date — a failed or partial run
-  never advances the as-of date
+- **Then** it shows the earlier run's date — a `FAILED` run, or a mid-run
+  termination with no `finished_at`, never advances the as-of date
+
+  **Amended 2026-08-08 (`ASM-26`, ruled and accepted).** As originally
+  written this criterion also withheld advancement on `PARTIAL`. Implemented
+  literally that made the product permanently unusable: `PARTIAL` means "only
+  expected quarantines, exit 0", and a real corpus quarantines something on
+  essentially every run, so `corpus_as_of` would never advance and the surface
+  would refuse every question forever (`AC-F39-04`, `FDA-5`) — a guardrail
+  inverted into total unavailability. **`PARTIAL` now advances the as-of
+  date; only `FAILED` and an unfinished run do not.** The excluded documents
+  are still reported in the run report and restated in the coverage panel's
+  standing limits, so nothing is hidden — only the *date* stops being
+  withheld for the normal case.
 
 ### AC-F39-06 `[UI]`
 - **Given** a rendered answer or refusal

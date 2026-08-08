@@ -18,7 +18,7 @@
   <div class="dr-note">
     <h2>What you are looking at</h2>
     <p>The ingestion job is the product's second surface, and it fails independently of the web app. A silently-stopped scraper yields a stale corpus, and a stale corpus yields confident, wrong, well-cited answers with <strong>no UI symptom at all</strong> — unless this banner exists. It is therefore in the app bar on every screen including the empty first-run screen, not tucked into a settings page.</p>
-    <p>Four states below. Note that a failed or partial run <em>never advances the as-of date</em> (<code>AC-F39-05</code>): the banner reports the last run that actually succeeded, and mentions the newer unsuccessful one separately. And the date in this banner is always the same date shown on the coverage panel (<code>AC-F39-06</code>) — one fact, one value, two places.</p>
+    <p>Four states below. Note that a <em>failed</em> run never advances the as-of date (<code>AC-F39-05</code>, amended per <code>ASM-26</code>) — the banner reports the last <code>SUCCEEDED</code>-or-<code>PARTIAL</code> run, and mentions a newer <em>failed</em> one separately. A <code>PARTIAL</code> run (expected quarantines, still exit&nbsp;0) <em>does</em> advance it: gating on <code>SUCCEEDED</code> alone made the corpus permanently undateable, since a real corpus quarantines something on nearly every run. And the date in this banner is always the same date shown on the coverage panel (<code>AC-F39-06</code>) — one fact, one value, two places.</p>
   </div>
 </div>
 

@@ -216,6 +216,61 @@ Two notes the architect should not skip:
   exposure inside what looks like "the public corpus." Flag it at ingestion; do
   not assume "it was on the commission website" means "it is public."
 
+#### Addendum, 2026-08-08 — the table above is the original proposal; shipped code has drifted from it
+
+**This is a record-reconciliation addendum, not a rewrite.** The table above
+is preserved as originally proposed at Intake. `review-agent` found at the
+Review gate (finding E-1) that `AC-F3-05` — the acceptance criterion binding
+the shipped `document_type` enum to this table — was false of the code as
+built, and escalated rather than adjudicating which was right. The
+orchestrator ruled the shipped enum authoritative and corrected `AC-F3-05` to
+match it (see `FUNCTIONAL_SPEC.md` §AC-F3-05). This addendum records exactly
+how the two diverged, so the divergence is visible rather than silently
+absorbed into a bumped count.
+
+**Shipped `document_type` (16 values, `app/enums/document.py`):**
+
+| Rank | Value | Relationship to the original proposal |
+|---|---|---|
+| 1 | `FINAL_ORDER` | unchanged |
+| 2 | `ORDER_ON_REHEARING` | unchanged |
+| 3 | `APPROVED_SETTLEMENT` | unchanged |
+| 4 | `COMPLIANCE_FILING` | unchanged |
+| 5 | `RECOMMENDED_DECISION` | **replaces** `PROPOSED_ORDER_ALJ`, split into two |
+| 6 | `ALJ_INITIAL_DECISION` | **replaces** `PROPOSED_ORDER_ALJ`, split into two |
+| 7 | `PROPOSED_SETTLEMENT` | **new** — a settlement filed but not yet approved, distinct from `APPROVED_SETTLEMENT` |
+| 8 | `STAFF_TESTIMONY` | renamed from `STAFF_REPORT_OR_TESTIMONY` |
+| 9 | `UTILITY_DIRECT_TESTIMONY` | unchanged (rank unchanged too, coincidentally) |
+| 10 | `UTILITY_REBUTTAL_TESTIMONY` | unchanged value, rank moved 8→10 |
+| 11 | `INTERVENOR_TESTIMONY` | unchanged value, rank moved 7→11 |
+| 12 | `EXHIBIT_SCHEDULE` | unchanged value, rank moved 11→12 |
+| 13 | `BRIEF` | unchanged value, rank moved 14→13 |
+| 14 | `APPLICATION` | unchanged value, rank moved 10→14 |
+| 15 | `PROCEDURAL_ORDER` | **new** — deliberate, documented (`RCA-R13`, gap 2) |
+| 16 | `WITHDRAWAL_NOTICE` | **new** — deliberate, documented (`RCA-R13`, gap 2) |
+
+**Dropped from the original proposal, present in this table but absent from
+shipped code**: `DATA_REQUEST_RESPONSE` (rank 12 above) and
+`HEARING_TRANSCRIPT` (rank 13 above). Both losses were already surfaced —
+`TEST_DATA_KB.md` §7 flagged the missing `DATA_REQUEST_RESPONSE` member and
+`synthetic-data-agent` worked around it by typing the one discovery-response
+fixture as `EXHIBIT_SCHEDULE`, parented to the testimony it supports (true in
+kind, but loses the ability to select the discovery-response document class
+specifically — the confidentiality-flag note above cannot be fully acted on
+without it). Neither drop is adjudicated here; both are recorded as known
+gaps, in the same spirit as `ASM-29`'s deferred claim-schema gaps —
+candidates for a future enhancement pass, not a Code-gate fix forced under
+time pressure.
+
+**Why `RECOMMENDED_DECISION`/`ALJ_INITIAL_DECISION`/`PROPOSED_SETTLEMENT`
+happened without a KB update**: unknown — no commit message or KB note from
+the Code gate's early passes explains the split. Recorded honestly rather
+than guessed at; `functional-agent` should evaluate at the next enhancement
+whether the three-way split is domain-correct (it plausibly is — a
+recommended decision, an ALJ's initial decision, and a not-yet-approved
+settlement are genuinely distinct documents the original single
+`PROPOSED_ORDER_ALJ` value conflated) or whether it should be reconciled back.
+
 ### 2.4 Proposed enum B — `claim_status` (orthogonal, and the real fix)
 
 Document type alone is not enough, because a *final order* recites what was
