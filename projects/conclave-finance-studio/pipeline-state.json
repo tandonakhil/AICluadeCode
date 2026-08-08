@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "MVP1 complete \u2014 all 11 gates. Current Status awaiting the human.",
+  "position": "Enhancement `close-cockpit-home` \u2014 Experience Design (MVP1 complete, all 11 gates)",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
@@ -209,7 +209,7 @@
       "reason": "AC-F41-13 contradicted. functional-design-agent ruled: a split element set is not a relocation. AC-F41-13 retired in place; AC-F41-22/-23/-24 and AC-F5-08 issued. Spec now 267 issued / 265 live / 2 retired."
     }
   ],
-  "updated": "2026-08-06",
+  "updated": "2026-08-08",
   "updated_by": "orchestrator",
   "route_changes": [
     {

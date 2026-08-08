@@ -13,9 +13,17 @@ Ingest run R-PLAYWRIGHT-EVIDENCE
 
   Ingested
     cases ingested          4
+    documents seen          0
     documents ingested      0
+    documents skipped unchanged0
     chunks written          0
     claims written          0
+
+  Document changes (0)
+    none — no document was new or modified this run
+
+  Searches returning zero results (0) — stated, so a quiet docket is never mistaken for a broken adapter
+    none — every search returned at least one entry
 
   Quarantine — a count is stated for every reason, including zero
     PROTECTED_MARKING           0

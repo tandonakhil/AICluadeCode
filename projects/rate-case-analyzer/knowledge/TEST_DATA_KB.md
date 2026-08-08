@@ -20,20 +20,62 @@ invariant), [`RESPONSIBLE_AI_KB.md`](RESPONSIBLE_AI_KB.md) (`BP-1…BP-6`,
 
 ---
 
+## 0. Run 1 was lost. What happened, and what changed because of it
+
+**Run 1 (`RUN-2026-08-07-MEDIUM`) no longer exists on disk.** 25 cases, 176
+documents, 672 claims and 14 quarantine fixtures were written to
+`dev/data/synthetic/` and are gone.
+
+**Cause, confirmed rather than guessed.** `dev/.gitignore` excludes the whole of
+`data/` wholesale — deliberately, under `SEC-S1`, because `data/` is where the
+derived stores, reports and provenance live and the intent is that *a new
+directory created by any later change is ignored by default rather than by
+someone remembering to add a line*. That is a good rule. The defect was mine
+and the orchestrator's, not the rule's: **I put a project asset inside a
+directory reserved for derived state.** Nothing under `data/` was ever tracked,
+so a clean removed all of it.
+
+**What changed.**
+
+| | Run 1 | Run 2 |
+|---|---|---|
+| Corpus root | `dev/data/synthetic/` — untracked, lost | **`dev/corpus/synthetic/`** — outside the ignored root, tracked |
+| Generator | `data/synthetic/tools/generate_corpus.py` — lost with it | **`corpus/synthetic/tools/generate_corpus.py`** — tracked |
+
+The generator being lost alongside its output is the part that made this
+expensive: a build product whose builder is also untracked is not
+regenerable, it is just absent. Both are now tracked. The generator carries a
+`PATH HISTORY` block at the top saying why, so a future reader does not
+helpfully move it back.
+
+**The general lesson, worth stating once**: this corpus is a *primary project
+asset* (Intake A6.1 — the internal corpus is synthetic **by design**, which is
+what discharges the privilege-waiver control). It is not derived state, it is
+not a cache, and it is not reconstructible from anything else in the
+repository. It belongs with the code, under version control.
+
+---
+
 ## 1. Write set
 
 This pass creates exactly these paths and nothing else:
 
 - `knowledge/TEST_DATA_KB.md` — this file.
-- `dev/data/synthetic/tools/generate_corpus.py` — the generator.
-- `dev/data/synthetic/**` — everything the generator emits.
+- `dev/corpus/synthetic/tools/generate_corpus.py` — the generator.
+- `dev/corpus/synthetic/**` — everything the generator emits.
 
-**Nothing under `dev/app/` is touched.** `code-agent` is running concurrently on
-the loader and owns that tree entirely. `dev/data/synthetic/tools/` is a
-data-production tool, not application code: it is outside `app/`, it is not
-importable from `app/`, and no module in `app/` may import it. It is committed
-alongside its output so the corpus is regenerable and every past run is
-reproducible.
+**Nothing under `dev/app/` is touched.** `code-agent` owns that tree entirely.
+`dev/corpus/synthetic/tools/` is a data-production tool, not application code:
+it is outside `app/`, it is not importable from `app/`, and no module in `app/`
+may import it. It is committed alongside its output so the corpus is
+regenerable and every past run is reproducible.
+
+The generator **cleans the four directories it owns** (`public/`,
+`workproduct/`, `quarantine/`, `index/`) before writing. Without that, a rename
+or a format change leaves the previous artefact behind and the corpus on disk
+becomes the union of two runs — which is exactly the silent drift the
+verification pass exists to prevent. It never deletes anything else and never
+touches `tools/`.
 
 ---
 
@@ -108,12 +150,51 @@ resolve. A live fetch against this corpus fails at DNS, before any request.
 
 ---
 
+## 2A. Schema alignment — the corpus follows what shipped, not `PLAN.md`
+
+Between run 1 and run 2 `code-agent` shipped `dev/app/enums/`, which differs
+from `PLAN.md` §4.5's draft in more places than the two flagged. **The code is
+authoritative and this corpus emits exactly what shipped.** It does not rely on
+`corpus_format.DOCUMENT_TYPE_ALIASES`: an alias is a compatibility shim, and a
+corpus that needs one is a corpus that has drifted from its schema.
+
+| Axis | `PLAN.md` §4.5 draft | Shipped | What the corpus does |
+|---|---|---|---|
+| `document_type` | 14 members | **16** — `STAFF_REPORT_OR_TESTIMONY`→`STAFF_TESTIMONY`; `PROPOSED_ORDER_ALJ` split into `RECOMMENDED_DECISION` (PA) and `ALJ_INITIAL_DECISION` (SOAH/CPUC); `PROPOSED_SETTLEMENT`, `PROCEDURAL_ORDER`, `WITHDRAWAL_NOTICE` added; `HEARING_TRANSCRIPT` and `DATA_REQUEST_RESPONSE` **removed** | Emits all **16**. Gaps 7 below. |
+| `claim_status` | 6 | 6, unchanged | unchanged |
+| `unit` | no `NOT_STATED` | **`NOT_STATED` added** (gap 1 closed); `USD_PER_KWH`/`USD_PER_MONTH` removed | `NOT_STATED` claims emit `unit: "NOT_STATED"` and **no** `value_text` — the single legal form |
+| `parameter` | included `ROR` | **`ROR` removed**, `DEPRECIATION_EXPENSE` added | No `ROR` claims. Gap 6. |
+| `basis` | `PRETAX\|AFTERTAX\|NOT_STATED` | **the jurisdictional axis** — `RETAIL_JURISDICTIONAL\|TOTAL_COMPANY\|ELECTRIC_DIVISION\|GAS_DIVISION\|NOT_STATED` | Used as the jurisdictional axis. Pre-tax/after-tax has no field. Gap 5. |
+| `scope` | the jurisdictional axis | **a new functional axis** — `DISTRIBUTION\|TRANSMISSION\|GENERATION\|BUNDLED\|TOTAL\|NOT_STATED` | PA/TX wires-only → `DISTRIBUTION`; CPUC → `BUNDLED`; TCOS rider → `TRANSMISSION`. This encodes DOMAIN §3.2's deepest structural split **on the claim itself**, which is a genuine improvement. |
+| `customer_class` | open text | **closed enum** | `ALL_CLASSES` for system figures, `RESIDENTIAL` for the class-specific one |
+| `case_type` | had `COST_OF_CAPITAL` | `BASE_RATE\|RIDER\|FORMULA_RATE\|TRACKER\|MYRP\|OTHER\|NOT_STATED` | CPUC cost-of-capital cases → `OTHER` + `topic_tags: [COST_OF_CAPITAL]`. Gap 8. |
+| `resolution_path` | `LITIGATED\|SETTLED_FULL\|…` | **`BLACK_BOX_SETTLEMENT` is now first-class**, plus `SPECIFIED_SETTLEMENT`, `PARTIAL_SETTLEMENT`, `FULLY_LITIGATED` | Used throughout. A clear improvement: RCA-R5's shape is now in the case record, not only in the claims. |
+| `author_party` | 7 | `COMMISSION_STAFF`, `CONSUMER_ADVOCATE`, `ADMINISTRATIVE_LAW_JUDGE`, `JOINT_PARTIES` | Consumer advocates now carry `CONSUMER_ADVOCATE` rather than a generic `INTERVENOR` — better for `BP-3` |
+| `test_year_convention` | 5 | adds `HISTORICAL_WITH_ADJUSTMENTS` | Texas base rate cases now carry it, which is what PURA actually requires |
+
+**Internal material** (`internal_material_kind`, gap 3 closed): work-product
+documents declare what they actually *are* — `DRAFT_TESTIMONY`,
+`COST_POSITION_PAPER`, `STRATEGY_MEMORANDUM`, `POSTURE_MEMORANDUM` — instead of
+pretending to a public-docket type, and `app/ingest/internal_material.py` maps
+each to a `document_type`. The loader **refuses** the declaration on a public
+document and **refuses** a `COST_POSITION_PAPER` with no `parent_doc_id`. Both
+refusals are correct and the generator asserts the same two rules before
+writing.
+
+`confidentiality = NOT_APPLICABLE` was **refused**, with reasoning I accept: the
+`CHECK` is shared by both stores and widening it to improve work-product
+readability would let the public store hold a document whose confidentiality was
+never classified. Trading a security control for readability is a bad trade. The
+mapping table in gap 3 is used instead.
+
+---
+
 ## 3. On-disk layout and format
 
-Root: `dev/data/synthetic/`. Point the loader here.
+Root: **`dev/corpus/synthetic/`**. Point the loader here.
 
 ```
-dev/data/synthetic/
+dev/corpus/synthetic/
   MANIFEST.json               # run id, volume preset, every count, the
                               #   invariants verified at generation time
   namespace.json              # the machine-readable namespace invariant above
@@ -129,7 +210,8 @@ dev/data/synthetic/
 
   quarantine/
     fixtures.json                      # 14 fixture descriptors
-    <fixture_id>/body.{txt,html,json}  # the raw body a transport returns
+    <fixture_id>/body.{pdf,txt,html,json}   # the raw body a transport returns
+    q07_invisible_text_injection/rendered.html  # what a human sees
 
   index/
     cases.json                # one flat row per case, all sets
@@ -163,7 +245,8 @@ purpose and are described here rather than left for the loader to guess:
 | `page_count` | Number of pages. |
 | `content_hash` | `sha256:…` over the page text. |
 | `synthetic_marker` | The corpus marker this document carries. |
-| `invisible_text_lines` | `null` in the corpus proper; used only by quarantine fixture `q07`. |
+| `internal_material_kind` | Work-product documents only. Absent on every public document — the loader refuses it there. |
+| `non_precedent_clause` | The clause verbatim, on the documents that carry it (`""` otherwise). Also recorded at case level. |
 | `supersedes_doc_id` / `superseded_by_doc_id` | **Views** over the single edge row, emitted for loader convenience only. `ARCHITECTURE_KB` §6.3.1 stores one edge; `supersession.json` is that edge and is authoritative. |
 
 The `.txt` file carries the same content with printed left-margin line numbers
@@ -185,41 +268,77 @@ and `[page n]` separators. It is a faithful stand-in for what
 | Exhibits and schedules | `page` + `schedule_no` |
 | Applications, briefs, compliance filings | `page` |
 
-### Verbatim quotes
+### Verbatim quotes — and why uniqueness is load-bearing
 
-Every claim carries a `verbatim_quote` that **is present in its document**. The
-generator asserts this for all 663 valued claims, comparing after the same
-whitespace normalisation `app/grounding/normalise.py` performs (NFKC,
-whitespace-run collapse). A claim-bearing paragraph is never allowed to straddle
-a page break, so `(page, line_start, line_end)` always resolves.
+Every claim carries a `verbatim_quote` that **is present in its document**,
+compared after the same whitespace normalisation `app/grounding/normalise.py`
+performs. A claim-bearing paragraph never straddles a page break, so
+`(page, line_start, line_end)` always resolves. There is no hyphenated line
+breaking anywhere in the corpus, so a match failure is a real defect and not an
+artefact of the fixture.
 
-There is no hyphenated line breaking anywhere in the corpus. That is deliberate:
-it keeps the quote-matching property true under whitespace normalisation alone,
-so a failure to match is a real defect and not an artefact of the fixture.
+**A stronger property is required, and run 1 did not have it.**
+`app/ingest/corpus_format._chunk_for_quote` scans **all chunks of the case**,
+takes the **first** match, and then **overrides the claim's `doc_id`** with that
+chunk's. So a quote appearing in two documents of one case silently
+re-attributes the claim to whichever document sorts first — and a claim attached
+to the wrong document is a wrong authority rank, which is `RCA-R1` arriving
+through the loader instead of through the model.
+
+> **Every claim quote resolves to exactly one document of its case.** The
+> generator asserts it and refuses to emit otherwise. The loader cannot detect
+> this — it has no way to know which document was meant.
+
+It caught four real collisions on the first run of this invariant: two
+documents in one case whose ROE recommendation sentences were identical because
+their position sets were identical, a direct-testimony equity quote that was a
+**substring** of the final order's equivalent finding, a never-approved
+settlement reusing a party's exact numbers, and a superseding draft that was
+byte-identical to the draft it superseded. All four are fixed at the source —
+the positions now genuinely differ, which is also more realistic.
+
+Verified end to end: loading all 644 claims through the real
+`corpus_format.read_case` and comparing each resolved `doc_id` against the
+intended one gives **0 misattributions**.
 
 ### `NOT_STATED` claims
 
-Nine claims carry `claim_status = NOT_STATED`. For these, `value_text` and
-`unit` are `null` and `verbatim_quote` carries the document's **affirmative
-silence** sentence. See §7 gap 1 — `unit` has no `NOT_STATED` member, and this
-convention is a judgment call I am flagging, not hiding.
+14 claims carry `claim_status = NOT_STATED`. Schema gap 1 is closed, so there is
+now exactly **one** legal representation and the corpus emits it:
+`value_text` absent, `unit: "NOT_STATED"`, and `verbatim_quote` carrying the
+document's **affirmative silence** sentence. The generator asserts both
+directions — a `NOT_STATED` claim with a value or a unit is refused, and a
+valued claim without a unit is refused.
+
+They appear on: the black-box settlement and its approving order (`ROE`,
+`EQUITY_RATIO`); the CPUC GRC that does not decide cost of capital; and both
+rider/tracker approving orders, so *"this docket set no ROE"* is a recorded fact
+with a quote rather than an absence.
 
 ---
 
 ## 4. Corpus inventory
 
-Volume preset for this run: **MEDIUM**. Run id `RUN-2026-08-07-MEDIUM`.
+Volume preset for this run: **MEDIUM**. Run id `RUN-2026-08-08-MEDIUM`.
 
 ### By set
 
 | Set | Cases | Documents | Claims | Purpose |
 |---|---:|---:|---:|---|
-| `public/balanced` | 6 | 48 | 210 | Equal coverage by construction. `BP-1`…`BP-6`. |
-| `public/probes` | 2 | 16 | 70 | `BP-2` utility-identity twin pair. |
-| `public/risk` | 12 | 86 | 327 | Named-risk fixtures. Deliberately gapped. |
-| `workproduct` | 5 | 26 | 65 | The synthetic internal history corpus (`F23`). |
-| `quarantine` | — | 14 fixtures | — | Must not become corpus records (12), and two negative controls that must. |
-| **Total** | **25** | **176** | **672** | |
+| `public/balanced` | 6 | 48 | 198 | Equal coverage by construction. `BP-1`…`BP-6`. |
+| `public/probes` | 2 | 16 | 66 | `BP-2` utility-identity twin pair. |
+| `public/risk` | 12 | 89 | 318 | Named-risk fixtures. Deliberately gapped. |
+| `workproduct` | 5 | 26 | 62 | The synthetic internal history corpus (`F23`). |
+| `quarantine` | — | 14 fixtures | — | 11 must not become corpus records; **3 must** (two negative controls plus one whose gate is a later stage). |
+| **Total** | **25** | **179** | **644** | |
+
+Verified through `app/ingest/corpus_format.read_case`: 25 cases, 179 documents,
+**500 chunks**, 644 claims, 4 supersession edges, 0 read failures.
+
+**Why the claim count moved from run 1's 672.** `ROR` was removed from the
+shipped `Parameter` enum (−92 claims) and `DEPRECIATION_EXPENSE` added (+54);
+the remainder is the four de-duplicated quotes and the extra documents. Cases
+(25) and the shape of the corpus are unchanged.
 
 ### By jurisdiction
 
@@ -237,49 +356,66 @@ the risk set is deliberately shaped by the risks, and the work-product corpus is
 one utility's own file, which is Pennsylvania-only because the fictional
 employer is a Pennsylvania utility.
 
-### By document type — all 14 members present
+### By document type — all **16** shipped members present
 
-| `document_type` | Rank | Count |
-|---|---:|---:|
-| `FINAL_ORDER` | 1 | 23 |
-| `ORDER_ON_REHEARING` | 2 | 2 |
-| `APPROVED_SETTLEMENT` | 3 | 3 |
-| `COMPLIANCE_FILING` | 4 | 24 |
-| `PROPOSED_ORDER_ALJ` | 5 | 1 |
-| `STAFF_REPORT_OR_TESTIMONY` | 6 | 18 |
-| `INTERVENOR_TESTIMONY` | 7 | 16 |
-| `UTILITY_REBUTTAL_TESTIMONY` | 8 | 12 |
-| `UTILITY_DIRECT_TESTIMONY` | 9 | 24 |
-| `APPLICATION` | 10 | 20 |
-| `EXHIBIT_SCHEDULE` | 11 | 24 |
-| `DATA_REQUEST_RESPONSE` | 12 | 2 |
-| `HEARING_TRANSCRIPT` | 13 | 1 |
-| `BRIEF` | 14 | 6 |
+| `document_type` | Rank | Count | |
+|---|---:|---:|---|
+| `FINAL_ORDER` | 1 | 23 | outcome |
+| `ORDER_ON_REHEARING` | 2 | 2 | outcome |
+| `APPROVED_SETTLEMENT` | 3 | 3 | outcome |
+| `COMPLIANCE_FILING` | 4 | 24 | outcome |
+| `RECOMMENDED_DECISION` | 5 | 1 | PA ALJ track |
+| `ALJ_INITIAL_DECISION` | 6 | 1 | SOAH / CPUC ALJ track |
+| `PROPOSED_SETTLEMENT` | 7 | 1 | never approved — **not** an outcome |
+| `STAFF_TESTIMONY` | 8 | 18 | |
+| `UTILITY_DIRECT_TESTIMONY` | 9 | 24 | |
+| `UTILITY_REBUTTAL_TESTIMONY` | 10 | 12 | |
+| `INTERVENOR_TESTIMONY` | 11 | 16 | |
+| `EXHIBIT_SCHEDULE` | 12 | 26 | |
+| `BRIEF` | 13 | 6 | |
+| `APPLICATION` | 14 | 20 | |
+| `PROCEDURAL_ORDER` | 15 | 2 | decides nothing about rates |
+| `WITHDRAWAL_NOTICE` | 16 | 1 | records **when** the record stops |
 
 **Every decided or settled case has both its final order and its compliance
 tariff.** The generator refuses to emit a corpus in which a `DECIDED` or
-`SETTLED_APPROVED` case lacks an outcome document — a corpus of asks without
-outcomes is the project's number-one harm mechanism, so it is an invariant of
-the generator and not a property to be checked later. `COMPLIANCE_FILING` (24)
-exceeds `FINAL_ORDER` (23) because the `RCA-R4` case carries two tariffs, the
-superseded one and the revised one.
+`SETTLED_APPROVED` case lacks either — a corpus of asks without outcomes is the
+project's number-one harm mechanism, so it is an invariant and not a property to
+be checked later. `COMPLIANCE_FILING` (24) exceeds `FINAL_ORDER` (23) because
+the `RCA-R4` case carries two tariffs, the superseded one and the revised one.
+
+Three of the new members are load-bearing rather than decorative:
+`WITHDRAWAL_NOTICE` closes run 1's gap 2 and lets `RCA-R13` record the date the
+record stopped; `PROPOSED_SETTLEMENT` gives the withdrawn case a settlement that
+was filed and never approved, which must not read as an outcome; and
+`PROCEDURAL_ORDER` puts a suspension order in two dockets that decides nothing.
 
 ### By claim status and parameter
 
 | `claim_status` | Count | | `parameter` | Count |
 |---|---:|---|---|---:|
-| `REQUESTED` | 204 | | `ROE` | 124 |
-| `RECOMMENDED` | 215 | | `ROR` | 92 |
-| `AUTHORIZED` | 160 | | `EQUITY_RATIO` | 72 |
-| `SETTLED` | 5 | | `RATE_BASE` | 58 |
-| `IMPLEMENTED` | 79 | | `GROSS_PLANT` | 55 |
-| `NOT_STATED` | 9 | | `NET_PLANT` | 55 |
-| | | | `REVENUE_REQUIREMENT_TOTAL` | 75 |
-| | | | `REVENUE_REQUIREMENT_INCREASE` | 141 |
+| `REQUESTED` | 204 | | `ROE` | 129 |
+| `RECOMMENDED` | 201 | | `EQUITY_RATIO` | 76 |
+| `AUTHORIZED` | 148 | | `RATE_BASE` | 58 |
+| `IMPLEMENTED` | 69 | | `GROSS_PLANT` | 55 |
+| `SETTLED` | 8 | | `NET_PLANT` | 55 |
+| `NOT_STATED` | 14 | | `DEPRECIATION_EXPENSE` | 54 |
+| | | | `REVENUE_REQUIREMENT_TOTAL` | 74 |
+| | | | `REVENUE_REQUIREMENT_INCREASE` | 143 |
 
-`scope`: 592 `RETAIL_JURISDICTIONAL`, 71 `TOTAL_COMPANY`, 9 `NOT_STATED`.
-Case status: 20 `DECIDED`, 3 `SETTLED_APPROVED`, 1 `PENDING`, 1 `WITHDRAWN`.
-Test year convention: 12 `FPFTY`, 6 `HISTORICAL`, 5 `FORECAST`, 2 `NOT_STATED`.
+- `unit`: 436 `USD`, 191 `PERCENT`, 14 `NOT_STATED`, 1 `BASIS_POINTS`.
+- `basis` (jurisdictional axis): 557 `RETAIL_JURISDICTIONAL`, 71 `TOTAL_COMPANY`, 14 `NOT_STATED`.
+- `scope` (functional axis): 363 `DISTRIBUTION`, 143 `TOTAL`, 119 `BUNDLED`, 3 `TRANSMISSION`, 14 `NOT_STATED`.
+- `customer_class`: 627 `ALL_CLASSES`, 14 `NOT_STATED`, **1 `RESIDENTIAL`** — the
+  one class-specific figure in the `RCA-R9` trap case, deliberately singular so
+  that a system average answering a class question is distinguishable *in the
+  store* and not only in the prose.
+- Case status: 20 `DECIDED`, 3 `SETTLED_APPROVED`, 1 `PENDING`, 1 `WITHDRAWN`.
+- Test year convention: 12 `FPFTY`, 5 `HISTORICAL_WITH_ADJUSTMENTS`, 5 `FORECAST`,
+  2 `NOT_STATED`, 1 `HISTORICAL`.
+- Resolution path: 19 `FULLY_LITIGATED`, 2 `BLACK_BOX_SETTLEMENT`, 2 `NOT_STATED`,
+  1 `SPECIFIED_SETTLEMENT`, 1 `PARTIAL_SETTLEMENT`.
+- Case type: 21 `BASE_RATE`, 2 `OTHER` (cost of capital), 1 `RIDER`, 1 `TRACKER`.
 
 ### Numbers reconcile
 
@@ -438,8 +574,36 @@ numbers about an outcome that does not exist yet.
 
 ### 6.4 Quarantine fixtures
 
-14 fixtures at `dev/data/synthetic/quarantine/`, covering all seven
-`QuarantineReason` values plus two negative controls.
+14 fixtures at `dev/corpus/synthetic/quarantine/`. Descriptor keys are the ones
+`app/cli/seed_quarantine.py` actually reads: `fixture_id`, `body`,
+`content_type`, `status`, `index_marking`, `expected`.
+
+**Run through the real classifier chain: 14 fixtures, 0 disagreeing.** Getting
+there corrected three defects in my own fixtures, all of which had made run 1's
+set weaker than it looked:
+
+1. **Every text body was declared `application/pdf`.** The sanity stage checks
+   for `%PDF-` magic bytes, so all eleven text fixtures quarantined as
+   `CONTENT_TYPE_MISMATCH` — the right verdict for the wrong reason. `q01` never
+   reached the confidentiality scan it exists to exercise. *A fixture that
+   quarantines for the wrong reason tests nothing.* Text bodies now declare
+   `text/plain`.
+2. **Fixtures that must be INGESTED, or whose reason lies at or past
+   extraction, need real PDFs.** `extract_text.extract` dispatches to `pypdf` or
+   `python-docx` and has no text path. `q02`, `q09`, `q10`, `q11` and `q14` are
+   now **real PDF binaries**, written with `code-agent`'s existing hand-rolled
+   writer (`tools/make_binaries.write_pdf`), imported rather than duplicated —
+   one PDF writer in the project, not two. The import is optional so the
+   generator still runs on the standard library alone.
+3. **I had `q07`/`q08` wrong on the merits.** I briefly reasoned that prompt
+   injection is an answer-time concern and marked them `INGEST`. The shipped
+   design disagrees and is right: `QuarantineReason.INJECTION_MARKER` and
+   `INVISIBLE_TEXT` exist and are in `RUN_FAILING_QUARANTINE_REASONS` — a
+   hostile document is not a routine one, and it should never enter the corpus
+   to be defended against later. Both are `QUARANTINE`.
+
+Three fixtures carry `expected: INGEST` — `q02` (the redacted twin), `q14` (the
+negative control) and `q11` (see below).
 
 | Fixture | What it is |
 |---|---|
@@ -449,18 +613,30 @@ numbers about an outcome that does not exist yet.
 | `q04_access_denied_page` | Access-denied HTML **served with HTTP 200**. A pipeline that trusts the status code ingests it. |
 | `q05_login_page` | A login form with no error wording at all — a body scan looking for "denied" or "error" misses it. The signal is a password input. |
 | `q06_soft_404_page` | Not-found page served 200. Contains the phrase "may have been superseded", which will mis-fire a naive supersession grep. |
-| `q07_invisible_text_injection` | **The injection probe.** Two concealment techniques in one document: a `font-size:0px` span and a white-on-white span, each carrying an injection payload, wrapped in genuinely legitimate visible comment prose. A human reading the rendered page sees nothing wrong. |
-| `q08_prompt_injection_brief` | Intervenor brief with a visible injection under a heading addressed to an automated reader. The payload instructs the system to assert a fabricated ROE against a docket number in **real PA format** — it is trying to make the citation look real, which a namespace check catches. |
-| `q09_no_extractable_text` | Image-only scanned document, no extractable text on any page. |
-| `q10_partial_extraction` | Text on pages 1–2, none on 3–9 — and the surviving text is a **system average**, so a pipeline that ingests what it can get silently loses every class-specific figure. |
-| `q11_orphan_exhibit` | `RCA-R8`. Four large precise numbers, no parent, no case identity. |
-| `q12_missing_outcome_case` | `DECIDED` with a `decided_date` and no outcome document of any kind. |
-| `q13_enum_validation_failure` | Three failures at once: lower-case `"decided"` (must not be coerced), an unknown enum value, and a **misspelled key** `confidentialty` that must be rejected rather than absorbed. |
-| `q14_marking_words_in_body_only` | **Negative control.** A legitimate public final order whose body, on page 4+, discusses protective designations and contains the exact trigger phrases. It must be **ingested**. Without this fixture, a scan that greps the whole document passes every positive case and quietly quarantines legitimate orders — and orders are the only documents that carry outcomes. |
+| `q07_invisible_text_injection` | **The injection probe.** Two concealment techniques in one document: a `font-size:0px` span and a white-on-white span, each carrying a payload, wrapped in genuinely legitimate visible comment prose. The body is the **extraction-faithful text** — invisible text is invisible only to a human — and the HTML that produces it is committed beside it as `rendered.html`. The difference between the two files *is* the attack. |
+| `q08_prompt_injection_brief` | Intervenor brief with a visible injection under a heading addressed to an automated reader. The payload instructs the system to assert a fabricated ROE against a docket number in **real PA format** — it is trying to make the citation look real, which a namespace check over emitted citations catches. |
+| `q09_no_extractable_text` | A **real image-only PDF** — pages carry an image and no text object at all. |
+| `q10_partial_extraction` | A **real PDF**: pages 1–2 extract, pages 3–9 yield nothing. The surviving text is a **system average**, so a pipeline that ingests what it can get silently loses every class-specific figure — DOMAIN §4.8's trap arriving through an extraction failure rather than a reading error. |
+| `q11_orphan_exhibit` | `RCA-R8`. Four large precise numbers, no caption, no parent, no case identity. **`expected: INGEST`** — and that is the point: it passes sanity, confidentiality and extraction perfectly, because a well-formed schedule with no parent is *exactly* what makes an orphan dangerous. Its gate is `UNRESOLVED_PARENT` at F12 parent binding, one stage downstream of what `seed_quarantine` runs. |
+| `q12_missing_outcome_case` | `DECIDED` with a `decided_date` and no outcome document of any kind. **A case manifest, not a document body** — see the harness-scope note below. |
+| `q13_enum_validation_failure` | Three failures at once: lower-case `"decided"` (must not be coerced), an unknown enum value, and a **misspelled key** `confidentialty` that must be rejected rather than absorbed. Also a case manifest. |
+| `q14_marking_words_in_body_only` | **Negative control.** A legitimate public final order whose page 8 discusses protective designations and contains the exact trigger phrases, at byte ~37,000 — well past the 8,192-byte first-page window the scan reads. Page 1 is clean. It must be **ingested**. Without this fixture, a scan that greps the whole document passes every positive case and quietly quarantines legitimate orders — and orders are the only documents that carry outcomes. |
 
 Each fixture records **what the document is** and why. It does not record what
 the pipeline should do — that is `test-agent`'s and `security-architect`'s
 assertion to write.
+
+**Harness scope, stated so nobody reads more into a green line than is there.**
+`seed_quarantine` runs `sanity → confidentiality → extract`. Three fixtures have
+their true gate elsewhere: `q11` at F12 parent binding, and `q12`/`q13` are
+**case manifests, not document bodies** — running them through the document
+chain is a category mismatch and the reason it reports for them
+(`NO_EXTRACTABLE_TEXT`, `PROTECTED_MARKING`) is meaningless. Their real reasons,
+`MISSING_OUTCOME_DOCUMENT` and `ENUM_VALIDATION_FAILURE`, are `GateFailureReason`
+members reached by the case loader. Their `expected` values are set to what the
+document chain actually produces so the seed is honest; the reason they exist is
+recorded in `expected_quarantine_reason`. **Flagged to `code-agent`:** a
+case-level fixture path would let `q12`/`q13` assert what they are for.
 
 ### 6.5 Bias probes — equal coverage by construction
 
@@ -490,83 +666,184 @@ already accounted for.
 
 ---
 
-## 7. Gaps flagged, not worked around
+## 7. Gaps
 
-Four things I could not model cleanly against the agreed schema. Each is
-reported rather than papered over.
+Run 1 raised four. `code-agent` closed three and refused one with reasoning I
+accept. Run 2 raises seven more, five of them found by putting the corpus
+through the real loader. **Two are defects in shipped code, one of which blocks
+loading.**
 
-**Gap 1 — `unit` has no `NOT_STATED` member.** A `NOT_STATED` claim has no value
-and no unit, but `unit` is a closed enum (`PERCENT | BASIS_POINTS | USD |
-USD_PER_KWH | USD_PER_MONTH | RATIO`) with no member for absence, and
-`PLAN.md` §4.5 describes `value` as the figure as stated. My convention:
-`value_text = null` and `unit = null` for the nine `NOT_STATED` rows, relying on
-`PLAN.md` §4.6.2's reservation of `null` for "not applicable to this record
-type". **For `solution-architect` / `code-agent`**: this either needs a
-`NOT_STATED` member on `unit`, or an explicit written rule that `value_text` and
-`unit` are null exactly when `claim_status = NOT_STATED`. Leaving it implicit
-means the black-box case is representable two ways, which is how `RCA-R5`
-regresses.
+### Closed since run 1
 
-**Gap 2 — `document_type` has no member for a withdrawal or a procedural
-order.** The `RCA-R13` case ends with the utility withdrawing. There is no
-document type in the closed 14-value enum that describes a withdrawal notice or
-a commission order permitting withdrawal, and typing it `FINAL_ORDER` would make
-it an outcome document and defeat the fixture. I have therefore modelled the
-withdrawal as a **case-level fact only** (`case_status = WITHDRAWN`,
-`decided_date = null`, `has_outcome_document = false`), with no document
-representing it. That is honest but lossy: the corpus cannot say *when* or *why*
-the case was withdrawn.
-
-**Gap 3 — `document_type` and `confidentiality` are public-docket taxonomies,
-and the work-product corpus is not a public docket.** There is no member that
-describes internal, unfiled material. My mapping, applied consistently and
-recorded here so it is not mistaken for extraction:
-
-| Internal material | Mapped to | Rationale |
+| | Gap | How it was closed |
 |---|---|---|
-| Draft, unfiled testimony | `UTILITY_DIRECT_TESTIMONY` | correct in kind; `filed_date = null` carries the draft-ness |
-| Internal workpaper / cost position paper | `EXHIBIT_SCHEDULE` with `parent_doc_id` | inherits from the filing it supports, never stands alone |
-| Strategy / posture memorandum | `BRIEF` | argument, never a fact source — which is the right authority for a memo |
-| File copies of orders, settlements, tariffs | their own types | they are what they are |
+| 1 | `unit` had no `NOT_STATED` member, so a black-box claim was representable two ways | `Unit.NOT_STATED` added; `corpus_format._claim_unit` now enforces **one** legal form. Exactly the fix asked for. |
+| 2 | No `document_type` for a withdrawal | `WITHDRAWAL_NOTICE` and `PROCEDURAL_ORDER` added, both **outside** `OUTCOME_DOCUMENT_TYPES`, both ranked below every substantive filing. Better than my proposal — I had modelled the withdrawal case-level-only, which lost the date, and "when the record stops" is the whole of `RCA-R13`. |
+| 3 | No taxonomy for internal, unfiled material | `InternalMaterialKind` as a **separate** enum mapped to `document_type`, so provenance does not become an authority rank. Also the right call. |
+| 4 | No PDF/DOCX binaries | `tools/make_binaries.py`. This corpus now borrows its writer for the quarantine fixtures. |
 
-`confidentiality` is set to `PUBLIC` on work-product records because `PROTECTED`
-is unrepresentable in the store by SQL `CHECK` and `UNKNOWN` means "quarantine".
-On a work-product record that value is semantically empty — the `corpus` field
-and the physical store separation are doing the real work — but it is
-misleading to read. **A `NOT_APPLICABLE` member would fix it.**
+### Refused, with reasoning I accept
 
-**Gap 4 — no PDF or DOCX binaries.** The corpus ships as structured JSON plus a
-layout-faithful `.txt` rendering. It therefore exercises chunking, locators,
-claim extraction, retrieval and grounding fully, but it does **not** exercise
-`pypdf` layout-mode extraction or `python-docx` table handling against real
-binaries. `AC-F11-*` needs real files. Generating them would mean adding a PDF
-library, which is `code-agent`'s call on the dependency set, not mine. **This is
-a gap for `code-agent`**, and the `.txt` rendering is designed to be the input if
-the decision is to synthesise binaries from it.
+`confidentiality = NOT_APPLICABLE` for work-product records. The `CHECK` is
+shared by both stores; widening it would let the **public** store hold a
+document whose confidentiality was never classified, weakening `AC-F4-05`.
+Trading a real security control for readability is a bad trade. Work-product
+records carry `PUBLIC`, and `is_confidentiality_meaningful(corpus)` exists for
+code that needs to know the field does not apply.
+
+### New — defects in shipped code
+
+**Gap 12 — `authority_rank` is bounded at 14 but the enum now has 16 members.
+THIS BLOCKS LOADING.**
+
+```
+app/stores/schema_sql.py:114
+    authority_rank INTEGER NOT NULL CHECK (authority_rank BETWEEN 1 AND 14),
+```
+
+`DocumentType` gained `PROCEDURAL_ORDER` (15) and `WITHDRAWAL_NOTICE` (16) —
+the very members added to close gap 2 — but the store constraint was not
+widened with it. Loading fails with
+`sqlite3.IntegrityError: CHECK constraint failed: authority_rank BETWEEN 1 AND 14`
+on the three documents that use them.
+
+This is a one-line fix, and `app/enums/document.py` already contains the right
+value and says why it exists: `DOCUMENT_TYPE_RANK_COUNT`, commented *"so 'rank N
+of M' is never a hard-coded 14 that silently lies the moment a member is
+added."* Every other enum `CHECK` in that file is generated by `chk(col, Enum)`;
+`authority_rank` is the only hard-coded one. **Deriving the bound from
+`DOCUMENT_TYPE_RANK_COUNT` would make it unable to lie again.**
+
+I confirmed by patching the DDL **in memory only** (nothing under `app/` was
+modified) that this is the *sole* blocker: with the bound at 16 the entire
+corpus loads clean — public store 20 cases / 152 documents / 418 chunks / 582
+claims, work-product store 5 / 26 / 82 / 62, both exit 0.
+
+**Gap 13 — the confidentiality marker scan matches by substring, so
+"confidentiality" matches "confidential".**
+`app/ingest/confidentiality.py` does `if marker in lowered`. An entirely public
+order whose **first page** says *"the parties' confidentiality designations were
+resolved"* is quarantined today. That is a live `AC-F10-07` / `FDA-7` exposure
+in the one document class that carries outcomes. Found because my `q14` negative
+control tripped on its own explanatory sentence; I reworded the fixture so it
+tests page-*scoping* and one thing only, and am reporting the substring
+behaviour separately rather than burying it in a fixture. A word-boundary match
+would fix it.
+
+### New — schema expressiveness, reported not worked around
+
+**Gap 5 — pre-tax vs after-tax has no field at all.** `PLAN.md` §4.5 had
+`basis: PRETAX | AFTERTAX | NOT_STATED`; the shipped `Basis` is the
+jurisdictional axis. `DOMAIN_KB` §4.5 is explicit that quoting a return-level
+deficiency as a revenue-level number **overstates by ~35%**, and the revenue
+conversion factor of 1.3514 is on Schedule R-4 of the `RCA-R9` case. Both
+figures are in the prose; only the revenue-level one is a claim, because there
+is no field that would distinguish them. **This is a named numeric trap that the
+schema can no longer record.**
+
+**Gap 6 — `ROR` is no longer a parameter.** `DOMAIN_KB` §3.8 calls the overall
+rate of return *the economically meaningful comparison* — comparing ROEs without
+comparing equity ratios is named there as the most common analyst error in the
+domain. The overall rate of return is stated in prose and on Schedule C-1 of
+every case, but **no `ROR` claim exists**, so the one comparison the domain says
+matters most cannot be answered from stored claims. `DEPRECIATION_EXPENSE`
+replaced it; both could exist.
+
+**Gap 7 — `HEARING_TRANSCRIPT` and `DATA_REQUEST_RESPONSE` were removed.**
+`corpus_format` aliases them to `STAFF_TESTIMONY` and `EXHIBIT_SCHEDULE`, which
+this corpus does not use — a transcript typed as staff testimony has the wrong
+author and the wrong authority. Consequences:
+- The cross-examination exchange in which the utility's witness says *"No. It is
+  the Company's request. What the Commission authorizes is a matter for the
+  Commission"* — the clearest statement of `RCA-R1` in the corpus — is carried in
+  the utility's `BRIEF` instead, quoted as argument. It survives; its authority
+  does not.
+- Discovery responses are typed `EXHIBIT_SCHEDULE` with a parent. That is true
+  in kind, but `DATA_REQUEST_RESPONSE` was the document class `DOMAIN_KB` §2.3
+  singles out as needing a confidentiality flag — it is the `RCA-R11` exposure
+  surface, and **it is no longer selectable by type.**
+
+**Gap 8 — `CaseType` has no `COST_OF_CAPITAL`.** California setting cost of
+capital in a *separate proceeding* is the structural fact that makes the CPUC
+fixtures work. Those two cases are `OTHER` with `topic_tags: [COST_OF_CAPITAL]`,
+so the distinction survives only in an open vocabulary.
+
+**Gap 9 — `InternalMaterialKind.FILE_COPY` maps unconditionally to
+`FINAL_ORDER`.** A file copy of an order on rehearing or a compliance tariff
+would be mis-typed. Avoided by declaring `document_type` directly on those five
+work-product documents, which the loader permits. A `FILE_COPY` that inherited
+the type of what it copies would remove the trap.
+
+**Gap 10 — the exhibit-inherits-from-parent rule is not implemented.**
+`DOMAIN_KB` §2.3 says an `EXHIBIT_SCHEDULE` *"inherits, never stands alone"* —
+authority and case identity from its parent filing. Neither `authority_rank`
+(computed from the document's own type) nor the `AUTHORIZED` trigger (which
+requires the claim's own document to be a `FINAL_ORDER`/`ORDER_ON_REHEARING`)
+implements it, so a schedule attached to a final order cannot carry an
+`AUTHORIZED` claim. **I did not argue with the store.** The `RCA-R9`
+reconciliation schedules are re-cast as the proof of revenues attached to the
+**compliance tariff**, with `IMPLEMENTED` claims — which is where reconciliation
+schedules actually live in practice, so the fixture is more realistic than
+before and the case now carries both statuses. My generator's own invariant was
+tightened to the store's exact rule: *an invariant looser than the store it
+feeds is not an invariant.*
+
+**Gap 11 — the quarantine harness runs only the document chain.** See §6.4.
+`q11`, `q12` and `q13` have their real gates elsewhere.
 
 ---
 
-## 8. Reset / reload — and a blocking gap
+## 8. Reset / reload — status and the two path constants
 
-Division of labour, per my contract: **`code-agent` owns the mechanism**
-(`dev/scripts/seed-data.sh reset|reload`), **I own the content**.
+Division of labour, per my contract: **`code-agent` owns the mechanism**, **I own
+the content**. `dev/scripts/seed-data.sh` now exists with
+`reset | load | reload | verify` and two separate loader modules — one store
+import each, no `--corpus` flag — so `SEC-W6(b)` is a property of the module
+graph. That is exactly the right shape and I have not touched it.
 
-> **`dev/scripts/seed-data.sh` does not exist.** There is no `dev/scripts/`
-> directory at all as of this pass. I therefore could **not** apply the corpus
-> to any store, and I did not build an alternative — writing my own seeding path
-> is exactly the thing my contract forbids, and it would put a second, divergent
-> loader beside `code-agent`'s.
+### What I verified
 
-The corpus is generated, verified and on disk. Applying it is one command once
-the script exists. **Flagged to `code-agent` as a gap**, together with the note
-that the script will need two modes matching the two stores: the `workproduct/`
-tree loads **only** into the work-product store (`SEC-W6(b)`: the synthetic
-loader must have no import route to the public store), and the three `public/`
-trees load only into the public store.
+| Check | Result |
+|---|---|
+| `corpus_format.read_case` over all four sets | 25 cases, 179 documents, 500 chunks, 644 claims, 4 edges, **0 read failures** |
+| Claim attribution survives the loader's quote→chunk resolution | **0 misattributed** of 644 |
+| `seed_quarantine` against the real classifier chain | **14 fixtures, 0 disagreeing** |
+| `seed_public` + `load_synthetic` into both stores | **clean, both exit 0** — with the gap 12 one-liner applied in memory |
 
-`ARCHITECTURE_KB` §3.1 names `app/cli/load_synthetic.py` as the loader for the
-work-product store. Point it at `dev/data/synthetic/workproduct/`; §3 above is
-the format contract.
+### Two things to change, both `code-agent`'s
+
+**1. The corpus root constant still points at the lost path.**
+
+```
+app/config/paths.py:22
+    SYNTHETIC_CORPUS_ROOT: Path = DATA_ROOT / "synthetic"     # -> dev/data/synthetic
+```
+
+It needs to be `REPO_ROOT / "corpus" / "synthetic"`. The comment above it —
+*"Under data/, which .gitignore excludes wholesale (SEC-S1) — so the corpus is a
+BUILD PRODUCT regenerated from its committed generator, never a tracked asset"* —
+was a reasonable inference from where the corpus was, but it is the inference
+that cost us run 1. **The corpus is a tracked project asset.** Same for
+`scripts/seed-data.sh:31`'s `CORPUS_ROOT` default and the help text in
+`seed_public.py`, `load_synthetic.py`, `seed_quarantine.py`, `README.md`,
+`tools/make_synthetic.py` and `tools/make_corpus_format_fixture.py`.
+
+Until then the corpus is loadable today by pointing at it explicitly:
+
+```
+CORPUS_ROOT="$PWD/corpus/synthetic" ./scripts/seed-data.sh reload
+```
+
+(`verify` alone reads `paths.SYNTHETIC_CORPUS_ROOT` directly and ignores the
+environment variable, so it reports ABSENT until the constant moves.)
+
+**2. Gap 12 blocks `load` outright** — `authority_rank BETWEEN 1 AND 14`. One
+line, §7.
+
+I left **no stores seeded**. The load I ran to prove gap 12 was produced by a
+process with a patched schema, and a store whose provenance needs a paragraph of
+explanation is the kind of state my contract tells me is worse than none. Once
+the one-liner lands, `reload` populates everything.
 
 ---
 
@@ -577,8 +854,8 @@ editing `tools/generate_corpus.py` and re-running.
 
 | # | Assumption |
 |---|---|
-| `SDA-1` | Volume preset **MEDIUM**: 25 cases / 176 documents / 672 claims. Enough to exercise every flow and every enum member several times, small enough to review by hand. Not sized for load exploration. |
-| `SDA-2` | Corpus as-of date **2026-08-06**, matching the project's present. Case dates span 2011–2026 so vintage is genuinely variable. |
+| `SDA-1` | Volume preset **MEDIUM**: 25 cases / 179 documents / 644 claims. Enough to exercise every flow and every enum member several times, small enough to review by hand. Not sized for load exploration. |
+| `SDA-2` | Corpus as-of date **2026-08-08**, matching the project's present. Case dates span 2011–2026 so vintage is genuinely variable. |
 | `SDA-3` | The corpus is split into four independently loadable sets. This is forced: `BP-1` needs equal coverage and `RCA-R6` needs a deliberate gap, and one undifferentiated corpus cannot be both. The `RCA-R6` gap is nonetheless enforced across the **union** of all sets, so no combination of loads closes it. |
 | `SDA-4` | The work-product corpus is one utility's own archive, holding both its unfiled internal material **and** its file copies of the public outcomes. That is how a regulatory affairs group actually keeps files, and it is what makes `AC-F23-07`'s order-on-rehearing requirement satisfiable inside the internal corpus. |
 | `SDA-5` | The CPUC GRC-without-an-ROE is recorded as `NOT_STATED` with the decision's own affirmative sentence, not as an absent row. The decision *says* cost of capital is set elsewhere, and an affirmative statement is a fact worth recording. Reversible, but recording it as absence would make it indistinguishable from a parse failure. |
@@ -589,6 +866,12 @@ editing `tools/generate_corpus.py` and re-running.
 | `SDA-10` | Injection payloads in `q07`/`q08` are realistic attempts written for a defensive red-team suite. `q08`'s payload deliberately cites a **real-format** PA docket number, because that is what a real injection would do. |
 | `SDA-11` | The generator is committed with its output. The corpus is a build artefact of a reviewable script, so a reviewer can check *why* a number is what it is, and any future run is reproducible. |
 | `SDA-12` | All hostnames are under the reserved `.invalid` TLD, so a live fetch against this corpus fails at DNS resolution rather than reaching anything. |
+| `SDA-13` | **The corpus lives under `dev/corpus/`, not `dev/data/`.** It is a primary project asset, not derived state, and `data/` is correctly ignored wholesale by `SEC-S1`. Reversing this loses the corpus again. |
+| `SDA-14` | The generator **cleans the four directories it owns** before writing, so the corpus on disk is always exactly one run and never the union of two. |
+| `SDA-15` | The generator emits the values that **actually shipped** in `dev/app/enums/` and deliberately does not rely on `corpus_format.DOCUMENT_TYPE_ALIASES`. An alias is a compatibility shim; a corpus that needs one has drifted from its schema. Where the shipped schema cannot express something the domain needs, it is recorded in §7 rather than approximated. |
+| `SDA-16` | The `RCA-R9` reconciliation schedules are attached to the **compliance tariff** with `IMPLEMENTED` claims, not to the final order with `AUTHORIZED` ones. Forced by gap 10, but independently more realistic — reconciliation schedules are filed in compliance — and it gives the case both statuses over the same figures. |
+| `SDA-17` | The generator borrows `code-agent`'s PDF writer rather than adding a second one, via an optional import that degrades loudly. One PDF writer in the project. |
+| `SDA-18` | `expected` on the quarantine fixtures records what the **document chain** produces, because that is what the harness runs. Where a fixture's true gate is elsewhere (`q11`, `q12`, `q13`) that is recorded in `expected_quarantine_reason` and in §6.4 rather than by setting a value the harness would then disagree with. |
 
 ---
 
@@ -597,40 +880,54 @@ editing `tools/generate_corpus.py` and re-running.
 Recorded per run, not only for the latest, so a later run or a human can tell
 what state the environment is in.
 
-| Run id | Date | Preset | Sets generated | Cases | Docs | Claims | Quarantine | Applied to a store? |
+| Run id | Date | Preset | Root | Cases | Docs | Claims | Quarantine | Applied to a store? |
 |---|---|---|---|---:|---:|---:|---:|---|
-| `RUN-2026-08-07-MEDIUM` | 2026-08-07 | **MEDIUM** | `public/balanced`, `public/probes`, `public/risk`, `workproduct`, `quarantine` | 25 | 176 | 672 | 14 | **No** — `dev/scripts/seed-data.sh` does not exist (§8). Content generated and verified on disk only. |
+| `RUN-2026-08-07-MEDIUM` | 2026-08-07 | MEDIUM | `dev/data/synthetic` | 25 | 176 | 672 | 14 | **No.** `seed-data.sh` did not exist yet. **This run no longer exists** — see §0. |
+| `RUN-2026-08-08-MEDIUM` | 2026-08-08 | **MEDIUM** | **`dev/corpus/synthetic`** | 25 | 179 | 644 | 14 | **No** — blocked by gap 12 (`authority_rank` bound). Verified through the real loader end to end; see §8. |
 
 ### Invariants verified at generation time
 
-The generator **refuses to emit the corpus** unless all ten hold. They are
-properties of the data, asserted where the data is made; they are not tests, and
-they do not substitute for any suite.
+The generator **refuses to emit the corpus** unless all fifteen hold. They are
+properties of the data, asserted where the data is made. They are not tests and
+do not substitute for any suite.
 
-1. Every `docket_number` is in the `SYN-` namespace and collides with no real
-   PA PUC / PUCT / CPUC format.
+1. Every `docket_number` is in the `SYN-` namespace, matches its **own
+   corpus's** pattern, collides with no real PA PUC / PUCT / CPUC format, and
+   its prefix-stripped sequence is in an out-of-range band.
 2. Every claim's `verbatim_quote` is present in its document after the same
    whitespace normalisation the grounding verifier applies.
-3. No `AUTHORIZED` claim outside a `FINAL_ORDER` / `ORDER_ON_REHEARING` (or a
-   schedule parented to one) in a `DECIDED` case.
-4. Every `DECIDED` or `SETTLED_APPROVED` case has an outcome document.
-5. **The `RCA-R6` gap**: no case in any set is both `PUCT` and `FORECAST`.
-6. The blend value does not appear as a stored `ROE` or on any equity line.
-7. Every document carries its own corpus marker and not the other one.
-8. Balanced set: identical document slice, identical parameter × status
+3. **Every claim quote resolves to exactly one document of its case.** New in
+   run 2 — the loader takes the first match and overrides `doc_id`, so an
+   ambiguous quote silently re-attributes a claim. Caught four real collisions.
+4. No `AUTHORIZED` claim outside a `FINAL_ORDER` / `ORDER_ON_REHEARING` in a
+   `DECIDED` case — **the shipped store trigger's exact rule**, not a looser one.
+5. Every `DECIDED` or `SETTLED_APPROVED` case has **both** an order and a
+   compliance tariff.
+6. **The `RCA-R6` gap**: no case in any set is both `PUCT` and `FORECAST`.
+7. The blend value is not a stored `ROE` and appears on no equity line.
+8. Every document carries its own corpus marker and not the other one.
+9. Balanced set: identical document slice, identical parameter × status
    availability, equal case count per jurisdiction, and identical authorized
    increase %, ROE and equity ratio across all six cases.
-9. `BP-2` arms are identical in every claim value.
-10. Every revenue requirement reconciles to the sum of its components, for all
+10. `BP-2` arms are identical in every claim value.
+11. Every revenue requirement reconciles to the sum of its components, for all
     four position sets of every case.
+12. `NOT_STATED` claims carry `unit=NOT_STATED` and no `value_text`; valued
+    claims carry neither — the single legal form, both directions.
+13. `internal_material_kind` appears only on work-product documents, and kinds
+    requiring a parent have one.
+14. Every locator carries a page.
+15. Every `parent_doc_id` resolves inside its own case.
 
 To regenerate:
 
 ```
-cd dev/data/synthetic && python3 tools/generate_corpus.py
+cd dev/corpus/synthetic && python3 tools/generate_corpus.py
 ```
 
-Deterministic, no dependencies beyond the standard library, no network.
+Deterministic, standard library only, no network. The one optional import is
+`code-agent`'s PDF writer for the quarantine binaries; without it the generator
+still runs and says what it could not produce.
 
 ---
 
@@ -638,4 +935,5 @@ Deterministic, no dependencies beyond the standard library, no network.
 
 | Date | Version | Change |
 |---|---|---|
-| 2026-08-07 | 1.0.0 | Initial pass, `RUN-2026-08-07-MEDIUM`. Synthetic internal work-product corpus (`F23`, 5 cases); synthetic public corpus across PA PUC / PUCT / CPUC with all 14 `document_type` members and an outcome document on every decided case; 12 named-risk fixtures incl. the `RCA-R6` extrapolation trap enforced as a generator invariant; 14 quarantine fixtures incl. two negative controls; equal-coverage bias-probe set for `BP-1`…`BP-6`. Three-belt synthetic namespace. Four schema gaps flagged (`unit` has no `NOT_STATED`; no `document_type` for withdrawal; no internal-material taxonomy; no PDF/DOCX binaries). `dev/scripts/seed-data.sh` absent — corpus generated but not applied, flagged to `code-agent`. |
+| 2026-08-08 | 2.0.0 | **Regenerated after run 1 was lost** (§0: written under `dev/data/`, which `SEC-S1` ignores wholesale; never tracked; removed by a clean). New root `dev/corpus/synthetic/`, tracked, generator alongside. Re-aligned to the **shipped** `dev/app/enums/` rather than `PLAN.md` §4.5 — 16 document types, `Unit.NOT_STATED`, `internal_material_kind`, `BLACK_BOX_SETTLEMENT` as a first-class resolution path, `basis`/`scope` swapped to the shipped semantics, no `ROR`. Four new generator invariants incl. **quote uniqueness within a case**, which caught four silent claim-misattribution collisions. Verified end to end through the real loader (0 read failures, 0 misattributed claims of 644, 14/14 quarantine fixtures agreeing). Run 1's four gaps: 3 closed by `code-agent`, 1 refused with accepted reasoning. **Two shipped-code defects reported, one blocking**: `authority_rank BETWEEN 1 AND 14` against a 16-member enum, and substring matching in the confidentiality scan. Five further schema-expressiveness gaps recorded (pre-tax/after-tax, `ROR`, `HEARING_TRANSCRIPT`/`DATA_REQUEST_RESPONSE`, `COST_OF_CAPITAL`, exhibit inheritance). |
+| 2026-08-07 | 1.0.0 | Initial pass, `RUN-2026-08-07-MEDIUM`. **Superseded and lost.** Synthetic internal work-product corpus (`F23`, 5 cases); synthetic public corpus across PA PUC / PUCT / CPUC with all 14 `document_type` members and an outcome document on every decided case; 12 named-risk fixtures incl. the `RCA-R6` extrapolation trap enforced as a generator invariant; 14 quarantine fixtures incl. two negative controls; equal-coverage bias-probe set for `BP-1`…`BP-6`. Three-belt synthetic namespace. Four schema gaps flagged (`unit` has no `NOT_STATED`; no `document_type` for withdrawal; no internal-material taxonomy; no PDF/DOCX binaries). `dev/scripts/seed-data.sh` absent — corpus generated but not applied, flagged to `code-agent`. |

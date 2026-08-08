@@ -1,71 +1,81 @@
 {
   "name": "rate-case-analyzer",
   "template": "custom (Python 3.12 \u00b7 FastAPI + Jinja2 server-rendered \u00b7 SQLite \u00d73 \u00b7 numpy ranking)",
-  "position": "Gate 7 \u00b7 Code (complete) \u2192 Gate 8 \u00b7 Test",
+  "position": "Gate 10 \u00b7 Review",
   "env": "dev, local",
   "last_activity": "2026-08-08",
-  "served_url": "http://127.0.0.1:8041/ (design review); app run locally per dev/README.md",
-  "notes": "MVP1 built: 44 features, 864 tests green across 8 suites incl. Playwright rendered-UI. Two-corpus ethical wall enforced by static import-closure check with 7 negative-control fixture trees. Full autonomy run - every gate closed 'assumed', assumptions ASM-1..ASM-28 recorded.",
+  "served_url": "http://127.0.0.1:8041/ (design review)",
+  "notes": "MVP1 built and running. 899 tests green across 8 blocking suites against the real corpus (independently derived by test-agent, evidence at test-evidence/test-gate-2026-08-08-final.md). Gate 9 Verification 342/342 mapped, 0 NOT VERIFIED, 0 FAILED -- after one accepted loop-back to Code. Full-autonomy run at human instruction: every gate carries batch_authorized, and 31 numbered orchestrator assumptions (ASM-1..ASM-31) are recorded in PROJECT_CONTEXT.md for retrospective ratification.",
   "gates": [
     {
       "n": 1,
       "name": "Intake",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "functional-agent + industry-expert KBs; jurisdictions PA PUC/PUCT/CPUC (ASM-1)"
     },
     {
       "n": 2,
       "name": "Team",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "full roster, 14 agents, nothing dropped (ASM-4); all suites blocking (ASM-5)"
     },
     {
       "n": 3,
       "name": "Plan",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "58 features, 44 MVP1 (ASM-22); no aggregates in MVP1 (ASM-14)"
     },
     {
       "n": 4,
       "name": "Functional",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "342 acceptance criteria, stack-neutral; 8 FDA-* assumptions"
     },
     {
       "n": 5,
       "name": "Experience",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "12 rendered screens + system sheet; no Figma (View seat, 6 calls/month)"
     },
     {
       "n": 6,
       "name": "Architecture",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "FastAPI+Jinja2, SQLite x3, no vector DB, no LangChain (ASM-23); 10 cross-KB conflicts adjudicated (ASM-24)"
     },
     {
       "n": 7,
       "name": "Code",
       "status": "done",
-      "approval": "assumed"
+      "approval": "batch_authorized",
+      "note": "4 passes. 899 tests, 8 suites. Final pass closed the 7 gate-9 gaps."
     },
     {
       "n": 8,
       "name": "Test",
-      "status": "running",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized",
+      "note": "899 tests, exit 0, independently derived by test-agent; evidence filed"
     },
     {
       "n": 9,
       "name": "Verify",
-      "status": "pending",
-      "approval": "pending"
+      "status": "done",
+      "approval": "batch_authorized",
+      "note": "1st pass 335/342 BLOCKED -> loop-back to Code -> re-audit 342/342, 0 NOT VERIFIED"
     },
     {
       "n": 10,
       "name": "Review",
-      "status": "pending",
-      "approval": "pending"
+      "status": "active",
+      "approval": "awaiting",
+      "note": "review-agent terminated mid-run on an API error; re-running"
     },
     {
       "n": 11,
@@ -73,5 +83,7 @@
       "status": "pending",
       "approval": "pending"
     }
-  ]
+  ],
+  "updated": "2026-08-08",
+  "updated_by": "orchestrator (backfilled 2026-08-08 \u2014 the freshness check found this project had no updated field)"
 }

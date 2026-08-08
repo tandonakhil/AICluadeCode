@@ -73,8 +73,18 @@ def check():
             highest = max([g["n"] for g in d.get("gates", [])
                            if g.get("status") in ("done","active","warn")] or [0])
             claimed = [i+1 for i,gn in enumerate(GATES) if gn.lower() in stage.lower()]
-            if claimed and max(claimed) < highest:
-                problems.append((name, "INDEX.md says %r but pipeline-state reaches gate %s"
+            # An ENHANCEMENT re-enters an earlier gate on a finished project, so a
+            # row naming an early gate against a high-water mark is the normal shape
+            # of that -- not staleness. Same refinement the loop-back rule needed.
+            # It is only a defect when nothing explains the re-entry.
+            enhancing = ("complete" in stage.lower()
+                         or "enhancement" in stage.lower()
+                         or (ROOT / "projects" / name / "FEATURES.md").exists()
+                         and "## In Development" in (ROOT / "projects" / name / "FEATURES.md").read_text())
+            if claimed and max(claimed) < highest and not enhancing:
+                problems.append((name, "INDEX.md says %r but pipeline-state reaches gate %s, "
+                                       "with no 'complete'/'enhancement' marker and no "
+                                       "FEATURES.md In Development entry to explain the re-entry"
                                        % (stage, highest)))
             date_cell = cells[5] if len(cells) > 5 else ""
             if d.get("updated") and re.match(r"\d{4}-\d{2}-\d{2}", date_cell or ""):
