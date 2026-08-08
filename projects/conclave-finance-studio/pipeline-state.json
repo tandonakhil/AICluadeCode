@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Enhancement close-cockpit-home \u2014 Architecture (criteria issued, Experience approved)",
+  "position": "Enhancement close-cockpit-home \u2014 Test",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
