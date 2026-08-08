@@ -8,7 +8,12 @@ retired ID.
 **Pass 3 (2026-08-03)** — gate-4 loop-back from gate 9's Verification block.
 Three rulings in **§28**: `AC-F41-13` retired and replaced by `AC-F41-22`–`-24`;
 `AC-F5-07`'s population ruled and `AC-F5-08` issued; §23's screen table re-keyed
-to routes. §20 now carries two retired IDs. This file is a durable
+to routes. §20 now carries two retired IDs.
+**Pass 4 (2026-08-08)** — the `close-cockpit-home` enhancement, approved by the
+human from a rendering on 2026-08-08. Twenty-two criteria issued in **§29**
+(`AC-COCKPIT-01`–`-19`, `AC-TYPESIZE-01`–`-03`), none retired. §29.11 records what
+this pass **refused** to issue, including the FP&A persona's home page.
+This file is a durable
 knowledge base: it accumulates across features and enhancements, and it is what
 `verification-agent` audits against at the Verification gate.
 
@@ -1232,6 +1237,11 @@ file rather than a search.
 > **Pass 3 (2026-08-03)** issued four further criteria (`AC-F41-22`, `-23`, `-24`,
 > `AC-F5-08`) and retired `AC-F41-13`. File total: **267 issued, 265 live**, two
 > retired (`AC-F12-08`, `AC-F41-13`). Per-feature deltas in §28.4.
+>
+> **Pass 4 (2026-08-08)** issued twenty-two further criteria for the
+> `close-cockpit-home` enhancement (`AC-COCKPIT-01`–`-19`) and the product-wide
+> typography floor (`AC-TYPESIZE-01`–`-03`), and retired none. File total:
+> **289 issued, 287 live**, two retired. Counts in §29.8.
 
 ### 22.1 Criteria per feature
 
@@ -1360,8 +1370,19 @@ governing when that is legitimate and when it is not).
 | `/inventory` | `AC-F5-07`, **`AC-F5-08`** |
 | `/audit` | `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-04` |
 | `/refusals` | `AC-REFUSAL-01`, `AC-REFUSAL-02` |
+| **the entry point — the close cockpit** (route not yet settled; `ui-ux-designer` proposes `/close` with `/` re-pointed to it from `/queue`) | `AC-COCKPIT-01`, `-02`, `-05`, `-06`, `-07`, `-09`, `-15`, `-17`, `-19`; `AC-F38-11` now binds here too (§29.10 item 4) |
+| **every screen** — not a route | `AC-COCKPIT-03` (the drawer), `AC-COCKPIT-04` (the return control, on every screen but the cockpit), `AC-TYPESIZE-01`–`-03` |
 
 `AC-F41-13` appears nowhere in this table: it is retired (§20, §28.1).
+
+**Pass 4 (2026-08-08) added the last two rows.** The cockpit's row is keyed on
+*the entry point* rather than on a route because the route is `solution-architect`'s
+and `ui-ux-designer`'s to settle and is not settled; §29.10 names which existing
+criteria and which existing checks a re-point of `/` touches, and rules on
+`AC-REFUSAL-13`. The "every screen" row is deliberately not a route: three of its
+five criteria are about what must hold *wherever* the product renders, and
+inventing a pseudo-route for them would have made them look narrower than they
+are.
 
 Two features are predominantly backend and their observable-UI criteria are
 correspondingly narrow, stated here so the narrowness is visible rather than
@@ -1452,6 +1473,8 @@ reading I state, and I have not resolved either.
 |---|---|---|---|
 | 2026-07-31 | 1.0.0 | Initial specification. 17 build-now features from `PLAN.md` §7 plus the A19–A22 refusal surface. 186 criteria issued (`AC-F26-01` … `AC-F42-08`, `AC-F32-01` … `-10`, `AC-REFUSAL-01` … `-07`). No IDs retired. | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 4 human approval pending |
 | 2026-07-31 | 1.1.0 | **Pass 2 — gate-4 loop-back after gate 6.** 77 criteria issued in §27 for requirements the three architects added that no criterion covered; `AC-F12-08` retired and replaced by `AC-F12-10`. Total 263 issued, 262 live (recorded as 262/261 at the time; the addition was wrong, no ID changed -- corrected at the gate-9 loop-back, see 27.11). | `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 gate-6 rulings 1–6; `ARCHITECTURE_KB` §18.1/§18.3/§19; `SECURITY_KB` §10.1; `RESPONSIBLE_AI_KB` §§1–6 |
+| 2026-08-08 | 1.3.0 | **Pass 4 — the `close-cockpit-home` enhancement.** 22 criteria issued in §29, 0 retired; file total 289 issued, 287 live. `AC-COCKPIT-01`–`-19`: the per-persona landing, drawer completeness and the non-drawer return control; the KPI rule `ui-ux-designer` asked for by name (a figure is inside a link to a specific object and carries a ≥13px qualifier, `-05`/`-06`); the abstention count (`-07`); the probe-arithmetic hazard as a **differential** criterion (`-08`); the close tracker's four states including both absences (`-09`–`-12`); the human's condition, the post-resolution landing, with its empty and error cases (`-13`–`-16`); and `-19`, a new screen inherits the standing per-screen disclosures. `AC-TYPESIZE-01`–`-03`: A2.5's typography floor issued **product-wide**, with the consequence disclosed in §29.11 rather than narrowed away. **Refused: the FP&A home page** — no such persona exists in the build and admitting one is `plan-agent`'s lane (§29.11 item 1). §23 gains two rows; §29.10 names the criteria and checks a re-point of `/` touches and rules that `AC-REFUSAL-13`'s text, not its check's gloss, governs. | Human approval of the close-cockpit design from a rendering, `PROJECT_CONTEXT.md` Decisions Log 2026-08-08, including the post-resolution-landing condition; `UX_KB` Part A3 (A3.7's two named requests); `FEATURES.md` `feature/2026-08-08-close-cockpit-home`. Gate 4 human approval of these criteria pending |
+| 2026-08-03 | 1.2.0 | **Pass 3 — gate-9 loop-back.** Three rulings in §28: `AC-F41-13` retired and replaced by `AC-F41-22`/`-23`/`-24`; `AC-F5-07`'s population ruled and `AC-F5-08` issued; §23 re-keyed from screen names to routes. Total 267 issued, 265 live, two retired. | Gate-9 Verification block, `PROJECT_CONTEXT.md` Decisions Log 2026-08-03 |
 | 2026-07-31 | 1.1.1 | **PATCH — arithmetic only.** §27.11 read "262 issued, 261 live (186 + 77 − 1)"; 186 + 77 = 263, so the file holds **263 issued, 262 live**. Found by `verification-agent` at gate 9, whose per-feature enumeration gave 262 and disagreed with the stated total. **No acceptance criterion was added, removed or renumbered** — two figures in one sentence were wrong. The corrected figures are carried through §21's cross-reference and the 1.1.0 row above. | Gate-9 loop-back to gate 7, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 |
 
 ---
@@ -2309,3 +2332,406 @@ rather than eroded.
    without one. Neither says what the proposal's lifecycle is afterwards. I have
    deliberately not invented it — that is workflow scope. **Owner: `plan-agent`.**
    Note that `AC-F41-24` is checkable without this being settled.
+
+---
+
+## 29 · Pass 4 — the close-cockpit enhancement (2026-08-08)
+
+**Why this pass exists.** The human approved the close-cockpit design from a
+rendering on 2026-08-08 (`design-review/close-cockpit-2026-08-08/`, `UX_KB`
+Part A3) with one explicit condition — the **post-resolution landing** ships with
+the drawer. `FEATURES.md` carries the enhancement as
+`feature/2026-08-08-close-cockpit-home`. The approved change adds a screen, moves
+all navigation into a drawer, and puts counts that were previously on separate
+screens onto one page for the first time. None of that is covered by an existing
+criterion, and `ui-ux-designer` asked for two criteria by name (A3.7).
+
+**Inputs read in full for this pass**: `UX_KB` Part A3 in full, plus A2.1, A2.2,
+A2.5 and A2.6; `FEATURES.md`'s enhancement block B1–B9; `PROJECT_CONTEXT.md`
+Decisions Log in full including every entry recorded since pass 3; this file
+including §12's standing exclusion, §20, §22, §23 and §28. `PLAN.md` §7.7 and
+§9.2. No `PRD.md` exists.
+
+**Nothing in this pass adds a feature, defers one, or re-cuts scope.** Every
+criterion below specifies behaviour of the enhancement the human approved, or
+states a rendering requirement on a surface that enhancement adds. Where
+specifying revealed a genuine scope question — the FP&A persona above all — it is
+reported in §29.13 and **not** resolved here.
+
+### 29.0 ID namespace for this enhancement
+
+The enhancement has no `F`-number in `FEATURES.md`; it is keyed
+`close-cockpit-home`. Its criteria take the prefix **`AC-COCKPIT-NN`**, on the
+`AC-REFUSAL-NN` precedent (§27, ID namespace note): a non-`F` prefix is a real
+namespace, not a placeholder. **If `plan-agent` later assigns this enhancement a
+feature number, the prefix does not change** — renaming `AC-COCKPIT-05` to
+`AC-F51-05` would be a renumbering, and this file does not renumber.
+
+Three further criteria carry the prefix **`AC-TYPESIZE-NN`**. They are not
+cockpit criteria — they bind every screen the product renders — and giving them
+the cockpit's namespace would have hidden that. See §29.7 and §29.11 for why they
+are issued product-wide and what follows from it.
+
+---
+
+### 29.1 The landing, the persona, the drawer and the way back
+
+#### AC-COCKPIT-01 — observable UI
+- **Given** a signed-in user whose persona the product recognises
+- **When** they arrive at the product's entry point without typing any address other than the application root
+- **Then** the close cockpit is visible on the screen they arrive at, carrying both the close tracker and that user's action items, and the entry point is not the queue, the Ask screen or any other screen that existed before this enhancement
+
+#### AC-COCKPIT-02 — observable UI
+- **Given** two signed-in users whose personas differ, and one proposal awaiting an approval only one of those personas is entitled to give
+- **When** each opens the close cockpit
+- **Then** the proposal is visible as an action item on the entitled persona's cockpit and is visible on no other persona's cockpit, and every count rendered on each cockpit is computed over the items routed to *that* persona only — two personas rendering the same set of figures fails this criterion even if both sets are individually correct
+
+#### AC-COCKPIT-03 — observable UI
+- **Given** a signed-in user on any screen, with all navigation moved into the drawer
+- **When** they open the navigation drawer
+- **Then** each of `/queue`, `/approvals`, `/ask`, `/catalogue`, `/monitors`, `/audit`, `/inventory`, `/refusals` and `/my-probe-history` is present in the drawer as an activatable destination, and following each one reaches that screen; a drawer missing any one of the nine fails, and no destination this product served from its navigation before this enhancement is reachable only by typing an address
+
+#### AC-COCKPIT-04 — observable UI
+- **Given** a signed-in user on any screen other than the close cockpit, with at least one item routed to them
+- **When** that screen is rendered
+- **Then** a control returning to the close cockpit is visible **without the drawer being opened**, and it states the close period and the number of items still routed to that user, and that number is equal to the routed-item count rendered on the cockpit itself in the same state
+
+---
+
+### 29.2 KPIs as action items — the rule `ui-ux-designer` asked to be made structural
+
+`UX_KB` A3.5. The rule is enforced today by one component (`.act` has no variant
+without a destination or a qualifier). A component is not a specification:
+A2.1 records an approved information architecture degrading after approval with
+nothing watching it, because it was a paragraph rather than a checked artefact.
+These two criteria are what watches it.
+
+#### AC-COCKPIT-05 — observable UI
+- **Given** the close cockpit rendered for a signed-in user, in any state and for any persona
+- **When** the screen is rendered
+- **Then** **every** numeric figure on it is inside a link carrying an in-product destination **and** carries a qualifier naming what the figure counts and the basis on which it was computed, rendered at a computed font size of at least 13px — one figure on the screen with no link, or with no such qualifier, or with the qualifier below 13px, fails this criterion, and a check that inspects a subset of the screen's figures does not satisfy it
+
+#### AC-COCKPIT-06 — observable UI
+- **Given** each numeric figure on the close cockpit and the link it is inside
+- **When** that link is followed
+- **Then** the screen reached renders the subject that figure counts — the items, the object or the period the figure is about — without the user applying a filter, a sort or a search to find it, and no figure's link resolves to the close cockpit itself; each figure on the screen satisfies this, and one figure landing on a screen where its subject must be located among unrelated content fails the criterion
+
+---
+
+### 29.3 The abstention count, and the probe arithmetic that must not be done
+
+#### AC-COCKPIT-07 — observable UI
+- **Given** a signed-in user to whom six items are routed, of which five are findings and one is an item the system abstained on
+- **When** they open the close cockpit
+- **Then** the figure 6 is rendered only as the count of items routed, the five findings are rendered as five, the abstention is rendered as a separately named item of its own, and no text anywhere on the screen describes six items as findings or as anything the system settled — the routed total and the finding count are both present, and rendering only one of them fails
+
+#### AC-COCKPIT-08
+- **Given** two otherwise identical states of the product differing only in how many of a user's routed items are injected probes, noting that the routed-item count includes probes while the coverage population excludes them (`AC-F12-16`)
+- **When** the close cockpit is rendered for each state
+- **Then** the routed-item count differs between the two renderings by exactly the difference in probes, **no other figure on the screen differs between the two renderings**, and no label, qualifier or adjacent text on either rendering states a difference, remainder, reconciliation or exclusion between the routed-item count and any coverage figure — a probe stays undetectable by arithmetic performed on what the page renders (`AC-F41-08`)
+
+> **Why this is a differential criterion rather than a numeric one.** The obvious
+> phrasing — *"no rendered figure equals the routed count minus the probe
+> count"* — is wrong, because in the six-item state of `AC-COCKPIT-07` the honest
+> finding count (5) coincidentally equals 6 minus one probe. A criterion that
+> forbade the coincidence would forbid the correct page. What must be forbidden
+> is the **derivation**, and a derivation is observable only by varying the probe
+> count and seeing what moves. `UX_KB` A3.6 records this hazard as a note in a
+> KB; A2.1 is about what happens to notes in KBs.
+
+---
+
+### 29.4 The close tracker — four states, and the fourth is the load-bearing one
+
+`UX_KB` A3.4. The tracker's positions come from the declared close calendar, not
+from the data, which is why the two absence states below are rendered from the
+calendar and not inferred from the refresh.
+
+#### AC-COCKPIT-09 — observable UI
+- **Given** a declared close calendar containing N checkpoints, and a data refresh observed at or before the last of them
+- **When** the close cockpit renders the close tracker
+- **Then** the tracker renders exactly N checkpoints where N is the number of checkpoints in the declared calendar and no other number, states the current close day against N, and states the staleness of the refresh relative to the checkpoint it was due by — a tracker whose checkpoint count differs from the declared calendar's fails this criterion even when the current close day is right
+
+#### AC-COCKPIT-10
+- **Given** a declared close calendar and a data refresh observed **after** the last checkpoint
+- **When** the tracker renders
+- **Then** it states that the refresh arrived after the last checkpoint, in wording that is not identical to the wording rendered when a refresh arrives at or before the last checkpoint, and it does not render the refresh as having met the last checkpoint — the two states are textually distinguishable on screen, as `AC-F38-07` requires of the coverage pair
+
+#### AC-COCKPIT-11
+- **Given** a declared close calendar and **no** data refresh observed in the current close
+- **When** the tracker renders
+- **Then** the checkpoints are still rendered from the declared calendar, the refresh marker is absent from the tracker, and the screen states that no refresh has been observed; no figure on the screen states zero close days behind, zero staleness, or a refresh that is current — the absence is rendered as an absence and never as a zero
+
+#### AC-COCKPIT-12
+- **Given** no close calendar declared for the tenant and period
+- **When** the close cockpit renders
+- **Then** the close tracker is **absent** from the screen rather than rendered empty, greyed or with unfilled checkpoints; a statement stands where it would have been, naming that no close calendar is declared, naming `AC-F38-11` as consequently unmet, and identifying the disclosure-register entry that records it; and no close-day figure, staleness figure or checkpoint graphic is rendered anywhere on the screen
+
+---
+
+### 29.5 The post-resolution landing — the human's condition, made checkable
+
+`PROJECT_CONTEXT.md` 2026-08-08: the human said yes to shipping this **with** the
+drawer. `UX_KB` A3.3 states why it stops being an irritation and becomes the
+dominant interaction of the night once every destination is behind a hamburger.
+Four criteria, because the state after a save has an empty case and an error case
+that are exactly where a dead end would reappear.
+
+#### AC-COCKPIT-13
+- **Given** a signed-in user with K items routed to them, on the screen for one of those items
+- **When** they record a resolution on it and the save completes
+- **Then** that item is absent from their queue, the routed-item count on the close cockpit reads K−1, and the count on the return control of `AC-COCKPIT-04` reads K−1 — all three, not any one of them
+
+#### AC-COCKPIT-14 — observable UI
+- **Given** a signed-in user who has just recorded a resolution that saved successfully, with at least one further item routed to them
+- **When** the save completes
+- **Then** the user is on either the screen for the next routed item or the close cockpit — not left on the screen of the item they just resolved and not on a screen with no forward action — and a confirmation is visible naming the item that was resolved and the resolution type recorded for it
+
+#### AC-COCKPIT-15 — observable UI
+- **Given** a signed-in user resolving the last item routed to them
+- **When** the save completes
+- **Then** they are on the close cockpit, the routed-item count is rendered as an explicit zero carrying its qualifier rather than omitted or blank, no control offering a next item is visible, and no link on the screen resolves to an item that does not exist
+
+#### AC-COCKPIT-16
+- **Given** a signed-in user recording a resolution that does **not** save — including the hard save failure of `AC-F32-01` (no expected clearing period) and a failure of the request itself
+- **When** the save is attempted
+- **Then** the user remains on that item's screen, the item is still present in their queue, the routed-item count on the cockpit and on the return control are both unchanged, no confirmation is rendered, no next item is offered, and the reason the save did not complete is stated on the screen
+
+---
+
+### 29.6 The empty case, the error case, and what a new screen inherits
+
+#### AC-COCKPIT-17 — observable UI
+- **Given** a signed-in user to whom no items are routed in the current close
+- **When** they open the close cockpit
+- **Then** the cockpit states explicitly that nothing is routed to them, carrying the same qualifier a non-zero count carries; the region is not blank and no spinner persists; and nothing on the screen states or implies that the close is clean, complete, or without exceptions — negative assurance remains governed by `AC-F38-07` and `AC-F38-08` and is not manufactured here by an empty queue
+
+#### AC-COCKPIT-18
+- **Given** a close cockpit on which at least one figure cannot be computed — its source is unavailable, its computation failed, or the capability behind it does not exist in this build
+- **When** the cockpit renders
+- **Then** that figure's place on the screen states that it could not be established and names why, and it is neither omitted from the screen nor rendered as zero, as blank, as a dash or as a stale prior value — convention C2 (silence is never a pass) holds on this screen as on every other
+
+#### AC-COCKPIT-19
+- **Given** the close cockpit as a screen this build renders
+- **When** it is rendered in any state and for any persona
+- **Then** it carries the standing per-screen disclosures every other screen of this build carries — the data-provenance (pilot) disclosure and the transport-topology disclosure — under the same wording obligations, so that adding a screen does not add a surface on which a disclosed weakness goes unstated
+
+> `AC-COCKPIT-19` exists because of a pattern already on this project's record:
+> `PROJECT_CONTEXT.md` 2026-08-06 notes that the collapsed trust boundary
+> *"slipped past three disclosure surfaces."* A new top-level screen is a fourth
+> opportunity. This criterion says nothing about the wording, which belongs to
+> the disclosures' owners; it says the new surface is not exempt.
+
+---
+
+### 29.7 The typography floor — A2.5's design ruling, issued as a criterion
+
+`UX_KB` A2.5 measured navigation at 10px computed and reliability qualifiers at
+10.5–11.5px, and recorded that **no criterion set a minimum, so nothing failed.**
+A2.7 then built the floor into four screens. The designer's own note is the whole
+argument for issuing it: *"nothing stops the next component omitting it,"* and
+A2.1 is the record of what happens to a design rule that lives only in a
+paragraph.
+
+These bind **every screen the product renders**, not only the cockpit. Scoping
+them to the new component would have reproduced exactly the defect they exist to
+prevent. §29.11 states what follows from that, and it is a disclosure, not a
+narrowing.
+
+#### AC-TYPESIZE-01
+- **Given** any screen this product renders, in any state
+- **When** it is rendered
+- **Then** every text node that is persistently rendered — visible without hover, focus, or opening a disclosure control — and every text node inside an interactive control, has a computed font size of at least **12px**; a single such text node below 12px on any screen fails this criterion, and a check that inspects a subset of screens or a selector list rather than every rendered text node does not satisfy it
+
+#### AC-TYPESIZE-02
+- **Given** any navigation destination this product renders, including destinations inside the navigation drawer
+- **When** the screen is rendered, with the drawer open where the destination lives in the drawer
+- **Then** every navigation destination's label has a computed font size of at least **14px**; one destination below 14px fails, and the criterion is asserted over every destination `AC-COCKPIT-03` enumerates, not a sample of them
+
+#### AC-TYPESIZE-03
+- **Given** any screen rendering a reliability qualifier, where a reliability qualifier is each of: close-clock staleness, coverage, dataset tier, certification state, an abstention statement, a not-run statement, and a retention-non-enforcement statement
+- **When** the screen is rendered in a state in which such a qualifier appears
+- **Then** **every** rendered instance of **each** of those seven classes has a computed font size of at least **13px**; an instance below 13px fails, and satisfying the floor for some of the seven classes, or for some instances of one class, does not satisfy this criterion
+
+---
+
+### 29.8 Pass-4 counts
+
+| Namespace | New criteria | IDs | Observable-UI among them |
+|---|---|---|---|
+| `close-cockpit-home` | 19 | `AC-COCKPIT-01` … `-19` | `AC-COCKPIT-01`, `-02`, `-03`, `-04`, `-05`, `-06`, `-07`, `-09`, `-14`, `-15`, `-17` (11) |
+| Typography floor (all screens) | 3 | `AC-TYPESIZE-01` … `-03` | none as such — they constrain how every already-required component renders, not whether a component is visible; issuing them as observable-UI criteria would have implied they replace one |
+
+**Pass 4: 22 criteria issued, 0 retired.**
+**File total: 289 issued, 287 live** (267 + 22), two retired (`AC-F12-08`,
+`AC-F41-13`). No feature added, removed, deferred or re-cut; the build-now count
+stays at 18 and this enhancement is `FEATURES.md`'s
+`feature/2026-08-08-close-cockpit-home`, not an eighteenth-plus-one feature
+invented here.
+
+### 29.9 Observable-UI position after this pass
+
+The enhancement is entirely UI-bearing and carries **eleven** observable-UI
+criteria, each naming which component, on which screen, in which state. Three
+areas of it are deliberately *not* observable-UI criteria, stated so the omission
+is visible rather than silent:
+
+- **`AC-COCKPIT-08`** (probe arithmetic) is a differential assertion across two
+  renderings. It is about what must **not** be derivable from the screen, and an
+  "X is visible on Y" form cannot express a prohibition on a derivation.
+- **`AC-COCKPIT-13`** and **`-16`** assert state after a save — queue membership
+  and counts, and the non-occurrence of a change. `AC-COCKPIT-14`/`-15` carry the
+  visible half of the same moment and are marked observable-UI.
+- **`AC-TYPESIZE-01`–`-03`** — see the table note above.
+
+### 29.10 The route change, and which existing criteria it touches
+
+`UX_KB` A3.7 suggests `/close` for this screen with `/` re-pointed to it from
+`/queue`, and asks which criteria that touches. **Named here, because §23's table
+is keyed on routes since pass 3 and a route change is now a maintenance event
+with a defined blast radius.** I have not chosen the route — that is
+`solution-architect`'s and `ui-ux-designer`'s. What follows holds for any route
+that re-points `/`.
+
+`dev/backend/app/ui/routes.py` currently **renders the queue at `/`** (it is a
+render, not a redirect, deliberately). So:
+
+1. **No criterion in §23 is invalidated.** §23 keys the queue's criteria
+   (`AC-F29-12`, `AC-F42-08`, `AC-F41-09`, `AC-F41-10`, `AC-F38-15`) to `/queue`,
+   which continues to serve. This is the pass-3 re-keying earning its cost.
+2. **Checks that reach those criteria via `/` do break**, and they are the real
+   blast radius. In `dev/` today the following fetch `/` and would be asserting
+   against the cockpit rather than the queue after a re-point:
+   `tests/suites/functional/test_ask_request_criteria.py` (its `_ask` helper
+   asserts `/` links to Ask before posting the Ask form — F39's criteria reach
+   the form through it); `tests/suites/functional/test_semantic_versions_criteria.py`
+   (three places asserting `/ask` appears in `/`'s hrefs);
+   `tests/suites/functional/test_unclaimed_criteria.py`
+   (`AC-REFUSAL-13`, asserting `/refusals` is linked from `/`); and
+   `tests/suites/security/test_transport_disclosure.py` (four places treating `/`
+   as a screen that must carry the topology disclosure).
+3. **One of those needs a ruling, not a re-point: `AC-REFUSAL-13`.** Its own text
+   is about what the Refusals screen renders and is untouched. But the check
+   bearing it asserts reachability *from the entry point* — a property `UX_KB`
+   §5.11 argues for in terms ("burying a refusal makes it look like an
+   omission"), which the hamburger changes. **Ruling: the criterion's text
+   governs, and it does not require the link to be visible without opening the
+   drawer.** `AC-COCKPIT-03` now requires `/refusals` to be in the drawer, and
+   `UX_KB` A3.2 answers the demotion by content rather than position. If the
+   human or `ui-ux-designer` wants Refusals reachable without opening the drawer,
+   that is a **new** criterion, not a re-reading of `AC-REFUSAL-13`.
+4. **`AC-F38-11` starts binding on a new surface.** It requires staleness
+   relative to the close clock on the same surface as the figure. The cockpit is
+   the first screen that puts many figures from many sources on one page, so
+   `AC-F38-11` now has more to satisfy there than anywhere else, and it is
+   currently a disclosed-unmet criterion (register 6) — which is precisely the
+   state `AC-COCKPIT-12` specifies the tracker's behaviour for.
+5. **`AC-COCKPIT-19` is written against "the close cockpit as a screen this
+   build renders"**, not against a route, for the same reason `AC-F41-23`/`-24`
+   were: a criterion pointing at a screen that no longer exists is a criterion
+   nobody can check.
+
+§23's table gains one row for this screen, keyed on the entry point rather than
+on a route name that is not yet settled.
+
+### 29.11 What I refused to issue, and why
+
+Stated rather than omitted, because a silent refusal is indistinguishable from an
+oversight.
+
+1. **The FP&A home page — refused in full. No criteria issued, and this is the
+   ruling `ui-ux-designer` asked for.** `state.PERSONAS` carries two personas;
+   nothing in this product routes to a third. `UX_KB` A2.6 marks the FP&A
+   persona **"net-new scope requiring a ruling not a design decision"**, `PLAN.md`
+   §7.7 records it as an open conflict, and `FEATURES.md` B9 puts *Inquire mode*
+   **out of scope** for this enhancement. Writing acceptance criteria for a home
+   page belonging to a persona the product does not have would be me admitting a
+   persona to scope, which is `plan-agent`'s lane and the human's approval.
+   The design of that page — abstention grammar applied to a whole persona — is
+   good and it survives untouched in `UX_KB` A3.5; what it lacks is an approved
+   subject. **If `plan-agent` and the human admit the persona, its criteria are a
+   half-hour of work at a later pass and will take fresh `AC-COCKPIT` IDs.**
+   Nothing here needs to change for that to happen.
+2. **Undo after a resolution.** `UX_KB` A2.6 lists "confirmation + queue removal
+   + **undo** + next-item" as one gap. I have specified confirmation, removal and
+   next-item, all of which are behaviour of an approved act. **Undo is a new
+   capability** — it needs a reversal path, a lifecycle state and an audit
+   consequence (a reversed disposition is an evidential event under F1/F12).
+   That is scope, and it is `plan-agent`'s. Flagged in §29.13.
+3. **A criterion fixing the cross-persona composition** — the readiness `P2
+   unmet` and the staff accountant's missed forward disposition being one fact
+   seen from two ends. It is real, observable, and the best thing in A3.5. But
+   *which* facts compose a persona's page is the designer's composition, and a
+   criterion freezing this particular pairing would harden one editorial choice
+   into a contract while asserting nothing about the next one. `AC-COCKPIT-02`
+   requires per-persona computation, which is the part that is behaviour.
+4. **The per-user forward-disposition hit rate ("31 of 38 met").** `UX_KB` A3.7
+   records `disposition_store.hit_rate()` as period-wide and says the tile is
+   **dropped rather than faked** if it is not computable. A criterion would
+   convert "drop it if it isn't there" into "build it", which is scope. If it is
+   computable, `AC-COCKPIT-05` already governs how it must render.
+5. **Anything about the tracker's appearance.** A3.4's neutral-ink checkpoints,
+   the severity-coloured bracket, the serif voice for the two absence states, the
+   gap-not-progress graphic. All correct, all `ui-ux-designer`'s.
+   `AC-COCKPIT-09`–`-12` fix what must be *stated and distinguishable*, and are
+   silent on how.
+6. **The Period record and J3.** `FEATURES.md` B9 puts it out of scope for this
+   enhancement. `UX_KB` A2.6 still carries it at severity A. Not specified here.
+
+**And one thing I did not refuse but must flag, because it is the cost of issuing
+`AC-TYPESIZE-01`–`-03` product-wide.** `UX_KB` A2.7 restyled four screens and
+records **fifteen not restyled**. Those fifteen almost certainly render
+navigation at 10px and reliability qualifiers at 10.5–11.5px, so these three
+criteria are likely **unmet across most of the product on the day they are
+issued**. That is a disclosure, not a defect in the criteria, and it is not a
+reason to narrow them to the new component: a criterion states what must be true;
+*when* it is made true is a backlog question and therefore `plan-agent`'s and the
+human's. This gate does not mark criteria satisfied and does not schedule
+remediation. `test-agent` will find them unmet; they should be recorded as
+disclosed unmet criteria joined to this section, exactly as the project's other
+eight are.
+
+### 29.12 Completeness check — binding decisions this pass was checked against
+
+`PROJECT_CONTEXT.md`'s Decisions Log re-read **in full**, including every entry
+recorded since pass 3 (2026-08-04 through 2026-08-08). Those that bind this pass:
+
+| Binding decision | How this pass satisfies it |
+|---|---|
+| **2026-08-08 — human approved the close-cockpit design from a rendering, *including the condition* that the post-resolution landing ships with the drawer** | §29.5 is that condition, as four criteria covering the success path, the visible confirmation, the last-item boundary and the save failure. `AC-COCKPIT-13`/`-14` are the condition itself; `-15`/`-16` are where a dead end would otherwise reappear. |
+| **2026-08-08 — build hazard: queue counts include probes, coverage excludes them, and they must not be reconciled (`AC-F12-16`, `AC-F41-08`)** | `AC-COCKPIT-08`, written differentially so it forbids the derivation rather than a coincidental number. It was a note in a KB; it is now an ID. |
+| **2026-08-08 — the human chose *everything* in the hamburger** | Accepted as theirs and not re-litigated. `AC-COCKPIT-03` specifies the drawer's completeness so the choice cannot silently cost a destination; `AC-COCKPIT-04` specifies the one non-drawer return control `UX_KB` A3.2 argues for, and states nothing about where it sits. |
+| **§12 standing exclusion — no criterion asserts explanation quality** | **Re-checked line by line.** No criterion in this pass asserts that a composition is good, clear, legible or persuasive. `AC-COCKPIT-05` requires a qualifier to be *present and ≥13px*; it says nothing about whether it is well worded. `AC-COCKPIT-07` requires the word "findings" not to be applied to a total that includes an abstention — a statement about *what is claimed*, not about how well it is explained. `AC-TYPESIZE-01`–`-03` are size floors, which are neither quality nor design: they fix no typeface, weight, colour, spacing or hierarchy. |
+| **2026-07-30 — write-back with per-action approval, "the defining decision"** | Untouched and unweakened. `AC-COCKPIT-02` routes a proposal to the entitled persona's cockpit as one action item; nothing in this pass introduces an affordance acting on more than one item, so `AC-F41-01` holds on the new screen as everywhere else. A cockpit is a set of links to single objects — `AC-COCKPIT-06` requires exactly that. |
+| **Gate-6 ruling 4 / G-PROBE-3, and A24 — no per-named-person judgement surface** | Honoured, and `UX_KB` A3.5 refused a place to override rate, dwell time and probe aggregates on the cockpit for this reason. **No criterion in this pass requires any per-named-person figure on the cockpit**, and `AC-COCKPIT-08` further keeps probe information off it. |
+| **2026-08-06 — claim prohibition 6 declined; the collapsed trust boundary "slipped past three disclosure surfaces"** | `AC-COCKPIT-19`: a new screen inherits the standing per-screen disclosures. This is the one place this pass touches that thread, and it does not pre-empt the open ruling recorded against my name (§29.13 item 4). |
+| **2026-08-05 — gate-10 register rulings; disclosed-unmet criteria are recorded, never narrowed** | §29.11's closing note applies that rule to `AC-TYPESIZE-01`–`-03` in advance, rather than discovering it at the Test gate. |
+| **MVP1 desktop web only; `PROJECT_CONTEXT.md` header still reads multi-surface** | No criterion here names a mobile surface. The header discrepancy is `UX_KB` §10.4's flag and `plan-agent`'s to settle; carried forward, not re-decided. |
+| **Scope correction — the system is not the GL** | A cockpit composes figures already computed. No criterion here asserts any GL behaviour or any new computation. |
+| **Test Policy: all suites blocking, no advisory exceptions** | Every criterion here is checkable by a suite. Where the build cannot meet one, it is recorded as a disclosed unmet criterion rather than narrowed — see §29.11. |
+| **Standing authorization; make the calls** | Calls made, not returned — including the FP&A ruling, which is a refusal to issue, made and argued rather than deferred silently. The three genuine scope questions are in §29.13. |
+
+**Conflicts: none.** No binding decision is contradicted by this pass.
+
+### 29.13 Scope ambiguity found and **not** resolved in this pass
+
+1. **The FP&A persona.** `state.PERSONAS` carries two; the approved design draws
+   a third persona's home page. **Owner: `plan-agent`, then the human.** Until it
+   is ruled on, that page has no criteria and therefore no gate can report it
+   met or unmet — which is the correct state for an unapproved subject, and is
+   stated here so it is not read as coverage.
+2. **Undo after a recorded resolution.** §29.11 item 2. **Owner: `plan-agent`.**
+   `AC-COCKPIT-13`–`-16` are checkable without it being settled.
+3. **Whether the typography floor's remediation of the fifteen unrestyled
+   screens belongs to this enhancement or to its own backlog line.**
+   `AC-TYPESIZE-01`–`-03` say what must be true; they do not say when.
+   **Owner: `plan-agent`.**
+4. **Carried forward, not closed by this pass: whether the pilot's process/trust
+   boundary should have an acceptance criterion of its own.**
+   `PROJECT_CONTEXT.md` 2026-08-06 records this as an open ruling owed by this
+   agent and calls it *"the root cause of it having slipped past three disclosure
+   surfaces."* It is not this enhancement's question and I have not answered it
+   inside a cockpit pass, where it would be buried. `AC-COCKPIT-19` neither
+   closes nor pre-empts it. **It remains owed, and it should be invoked as its
+   own pass with `solution-architect` and `security-architect`'s §25.3.3
+   material in front of me.**

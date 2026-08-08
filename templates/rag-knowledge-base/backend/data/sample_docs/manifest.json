@@ -1,0 +1,12 @@
+{
+  "grid_maintenance_policy.txt": {
+    "authority": "internal_policy",
+    "label": "Internal Policy",
+    "as_of": "2026-01-01"
+  },
+  "renewable_incentives_faq.txt": {
+    "authority": "faq",
+    "label": "FAQ — Informal Guidance",
+    "as_of": "2026-01-01"
+  }
+}

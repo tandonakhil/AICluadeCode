@@ -11,13 +11,18 @@ Ingest run R-PLAYWRIGHT-EVIDENCE
   finished  : 2026-08-08T03:41:00+00:00
   sources   : (none)
 
-  Ingested
-    cases ingested          4
-    documents seen          0
-    documents ingested      0
-    documents skipped unchanged0
-    chunks written          0
-    claims written          0
+  Run counts
+    cases ingested                4
+    documents seen                0
+    documents ingested            0
+    documents skipped unchanged   0
+    documents quarantined         0
+    documents gated               0
+    documents abandoned           0
+    documents unreachable         0
+    chunks written                0
+    claims written                0
+    reconciliation                0 seen = 0 ingested + 0 unchanged + 0 quarantined + 0 dropped at a gate + 0 abandoned
 
   Document changes (0)
     none — no document was new or modified this run

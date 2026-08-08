@@ -14,7 +14,15 @@ def get_chat_model():
     if provider == "anthropic":
         from langchain_anthropic import ChatAnthropic
 
-        return ChatAnthropic(model=os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5"))
+        # Default max_tokens (1024) was observed truncating real chat
+        # responses mid-sentence during red-team testing on little-milestones
+        # -- thinking-block overhead eats into that budget before the final
+        # answer text is generated. Raised so grounded answers carrying
+        # citations and scope statements have room to complete.
+        return ChatAnthropic(
+            model=os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5"),
+            max_tokens=int(os.environ.get("ANTHROPIC_MAX_TOKENS", "4096")),
+        )
 
     if provider == "openai":
         from langchain_openai import ChatOpenAI
