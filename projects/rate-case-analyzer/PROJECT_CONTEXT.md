@@ -1,0 +1,860 @@
+# Project: rate-case-analyzer
+
+## Overview
+
+**Rate Case Analyzer** — an agentic AI sidekick for preparing rate case
+analysis for power utilities.
+
+- **Created**: 2026-08-07
+- **Template**: **custom** — human override of `plan-agent`'s
+  `rag-knowledge-base` recommendation. **Stack deliberately undecided**;
+  committed at the Architecture gate by `solution-architect`, not chosen by
+  orchestrator intuition.
+- **Surfaces**: **two** — desktop web + scheduled ingestion job. They share a
+  backend and corpus store. `solution-architect` is therefore **non-droppable**
+  and its Impact Analysis mandatory.
+- **Data**: public state commission dockets (2–3 jurisdictions, TBD) +
+  synthetic "internal history" mocked from public rate cases. **No real work
+  product is ever held by this project.**
+- **Target environment**: local (dev)
+- **Current stage**: gate 1 · Intake
+- **Intake record**: [`INTAKE.md`](INTAKE.md)
+
+### MVP scope
+
+Capabilities **#1 + #2** only — ingest rate cases from 2–3 public commission
+dockets plus the synthetic internal corpus, and answer precedent questions with
+hard resolvable citations and honest refusal when the corpus does not support an
+answer.
+
+**Out of MVP scope**: capability #3 (approval-likelihood / competitive
+analysis — the planned first enhancement); intervenor and commission-staff use;
+real non-synthetic work product; mobile surfaces; exportable Office deliverables.
+
+## Standing constraints (from Intake — not re-litigable without a recorded decision)
+
+1. **Grounding is mandatory.** Every claim about precedent carries a resolvable
+   docket citation. An unsupported claim refuses rather than paraphrases.
+2. **The ethical wall.** Two corpora — `public` and `work-product` — with
+   separate stores and separate credentials. The retriever is **bound at session
+   construction**, never a `visibility` filter over one shared store: a session
+   without the right role must have **no code path** to the other corpus, not a
+   path that returns empty.
+3. **The aggregate leak.** Every number in the future competitive-analysis
+   feature is computed over the **public corpus only**. A benchmark learned from
+   non-public material is a disclosure channel even though no document crossed.
+4. **Silence is not clearance.** The system states coverage explicitly
+   ("checked N comparable cases, flagged 3, could not assess 5 because …")
+   rather than showing a flag list that is empty both when nothing is wrong and
+   when nothing was examined. This is a **required acceptance criterion** at
+   Functional Design, not designer discretion.
+
+## Decisions Log
+
+- **2026-08-07** · Q0 path confirmed as **new project**, not an enhancement to
+  `policy-lookup-assistant`, against a stated close call. The overlap is
+  capability #2 (grounded Q&A in the same industry); the split is justified by
+  the filings-acquisition pipeline and the judgment-generating analysis
+  capability, which carry a different harm profile and roster. The form's
+  default-to-enhancement rule was stated explicitly and the human chose the
+  split knowingly. [`/new-project` intake]
+- **2026-08-07** · Intake form completed and recorded at `INTAKE.md`. A5
+  (surfaces) and A7.2 (worst plausible harm) both answered, neither skipped.
+  Four open questions carried forward as known risks (A3.3 user count, A6.1b
+  named commissions, A6.4 retention, A9.3 compliance obligations). [intake gate]
+- **2026-08-07** · **All four A7.2 harms selected** → `responsible-ai-architect`
+  becomes **non-droppable**; grounding/refusal becomes mandatory rather than
+  preferred. [intake gate]
+- **2026-08-07** · **Two surfaces confirmed** (desktop web + scheduled ingestion
+  job) → `solution-architect` **non-droppable** per the multi-surface rule. The
+  ingestion job counts as a surface because it ships and fails independently:
+  a silently-broken scraper yields a stale corpus, and a stale corpus yields
+  confident wrong answers with no UI symptom. [intake gate]
+- **2026-08-07** · Conflict-of-interest finding raised at A2.2 (all four
+  personas selected, including adversarial intervenor/commission-staff users)
+  and resolved as a **scope decision**: intervenor use is in the persona set but
+  **out of MVP scope**; the ethical wall is designed in from the start because
+  retrofitting it means re-architecting retrieval. `security-architect`
+  ratifies or amends at Architecture. [intake gate]
+- **2026-08-07** · MVP slice set to **#1 + #2**, deferring capability #3.
+  Rationale: #3's value is entirely parasitic on corpus quality — an
+  approval-likelihood estimate over a thin or mis-parsed corpus *is* the
+  worst-harm case, delivered confidently with a number attached. [intake gate]
+- **2026-08-07** · Jurisdiction scope set to **2–3, chosen for contrast**.
+  **Which commissions is deliberately unresolved** — `industry-expert`
+  researches and recommends named dockets at the Intake gate on both contrast
+  value and public-access tractability, for human confirmation. Not chosen by
+  orchestrator intuition. [intake gate]
+- **2026-08-07** · Budget: **no hard ceiling**. `usage-monitor` tracks and
+  estimates but enforces no soft limit. [intake gate]
+- **2026-08-07** · **Template: `custom`** — human override. `plan-agent`
+  recommended `rag-knowledge-base` with high confidence and explicitly reported
+  the choice as **not ambiguous**, so it was put as a confirm-or-override rather
+  than a menu. The human overrode to custom.
+  - *Recommendation's reasoning, recorded so it is not silently lost*: the MVP
+    as scoped is the template's literal trigger; the scaffold would be extended
+    rather than fought; and it ships a wired SME test-suite harness.
+  - *Accepted cost of the override*: *(a)* the `tests/suites/` harness —
+    including the `redteam` and `security` runners and the Playwright browser
+    harness — is **now our work to build**. `responsible-ai-architect` is
+    non-droppable and owns a red-team suite, so this is tracked as an explicit
+    obligation, not a Test-gate surprise. *(b)* `.env`/`.gitignore` hygiene and
+    the `chroma_db` path-anchoring fix already debugged into the template source
+    must be re-established.
+  - *Benefit claimed*: full freedom over the two-corpus architecture and the
+    ingestion shape — the two hardest and most net-new pieces, which
+    `plan-agent` estimated as ~100% custom under the template anyway.
+- **2026-08-07** · **Stack deferred to the Architecture gate.** Custom means no
+  default stack, and the orchestrator does not pick one by intuition —
+  consistent with deferring the named jurisdictions to `industry-expert`.
+  `dev/` is scaffolded minimally so the repo and pipeline state exist from the
+  start; `solution-architect` commits the stack at gate 6 with a recorded
+  rationale. [orchestrator]
+
+## Deliberate reuse from `policy-lookup-assistant`
+
+Recorded at intake A9.4 and confirmed by `plan-agent`. That project is a
+deployed RAG build in this exact industry; these are inputs to the Architecture
+gate, not things to rediscover.
+
+- **The sentinel-token refusal mechanism** — a fixed `INSUFFICIENT_EVIDENCE`
+  literal emitted as the model's own first line, parsed by exact `.startswith()`
+  on stripped content, **never** regex/case-insensitive/substring. On refusal
+  the model's prose is discarded entirely in favour of a product-controlled
+  string. That last property matters more here than it did there: it is what
+  stops a partially-hedging paraphrase leaking through, which is the mechanism
+  of the fabricated-precedent harm.
+- **Manifest-driven, ingestion-time authority validation, fail-loud on a missing
+  entry.** Metadata validated once at ingest and travelling with the data; the
+  query path never reads the manifest. Generalises to docket metadata
+  (commission, docket number, order date, document type, as-filed vs.
+  as-authorized), and fail-loud is exactly right for a scheduled job that would
+  otherwise ingest an unlabeled filing silently. Its noted limitation —
+  malformed keys passing through as extra metadata — **should be closed here**
+  with the closed-enum schema check that KB recommended and deferred, since this
+  corpus is machine-populated across many jurisdictions rather than
+  hand-written with two entries.
+- **Badge/citation UI patterns**: authority never encoded by colour alone
+  (always label text plus `as_of` date); refusal styled neutral, **never** as an
+  error, because refusal is correct behaviour. The four-value authority taxonomy
+  itself does **not** transfer — a rate-case corpus needs its own (commission
+  order vs. as-filed testimony vs. settlement vs. intervenor brief), which is
+  `functional-agent`/`industry-expert` territory. The transferable thing is the
+  *pattern* of a closed, ranked, manifest-enforced authority enum.
+- **Two hard-won bug fixes to port on day one**: the `min_length=1` +
+  whitespace-rejecting validator on the question field, and normalising
+  LangChain's `AIMessage.content: str | list[...]` shape. Both were found by real
+  suite runs, not review.
+- **The extrapolation-trap regression test** (`DOMAIN_KB` risk #6) — asking
+  about something adjacent to but absent from the corpus and correctly refusing.
+  Its rate-case analogue is near-identical in structure: an ROE authorized in a
+  jurisdiction/test-year combination the corpus does not cover, where a
+  plausible blend of two neighbouring cases *is* the worst-harm case. Carried to
+  the Test gate explicitly.
+
+### Explicitly NOT reused
+
+- `policy-lookup-assistant`'s no-authn/no-authz decision. It does not carry
+  over: the ethical wall requires a notion of session role at construction time
+  even in MVP. No *intervenor* login is needed (MVP is utility-side only), but
+  the retriever must already be bound by role rather than globally imported.
+- Its accepted trade-off that `sources[]` reflects **what retrieval pulled**,
+  rather than what the model actually cited. Non-blocking there; **not accepted
+  unchanged here** — an irrelevant docket badge beside a precedent claim is far
+  closer to the fabricated-precedent harm than an irrelevant policy-doc badge
+  was. Carried to Architecture as an **open item**, not inherited settled law.
+
+## Operating mode (set 2026-08-07)
+
+**Full autonomy, human-directed.** The human first chose "batch-authorize all
+except Backlog + Design", then superseded it with *"make all assumptions, don't
+ask any questions."* The concern that this is the exact failure mode the
+standing backlog/mockup guidance was written to prevent **was raised before the
+instruction was given and the instruction was then reaffirmed** — so it is
+recorded as the human's decision and followed for the whole run.
+
+Consequence: every gate closes as `assumed` rather than `approved`, every
+judgment the human would normally have made is taken by the orchestrator and
+written to this log as a **numbered assumption (ASM-n)**, and the complete set
+is presented at the end for retrospective ratification. No gate is skipped; the
+approval *question* is what is suppressed, not the work or the record.
+
+## Gate 1 · Intake — closed 2026-08-07
+
+Both unconditional Intake agents ran and wrote real researched KBs:
+`knowledge/DOMAIN_KB.md` (`functional-agent`), `knowledge/INDUSTRY_KB.md`
+(`industry-expert`).
+
+### Findings accepted into the design
+
+- **Authority is two-dimensional.** A single ranked authority enum is
+  insufficient: a final order *recites* what was requested, and rebuttal
+  testimony *quotes* prior orders. Two orthogonal closed enums instead —
+  `document_type` (14 ranked values, `FINAL_ORDER` = 1 … `BRIEF` = 14) and
+  `claim_status` (`REQUESTED | RECOMMENDED | SETTLED | AUTHORIZED |
+  IMPLEMENTED | NOT_STATED`). **`NOT_STATED` must be representable, not
+  `null`** — "the settlement did not specify an ROE" and "we failed to parse the
+  ROE" are different facts, and collapsing them destroys the ability to refuse
+  honestly. Binding on Architecture.
+- **Comparability is a structured predicate, not a similarity score.**
+  Rate-case testimony is highly formulaic, so embedding similarity carries
+  little discriminating signal (`RCA-R14`). Comparability must be computed over
+  extracted metadata with non-matching dimensions **named**. Evidence:
+  vertically-integrated electric ROE averaged 9.47% vs. distribution-only 9.13%
+  in H1 2022 — a ~34bp structural gap unrelated to case merits.
+- **`sources[]` escalated from open item to blocking.** `functional-agent`
+  pushed back on carrying `policy-lookup-assistant`'s "`sources[]` = whatever
+  retrieval pulled" trade-off forward. Accepted: showing retrieval hits beside a
+  claim does not merely under-specify, it *manufactures the appearance of
+  support*. The third hallucination kind in the 2025–26 sanctions literature —
+  a real quote from a real source that does not support the proposition — is not
+  caught by verifying the docket exists.
+- **Confidential material inside public dockets is a distinct hazard** from the
+  work-product wall (`RCA-R11`, `IND-10/11`). Multi-tier protective orders are
+  standard, public-redacted and confidential-unredacted versions of the same
+  document coexist, improper redaction (extractable text under black boxes) is
+  real, and an access-denied HTML body stored as a "document" is a mundane bug
+  with a serious signature. Handling is **quarantine-and-report**, never
+  flag-and-index.
+- **A corpus of asks without outcomes is a machine for producing harm #1.**
+  Every ingested case needs its **final order and compliance tariff**, not just
+  the application and testimony — the authorized numbers often exist only there.
+- **Schema-bound risks that cannot be retrofitted at query time**: `RCA-R4`
+  (supersession links), `RCA-R11` (confidentiality flag), `RCA-R13` (case
+  status, incl. withdrawn cases — a full docket of persuasive testimony and no
+  outcome). Raised at Architecture, not left to Test.
+
+### Correction
+
+`policy-lookup-assistant`'s extrapolation trap is **risk #5**, not #6 (#6 is the
+incentive-stacking trap). The earlier reference in this file was wrong; the
+rate-case analogue is numbered `RCA-R6` in `DOMAIN_KB.md` to match the name in
+circulation, with the lineage noted there.
+
+### Risk register now available for downstream citation
+
+`RCA-R1` … `RCA-R14` in `DOMAIN_KB.md`; `IND-1` … `IND-18` in `INDUSTRY_KB.md`.
+
+## Decisions Log — gates 1–2 (autonomy assumptions)
+
+- **ASM-1 · Jurisdictions: PA PUC + PUCT + CPUC**, per `industry-expert`'s
+  primary recommendation. PA (fully projected future test year, settlement-
+  dominant) and TX (historical test year, rider-heavy, statutory four-year
+  comprehensive proceeding) are both restructured but reached by opposite
+  routes; CPUC supplies what neither can — vertically integrated with generation
+  in rate base, forecast test year, cost of capital in a separate proceeding,
+  litigation-heavy. Michigan MPSC **rejected** (JavaScript Salesforce portal, no
+  stable document URLs — disproportionate ingestion cost). FERC **rejected as a
+  jurisdiction** (does not set state retail base rates) but recorded as the
+  best post-MVP extension, being the only candidate with a documented official
+  public API and the only source of cross-state-comparable Form 1 data.
+- **ASM-2 · Live network fetching is behind a flag; MVP1 correctness is proven
+  against captured fixtures + the synthetic corpus.** Docket adapters are built
+  and unit-tested against recorded fixtures rather than requiring live network
+  access during the Test gate. Rationale: the target environment is local dev,
+  the three docket systems have no official APIs, and a test suite whose result
+  depends on a third-party website's availability is not a test suite. The
+  adapters are real code against the real URL shapes — this bounds *when* the
+  network is touched, not *whether* the integration is genuine.
+- **ASM-3 · `sources[]` blocking treatment accepted** — a cited source must be
+  one the answer actually relies on, not merely one retrieval returned.
+- **ASM-4 · Full roster, nothing dropped** — see Active Team.
+- **ASM-5 · All test suites blocking, no advisory exceptions.** Given the A7.2
+  harm profile (all four selected, including fabricated precedent in filed
+  material), an advisory suite is a hole in the argument that this tool's
+  output is safe to rely on.
+
+## Decisions Log — Code gate, pass 2 (2026-08-08)
+
+- **ASM-26 · `corpus_as_of` advances on `PARTIAL`** — raised by `code-agent` at
+  the first Code gate as a judgment call against `AC-F39-05`; **ruled and
+  ACCEPTED by the orchestrator, 2026-08-08.** A real corpus quarantines a
+  confidential exhibit on essentially every run, so `PARTIAL` is the normal
+  steady state; gating the corpus date on `SUCCEEDED` would leave
+  `corpus_as_of` permanently `None`, and because the surface refuses over a
+  corpus it cannot date (`AC-F39-04`, `FDA-5`) the product would refuse every
+  question forever — a safety feature turned into a denial of service, which is
+  the failure mode `RESPONSIBLE_AI_KB` §6 names. `FAILED` and mid-run
+  termination continue not to advance it. Recorded in `dev/README.md` and beside
+  `OpsStore.DATING_STATUSES`.
+- **ASM-27 · No `NOT_APPLICABLE` member on `Confidentiality`** — `TEST_DATA_KB`
+  §7 gap 3 asks for one; **refused.** `CORPUS_SCHEMA` is one schema used by both
+  stores and carries `CHECK (confidentiality IN ('PUBLIC','REDACTED_PUBLIC'))`.
+  A third storable value would widen that check on the **public** store, which
+  could then hold a document whose confidentiality was never classified —
+  trading `AC-F4-05` for a better-reading field. Answered instead by
+  `internal_material.is_confidentiality_meaningful()`.
+- **ASM-28 · The corpus of record has never been loaded.** `TEST_DATA_KB` §10
+  records `RUN-2026-08-07-MEDIUM` as generated, but `dev/data/synthetic/` and
+  its generator `data/synthetic/tools/generate_corpus.py` **are both absent from
+  disk**. They were written under `data/`, which `dev/.gitignore` excludes
+  wholesale (SEC-S1), so no commit carried them. Every number this codebase has
+  produced is a number about a fixture. **Blocking for the Test gate**;
+  `synthetic-data-agent` must regenerate, and the corpus needs a tracked home or
+  a committed generator outside `data/`.
+- **Schema gaps 1, 2, 4 CLOSED; gap 3 closed for `document_type` and refused for
+  `confidentiality` (ASM-27).** Gap 2 added `PROCEDURAL_ORDER` and
+  `WITHDRAWAL_NOTICE` to `DocumentType` (14 → 16 members), neither an outcome
+  document, so the `RCA-R13` fixture is preserved. Gap 4 added real PDF/DOCX
+  binaries under `fixtures/binaries/` and a hand-rolled PDF writer (no new
+  dependency).
+- **`playwright` added as a dependency**, under a `rendered-ui` extra rather than
+  `[dev]`, so the other seven suites install and run without it. Authorized by
+  the pass brief. **rendered-ui is a blocking suite per ASM-5**, and NOT
+  EXECUTED counts as not passing.
+- **`tools/make_synthetic.py` demoted, not retired** — it cannot be retired while
+  `data/` is untracked, or the work-product path is unrunnable on a fresh clone.
+  It announces itself on every run and `--no-stand-in` refuses it outright.
+- **No browser route for the run report** — `design-review/11-run-report.html` is
+  a design with no route behind it. Reported, not fixed: adding one is a surface
+  addition requiring an Architecture pass.
+
+## Active Team
+
+**Set 2026-08-07 by orchestrator assumption (ASM-4) — full roster, 14 agents,
+nothing dropped.**
+
+Core (8): `plan-agent`, `functional-design-agent`, `code-agent`, `test-agent`,
+`verification-agent`, `review-agent`, `deploy-agent`, `ui-ux-designer`
+(UI-bearing).
+
+Optional, all retained, each with a named obligation that would otherwise go
+unowned:
+
+- `solution-architect` — **non-droppable by rule** (two surfaces); owes the
+  mandatory Impact Analysis, and owns the two-corpus session-bound retriever
+  design plus the schema-bound risks (`RCA-R4/R11/R13`).
+- `responsible-ai-architect` — **non-droppable** by the A7.2 harm profile; owns
+  the fabrication guardrails, the "silence is not clearance" coverage
+  requirement, the public-corpus-only aggregate rule, and the red-team suite —
+  which, per the custom-template override, **must be built rather than
+  inherited**.
+- `security-architect` — owns the ethical wall's credential separation and the
+  confidential-material quarantine path (`IND-10/11`).
+- `functional-agent` — standing domain SME; owns the functional suite and the
+  `RCA-*` register it authored. Devil's advocate at Plan and Architecture.
+- `industry-expert` — owns the `IND-*` obligation register and the compliance
+  floor; owns the industry/compliance suite.
+- `synthetic-data-agent` — **required here, not optional in practice**: the
+  entire "internal history" corpus is synthetic by design (A6.1), so this agent
+  produces a primary project asset rather than test fixtures.
+
+**Test Policy: all suites blocking (ASM-5).** No advisory exceptions.
+
+## Gate 3 · Plan & Backlog — closed (assumed) 2026-08-07
+
+`PLAN.md` + `FEATURES.md` written: **58 features, 44 in MVP1**, 14 deferred with
+their reasoning retained so any can be pulled forward. Assumptions
+**ASM-6 … ASM-21** added to the register (full text in `PLAN.md`).
+
+MVP1 shape: P0 foundation (incl. **F2 — the test harness, built from scratch**
+per the custom-template override) · P1 acquisition (adapter interface + fixture
+capture + `LIVE_FETCH` flag, PA/PUCT/CPUC adapters, non-document fetch
+detection, confidentiality quarantine) · P2 extraction (locators, doc-type and
+exhibit parent-binding, case metadata, claim extraction, outcome-completeness
+gate, supersession, non-precedent clause, rider classification) · P3 the wall
+(two physical stores, session binding + static import-boundary test, synthetic
+work-product corpus) · P4 grounding (query-frame parser, metadata-filtered
+retrieval, comparability predicate, coverage object, deterministic citation
+verification, sentinel refusal, vintage/staleness, provenance) · P5 surfaces
+(web citation card, coverage panel, neutral refusal, freshness banner, caveat
+rendering; job + run report) · P6 the six test suites.
+
+### Sharpest scope call — **ASM-14: no aggregates or peer benchmarks in MVP1**
+
+MVP1 answers with **named cases and individual cited figures**, never "peers got
+9.5%." An aggregate is simultaneously the delivery mechanism of harm #1 and the
+substance of deferred capability #3; removing that surface also removes the one
+`RCA-R3` (structurally non-comparable peer set) needs. `Source.corpus` ships in
+MVP1 **with no consumer** — deliberate, so the public-corpus-only aggregate rule
+is enforceable when `F33` lands rather than retrofitted over records that never
+distinguished corpora.
+
+### Other assumptions worth surfacing
+
+- **ASM-6/7** — 12 real cases (4 per jurisdiction), each chosen to exercise a
+  named risk; document scope is a defined slice per case, not the whole docket
+  (a single CPUC GRC runs to tens of thousands of pages).
+- **ASM-9** — outcome-completeness is an ingest **gate**, not a warning.
+- **ASM-11** — question-parse failure **refuses**; no keyword fallback, because
+  a loose search over this corpus *is* `RCA-R2` (cross-jurisdiction blending).
+- **ASM-12** — session **role binding** ships; **login** does not. Deliberately
+  not an inheritance of `policy-lookup-assistant`'s no-authz decision.
+- **ASM-19** — `LIVE_FETCH` off by default even for the scheduled job. `IND-18`
+  (per-jurisdiction terms-of-use review) is a precondition for flipping it, not
+  an MVP1 blocker.
+- **ASM-21** — the autonomy instruction suppresses the approval *question*, not
+  the *record*: all 58 features are individually listed, including every
+  deferred one, so the human can pull any forward on review.
+
+### Deferred (14), with the three that carry the most weight
+
+`F19` OCR · `F20` data requests/transcripts · `F24` intervenor role + authn ·
+**`F33` aggregates** · `F41` export · `F50` FERC Form 1 · **`F51` capability
+#3** · `F52` Illinois · `F53` Michigan/NY · **`F54` retention — flagged
+*gating*, not merely deferred: A6.4 is non-blocking only because the internal
+corpus is synthetic** · `F55` deliverables · `F56` gas · `F57` MYRP/PBR ·
+`F58` large-load tariffs.
+
+`F19`/`F20` are bounded by keeping both in the `document_type` enum and
+quarantining rather than degrading, so neither becomes a schema change later.
+
+**`IND-16` discharged early** — `PLAN.md` §9 writes capability #3's six standing
+constraints now, while it is cheap, rather than carrying the obligation to
+enhancement as originally assigned.
+
+**Stack not pre-empted**: `PLAN.md` §7 states 12 requirements the stack must
+satisfy, leaving the choice to `solution-architect` at gate 6.
+
+### ASM-22 · MVP1 count ruled at **44**, not 42 — orchestrator ruling
+
+`functional-design-agent` found `FEATURES.md`'s summary header ("42 MVP1 · 16
+LATER") contradicting its own per-feature `When` column (44 MVP1 · 14 LATER),
+and correctly refused to guess which two to drop, specifying all 44 and raising
+it instead of resolving it in someone else's lane.
+
+**Ruling: the per-feature column is authoritative; the header was miscounted.**
+MVP1 is **44 features**, deferred is **14**. Reasoning: the column is where the
+per-feature reasoning actually lives and was written deliberately item by item,
+whereas the header is a derived summary — a derived total contradicting its own
+source is an arithmetic slip, not a scope decision. Dropping two features to
+satisfy a summary line would be scope loss caused by a typo. The header is
+corrected to match.
+
+## Test Results
+
+None yet.
+
+## Gate 4 · Functional Design — closed 2026-08-07 (assumed)
+
+`functional-design-agent` wrote `knowledge/FUNCTIONAL_SPEC.md` — **342
+acceptance criteria** in Given/When/Then form with stable IDs (`AC-F1-01` …
+`AC-F49-05`), covering **every feature marked `MVP1`** in `FEATURES.md`. The
+spec is a durable KB and is what `verification-agent` audits against at gate 9.
+
+- All eight UI-bearing MVP1 features (`F34`–`F40`, `F48`) carry at least one
+  observable-UI criterion naming component, screen and state. **None missing.**
+- The nine binding product constraints are each pinned by explicit criteria:
+  sentinel refusal by exact `.startswith()` with model prose discarded
+  (`AC-F31-01`…`12`); coverage on every path incl. refusals (`AC-F28-01`…`09`);
+  `sources[]` from verified citations only (`AC-F30-08`…`10`); the two-corpus
+  wall as a static import-boundary assertion with a negative control
+  (`AC-F22-03`, `AC-F22-05`); `NOT_STATED` distinguishable from parse failure
+  (`AC-F14-10`, `AC-F14-11`); comparability naming its dimensions with no scalar
+  score representable (`AC-F27-09`); outcome-completeness as an ingest gate
+  (`AC-F15-01`…`07`); confidential material quarantined and unretrievable
+  (`AC-F10-01`…`09`); vintage/staleness surfaced (`AC-F32-01`…`06`).
+- Criteria are behaviour-level and **stack-neutral** — no framework, library,
+  database or model vendor is named, so gate 6 is not pre-empted.
+- **Eight `FDA-*` assumptions** recorded in §12 of the spec under the
+  full-autonomy instruction (ingest exit-code semantics, provenance fails
+  closed, never-ingested corpus refuses, undetermined confidentiality
+  quarantines, marking-scan false-positive boundary, unit-equivalence is a
+  verification failure, negative controls are part of the suite features, screen
+  naming is state-not-layout).
+- **Scope observation raised, not resolved** (`plan-agent`'s lane):
+  `FEATURES.md`'s header states "42 MVP1 · 16 LATER" but its own `When` column
+  yields **44 MVP1 · 14 LATER**. The spec covers all 44. If two features were
+  meant to be deferred, `plan-agent` names which two and the criteria are
+  retired in place, keeping their IDs.
+
+## Gate 5 · Experience Design — closed (assumed) 2026-08-07
+
+`ui-ux-designer` wrote `knowledge/UX_KB.md` (719 lines) and **12 rendered
+screens + a system sheet** at `design-review/`, served locally at
+`http://127.0.0.1:8041/`. Self-contained static HTML/CSS, no build step, no CDN,
+no network calls; light and dark via `prefers-color-scheme`.
+
+**No Figma, and none faked.** The human's account is Starter tier with a **View**
+seat — 6 MCP calls/month and no write access, so `DesignSync`/Figma writes are
+unavailable. Recorded honestly, following `policy-lookup-assistant`'s precedent
+of documenting a genuine DesignSync failure rather than pretending. The designer
+flagged for `admin/LESSONS.md` that its design-system push has now failed on two
+consecutive projects for two different environmental reasons while its contract
+still presents it as routine.
+
+### The two hard problems, solved
+
+- **14 × 6 authority encoding** — each axis collapsed to a few visual *weights*
+  with full precision carried as text on every instance. `document_type` → four
+  tiers rendered as an **authority spine** (four stacked segments, N filled:
+  countable, hue-free, greyscale-safe, `aria-label`'d), where tier 4 is exactly
+  the set of documents from which `AUTHORIZED` may be written. `claim_status` →
+  three chip families: OUTCOME (solid), POSITION (**hatched outline, never
+  filled**), ABSENT (dashed). `REQUESTED` prints "— what the utility asked for;
+  **not granted**" plus a reconciliation line pointing at the outcome where one
+  exists. Four redundant channels; colour is the fourth, never the first. Net:
+  12 legible states, 4 structurally unreachable — the matrix makes a schema
+  invariant visible on screen.
+- **The coverage panel** — when `candidates == 0` the bar is **not rendered at
+  all**; it is replaced by `.coverage-none`, a dashed hatched "Nothing was
+  examined" band carrying the filter values. A zero-length bar scans as "all
+  clear"; a band with no bar geometry cannot. Screens 06 and 07 are placed
+  adjacent so the distinction is judged rather than asserted. The headline is
+  arithmetic in words with an explicit reconciliation line (`40 = 0 + 40 + 0`).
+
+### Other decisions
+
+**No green anywhere** (an answer is not a success, a refusal is not a failure);
+red appears exactly once in the product (system error); one accent, links and
+focus only; serif is semantic and means "the document's own words"; tabular
+numerals global; no web fonts. **No chart component exists in the design system
+at all** — deliberate, so `F33` cannot be built by reaching for one already
+sitting there. Accessibility: status never colour-alone, AA both themes, no
+alert/error role on refusal, no empty list anywhere.
+
+**Defect found and fixed mid-pass**: a screen printed the raw run-status enum
+`FAILED`, violating `AC-F38-02`. Now glossed as "did not complete", with a
+standing rule recorded for `code-agent`: the rendering rule governs **visible
+text, not stored values** — any enum literal containing a forbidden word must be
+glossed at the render boundary.
+
+**Honest gap**: the UX/accessibility suite is `STATIC ONLY — NOT EXECUTED`;
+`dev/tests/suites/ux/run.sh` does not exist until `F2` builds the harness.
+
+## Gate 6 · Architecture — closed (assumed) 2026-08-07
+
+Three architects ran concurrently on separate KBs:
+`knowledge/ARCHITECTURE_KB.md`, `knowledge/SECURITY_KB.md`,
+`knowledge/RESPONSIBLE_AI_KB.md`. They disagreed substantively in several
+places; the disagreements were surfaced rather than negotiated away, and are
+adjudicated below.
+
+### ASM-23 · The stack (`solution-architect`)
+
+**Python 3.12 · FastAPI + Jinja2, server-rendered · pydantic v2 · two SQLite
+corpus stores + a third `ops` store · numpy exact cosine ranking (no vector DB) ·
+Anthropic SDK direct (no LangChain) · OpenAI embeddings with a deterministic
+offline fallback · pypdf/python-docx · Playwright.** Nine runtime deps; no node,
+no Docker, no cloud.
+
+Four reasons that actually decided it:
+
+- **Server-rendered, not SPA** — the UX deliverable is already a component
+  library in the target technology (a 27 KB `rca.css` with a stable class
+  contract), so Jinja2 adopts it with no translation step, and translation is
+  precisely where an invariant like "the refusal panel carries no error
+  semantics" goes missing. It also makes `AC-F35-07` structural: with no JSON
+  route, the browser never receives composition output. Not adding an API avoids
+  creating a third surface with a permanent Impact-Analysis obligation.
+- **No vector database** — `PLAN.md` §7.2 wants filtering at the vector-search
+  boundary; a `where` clause satisfies it but buries the ordering guarantee in a
+  third-party planner. Instead: SQL predicate → candidate id set →
+  `rank_within(candidate_ids, vec, k)`, a pure numpy function that never touches
+  the store. `AC-F26-02` becomes an assertion about a **signature** rather than
+  about behaviour, and the negative control is a substituted ranker. Also kills
+  the `chroma_db` relative-path bug class the template override already cost us.
+- **No LangChain** — none of its retrievers/stores/loaders are used, leaving
+  only the chat wrapper that produced the `AIMessage.content: str | list` bug
+  `F49` regresses against. Direct SDK means the normaliser is ours and `F49`
+  tests our own code.
+- **Determinism where the harm is** — the model runs in exactly two places
+  (question→frame, evidence→prose), both forced tool use, both fail-closed.
+  Extraction, classification, comparability, coverage, verification, sentinel
+  and filtering are all deterministic.
+
+### How the invariants were made unrepresentable rather than validated
+
+- **The wall**: four layers (separate DB files → credential gate → separate
+  types → static closure check). `app/boundaries.py` is a machine-readable
+  manifest of seven boundaries checked by a function that `ast.parse`s rather
+  than imports and is **a pure function of a package root path** — which is what
+  makes the `AC-F22-05` negative control a separate fixture tree rather than a
+  mutation of `app/`. It fails on `importlib`/`__import__`/`eval`/`globals()[…]`
+  anywhere in a closure. `wiring/compose_root.py` is the only module where both
+  corpora meet. `PublicSource`/`WorkProductSource` are distinct types with
+  `corpus` a read-only class property, so a public path cannot emit a
+  work-product source.
+- **Comparability**: a tagged union of three types, not a record with a
+  `verdict` field, with `NonEmpty[…]` on both non-comparable arms — so a
+  non-`COMPARABLE` verdict naming no dimension is **not constructible**. No float
+  or score-named field is permitted in `app/comparability/`.
+- **Coverage**: `Coverage` has no public constructor; `CoverageLedger.seal()`
+  raises unless every candidate is dispositioned exactly once, so `AC-F27-12`'s
+  arithmetic cannot be false of any `Coverage` that exists. `Refusal` has **no
+  `sources` field at all**.
+- **Ingest ordering**: a typed stage chain where `write_case` accepts only
+  `IngestableCase`, which requires a `ClassifiedDocument` upstream — `AC-F10-09`
+  becomes a type-graph property rather than a line ordering.
+- **Sentinel**: two **zero-import** modules, the only way `AC-F31-12` is
+  statically checkable.
+- **`sources[]`**: `build_sources(verified: VerifiedCitations)` — one parameter.
+  That signature is the whole of the ASM-3 deviation.
+
+### `security-architect` — wall ratified with seven amendments
+
+Ratifies all four Intake recommendations, and says the quiet part out loud:
+**MVP1's wall protects nothing today.** The single `UTILITY_ANALYST` role
+legitimately holds both retrievers and the work-product corpus is 100%
+synthetic; the wall's entire MVP1 value is structural, making `F24` a config
+change rather than a re-architecture. The predictable failure is a maintainer
+hitting `AC-F22-03`, finding it pedantic, and weakening it. Recorded so a green
+suite is not misread as a defended boundary.
+
+Amendments accepted:
+
+- **SEC-W2** — `PLAN.md` §3.3 (session holds both retrievers) and `AC-F22-03`
+  (answer path must not transitively import the work-product store) are
+  contradictory unless the answer path is a module *narrower than the session*.
+  Resolved, and `solution-architect` independently landed the same shape:
+  `public_path.py`/`workproduct_path.py` each emit a `CorpusContribution`; the
+  shared composer and verifier import **neither** store; only the session type
+  joins them.
+- **SEC-W3** — a transitive-closure assertion says nothing about dynamic import
+  machinery, so `AC-F22-03` could pass on a build that reaches work-product on
+  every request. The negative control now **builds that bypass and requires
+  detection**. Converges with `ASA`'s dynamic-import ban.
+- **SEC-W6** — the wall was asserted in one direction only. Adapters ↛
+  work-product store and synthetic loader ↛ public store are now also asserted.
+  The realistic breach is not an attacker but a developer loading one real
+  internal PDF "to test extraction."
+- **SEC-W4** — the aggregate leak is a **selection** channel, not only a number
+  channel: if work-product material influences which cases are retrieved or
+  ranked, the output discloses by choice of cases even with every number public.
+  `QueryRecord.corpora_consulted[]` ships now so the claim is auditable.
+- **SEC-W5** — the adverse-party trigger fires on **the consultant**, not the
+  intervenor: persona #3 reaches "two parties' material in one instance" with no
+  intervenor ever logging in. Separation is per **engagement**, including the
+  provenance store — a query log discloses what a party was worried about.
+- **SEC-W1** — MVP1's live boundary is the **write** side: process-scoped
+  credentials (job gets only the public key, synthetic loader only the
+  work-product key, web surface no write path).
+- **SEC-W7** — corpus labelling **fails closed** at the response boundary.
+  Defaulting an unlabelled `Source` to `PUBLIC` is the intuitive implementation
+  and exactly backwards: it turns a bug into a disclosure.
+
+Also decided rather than deferred: **`IND-18` terms-of-use policy** (robots
+honoured, identifiable non-impersonating UA, 2s delay, concurrency 1, 429 abort,
+**absolute no-circumvention rule** — a 403 is never retried with altered
+headers, and a ToU review older than 365 days blocks live fetch); **strict
+`LIVE_FETCH` boolean parsing** (`LIVE_FETCH=false` is `True` under naive
+coercion); ingestion hardening caps; https-only host allowlist with
+private/metadata-range rejection. **`A6.4` retention closed**: indefinite in
+MVP1; `F54` must carry **legal-hold** semantics, because a trail auto-expiring
+during a live proceeding is a spoliation problem — a minimisation-only policy
+makes things worse.
+
+**SEC-I7**, rated most likely to bite: fixture capture writes third-party bytes
+straight into git with no classification. `AC-F10-09` protects the *store*, which
+is rebuildable; a commit is not. Capture must classify at capture time.
+
+Secrets posture **verified, not assumed**: one commit, two tracked files, no
+`.env` ever tracked, all-history key scan clean — so the override's cost (b) is
+mostly already paid.
+
+### `responsible-ai-architect` — guardrails, and one real spec hole
+
+- **`RAI-AMEND-1`, the sharpest finding of the gate.** `AC-F30-02` verifies a
+  quote is present *somewhere in the cited chunk*. Given a real order passage
+  reading *"it would not be appropriate to adopt the requested 10.4% return"*,
+  an answer asserting 10.4% **was** adopted while quoting that exact span
+  **passes the check as specified**. Amended: for a `PARAMETER_VALUE` assertion
+  the span must **equal** the stored `Claim.verbatim_quote`.
+- **`RAI-G2`** — a **closed assertion vocabulary** (6 admissible types) in the
+  composition schema, making synthesis, trend characterisation, prediction,
+  "uncontroversial", recommendation and aggregates *unrepresentable* rather than
+  merely prohibited. The main new structural guardrail.
+- **`RAI-G1`/`G4`** — render-from-record: the model selects a `claim_id`; the
+  product renders value/unit/scope/basis/status from the stored row. No docket
+  number, order number, URL, locator, date or figure reaches the screen from
+  model output. Collapses hallucination kind (c) from an entailment problem into
+  a lookup.
+- **Policy**: a probabilistic check may never be the thing that *permits* an
+  answer — only the thing that refuses. **No confidence gate anywhere.**
+- **Injection reclassified**: because `F30` verifies against stored records,
+  prompt injection via an ingested intervenor brief cannot manufacture a
+  verified citation — ASM-3 converts injection from an **integrity** attack into
+  an **availability** attack. Hence a test for injected denial-of-service
+  (refuse everything about a utility → drive the workaround) and for invisible
+  injection (zero-size font, background-coloured text, PDF metadata) that a
+  human reviewing the public PDF cannot see.
+- **Over-refusal ruling** — `ASM-UX-8` retained but **narrowed**: removal
+  creates a dead end that routes a deadline-pressured analyst to an unguarded
+  chatbot, but a warning sentence does not constrain behaviour. **No offered
+  alternative may relax exactly one dimension of the refused combination** —
+  those two answers are precisely what a user hand-blends into `RCA-R6`.
+  Alternatives come from the corpus index, not the model; max 3.
+- **Bias probes** over fixtures with **equal coverage by construction**, so any
+  difference is the system's and not the corpus's — including framing bias
+  ("strongest precedent *for*" vs "*against*" must yield identical frames and
+  candidate sets) and party bias (under-surfacing intervenor positions is harms
+  #3 and #4 in one probe).
+- **`RT-REPEAT`: K=5 runs per adversarial prompt, all must pass** — single-shot
+  adversarial testing against a stochastic model is theatre.
+
+### ASM-24 · Orchestrator adjudication of cross-KB conflicts
+
+All decided here so `code-agent` receives one consistent instruction set:
+
+1. **`RAI-AMEND-1` accepted** — span equality with the stored claim quote for
+   `PARAMETER_VALUE` assertions. This is a genuine hole in `FUNCTIONAL_SPEC.md`,
+   found late, and closing it is cheap now and expensive after Code.
+2. **`RAI-AMEND-2` accepted, and already satisfied**:
+   `responsible-ai-architect` disputed `UX_KB` §6.1's claim that a dropped
+   candidate becoming a visible arithmetic mismatch is a feature — a user shown
+   `40 = 0 + 39 + 0` has no recourse and still reads the answer above it. It
+   asked for server-side fail-closed enforcement; `solution-architect`'s
+   `CoverageLedger.seal()` already makes the violating object unconstructible.
+   Convergent, not conflicting. The printed line stays.
+3. **`RAI-AMEND-3` accepted** — add `candidates_by_corpus`. A **count is an
+   aggregate**, so `Coverage.candidates_considered` is itself a mixed-corpus
+   aggregate whenever a session spans both. Same argument that put
+   `Source.corpus` in MVP1 with no consumer.
+4. **`RAI-AMEND-5` accepted** — `INJECTION_MARKER` and `INVISIBLE_TEXT`
+   quarantine reasons; `security-architect` owns the mechanism,
+   `responsible-ai-architect` owns the AI-behaviour reason.
+5. **`RAI-AMEND-6` accepted** — the system-failure state says *"No analysis was
+   performed."* Harm #3 does not care why the tool was silent.
+6. **`FDA-3` amended per `security-architect`** — `HIGHLY_SENSITIVE` quarantine
+   exits non-zero, narrowing the "expected quarantines → exit 0" rule.
+7. **Red-team suite naming resolved**: directory `dev/tests/suites/red-team/`,
+   harness key `redteam`. `responsible-ai-architect`'s tool scope is bound to
+   the hyphenated path, so any other choice means it can never execute the suite
+   it owns.
+8. **`ASM-UX-6` closed** — MVP1 binds **both** retrievers; the "public +
+   internal corpora" session chip stands and the work-product card variant is
+   live.
+9. **At-rest encryption not in MVP1** — SQLCipher is named as an `F54`
+   precondition. The application-level credential gate (per-store key with an
+   HMAC `store.stamp` verified at open) is mistake-prevention and
+   tamper-evidence on one machine as one user, **not** attacker-resistance, and
+   is recorded as such rather than overclaimed.
+10. **`ARCH-14` accepted** — `rca.css` is copied into the product, making
+    `design-review/` a source artifact; drift is controlled by a byte-identity
+    check in a blocking suite.
+
+### Execution posture — stated plainly
+
+All three architecture passes are **`STATIC ONLY — NOT EXECUTED`**.
+`dev/tests/` does not exist yet; `F2` builds the harness from scratch under the
+custom-template override. No scenario in any of the three KBs is a test result.
+For the security suite in particular, "not run" and "no vulnerabilities found"
+are opposite claims. Every scenario is re-run for real once the entry point
+lands, and the Test gate reports what actually executed.
+
+### ASM-25 · `code-agent` judgment calls at the Code gate (2026-08-08)
+
+Recorded because each is a deviation from, or a resolution of, something a KB
+stated. All are reversible; none was made silently.
+
+1. **Python 3.12 installed via `uv`.** The machine had only Python 3.9.6 and no
+   brew/pyenv, against `ARCHITECTURE_KB` §2.1's hard 3.12 floor. Installed into
+   `~/.local` with no sudo and nothing outside the user's own toolchain.
+2. **`corpus_as_of` advances on `PARTIAL` as well as `SUCCEEDED`.** As literally
+   written, AC-F39-05 makes the product permanently unusable: `PARTIAL` means
+   "only expected quarantines, exit 0", and a real corpus quarantines a
+   confidential exhibit on essentially every run, so the corpus would never be
+   dateable and FDA-5 would refuse every question forever. `FAILED` and a
+   mid-run termination still do not advance it. **The single largest deviation;
+   it wants a human ruling.** Reversible by removing one tuple entry in
+   `OpsStore.DATING_STATUSES`.
+3. **`web-never-writes` split in two.** `ARCHITECTURE_KB` §9.1 forbids
+   `app.grounding.compose` in the web surface's *transitive* closure. That is
+   unsatisfiable — the route calls `answer_question`, which necessarily
+   composes. Split into a transitive *writer* rule (which holds) and a **direct**
+   composer rule, which is what actually carries AC-F35-07.
+4. **`public-answer-path` split in two.** §4.6 lists
+   `app.stores.sqlite_engine` as forbidden *and* `app.session.public_only` as a
+   root; the public session must reach the *public* store. The new
+   `answer-path-imports-no-concrete-store` boundary is strictly stronger than
+   the original for the answer path.
+5. **Fixtures and transcripts are constructed, not captured.** Capturing real
+   commission bytes needs `LIVE_FETCH`, which no agent turn may enable
+   unilaterally. The adapters are written against the real URL shapes and title
+   vocabularies; the document *content* is synthetic.
+6. **`tools/make_synthetic.py` is a stand-in** for `synthetic-data-agent`'s
+   work-product asset, at the same path, so the work-product code path is live.
+
+## Gate 7 · Code — second pass, 2026-08-08
+
+Closed the integration gaps found when `code-agent`'s and
+`synthetic-data-agent`'s concurrent work met. **725 → 864 tests**, eight suites,
+`tests/run_all.sh` exits 0: unit 523 · architecture 45 · ui (TestClient) 48 ·
+security 43 · **rendered-ui (Playwright) 11, new** · red-team 27 · industry 26 ·
+functional 23.
+
+### The corpus loss (ASM-28) — a process defect, now a platform lesson
+
+`synthetic-data-agent`'s corpus **did not survive**. Verified directly by the
+orchestrator with `find`, not taken on either agent's account:
+`dev/data/synthetic/` and its generator do not exist. Cause: `dev/.gitignore`
+excludes `data/` **wholesale** and deliberately (SEC-S1 — it is where the derived
+SQLite stores live), so nothing was ever tracked and a clean removed it. Both
+agents reported truthfully about different moments: it was written, then it was
+gone.
+
+`code-agent` **correctly refused to author a replacement** — a second corpus is
+exactly what the division of labour exists to prevent — and instead built the
+loader against a small committed format-contract fixture (`fixtures/corpus_format/`,
+four cases, with a README stating it is not a corpus). That was the right call.
+
+Regeneration is under way into **`dev/corpus/synthetic/`** — outside the ignored
+`data/` root, tracked, with the generator tracked beside it so the loss is
+recoverable rather than merely detectable. Recorded in `admin/LESSONS.md` with
+the standing rule: **a derived-state directory and an asset directory must never
+be the same directory**, and the orchestrator checks a data deliverable's target
+path against `.gitignore` before dispatching.
+
+### Rendered-UI evidence — Playwright RAN
+
+11/11 against real Chromium over a running app; screenshots in
+`test-evidence/`. The `.coverage-none` band was verified by eye to render as a
+distinct hatched element with real height, not an empty bar — which is the whole
+point of the "silence is not clearance" design. Honest caveat recorded in the
+suite docstring: it serves the `webharness` corpus, so it is evidence the
+*rendering* is correct, **not** evidence about the corpus.
+
+**Gap reported rather than papered over**: there is no browser route for the run
+report — `design-review/11-run-report.html` is a design with nothing behind it. A
+new route is a surface addition needing an Architecture pass, so it was reported,
+not quietly added. Its text rendering is captured to
+`test-evidence/11-run-report.txt` with the gap stated at the top of the file.
+
+### Four more defects found by running, not reading
+
+1. **Utility name** — 8 of 15 realistic inputs wrong, after which the writer
+   substituted the docket number.
+2. **`chunk_page` lost every line locator** when a chunk did not *begin* on a
+   numbered line. The corpus marks every document's first line, so this would
+   have silently degraded the first chunk of every line-numbered document.
+3. **`LINE_NUMBER_PATTERN` required content after the number** — testimony
+   numbers its blank Q/A lines, so a genuine transcript scored ~0.67 against a
+   0.8 threshold and was detected as *not* line-numbered. **Only a real PDF
+   exposed this**, which is precisely why the binary-extraction gap was worth
+   closing.
+4. **Six sites leaking raw enum literals onto the painted page** (`NOT_STATED`,
+   `PA_PUC`, `BASE_RATE`, `UTILITY_ANALYST`, `PUCT`, `RIDER`). Markup was
+   correct in every case — **`TestClient` cannot see this class of defect**, only
+   a real browser can. `code-agent`'s own test found itself wrong twice while
+   chasing them.
+
+### Schema gaps closed, and one refused
+
+Gaps 1, 2 and 4 closed (`unit` gains `NOT_STATED` so a black-box claim is no
+longer representable two ways — the `RCA-R5` regression path; a `document_type`
+member for withdrawal; real PDF/DOCX generated so `AC-F11-*` extraction is
+exercised against actual file formats). **Gap 3 half-refused (ASM-27)**:
+`confidentiality` gets no `NOT_APPLICABLE` member, because the CHECK constraint
+is shared by both stores and widening it to improve work-product readability
+would weaken `AC-F4-05` on the public store. Refusing to widen a shared
+constraint for one side's convenience is the right instinct.
+
+### Self-caught policy violation, worth recording
+
+`code-agent` made the new `rendered-ui` suite **advisory** in one commit, which
+violates **ASM-5** (all suites blocking). It caught this itself on a completeness
+re-read and corrected it in the next commit — and noted that it only caught it by
+re-reading the Decisions Log, not while writing the code. That is an argument for
+the Decisions Log being re-read at gate close rather than trusted from memory.
+
+**New dependency flagged, not slipped in**: `playwright`, under a `rendered-ui`
+extra rather than `[dev]`. Authorized by the brief; flagged because dependency
+additions are reviewable.
+
+## Current Status
+
+Gate 7 · Code — MVP1 implemented and committed (6 commits in `dev/`), 864 tests
+green across eight suites, web surface and ingestion job both executed offline
+with no API key. Awaiting `synthetic-data-agent`'s corpus regeneration into
+`dev/corpus/synthetic/` before the Test gate can run against the corpus of
+record rather than a format fixture.

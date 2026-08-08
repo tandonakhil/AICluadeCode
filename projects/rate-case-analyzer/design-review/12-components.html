@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 · Components, tokens and the 14×6 authority encoding · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+<style>
+  .gs { filter: grayscale(1) contrast(1.05); }
+  .matrix { width:100%; border-collapse:collapse; font-size:.8125rem; }
+  .matrix th, .matrix td { border:1px solid var(--rule); padding:.5rem; vertical-align:top; text-align:left; }
+  .matrix thead th { background:var(--surface-2); font-size:.6875rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); }
+  .matrix tbody th { background:var(--surface-2); font-weight:600; white-space:nowrap; }
+  .tierlist { list-style:none; padding:0; margin:0; display:grid; gap:.75rem; }
+  .tierlist li { margin:0; display:grid; grid-template-columns:22px 1fr; gap:.75rem; align-items:start;
+                 border:1px solid var(--rule); border-radius:var(--radius); padding:.625rem .75rem; background:var(--surface); }
+</style>
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">12 / 12 · Components, tokens, and the 14×6 encoding</span>
+  <span class="dr-crumb">The reference sheet code-agent implements against</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The system sheet. Everything on screens 01–11 is assembled from what is on this page. If a future feature needs a visual treatment that is not here, that is a design decision to be made, not improvised.</p>
+    <p>The section that matters most is <strong>the 14×6 encoding</strong>. There are fourteen document types and six claim statuses, and a naïve design would need eighty-four distinct treatments — which is not a design, it is a legend nobody reads. The resolution is to collapse each axis into a small number of visually distinct <em>weights</em>, and to carry the full precision as text on every instance.</p>
+  </div>
+</div>
+
+<div class="rca-shell">
+
+  <!-- ============ THE 14x6 PROBLEM ============ -->
+  <h2 class="dr-sectionhead">The 14 × 6 problem, and how it is solved</h2>
+
+  <h3>Axis 1 · <code>document_type</code> — 14 ranked values → 4 authority tiers, shown as a countable spine</h3>
+  <p style="max-width:78ch;">The fourteen values are already ranked 1–14 by the domain KB. Not all fourteen need equal visual weight: what an analyst is actually scanning for is <em>"is this an outcome, a recommendation, an ask, or argument?"</em> — a four-way distinction. So the ranking is bucketed into four tiers rendered as a vertical spine of four segments with N filled. It is countable, it survives greyscale, it survives being read aloud ("authority tier 4 of 4"), and it needs no colour. The exact enum value and its rank are printed as text on every card, so nothing is lost (<code>AC-F36-03</code>).</p>
+
+  <ul class="tierlist" style="margin-top:1rem;">
+    <li>
+      <span class="authority-spine" role="img" aria-label="Tier 4 of 4"><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+      <div>
+        <strong>Tier 4 of 4 — Outcome documents.</strong> What was actually granted or implemented.<br>
+        <span class="mono tiny">1 FINAL_ORDER · 2 ORDER_ON_REHEARING · 3 APPROVED_SETTLEMENT · 4 COMPLIANCE_FILING</span><br>
+        <span class="tiny muted">The only tier from which an <code>AUTHORIZED</code> claim may be written. Enforced at write time, not query time.</span>
+      </div>
+    </li>
+    <li>
+      <span class="authority-spine" role="img" aria-label="Tier 3 of 4"><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i></i></span>
+      <div>
+        <strong>Tier 3 of 4 — Recommendations and official positions.</strong> Someone with standing proposed this. Never an outcome.<br>
+        <span class="mono tiny">5 PROPOSED_ORDER_ALJ · 6 STAFF_REPORT_OR_TESTIMONY · 7 INTERVENOR_TESTIMONY</span>
+      </div>
+    </li>
+    <li>
+      <span class="authority-spine" role="img" aria-label="Tier 2 of 4"><i data-on="1"></i><i data-on="1"></i><i></i><i></i></span>
+      <div>
+        <strong>Tier 2 of 4 — Party filings and the ask.</strong> What the utility requested, and the schedules behind it.<br>
+        <span class="mono tiny">8 UTILITY_REBUTTAL_TESTIMONY · 9 UTILITY_DIRECT_TESTIMONY · 10 APPLICATION · 11 EXHIBIT_SCHEDULE</span><br>
+        <span class="tiny muted">An <code>EXHIBIT_SCHEDULE</code> inherits its parent filing's identity at ingestion; one with no resolvable parent never enters the corpus.</span>
+      </div>
+    </li>
+    <li>
+      <span class="authority-spine" role="img" aria-label="Tier 1 of 4"><i data-on="1"></i><i></i><i></i><i></i></span>
+      <div>
+        <strong>Tier 1 of 4 — Record and argument.</strong> Useful context; never a fact source for an outcome.<br>
+        <span class="mono tiny">12 DATA_REQUEST_RESPONSE · 13 HEARING_TRANSCRIPT · 14 BRIEF</span><br>
+        <span class="tiny muted">Deferred from MVP1 ingestion, but the tier exists now so adding them later is a pipeline change, not a design change.</span>
+      </div>
+    </li>
+  </ul>
+
+  <h3 style="margin-top:2rem;">Axis 2 · <code>claim_status</code> — 6 values → 3 chip families</h3>
+  <p style="max-width:78ch;">The distinction that carries the harm is not six-way, it is three-way: <em>was this granted, was it merely proposed, or is it absent?</em> Confusing the first two is the project's named worst harm. So the six values collapse into three chip families with sharply different construction — filled, hatched-outline, dashed-outline — and every chip prints its family, its exact enum value, and a plain-English gloss. Colour is the last of four redundant channels, not the first.</p>
+
+  <div style="display:grid; gap:.75rem; margin:1rem 0 0;">
+    <div class="panel" style="padding:.875rem 1rem;">
+      <p class="eyebrow" style="margin-bottom:.5rem;">Family 1 · OUTCOME — solid fill, highest contrast</p>
+      <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
+      <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>SETTLED<span class="status-chip__gloss">— agreed in an approved settlement</span></span>
+      <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>IMPLEMENTED<span class="status-chip__gloss">— in effect per compliance tariff</span></span>
+    </div>
+    <div class="panel" style="padding:.875rem 1rem;">
+      <p class="eyebrow" style="margin-bottom:.5rem;">Family 2 · POSITION — hatched outline, never filled</p>
+      <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED<span class="status-chip__gloss">— what the utility asked for; not granted</span></span>
+      <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>RECOMMENDED<span class="status-chip__gloss">— proposed by staff or an intervenor; not granted</span></span>
+      <p class="tiny muted" style="margin:.5rem 0 0;">The hatch is the point. A hatched chip reads as provisional at a glance and never resolves into the solid outcome chip, at any size or contrast.</p>
+    </div>
+    <div class="panel" style="padding:.875rem 1rem;">
+      <p class="eyebrow" style="margin-bottom:.5rem;">Family 3 · ABSENT — dashed outline, no fill</p>
+      <span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED<span class="status-chip__gloss">— the document does not state this figure</span></span>
+      <p class="tiny muted" style="margin:.5rem 0 0;">Never blank, never a dash alone, never omitted. A dashed border is the visual grammar of "there is a slot here and it is deliberately empty" — distinct from both a value and a missing card.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:2rem;">The combined space — 4 tiers × 3 families = 12 legible states</h3>
+  <table class="matrix" style="margin-top:.75rem;">
+    <caption class="vh">Authority tier by claim status family</caption>
+    <thead><tr><th scope="col">Authority tier</th><th scope="col">OUTCOME</th><th scope="col">POSITION</th><th scope="col">ABSENT</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">Tier 4 · outcome docs</th>
+        <td><span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED</span><br><span class="tiny muted">The only combination that answers "what was granted".</span></td>
+        <td><span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED</span><br><span class="tiny muted">A final order <em>reciting</em> what a party asked for. Real, common, and the reason one axis was never enough.</span></td>
+        <td><span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED</span><br><span class="tiny muted">The black-box settlement. Screen 05.</span></td>
+      </tr>
+      <tr>
+        <th scope="row">Tier 3 · recommendations</th>
+        <td><span class="tiny muted">Not representable. Enforced at write time: an <code>AUTHORIZED</code> claim requires a tier-4 document and a <code>DECIDED</code> case.</span></td>
+        <td><span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>RECOMMENDED</span></td>
+        <td><span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED</span></td>
+      </tr>
+      <tr>
+        <th scope="row">Tier 2 · party filings</th>
+        <td><span class="tiny muted">Not representable.</span></td>
+        <td><span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED</span><br><span class="tiny muted">The most common card in the corpus, and the one most often mistaken for an outcome. Screen 03, citation [3].</span></td>
+        <td><span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED</span></td>
+      </tr>
+      <tr>
+        <th scope="row">Tier 1 · record &amp; argument</th>
+        <td><span class="tiny muted">Not representable.</span></td>
+        <td><span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>RECOMMENDED</span></td>
+        <td><span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="tiny muted" style="margin-top:.5rem;">Four of the twelve cells are structurally unreachable, which is not a rendering rule but a schema invariant made visible. <code>IMPLEMENTED</code> occurs only with <code>COMPLIANCE_FILING</code>, also tier 4.</p>
+
+  <!-- ============ GREYSCALE PROOF ============ -->
+  <h2 class="dr-sectionhead">Greyscale proof · no meaning is carried by colour alone</h2>
+  <p style="max-width:78ch;">The same three citation cards from screen 03, with all colour removed. Every distinction survives: the spine is countable, the chips differ in construction, and the words <em>AUTHORIZED — granted by commission order</em> and <em>REQUESTED — what the utility asked for; not granted</em> are present as text. This is the state the UI suite asserts against.</p>
+
+  <ul class="citation-list gs" style="margin-top:1rem;">
+    <li class="citation-card">
+      <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+      <div>
+        <div class="citation-card__head">
+          <span class="doctype-label">Final Order</span>
+          <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+          <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
+        </div>
+        <h3 class="citation-title">Opinion and Order, <i>Pa. PUC v. PPL Electric Utilities Corporation</i></h3>
+        <ul class="citation-meta">
+          <li><b>Docket</b> <span class="mono">R-2024-3042569</span></li>
+          <li><b>Order date</b> <span class="mono">19 Dec 2024</span></li>
+          <li><b>Locator</b> <span class="locator">p. 118 · Finding of Fact No. 214</span></li>
+        </ul>
+        <blockquote class="verbatim">"We therefore adopt a return on common equity of 9.85%…"</blockquote>
+      </div>
+    </li>
+    <li class="citation-card citation-card--position">
+      <span class="authority-spine" role="img" aria-label="Authority tier 2 of 4."><i data-on="1"></i><i data-on="1"></i><i></i><i></i></span>
+      <div>
+        <div class="citation-card__head">
+          <span class="doctype-label">Utility Direct Testimony</span>
+          <span class="doctype-rank">document_type rank 9 of 14 · party filing</span>
+          <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED<span class="status-chip__gloss">— what the utility asked for; not granted</span></span>
+        </div>
+        <h3 class="citation-title">Direct Testimony of D. A. D'Ascendis on behalf of PECO Energy Company</h3>
+        <ul class="citation-meta">
+          <li><b>Docket</b> <span class="mono">R-2023-3037679</span></li>
+          <li><b>Filing date</b> <span class="mono">31 Mar 2023</span></li>
+          <li><b>Locator</b> <span class="locator">PECO St. No. 5 · p. 34 · ll. 8–14</span></li>
+        </ul>
+        <blockquote class="verbatim">"I recommend a return on common equity of 10.95%…"</blockquote>
+      </div>
+    </li>
+    <li class="citation-card citation-card--absent">
+      <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+      <div>
+        <div class="citation-card__head">
+          <span class="doctype-label">Approved Settlement</span>
+          <span class="doctype-rank">document_type rank 3 of 14 · outcome document</span>
+          <span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED<span class="status-chip__gloss">— the settlement does not state this figure</span></span>
+        </div>
+        <h3 class="citation-title">Joint Petition for Settlement, as approved — <i>Pa. PUC v. PECO Energy Company</i></h3>
+        <ul class="citation-meta">
+          <li><b>Docket</b> <span class="mono">R-2021-3024601</span></li>
+          <li><b>Order date</b> <span class="mono">16 Dec 2021</span></li>
+        </ul>
+        <blockquote class="verbatim">"No specific return on common equity … is stipulated."</blockquote>
+      </div>
+    </li>
+  </ul>
+
+  <!-- ============ COLOUR ============ -->
+  <h2 class="dr-sectionhead">Colour</h2>
+  <p style="max-width:78ch;">Warm paper, cool ink, one accent, and functional colour used in exactly three places: the position family (amber), the caveat family (the same amber), and system failure (red — the only red in the product). No gradients. No green: an answer is not a "success" and a refusal is not a "failure", and colouring them that way would teach analysts to route around the guardrail. Light values shown; the dark theme is a token swap under <code>prefers-color-scheme</code> and preserves every contrast ratio.</p>
+
+  <ul class="swatch-grid" style="margin-top:1rem;">
+    <li><div class="swatch" style="background:#FBFAF9"></div><span class="name">Paper</span><span class="val">#FBFAF9 · page</span></li>
+    <li><div class="swatch" style="background:#FFFFFF"></div><span class="name">Surface</span><span class="val">#FFFFFF · panels</span></li>
+    <li><div class="swatch" style="background:#F4F2EF"></div><span class="name">Surface 2</span><span class="val">#F4F2EF · inset</span></li>
+    <li><div class="swatch" style="background:#16191D"></div><span class="name">Ink</span><span class="val">#16191D · 16.2:1</span></li>
+    <li><div class="swatch" style="background:#464C54"></div><span class="name">Ink 2</span><span class="val">#464C54 · 8.4:1</span></li>
+    <li><div class="swatch" style="background:#62696F"></div><span class="name">Ink 3</span><span class="val">#62696F · 5.6:1</span></li>
+    <li><div class="swatch" style="background:#1F4A7A"></div><span class="name">Accent</span><span class="val">#1F4A7A · 8.0:1 · links + focus only</span></li>
+    <li><div class="swatch" style="background:#2B3138"></div><span class="name">Outcome</span><span class="val">#2B3138 · filled chips, spine</span></li>
+    <li><div class="swatch" style="background:#FBF3E2; border-color:#C99A3A"></div><span class="name">Position / caveat</span><span class="val">#FBF3E2 on #6F4600 · 7.3:1</span></li>
+    <li><div class="swatch" style="background:#FBEEEC; border-color:#C4796C"></div><span class="name">System failure</span><span class="val">#FBEEEC on #8A2418 · the only red</span></li>
+    <li><div class="swatch" style="background:#DFDBD4"></div><span class="name">Rule</span><span class="val">#DFDBD4</span></li>
+    <li><div class="swatch" style="background:#C6C1B8"></div><span class="name">Rule strong</span><span class="val">#C6C1B8 · 3:1 vs paper, non-text</span></li>
+  </ul>
+
+  <!-- ============ TYPE ============ -->
+  <h2 class="dr-sectionhead">Typography</h2>
+  <p style="max-width:78ch;">Three system stacks, no web fonts — nothing to download, nothing to fail, no layout shift, and no CDN call from a tool handling regulatory material. Tabular numerals are on globally so columns of ROE figures align. Body measure is capped at 68 characters; the dense reference material lives in tables and cards, not in long prose.</p>
+  <table class="type-spec" style="margin-top:1rem;">
+    <caption class="vh">Type scale</caption>
+    <thead><tr><th scope="col">Role</th><th scope="col">Specimen</th><th scope="col">Spec</th></tr></thead>
+    <tbody>
+      <tr><td>Page title</td><td style="font-size:1.75rem; font-weight:600; letter-spacing:-.011em;">Ask a precedent question</td><td class="spec">28px / 1.25 / 600 / −0.011em · UI stack</td></tr>
+      <tr><td>Panel heading</td><td style="font-size:1.25rem; font-weight:600;">Coverage — what was checked</td><td class="spec">20px / 1.25 / 600 · UI stack</td></tr>
+      <tr><td>Answer body</td><td style="font-size:1.0625rem;">The Pennsylvania PUC has authorized a return on common equity in two cases.</td><td class="spec">17px / 1.55 / 400 · UI stack</td></tr>
+      <tr><td>Question echo</td><td style="font-family:var(--font-doc); font-size:1.0625rem; color:var(--ink-2);">What ROE has the PA PUC authorized since 2023?</td><td class="spec">17px / 1.5 · serif stack</td></tr>
+      <tr><td>Verbatim quote</td><td><span class="verbatim" style="display:inline-block;">"We therefore adopt a return on common equity of 9.85%."</span></td><td class="spec">15px / 1.5 · serif stack · left rule</td></tr>
+      <tr><td>Body / meta</td><td style="font-size:.8125rem; color:var(--ink-2);">Order No. 2024-3042569-OP, entered 19 Dec 2024</td><td class="spec">13px / 1.5 · UI stack</td></tr>
+      <tr><td>Identifiers &amp; figures</td><td class="mono">R-2024-3042569 · 9.85% · p. 118, FoF 214</td><td class="spec">13–14px · mono stack · tabular</td></tr>
+      <tr><td>Eyebrow / section label</td><td><span class="eyebrow" style="margin:0;">Standing limits of this corpus</span></td><td class="spec">11px / 700 / 0.09em / uppercase</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ COMPONENT INVENTORY ============ -->
+  <h2 class="dr-sectionhead">Component inventory — the names <code>code-agent</code> builds against</h2>
+  <table class="qtable">
+    <caption class="vh">Component inventory</caption>
+    <thead><tr><th scope="col">Component</th><th scope="col">Class</th><th scope="col">Variants</th><th scope="col">Seen on</th></tr></thead>
+    <tbody>
+      <tr><td>App bar</td><td class="mono">.rca-appbar</td><td>—</td><td>all</td></tr>
+      <tr><td>Freshness banner</td><td class="mono">.rca-freshness</td><td><span class="mono">default · --stale · --never</span></td><td>10</td></tr>
+      <tr><td>Session chip</td><td class="mono">.rca-session</td><td>—</td><td>all</td></tr>
+      <tr><td>Question form</td><td class="mono">.ask-form / .question-input / .submit-btn</td><td>default · disabled · invalid</td><td>01, 02</td></tr>
+      <tr><td>Inline validation</td><td class="mono">.inline-validation</td><td>—</td><td>02</td></tr>
+      <tr><td>In-progress indicator</td><td class="mono">.inflight</td><td>—</td><td>02</td></tr>
+      <tr><td>Answer panel</td><td class="mono">.answer-panel / .answer-body / .answer-figures</td><td>—</td><td>03, 04, 05</td></tr>
+      <tr><td>Coverage strip</td><td class="mono">.coverage-strip / .coverage-bar</td><td>bar · <span class="mono">.coverage-none</span> band</td><td>03–09</td></tr>
+      <tr><td>Coverage panel</td><td class="mono">.coverage-panel / .coverage-list / .coverage-empty-note</td><td>populated · zero-candidates · empty-region</td><td>03–08</td></tr>
+      <tr><td>Citation card</td><td class="mono">.citation-card</td><td>default · <span class="mono">--position</span> · <span class="mono">--absent</span></td><td>03, 04, 05, 11, 12</td></tr>
+      <tr><td>Authority spine</td><td class="mono">.authority-spine</td><td>4 tiers</td><td>03–05, 11, 12</td></tr>
+      <tr><td>Status chip</td><td class="mono">.status-chip</td><td><span class="mono">--outcome · --position · --absent</span></td><td>03–05, 11, 12</td></tr>
+      <tr><td>Card flag</td><td class="mono">.card-flag</td><td>default · <span class="mono">--superseded</span> · <span class="mono">--workproduct</span></td><td>04, 11</td></tr>
+      <tr><td>Comparability table</td><td class="mono">.dim-table / .dim-row</td><td><span class="mono">--matched · --caveat · --info · --unknown</span></td><td>03, 04</td></tr>
+      <tr><td>All-matched note</td><td class="mono">.all-matched-note</td><td>—</td><td>03</td></tr>
+      <tr><td>Vintage caveat</td><td class="mono">.vintage-caveat</td><td>per-case · all-cases-stale</td><td>04</td></tr>
+      <tr><td>Non-precedent quote</td><td class="mono">.nonprecedent-quote</td><td>—</td><td>04</td></tr>
+      <tr><td>Refusal panel</td><td class="mono">.refusal-panel / .refusal-gap / .examined-list</td><td>insufficient · verification-failed · parse-failed</td><td>06, 07, 08, 09, 10</td></tr>
+      <tr><td>System-error panel</td><td class="mono">.syserror-panel</td><td>—</td><td>09</td></tr>
+      <tr><td>Provenance panel</td><td class="mono">.provenance-panel</td><td>answered · refused</td><td>03–09</td></tr>
+      <tr><td>Run report</td><td class="mono">.run-status / .run-stats / .qtable</td><td><span class="mono">--succeeded · --partial · --failed</span></td><td>11</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ ACCESSIBILITY ============ -->
+  <h2 class="dr-sectionhead">Accessibility rules that are not negotiable</h2>
+  <ol style="max-width:78ch;">
+    <li><strong>Authority and status are never encoded by colour alone.</strong> Every instance carries the enum value as text plus a plain-English gloss, and a non-colour visual channel (spine segment count, chip fill construction).</li>
+    <li><strong>Every citation card shows a date</strong>, labelled as an order date or a filing date. There is no card layout in which the date is optional.</li>
+    <li><strong>The refusal panel carries no <code>alert</code> or <code>error</code> role</strong>, no danger semantics, and none of the words "error", "failed" or "problem". The system-error panel carries <code>role="alert"</code> and is the only component that does.</li>
+    <li><strong>No coverage region ever renders as a bare empty list.</strong> Empty regions render explicit text; a zero-candidate coverage renders a structurally different element from a zero-included coverage.</li>
+    <li><strong>WCAG AA contrast minimum</strong> for all text, in both light and dark themes. Non-text boundaries meet 3:1.</li>
+    <li><strong>Semantic structure</strong>: one <code>h1</code> per screen, real landmarks, real lists and tables with headers, visible 2px focus outlines, and the coverage bar carries a text alternative stating the same counts.</li>
+    <li><strong>No icon carries meaning on its own.</strong> There are almost no icons; the ones present are decorative and <code>aria-hidden</code>.</li>
+  </ol>
+
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a></p>
+</div>
+
+</body>
+</html>

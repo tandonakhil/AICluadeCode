@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 · Corpus freshness banner — four states · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">10 / 12 · Corpus freshness banner — four states</span>
+  <span class="dr-crumb">F39 · AC-F39-01…06 · RCA-R13</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The ingestion job is the product's second surface, and it fails independently of the web app. A silently-stopped scraper yields a stale corpus, and a stale corpus yields confident, wrong, well-cited answers with <strong>no UI symptom at all</strong> — unless this banner exists. It is therefore in the app bar on every screen including the empty first-run screen, not tucked into a settings page.</p>
+    <p>Four states below. Note that a failed or partial run <em>never advances the as-of date</em> (<code>AC-F39-05</code>): the banner reports the last run that actually succeeded, and mentions the newer unsuccessful one separately. And the date in this banner is always the same date shown on the coverage panel (<code>AC-F39-06</code>) — one fact, one value, two places.</p>
+  </div>
+</div>
+
+<div class="rca-shell">
+
+  <h2 class="dr-sectionhead">State 1 · Fresh — a successful run inside the threshold</h2>
+  <header class="rca-appbar" style="position:static;">
+    <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+    <span class="rca-appbar__spacer"></span>
+    <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+    <div class="rca-freshness">
+      <span class="rca-freshness__dot" aria-hidden="true"></span>
+      <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+    </div>
+  </header>
+  <p class="tiny muted" style="margin-top:.5rem;">Quiet by design. Filled dot, neutral surface, no adjective. The date is still stated in full rather than as "today" — an analyst copying a figure into filed material needs the actual as-of date, not a relative one.</p>
+
+  <h2 class="dr-sectionhead">State 2 · Stale — the last successful run is older than the 30-day threshold</h2>
+  <header class="rca-appbar" style="position:static;">
+    <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+    <span class="rca-appbar__spacer"></span>
+    <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+    <div class="rca-freshness rca-freshness--stale">
+      <span class="rca-freshness__dot" aria-hidden="true"></span>
+      <span>Corpus as of <strong>2 Jun 2026, 03:09 UTC</strong> · <strong>66 days old</strong> — no successful ingest run since</span>
+    </div>
+  </header>
+  <p class="tiny muted" style="margin-top:.5rem;">Amber, and it states the <em>age in days</em> rather than only the date, because "2 June" does not compute to "over two months" at a glance mid-task. The age is the finding. Colour is redundant here: remove it and the words "66 days old — no successful ingest run since" still carry the whole message.</p>
+
+  <h2 class="dr-sectionhead">State 3 · A newer run did not succeed</h2>
+  <header class="rca-appbar" style="position:static;">
+    <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+    <span class="rca-appbar__spacer"></span>
+    <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+    <div class="rca-freshness rca-freshness--stale">
+      <span class="rca-freshness__dot" aria-hidden="true"></span>
+      <span>Corpus as of <strong>28 Jul 2026, 03:11 UTC</strong> · the run of 7 Aug 2026 did not complete — the as-of date has not advanced</span>
+    </div>
+  </header>
+  <p class="tiny muted" style="margin-top:.5rem;">The date shown is the last <em>successful</em> run. The unsuccessful newer run is mentioned, never substituted — a partial run that ingested half the new filings must not be allowed to advertise itself as current coverage. Detail belongs in the run report, linked from here.</p>
+
+  <h2 class="dr-sectionhead">State 4 · No ingest run has ever succeeded</h2>
+  <header class="rca-appbar" style="position:static;">
+    <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+    <span class="rca-appbar__spacer"></span>
+    <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+    <div class="rca-freshness rca-freshness--never">
+      <span class="rca-freshness__dot" aria-hidden="true"></span>
+      <span>No ingest run has ever succeeded — this corpus cannot be dated</span>
+    </div>
+  </header>
+  <p class="tiny muted" style="margin-top:.5rem;">Dashed and hatched, so it does not read as a date at all. This state is <strong>load-bearing</strong>: the surface never answers over a corpus it cannot date, so a question asked in this state is refused, naming that as the gap. The refusal is below.</p>
+
+  <div style="margin-top:1.25rem; max-width:820px;">
+    <div class="panel refusal-panel">
+      <span class="refusal-label">No answer given</span>
+      <p class="answer-question" style="margin-top:1rem;">What ROE has the PA PUC authorized since 2023?</p>
+      <p class="refusal-statement">No ingest run has ever completed successfully, so there is no dated corpus to answer from. Anything returned now would carry an as-of date the system cannot vouch for.</p>
+      <div class="refusal-gap">
+        <dl>
+          <dt>Missing dimension</dt><dd>corpus_as_of — no successful IngestRun exists</dd>
+          <dt>Last run attempted</dt><dd>7 Aug 2026, 03:00 UTC — did not complete</dd>
+          <dt>Consequence</dt><dd>the answer path is closed until a run succeeds</dd>
+        </dl>
+      </div>
+      <p style="margin:0;">The ingestion job surface reports what happened on that run, and someone can act on it there.</p>
+    </div>
+    <p class="tiny muted" style="margin:.5rem 0 0;">Design note (not part of the product surface): neutral, not an error screen. From the analyst's side this is the system correctly declining. The words "error", "failed" and "problem" appear nowhere inside the refusal panel — note that even the run-status enum value is glossed as "did not complete" rather than printed raw, because the rendering rule is about the visible text, not about the stored value. <a href="11-run-report.html">See the run report →</a></p>
+  </div>
+
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="11-run-report.html">11 · Ingest run report</a></p>
+</div>
+
+</body>
+</html>

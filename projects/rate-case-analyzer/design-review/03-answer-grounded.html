@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 · Grounded answer with citations and coverage · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">03 / 12 · Grounded answer — the reference screen</span>
+  <span class="dr-crumb">F35 · F36 · F37 · F34 · F39 · F40</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>This is the reference layout — every other answer state is a variation on it. Read it in this order, because that is the order it was designed to be read in:</p>
+    <ul>
+      <li><strong>The answer, then immediately the coverage strip.</strong> The one-line arithmetic — <em>checked 12 · included 2 · excluded 8 · could not assess 2</em> — sits directly under the answer, above the fold, before any citation. You cannot read the answer without reading how much of the corpus stands behind it.</li>
+      <li><strong>Citation cards carry an "authority spine"</strong> — the 1-to-4 filled segments on the left edge. Countable, works in greyscale, works when read aloud ("authority tier 4 of 4"). It encodes the 14-value <code>document_type</code> ranking without needing 14 colours. The full enum label and its rank are always printed as text (<code>AC-F36-03</code>).</li>
+      <li><strong>The third card is the whole product in one component.</strong> PECO <em>asked</em> for 10.95%. It is on screen, adjacent to the authorized figure, and it is impossible to mistake for an outcome: hatched chip, amber outline, and the words <em>POSITION · REQUESTED — what the utility asked for; not granted</em>. Asked is never rendered as granted (<code>AC-F36-10</code>).</li>
+      <li><strong>The comparability region names dimensions, never a score.</strong> Where every dimension matched, it says so in words rather than rendering an empty region (<code>AC-F40-04</code>).</li>
+      <li><strong>The right rail is persistent, never collapsed.</strong> Coverage and provenance are always expanded. Nothing about the corpus's limits is behind a disclosure triangle.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+
+    <!-- ---------- Main column ---------- -->
+    <div class="rca-stack">
+
+      <section class="panel answer-panel" aria-labelledby="answer-h">
+        <h2 id="answer-h" class="vh">Answer</h2>
+        <p class="answer-question">What ROE has the PA PUC authorized in fully-projected-future-test-year distribution cases since 2023?</p>
+
+        <div class="answer-body">
+          <p>The Pennsylvania Public Utility Commission has authorized a return on common equity in <strong>two</strong> fully-projected-future-test-year electric distribution base rate cases decided since 1 January 2023.</p>
+
+          <table class="answer-figures">
+            <caption class="vh">Authorized ROE in PA PUC fully-projected-future-test-year distribution cases since 2023</caption>
+            <thead>
+              <tr><th scope="col">Utility</th><th scope="col">Docket</th><th scope="col">Order date</th><th scope="col">Authorized ROE</th><th scope="col">Source</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>PPL Electric Utilities Corporation</td>
+                <td class="mono">R-2024-3042569</td>
+                <td class="mono">19 Dec 2024</td>
+                <td class="num">9.85%</td>
+                <td><a class="cite-ref" href="#cite-1">[1]</a></td>
+              </tr>
+              <tr>
+                <td>PECO Energy Company</td>
+                <td class="mono">R-2023-3037679</td>
+                <td class="mono">14 Dec 2023</td>
+                <td class="num">9.60%</td>
+                <td><a class="cite-ref" href="#cite-2">[2]</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>Both figures are commission-authorized returns stated in a final order and expressed on a <strong>retail jurisdictional</strong> basis. In the PECO proceeding the company had requested <span class="claim-figure">10.95%</span> <a class="cite-ref" href="#cite-3">[3]</a>; that figure was <em>requested and not granted</em>, and is shown here only so the spread between the ask and the outcome is visible.</p>
+
+          <p class="tiny muted" style="margin-bottom:0;">No average, blend or peer benchmark is produced. Each figure is reported against its own named case.</p>
+        </div>
+
+        <p class="disclosure-note">AI-composed from cited docket documents. Every figure above was verified character-for-character against the quoted span on its citation card before this answer was shown; an answer that fails verification is discarded in full rather than shown with a caveat. Verify against the linked source before relying on it in filed material.</p>
+      </section>
+
+      <!-- Coverage strip: sits under the answer, above the citations. -->
+      <section class="coverage-strip" aria-labelledby="cov-strip-h">
+        <h2 id="cov-strip-h" class="vh">Coverage summary</h2>
+        <p class="coverage-strip__sentence">
+          Checked <span class="n">12</span> candidate cases · included <span class="n">2</span> · excluded <span class="n">8</span> · could not assess <span class="n">2</span>
+        </p>
+        <div class="coverage-bar" role="img" aria-label="Of 12 candidate cases: 2 included, 8 excluded, 2 could not be assessed.">
+          <span class="seg-included" style="width:16.7%"></span>
+          <span class="seg-excluded" style="width:66.6%"></span>
+          <span class="seg-unassessed" style="width:16.7%"></span>
+        </div>
+        <ul class="coverage-key">
+          <li><i class="k-included" aria-hidden="true"></i> Included (2)</li>
+          <li><i class="k-excluded" aria-hidden="true"></i> Excluded on a named dimension (8)</li>
+          <li><i class="k-unassessed" aria-hidden="true"></i> Could not assess (2)</li>
+        </ul>
+        <p class="coverage-arith">12 = 2 + 8 + 2 — every candidate is accounted for. Full reasons in the coverage panel →</p>
+      </section>
+
+      <!-- Citations -->
+      <section aria-labelledby="cites-h">
+        <div class="panel__head"><h2 id="cites-h">Citations <span class="muted tiny">— 3 verified sources</span></h2></div>
+        <ul class="citation-list">
+
+          <!-- [1] FINAL_ORDER + AUTHORIZED -->
+          <li class="citation-card" id="cite-1">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document.">
+              <i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i>
+            </span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Final Order</span>
+                <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome">
+                  <span class="status-chip__family">Outcome</span>
+                  AUTHORIZED
+                  <span class="status-chip__gloss">— granted by commission order</span>
+                </span>
+              </div>
+              <h3 class="citation-title">Opinion and Order, <i>Pa. PUC v. PPL Electric Utilities Corporation</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2024-3042569</span></li>
+                <li><b>Order</b> <span class="mono">Order No. 2024-3042569-OP</span>, entered <span class="mono">19 Dec 2024</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">p. 118 · Finding of Fact No. 214</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"We therefore adopt a return on common equity of 9.85% for PPL Electric's fully projected future test year ending December 31, 2025."</blockquote>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1859042.pdf">https://www.puc.pa.gov/pcdocs/1859042.pdf</a>
+            </div>
+          </li>
+
+          <!-- [2] FINAL_ORDER + AUTHORIZED -->
+          <li class="citation-card" id="cite-2">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document.">
+              <i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i>
+            </span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Final Order</span>
+                <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome">
+                  <span class="status-chip__family">Outcome</span>
+                  AUTHORIZED
+                  <span class="status-chip__gloss">— granted by commission order</span>
+                </span>
+              </div>
+              <h3 class="citation-title">Opinion and Order, <i>Pa. PUC v. PECO Energy Company — Electric Division</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2023-3037679</span></li>
+                <li><b>Order</b> <span class="mono">Order No. 2023-3037679-OP</span>, entered <span class="mono">14 Dec 2023</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">p. 96 · Finding of Fact No. 178</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"The Commission finds that a return on common equity of 9.60% is just and reasonable for PECO's electric distribution operations."</blockquote>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1812366.pdf">https://www.puc.pa.gov/pcdocs/1812366.pdf</a>
+            </div>
+          </li>
+
+          <!-- [3] UTILITY_DIRECT_TESTIMONY + REQUESTED — the harm-#1 card -->
+          <li class="citation-card citation-card--position" id="cite-3">
+            <span class="authority-spine" role="img" aria-label="Authority tier 2 of 4: party filing.">
+              <i data-on="1"></i><i data-on="1"></i><i></i><i></i>
+            </span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Utility Direct Testimony</span>
+                <span class="doctype-rank">document_type rank 9 of 14 · party filing</span>
+                <span class="status-chip status-chip--position">
+                  <span class="status-chip__family">Position</span>
+                  REQUESTED
+                  <span class="status-chip__gloss">— what the utility asked for; not granted</span>
+                </span>
+              </div>
+              <h3 class="citation-title">Direct Testimony of D. A. D'Ascendis on behalf of PECO Energy Company</h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2023-3037679</span></li>
+                <li><b>Filed</b> <span class="mono">31 Mar 2023</span> <span class="muted">(filing date — this document is not an order)</span></li>
+                <li><b>Witness</b> D. A. D'Ascendis</li>
+                <li><b>Locator</b> <span class="locator">PECO St. No. 5 · p. 34 · ll. 8–14</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"Based on the results of my analyses, I recommend a return on common equity of 10.95% for PECO's electric distribution operations."</blockquote>
+              <p class="tiny" style="margin:.5rem 0 .35rem; font-weight:600; color:var(--position-fg);">This figure was requested, not authorized. The commission authorized 9.60% — see citation [2].</p>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1790114.pdf">https://www.puc.pa.gov/pcdocs/1790114.pdf</a>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+      <!-- Comparability (F40) -->
+      <section class="panel comparability-panel" aria-labelledby="comp-h">
+        <div class="panel__head">
+          <h2 id="comp-h">Comparability</h2>
+          <span class="tiny muted">Dimensions are named individually. No similarity or comparability score is computed or shown.</span>
+        </div>
+        <p class="all-matched-note">All supporting cases matched the question on every assessed dimension: jurisdiction, market structure, case type, test-year convention, vintage and capital-structure band.</p>
+        <table class="dim-table" style="margin-top:1rem;">
+          <caption class="vh">Comparability dimensions assessed for the included cases</caption>
+          <thead><tr><th scope="col">Dimension</th><th scope="col">Your question</th><th scope="col">Both cases</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr class="dim-row dim-row--matched"><td>jurisdiction</td><td class="mono">PA_PUC</td><td class="mono">PA_PUC</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>market structure</td><td class="mono">RESTRUCTURED_WIRES_ONLY</td><td class="mono">RESTRUCTURED_WIRES_ONLY</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>case type</td><td class="mono">BASE_RATE</td><td class="mono">BASE_RATE</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>test year convention</td><td class="mono">FPFTY</td><td class="mono">FPFTY</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>vintage</td><td class="mono">since 2023-01-01</td><td class="mono">2023-12-14 … 2024-12-19</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>capital structure band</td><td class="mono">any</td><td class="mono">53.0% / 53.6% equity</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+          </tbody>
+        </table>
+        <p class="tiny muted" style="margin:.75rem 0 0;">Neither case carries a non-precedent clause. Neither order has been superseded as at the corpus as-of date.</p>
+      </section>
+
+    </div>
+
+    <!-- ---------- Right rail ---------- -->
+    <aside class="rca-rail rca-stack">
+
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">12</span></h4>
+          <p class="tiny muted" style="margin:0;">Jurisdictions examined: PA PUC, PUCT, CPUC. Date span examined: 14 Mar 2019 – 19 Dec 2024.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">2</span></h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">R-2024-3042569</span><span class="reason">PPL Electric Utilities · PA PUC</span></li>
+            <li><span class="case-id">R-2023-3037679</span><span class="reason">PECO Energy · PA PUC</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">8</span> — each on a named dimension</h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">56211</span><span class="reason"><span class="dim">jurisdiction</span> — PUCT, not PA PUC (blocking; out-of-state outcomes are market evidence, not PA authority)</span></li>
+            <li><span class="case-id">53601</span><span class="reason"><span class="dim">jurisdiction</span> — PUCT, not PA PUC (blocking)</span></li>
+            <li><span class="case-id">51415</span><span class="reason"><span class="dim">jurisdiction</span> — PUCT, not PA PUC (blocking)</span></li>
+            <li><span class="case-id">A.23-05-010</span><span class="reason"><span class="dim">jurisdiction</span> — CPUC, not PA PUC (blocking); also <span class="dim">market structure</span> — vertically integrated</span></li>
+            <li><span class="case-id">A.22-05-015</span><span class="reason"><span class="dim">jurisdiction</span> — CPUC, not PA PUC (blocking); also <span class="dim">market structure</span> — vertically integrated</span></li>
+            <li><span class="case-id">A.24-05-008</span><span class="reason"><span class="dim">jurisdiction</span> — CPUC, not PA PUC (blocking); also <span class="dim">market structure</span> — vertically integrated</span></li>
+            <li><span class="case-id">R-2023-3040020</span><span class="reason"><span class="dim">case type</span> — DSIC rider proceeding, not a base rate case (blocking)</span></li>
+            <li><span class="case-id">R-2021-3024601</span><span class="reason"><span class="dim">test year convention</span> — historical test year; your question named FPFTY (blocking)</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">2</span></h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">R-2019-3008671</span><span class="reason">Corpus does not record a <span class="dim">test year convention</span> for this case (<code>NOT_STATED</code>). Not treated as matching.</span></li>
+            <li><span class="case-id">WP-SYN-0007</span><span class="reason">Internal (synthetic) record; corpus does not record a <span class="dim">market structure</span> (<code>NOT_STATED</code>). Not treated as matching.</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7B4ZC9M3RQX</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 14:02:41 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-compose-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>28</dd>
+          <dt>Chunks cited</dt><dd>3 (all verified)</dd>
+          <dt>Outcome</dt><dd>ANSWERED</dd>
+        </dl>
+        <p class="tiny muted" style="margin:.75rem 0 0;">Recorded for every query, including every refusal. A utility's use of AI in preparing a filing may itself be commentable.</p>
+      </section>
+
+    </aside>
+  </div>
+</main>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="04-answer-caveats.html">04 · Answer with comparability caveats</a></p>
+</div>
+
+</body>
+</html>

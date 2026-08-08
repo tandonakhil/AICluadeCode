@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>08 · Refusal — the question could not be resolved · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">08 / 12 · Refusal — question could not be resolved into a frame</span>
+  <span class="dr-crumb">AC-F38-07 · AC-F28-04 · ASM-11</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The third refusal cause, and the one most easily got wrong. The question is not answerable because it was never resolved into a query frame — <em>"the big case last year"</em> names no commission, no utility and no parameter. There is deliberately no keyword-search fallback: a loose search over a corpus of near-identical formulaic testimony is exactly how cross-jurisdiction blending happens.</p>
+    <ul>
+      <li><strong>It must not say the corpus lacks evidence</strong> (<code>AC-F38-07</code>). Nothing was looked for, so nothing can be said about what is there. The wording is about the question, not the corpus.</li>
+      <li><strong>It names which parts of the question could not be resolved</strong> — as a slot-by-slot table showing what <em>was</em> understood alongside what was not. That turns a dead end into a one-edit fix.</li>
+      <li><strong>Still no error language.</strong> A partially-specified question is a normal thing for a person to type. The words "error", "failed" and "problem" appear nowhere on this screen's product surface.</li>
+      <li><strong>Coverage still renders</strong>, with <code>candidates_considered = 0</code> and text stating that no retrieval was performed because the question could not be resolved (<code>AC-F28-04</code>) — distinct wording from screen 07, where the question <em>was</em> resolved and the filters simply matched nothing.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel refusal-panel" aria-labelledby="refusal-h">
+        <span class="refusal-label">No answer given</span>
+        <h2 id="refusal-h" class="vh">No answer given</h2>
+        <p class="answer-question" style="margin-top:1rem;">how do the numbers compare for the big case last year</p>
+
+        <p class="refusal-statement">This question could not be resolved into a search. "The big case" does not identify a commission, a utility or a docket, and "the numbers" does not identify a parameter. Nothing was searched for, so nothing here is a statement about what the corpus contains.</p>
+
+        <div class="refusal-gap">
+          <dl>
+            <dt>Resolved</dt><dd>period → 2025-01-01 … 2025-12-31 ("last year")</dd>
+            <dt>Not resolved</dt><dd>jurisdiction — no commission named</dd>
+            <dt>Not resolved</dt><dd>utility / docket — "the big case" matches no identifier</dd>
+            <dt>Not resolved</dt><dd>parameter — "the numbers" is not one of ROE, ROR, equity ratio, rate base, gross plant, net plant, total revenue requirement or revenue requirement increase</dd>
+          </dl>
+        </div>
+
+        <p>The system does not fall back to a keyword search when a question cannot be resolved. Rate-case testimony is highly formulaic — a broad text search across three commissions returns confidently similar prose from unrelated proceedings, which is the single most likely route to a blended, wrong answer.</p>
+
+        <h3 style="font-size:.875rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3); margin-top:1.5rem;">Add any one of these and the question resolves</h3>
+        <ul class="next-steps">
+          <li>A commission — <span class="mono">PA PUC</span>, <span class="mono">PUCT</span> or <span class="mono">CPUC</span>.</li>
+          <li>A utility or docket number — e.g. <span class="mono">Oncor</span>, or <span class="mono">R-2024-3042569</span>.</li>
+          <li>A parameter — e.g. <span class="mono">ROE</span>, <span class="mono">equity ratio</span>, <span class="mono">revenue requirement increase</span>.</li>
+        </ul>
+        <p class="tiny muted" style="margin-top:.75rem;">Example: "What revenue requirement increase did the PUCT authorize for Oncor in 2025?"</p>
+      </section>
+
+    </div>
+
+    <aside class="rca-rail rca-stack">
+
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">0</span></h4>
+          <div class="coverage-none">
+            <p class="coverage-none__head">No retrieval was performed.</p>
+            <p class="tiny" style="margin:0 0 .5rem;">The question could not be resolved into a query frame, so no filters were built and no case was retrieved. This is different from a resolved question whose filters matched nothing.</p>
+            <dl>
+              <dt>jurisdiction</dt><dd>unresolved</dd>
+              <dt>utility / docket</dt><dd>unresolved</dd>
+              <dt>parameter</dt><dd>unresolved</dd>
+              <dt>period</dt><dd>2025-01-01 … 2025-12-31</dd>
+            </dl>
+          </div>
+          <p class="coverage-arith">0 = 0 + 0 + 0 — nothing entered the pipeline.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">Nothing was included; no search was run.</p>
+        </div>
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None excluded; no candidate set was built.</p>
+        </div>
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None; there was nothing to assess.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7HR3W8V6NCP</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 15:01:09 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-frame-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>0</dd>
+          <dt>Chunks cited</dt><dd>0</dd>
+          <dt>Outcome</dt><dd>REFUSED_PARSE_FAILED</dd>
+          <dt>Refusal gap</dt><dd>frame slots unresolved: jurisdiction, utility, parameter</dd>
+        </dl>
+      </section>
+
+    </aside>
+  </div>
+</main>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="09-system-error.html">09 · System error — a distinct component</a></p>
+</div>
+
+</body>
+</html>

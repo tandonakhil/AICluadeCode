@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>07 · Refusal — nothing examined (checked 0) · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">07 / 12 · Refusal — nothing examined</span>
+  <span class="dr-crumb">AC-F37-03 · AC-F31-08 · AC-F28-05 · RCA-R7 · constraint 4</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at — and this is the one to look at hardest</h2>
+    <p>This screen exists to be <em>visually incompatible</em> with screen 06. On 06 the system examined forty cases and found none comparable. Here it examined nothing at all. Both produce a refusal. If those two screens looked alike, the product would have a silence-is-clearance failure and every other guarantee would be decorative.</p>
+    <ul>
+      <li><strong>The coverage panel does not render a bar.</strong> A bar with zero length, or a bar with nothing in it, reads at a glance as "all clean". So the zero case is a <em>different element entirely</em>: a dashed, hatched band that cannot be scanned as a progress bar, headed <strong>Nothing was examined</strong>, with the filter values that produced the empty set printed inside it.</li>
+      <li><strong>The filter values are the finding.</strong> "Checked 0" alone is useless; "checked 0, because you asked for a commission this corpus does not contain" is actionable (<code>AC-F37-03</code>, <code>AC-F31-08</code>).</li>
+      <li><strong>Still neutral, still not an error.</strong> Same refusal panel treatment as 06. Asking about a commission outside the corpus is a reasonable thing to do and the tool should not scold you for it.</li>
+    </ul>
+    <p>A side-by-side of the two coverage panels is at the bottom of this page.</p>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel refusal-panel" aria-labelledby="refusal-h">
+        <span class="refusal-label">No answer given</span>
+        <h2 id="refusal-h" class="vh">No answer given</h2>
+        <p class="answer-question" style="margin-top:1rem;">What ROE has the Illinois Commerce Commission authorized in multi-year rate plans since 2024?</p>
+
+        <p class="refusal-statement">No case was examined. This corpus covers three commissions — Pennsylvania PUC, Public Utility Commission of Texas and California PUC — and the Illinois Commerce Commission is not among them. Nothing in the corpus is evidence about Illinois.</p>
+
+        <div class="refusal-gap">
+          <dl>
+            <dt>Missing dimension</dt><dd>jurisdiction</dd>
+            <dt>You asked for</dt><dd>ICC (Illinois Commerce Commission)</dd>
+            <dt>Corpus holds</dt><dd>PA_PUC, PUCT, CPUC</dd>
+            <dt>Also unmatched</dt><dd>case_type = MYRP — not present in this corpus in any jurisdiction</dd>
+          </dl>
+        </div>
+
+        <p style="font-weight:600;">Zero cases were retrieved and zero were assessed. This is not a statement that Illinois precedent supports no answer — it is a statement that this corpus has never looked at Illinois.</p>
+
+        <h3 style="font-size:.875rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3); margin-top:1.5rem;">Questions this corpus can answer instead</h3>
+        <ul class="next-steps">
+          <li>The same question for the PA PUC, the PUCT or the CPUC.</li>
+          <li>Illinois and multi-year rate plans are both recorded as deferred corpus extensions. Neither is available today, and neither can be approximated from what is here.</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <aside class="rca-rail rca-stack">
+
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">0</span></h4>
+          <div class="coverage-none">
+            <p class="coverage-none__head">Nothing was examined.</p>
+            <p class="tiny" style="margin:0 0 .5rem;">No candidate matched the filters below, so no case was retrieved, ranked or assessed.</p>
+            <dl>
+              <dt>jurisdiction</dt><dd>ICC</dd>
+              <dt>case_type</dt><dd>MYRP</dd>
+              <dt>parameter</dt><dd>ROE</dd>
+              <dt>period</dt><dd>since 2024-01-01</dd>
+              <dt>matches</dt><dd>0</dd>
+            </dl>
+          </div>
+          <p class="coverage-arith">0 = 0 + 0 + 0 — there was nothing to account for.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">Nothing was included, because nothing was examined.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None excluded — no candidate reached the comparability stage to be excluded from it.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None — there was nothing to assess.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Jurisdictions and date span examined</h4>
+          <p class="tiny muted" style="margin:0;">None. No retrieval was performed.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7G2M6D9K4TB</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 14:52:38 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-compose-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>0</dd>
+          <dt>Chunks cited</dt><dd>0</dd>
+          <dt>Outcome</dt><dd>REFUSED_INSUFFICIENT</dd>
+          <dt>Refusal gap</dt><dd>jurisdiction=ICC not in corpus</dd>
+        </dl>
+      </section>
+
+    </aside>
+  </div>
+</main>
+
+<!-- ============ THE COMPARISON ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">Side by side · "found nothing" vs. "looked at nothing"</h2>
+  <div class="dr-note">
+    <h2>The test this design has to pass</h2>
+    <p>Squint at these two. They should not be confusable at any distance, in greyscale, or read aloud. Left: a solid, fully-hatched bar with counts and forty named reasons. Right: no bar at all — a dashed hatched band whose first words are "Nothing was examined". A user who glances at the right-hand one and takes away "no risk flagged, therefore no risk" has to work against the layout to do it.</p>
+  </div>
+
+  <div class="rca-columns" style="grid-template-columns:1fr 1fr;">
+    <section class="panel">
+      <p class="eyebrow">Screen 06 — 40 examined, 0 comparable</p>
+      <h4>Candidates considered <span class="cov-count">40</span></h4>
+      <div class="coverage-bar" role="img" aria-label="Of 40 candidates: 0 included, 40 excluded." style="margin:.5rem 0;">
+        <span class="seg-excluded" style="width:100%"></span>
+      </div>
+      <p class="coverage-strip__sentence" style="font-size:.875rem; margin:.5rem 0 0;">Checked <span class="n">40</span> · included <span class="n">0</span> · excluded <span class="n">40</span> · could not assess <span class="n">0</span></p>
+      <p class="tiny muted" style="margin-top:.5rem;">The corpus was searched thoroughly and produced nothing usable. Forty named exclusion reasons follow.</p>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">Screen 07 — 0 examined</p>
+      <h4>Candidates considered <span class="cov-count">0</span></h4>
+      <div class="coverage-none">
+        <p class="coverage-none__head">Nothing was examined.</p>
+        <dl>
+          <dt>jurisdiction</dt><dd>ICC</dd>
+          <dt>case_type</dt><dd>MYRP</dd>
+          <dt>matches</dt><dd>0</dd>
+        </dl>
+      </div>
+      <p class="tiny muted" style="margin-top:.5rem;">The corpus was not searched, because the filters matched nothing. Silence here is not clearance.</p>
+    </section>
+  </div>
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="08-refusal-unparseable.html">08 · Refusal — question could not be resolved</a></p>
+</div>
+
+</body>
+</html>

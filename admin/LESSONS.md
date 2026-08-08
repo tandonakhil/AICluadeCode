@@ -15,6 +15,36 @@ doesn't get lost before that review happens.
 
 ## Common Pitfalls
 
+- **2026-08-08 — A generated project *asset* written under a wholesale-ignored
+  directory is not a deliverable, it is a temp file.** On
+  `rate-case-analyzer`, `synthetic-data-agent` produced the entire synthetic
+  corpus — 25 cases, 176 documents, 672 claims, 14 quarantine fixtures, plus its
+  generator — under `dev/data/synthetic/`. `dev/.gitignore` excludes `data/`
+  **wholesale** and deliberately (it is where the derived SQLite stores live),
+  so nothing was ever tracked, no commit carried it, and a clean removed all of
+  it. The agent reported success truthfully; the files existed when it finished.
+  The loss surfaced only when `code-agent` went to build the loader and found
+  nothing there.
+  **Why it wasn't caught**: the orchestrator's brief *told* the agent to write
+  to `dev/data/synthetic/` without checking that path against the project's own
+  `.gitignore`. Two correct decisions — "ignore all derived state" and "put the
+  corpus with the data" — combined into a defect neither owned.
+  **Standing rule**: when an agent's deliverable is *data*, the orchestrator
+  checks the target path against `.gitignore` **before** dispatching, and
+  prefers a path outside any ignored root (`dev/corpus/`, not `dev/data/`).
+  Corollary worth generalising: **a derived-state directory and an
+  asset directory must never be the same directory.** If a generator's output
+  is meant to survive, either the output or the generator must be tracked —
+  ideally both, since a tracked generator makes the loss recoverable rather
+  than merely detectable.
+  **Second-order lesson**: this was found by a *downstream consumer* failing,
+  not by any gate. Nothing in the pipeline verifies that a previous gate's
+  claimed artifact still exists. Cheap mitigation now in use: the orchestrator
+  verified the absence directly with `find` rather than relaying either agent's
+  account — `code-agent` reported the corpus missing, `synthetic-data-agent`
+  had reported it written, and both were telling the truth about different
+  moments.
+
 - **2026-07-06 — Flask `debug=False` caches compiled templates in memory.**
   Editing `templates/index.html` and re-curling without restarting the
   server serves the *old* render. Symptom: an edit that should be visible

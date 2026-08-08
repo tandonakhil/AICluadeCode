@@ -1,0 +1,77 @@
+{
+  "name": "rate-case-analyzer",
+  "template": "custom (Python 3.12 \u00b7 FastAPI + Jinja2 server-rendered \u00b7 SQLite \u00d73 \u00b7 numpy ranking)",
+  "position": "Gate 7 \u00b7 Code (complete) \u2192 Gate 8 \u00b7 Test",
+  "env": "dev, local",
+  "last_activity": "2026-08-08",
+  "served_url": "http://127.0.0.1:8041/ (design review); app run locally per dev/README.md",
+  "notes": "MVP1 built: 44 features, 864 tests green across 8 suites incl. Playwright rendered-UI. Two-corpus ethical wall enforced by static import-closure check with 7 negative-control fixture trees. Full autonomy run - every gate closed 'assumed', assumptions ASM-1..ASM-28 recorded.",
+  "gates": [
+    {
+      "n": 1,
+      "name": "Intake",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 2,
+      "name": "Team",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 3,
+      "name": "Plan",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 4,
+      "name": "Functional",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 5,
+      "name": "Experience",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 6,
+      "name": "Architecture",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 7,
+      "name": "Code",
+      "status": "done",
+      "approval": "assumed"
+    },
+    {
+      "n": 8,
+      "name": "Test",
+      "status": "running",
+      "approval": "pending"
+    },
+    {
+      "n": 9,
+      "name": "Verify",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 10,
+      "name": "Review",
+      "status": "pending",
+      "approval": "pending"
+    },
+    {
+      "n": 11,
+      "name": "Deploy",
+      "status": "pending",
+      "approval": "pending"
+    }
+  ]
+}

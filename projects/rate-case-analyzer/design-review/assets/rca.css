@@ -1,0 +1,622 @@
+/* =====================================================================
+   rate-case-analyzer — design-review stylesheet
+   Gate 5 · Experience Design · ui-ux-designer
+   Self-contained. No web fonts, no CDN, no network calls.
+   Works from file:// and from python3 -m http.server.
+   ---------------------------------------------------------------------
+   Naming here is the reference contract for code-agent. Every class
+   below maps to a named component in knowledge/UX_KB.md §4.
+   ===================================================================== */
+
+/* ---------- 1. Tokens ------------------------------------------------ */
+
+:root {
+  /* Neutrals — warm paper, cool ink. Deliberately low chroma. */
+  --paper:      #FBFAF9;
+  --surface:    #FFFFFF;
+  --surface-2:  #F4F2EF;
+  --surface-3:  #EBE8E3;
+  --rule:       #DFDBD4;
+  --rule-strong:#C6C1B8;
+
+  --ink:        #16191D;   /* 16.2:1 on paper */
+  --ink-2:      #464C54;   /*  8.4:1 on paper */
+  --ink-3:      #62696F;   /*  5.6:1 on paper */
+  --on-dark:    #F7F6F4;
+
+  /* Single interactive accent. Used for links + focus only. */
+  --accent:     #1F4A7A;   /*  8.0:1 on paper */
+  --accent-soft:#E7EEF6;
+
+  /* Functional families. Colour is ALWAYS redundant with text + shape. */
+  --outcome-bg:   #2B3138;  /* authority: granted / settled / implemented */
+  --outcome-fg:   #FFFFFF;
+  --position-bg:  #FBF3E2;  /* authority: asked for / recommended */
+  --position-fg:  #6F4600;  /*  7.3:1 on --position-bg */
+  --position-line:#C99A3A;
+  --absent-bg:    var(--surface-2);
+  --absent-fg:    var(--ink-2);
+  --absent-line:  var(--rule-strong);
+
+  /* Coverage bar segments */
+  --seg-included:   #2B3138;
+  --seg-excluded:   #9AA1A8;
+  --seg-unassessed: #C9CED3;
+
+  /* Caveat / attention (never used for refusals) */
+  --caveat-bg:  #FBF3E2;
+  --caveat-fg:  #6F4600;
+  --caveat-line:#C99A3A;
+
+  /* System error — the ONLY red in the system. Never used for refusals. */
+  --error-bg:   #FBEEEC;
+  --error-fg:   #8A2418;
+  --error-line: #C4796C;
+
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow: 0 1px 2px rgba(22,25,29,.06), 0 4px 14px rgba(22,25,29,.05);
+
+  --font-ui: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+             Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-doc: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
+
+  --measure: 68ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:      #14171A;
+    --surface:    #1B1F23;
+    --surface-2:  #22272C;
+    --surface-3:  #2A3036;
+    --rule:       #2F353B;
+    --rule-strong:#454C53;
+
+    --ink:        #E9ECEF;
+    --ink-2:      #B4BBC2;
+    --ink-3:      #8F979F;
+    --on-dark:    #14171A;
+
+    --accent:     #8FB6E8;
+    --accent-soft:#1D2732;
+
+    --outcome-bg:   #DDE2E7;
+    --outcome-fg:   #14171A;
+    --position-bg:  #2A2418;
+    --position-fg:  #E8C07A;
+    --position-line:#7A6329;
+    --absent-bg:    var(--surface-2);
+    --absent-fg:    var(--ink-2);
+    --absent-line:  var(--rule-strong);
+
+    --seg-included:   #DDE2E7;
+    --seg-excluded:   #6C757D;
+    --seg-unassessed: #3C444B;
+
+    --caveat-bg:  #2A2418;
+    --caveat-fg:  #E8C07A;
+    --caveat-line:#7A6329;
+
+    --error-bg:   #2C1B18;
+    --error-fg:   #F0A99C;
+    --error-line: #7A4038;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+  }
+}
+
+/* ---------- 2. Base -------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .4em; font-weight: 600; letter-spacing: -.011em; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.0625rem; }
+h4 { font-size: .9375rem; }
+p  { margin: 0 0 1em; max-width: var(--measure); }
+ul, ol { margin: 0 0 1em; padding-left: 1.25em; }
+li { margin: 0 0 .35em; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+code, .mono { font-family: var(--font-mono); font-size: .875em; }
+
+.vh {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.muted { color: var(--ink-3); }
+.tiny  { font-size: .8125rem; }
+.eyebrow {
+  font-size: .6875rem; text-transform: uppercase; letter-spacing: .09em;
+  font-weight: 700; color: var(--ink-3); margin: 0 0 .5rem;
+}
+
+/* ---------- 3. App bar + freshness banner (F39) ---------------------- */
+
+.rca-appbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  padding: .625rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+.rca-wordmark {
+  font-size: .9375rem; font-weight: 700; letter-spacing: -.01em;
+  display: flex; align-items: baseline; gap: .5rem; margin: 0;
+}
+.rca-wordmark .sub { font-weight: 400; color: var(--ink-3); font-size: .8125rem; letter-spacing: 0; }
+.rca-appbar__spacer { flex: 1 1 auto; }
+
+.rca-session {
+  font-size: .75rem; color: var(--ink-2);
+  border: 1px solid var(--rule); border-radius: 999px;
+  padding: .2rem .6rem; white-space: nowrap;
+}
+
+.rca-freshness {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .8125rem; color: var(--ink-2);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: .3rem .625rem; background: var(--surface-2);
+}
+.rca-freshness__dot {
+  width: .5rem; height: .5rem; border-radius: 50%;
+  background: var(--seg-included); flex: none;
+}
+.rca-freshness--stale { background: var(--caveat-bg); border-color: var(--caveat-line); color: var(--caveat-fg); }
+.rca-freshness--stale .rca-freshness__dot { background: var(--caveat-fg); }
+.rca-freshness--never {
+  background: repeating-linear-gradient(135deg, var(--surface-2) 0 6px, var(--surface-3) 6px 12px);
+  border-color: var(--rule-strong); border-style: dashed; color: var(--ink);
+  font-weight: 600;
+}
+.rca-freshness--never .rca-freshness__dot { background: transparent; border: 2px solid var(--ink-2); }
+.rca-freshness strong { font-weight: 600; }
+
+/* ---------- 4. Shell ------------------------------------------------- */
+
+.rca-shell { max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+.rca-shell--narrow { max-width: 760px; }
+
+.rca-columns { display: grid; gap: 2rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 1080px) {
+  .rca-columns { grid-template-columns: minmax(0,1fr) 384px; gap: 2.5rem; }
+  .rca-rail { position: sticky; top: 4.5rem; }
+}
+
+.rca-stack > * + * { margin-top: 1.25rem; }
+.rca-stack--tight > * + * { margin-top: .75rem; }
+
+/* ---------- 5. Panels ------------------------------------------------ */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.375rem;
+}
+.panel__head { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.panel__head h2, .panel__head h3 { margin: 0; }
+
+/* ---------- 6. Ask screen (F35) -------------------------------------- */
+
+.ask-hero { padding: 3.5rem 0 1.5rem; }
+.ask-hero h1 { font-size: 2rem; margin-bottom: .5rem; }
+.ask-hero .lede { font-size: 1.0625rem; color: var(--ink-2); max-width: 60ch; }
+
+.ask-form {
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+.ask-form__row { display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap; }
+.question-input {
+  flex: 1 1 22rem;
+  font: inherit; color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: .75rem .875rem;
+  min-height: 3.25rem; resize: vertical; width: 100%;
+}
+.question-input::placeholder { color: var(--ink-3); }
+.question-input[aria-invalid="true"] { border-color: var(--error-line); border-width: 2px; }
+
+.submit-btn {
+  font: inherit; font-weight: 600;
+  background: var(--outcome-bg); color: var(--outcome-fg);
+  border: 1px solid var(--outcome-bg); border-radius: var(--radius);
+  padding: .7rem 1.25rem; cursor: pointer; white-space: nowrap;
+}
+.submit-btn[disabled] { opacity: .5; cursor: default; }
+
+.inline-validation {
+  display: flex; gap: .5rem; align-items: baseline;
+  margin: .625rem 0 0; font-size: .875rem;
+  color: var(--error-fg); font-weight: 600;
+}
+
+.scope-note {
+  margin-top: 1.25rem; font-size: .875rem; color: var(--ink-2);
+  border-left: 3px solid var(--rule-strong); padding-left: .875rem;
+}
+
+.example-qs { list-style: none; padding: 0; margin: 1.75rem 0 0; display: grid; gap: .5rem; }
+.example-qs li { margin: 0; }
+.example-qs button {
+  font: inherit; text-align: left; width: 100%; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: .625rem .875rem; color: var(--ink-2);
+}
+
+/* ---------- 7. In-flight (F35-03) ------------------------------------ */
+
+.inflight { display: flex; gap: .875rem; align-items: flex-start; }
+.inflight__bars { display: flex; gap: 3px; padding-top: .35rem; flex: none; }
+.inflight__bars i {
+  display: block; width: 4px; height: 14px; border-radius: 2px;
+  background: var(--seg-unassessed);
+}
+.inflight__bars i:nth-child(1), .inflight__bars i:nth-child(2) { background: var(--seg-included); }
+.inflight__steps { list-style: none; padding: 0; margin: .5rem 0 0; font-size: .875rem; color: var(--ink-3); }
+.inflight__steps li::before { content: "· "; }
+.inflight__steps li[data-done="true"] { color: var(--ink-2); }
+.inflight__steps li[data-done="true"]::before { content: "✓ "; }
+
+/* ---------- 8. Answer (F35 / F29) ------------------------------------ */
+
+.answer-panel { border-left: 4px solid var(--outcome-bg); }
+.answer-question {
+  font-family: var(--font-doc); font-size: 1.0625rem; color: var(--ink-2);
+  margin: 0 0 1rem; padding-bottom: .875rem; border-bottom: 1px solid var(--rule);
+}
+.answer-question::before { content: "Asked: "; font-family: var(--font-ui); font-size: .75rem; text-transform: uppercase; letter-spacing: .09em; color: var(--ink-3); font-weight: 700; }
+.answer-body { font-size: 1.0625rem; }
+.answer-body p { max-width: var(--measure); }
+
+.claim-figure {
+  font-family: var(--font-mono); font-weight: 600;
+  background: var(--surface-2); border-radius: 4px; padding: .05em .3em;
+  white-space: nowrap;
+}
+.cite-ref {
+  font-family: var(--font-mono); font-size: .75rem; vertical-align: .35em;
+  color: var(--accent); text-decoration: none; padding: 0 .1em;
+}
+
+.answer-figures { width: 100%; border-collapse: collapse; margin: 1rem 0 1.25rem; font-size: .9375rem; }
+.answer-figures th, .answer-figures td {
+  text-align: left; padding: .5rem .625rem; border-bottom: 1px solid var(--rule); vertical-align: top;
+}
+.answer-figures thead th { font-size: .75rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); border-bottom-width: 2px; }
+.answer-figures td.num { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+
+.disclosure-note {
+  margin-top: 1.25rem; padding-top: .875rem; border-top: 1px solid var(--rule);
+  font-size: .8125rem; color: var(--ink-3);
+}
+
+/* ---------- 9. Citation card (F36) ----------------------------------- */
+/* The 14 x 6 encoding. See UX_KB §5.
+   - document_type -> 4 authority tiers, shown as a countable spine (1-4
+     filled segments) + the full enum label as text + "rank N of 14".
+   - claim_status  -> 3 chip families (OUTCOME / POSITION / ABSENT), each
+     printing the full enum value AND a plain-English gloss. */
+
+.citation-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .875rem; }
+
+.citation-card {
+  position: relative;
+  display: grid; grid-template-columns: 18px minmax(0,1fr); gap: .875rem;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius-lg); padding: .875rem 1rem;
+}
+.citation-card--position { background: var(--position-bg); border-color: var(--position-line); }
+.citation-card--absent {
+  background: var(--absent-bg); border-style: dashed; border-color: var(--absent-line);
+}
+
+/* Authority spine: 4 stacked segments, N filled = tier. Greyscale-safe. */
+.authority-spine { display: flex; flex-direction: column; gap: 3px; padding-top: .25rem; }
+.authority-spine i {
+  display: block; width: 100%; height: 12px; border-radius: 2px;
+  border: 1px solid var(--rule-strong); background: transparent;
+}
+.authority-spine i[data-on="1"] { background: var(--outcome-bg); border-color: var(--outcome-bg); }
+
+.citation-card__head { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: .5rem; }
+
+.doctype-label {
+  font-size: .75rem; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--ink);
+  border: 1px solid var(--rule-strong); border-radius: 4px;
+  padding: .15rem .45rem; background: var(--surface-2);
+}
+.doctype-rank { font-size: .75rem; color: var(--ink-3); font-family: var(--font-mono); }
+
+.status-chip {
+  display: inline-flex; align-items: baseline; gap: .4rem;
+  font-size: .75rem; font-weight: 700; letter-spacing: .03em;
+  border-radius: 4px; padding: .2rem .5rem;
+}
+.status-chip__family {
+  font-size: .625rem; letter-spacing: .1em; opacity: .8; text-transform: uppercase;
+}
+.status-chip__gloss { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.status-chip--outcome  { background: var(--outcome-bg);  color: var(--outcome-fg); }
+.status-chip--position { background: transparent; color: var(--position-fg); border: 1.5px solid var(--position-line);
+  background-image: repeating-linear-gradient(135deg, transparent 0 5px, rgba(201,154,58,.16) 5px 10px); }
+.status-chip--absent   { background: transparent; color: var(--absent-fg); border: 1.5px dashed var(--absent-line); }
+
+.citation-title { font-size: .9375rem; font-weight: 600; margin: 0 0 .35rem; }
+.citation-meta { list-style: none; padding: 0; margin: 0 0 .5rem; display: grid; gap: .15rem; font-size: .8125rem; color: var(--ink-2); }
+.citation-meta b { font-weight: 600; color: var(--ink-3); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; display: inline-block; min-width: 8.5rem; }
+.citation-meta .mono { color: var(--ink); }
+
+.locator { font-family: var(--font-mono); font-size: .8125rem; }
+.source-url {
+  display: inline-block; max-width: 100%; overflow-wrap: anywhere;
+  font-family: var(--font-mono); font-size: .75rem;
+}
+
+.verbatim {
+  font-family: var(--font-doc); font-size: .9375rem; color: var(--ink);
+  border-left: 3px solid var(--rule-strong); padding: .1rem 0 .1rem .75rem;
+  margin: .5rem 0 .25rem; max-width: none;
+}
+
+.card-flag {
+  display: inline-flex; gap: .35rem; align-items: baseline;
+  font-size: .75rem; font-weight: 600;
+  border: 1px solid var(--rule-strong); border-radius: 4px;
+  padding: .15rem .45rem; margin: .35rem .35rem 0 0; color: var(--ink-2);
+  background: var(--surface-2);
+}
+.card-flag--superseded { border-color: var(--caveat-line); background: var(--caveat-bg); color: var(--caveat-fg); }
+.card-flag--workproduct { border-style: dashed; }
+
+/* ---------- 10. Coverage strip + panel (F37) ------------------------- */
+
+.coverage-strip {
+  border: 1px solid var(--rule-strong); border-radius: var(--radius-lg);
+  background: var(--surface-2); padding: .875rem 1rem;
+}
+.coverage-strip__sentence { font-size: .9375rem; font-weight: 600; margin: 0 0 .5rem; }
+.coverage-strip__sentence .n { font-family: var(--font-mono); }
+
+.coverage-bar { display: flex; height: 14px; border-radius: 3px; overflow: hidden; border: 1px solid var(--rule-strong); }
+.coverage-bar span { display: block; height: 100%; }
+.coverage-bar .seg-included   { background: var(--seg-included); }
+.coverage-bar .seg-excluded   { background: repeating-linear-gradient(135deg, var(--seg-excluded) 0 4px, transparent 4px 8px); }
+.coverage-bar .seg-unassessed { background: var(--seg-unassessed); }
+
+.coverage-key { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 0; padding: 0; list-style: none; font-size: .8125rem; color: var(--ink-2); }
+.coverage-key li { display: flex; align-items: center; gap: .4rem; margin: 0; }
+.coverage-key i { width: 14px; height: 10px; border: 1px solid var(--rule-strong); border-radius: 2px; display: block; flex: none; }
+.coverage-key .k-included   { background: var(--seg-included); }
+.coverage-key .k-excluded   { background: repeating-linear-gradient(135deg, var(--seg-excluded) 0 4px, transparent 4px 8px); }
+.coverage-key .k-unassessed { background: var(--seg-unassessed); }
+
+/* The "checked 0" band is deliberately NOT a bar. It cannot be mistaken
+   for a full bar of clean results. (AC-F37-03 vs AC-F37-04) */
+.coverage-none {
+  border: 2px dashed var(--rule-strong); border-radius: var(--radius);
+  background: repeating-linear-gradient(135deg, var(--surface-3) 0 8px, var(--surface-2) 8px 16px);
+  padding: .75rem .875rem; margin-top: .25rem;
+}
+.coverage-none__head { font-weight: 700; font-size: .9375rem; margin: 0 0 .35rem; }
+.coverage-none dl { margin: 0; font-size: .8125rem; display: grid; grid-template-columns: max-content 1fr; gap: .1rem .75rem; }
+.coverage-none dt { color: var(--ink-3); }
+.coverage-none dd { margin: 0; font-family: var(--font-mono); }
+
+.coverage-arith {
+  font-family: var(--font-mono); font-size: .8125rem; color: var(--ink-3);
+  margin: .5rem 0 0; padding-top: .5rem; border-top: 1px dotted var(--rule-strong);
+}
+
+.coverage-panel .cov-section + .cov-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.cov-section h4 { margin: 0 0 .4rem; font-size: .8125rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.cov-count { font-family: var(--font-mono); color: var(--ink); }
+
+.coverage-list { list-style: none; padding: 0; margin: 0; font-size: .8125rem; display: grid; gap: .4rem; }
+.coverage-list li { margin: 0; display: grid; gap: .1rem; }
+.coverage-list .case-id { font-family: var(--font-mono); font-weight: 600; }
+.coverage-list .reason { color: var(--ink-2); }
+.coverage-list .dim { font-weight: 600; }
+
+/* Never a bare empty list. */
+.coverage-empty-note {
+  font-size: .8125rem; font-weight: 600; color: var(--ink-2);
+  border: 1px dashed var(--rule-strong); border-radius: 4px;
+  padding: .35rem .5rem; background: var(--surface-2);
+}
+
+.known-exclusions { font-size: .8125rem; color: var(--ink-2); padding-left: 1.1em; margin: 0; }
+
+/* ---------- 11. Comparability caveats (F40) -------------------------- */
+
+.comparability-panel { }
+.dim-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.dim-table th, .dim-table td { text-align: left; padding: .45rem .5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.dim-table thead th { font-size: .6875rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.dim-row__sev {
+  font-size: .6875rem; font-weight: 700; letter-spacing: .06em;
+  border: 1px solid var(--rule-strong); border-radius: 3px; padding: .1rem .35rem;
+  white-space: nowrap;
+}
+.dim-row--matched .dim-row__sev { background: var(--outcome-bg); color: var(--outcome-fg); border-color: var(--outcome-bg); }
+.dim-row--caveat  .dim-row__sev { background: var(--caveat-bg); color: var(--caveat-fg); border-color: var(--caveat-line); }
+.dim-row--info    .dim-row__sev { background: var(--surface-2); color: var(--ink-2); }
+.dim-row--unknown .dim-row__sev { background: transparent; color: var(--ink-2); border-style: dashed; }
+
+.all-matched-note {
+  font-size: .875rem; font-weight: 600; color: var(--ink-2);
+  border: 1px solid var(--rule-strong); border-radius: var(--radius);
+  padding: .5rem .625rem; background: var(--surface-2);
+}
+
+.nonprecedent-quote {
+  margin: .875rem 0 0; padding: .75rem .875rem;
+  border: 1px solid var(--caveat-line); background: var(--caveat-bg);
+  border-radius: var(--radius);
+}
+.nonprecedent-quote blockquote { margin: 0 0 .35rem; font-family: var(--font-doc); color: var(--caveat-fg); }
+.nonprecedent-quote figcaption { font-size: .75rem; color: var(--caveat-fg); font-family: var(--font-mono); }
+
+.vintage-caveat {
+  border: 1px solid var(--caveat-line); background: var(--caveat-bg); color: var(--caveat-fg);
+  border-radius: var(--radius); padding: .625rem .75rem; font-size: .875rem;
+}
+.vintage-caveat strong { font-weight: 700; }
+
+/* ---------- 12. Refusal (F38) ---------------------------------------- */
+/* Deliberately NOT error styling: neutral surface, no red, no alert role,
+   no warning glyph. Same visual weight as an answer — a refusal is a
+   first-class outcome. Distinguished by the left rule pattern + label. */
+
+.refusal-panel {
+  border-left: 4px dashed var(--rule-strong);
+  background: var(--surface);
+}
+.refusal-label {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .6875rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--ink-2); border: 1px solid var(--rule-strong); border-radius: 999px;
+  padding: .2rem .6rem; background: var(--surface-2);
+}
+.refusal-statement {
+  font-size: 1.125rem; font-family: var(--font-doc); color: var(--ink);
+  margin: .875rem 0 1rem; max-width: var(--measure);
+}
+.refusal-gap {
+  border: 1px solid var(--rule-strong); border-radius: var(--radius);
+  background: var(--surface-2); padding: .75rem .875rem; margin: 0 0 1rem;
+}
+.refusal-gap dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .25rem .875rem; font-size: .875rem; }
+.refusal-gap dt { color: var(--ink-3); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; padding-top: .1rem; }
+.refusal-gap dd { margin: 0; font-family: var(--font-mono); font-weight: 600; }
+
+.examined-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; font-size: .8125rem; }
+.examined-list li { margin: 0; }
+.examined-list .case-id { font-family: var(--font-mono); font-weight: 600; }
+
+.next-steps { font-size: .875rem; color: var(--ink-2); }
+
+/* ---------- 13. System error (F35-06) — distinct component ----------- */
+
+.syserror-panel {
+  border: 1px solid var(--error-line); border-left-width: 4px;
+  background: var(--error-bg); color: var(--ink);
+  border-radius: var(--radius-lg); padding: 1.25rem 1.375rem;
+}
+.syserror-label {
+  display: inline-flex; gap: .45rem; align-items: center;
+  font-size: .6875rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--error-fg); border: 1px solid var(--error-line); border-radius: 999px;
+  padding: .2rem .6rem;
+}
+.syserror-panel h2 { margin: .875rem 0 .5rem; }
+.syserror-detail { font-family: var(--font-mono); font-size: .8125rem; color: var(--ink-2); }
+
+/* ---------- 14. Provenance (F34) ------------------------------------- */
+
+.provenance-panel dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .25rem .875rem; font-size: .8125rem; }
+.provenance-panel dt { color: var(--ink-3); }
+.provenance-panel dd { margin: 0; font-family: var(--font-mono); overflow-wrap: anywhere; }
+
+/* ---------- 15. Ingest run report (F43) ------------------------------ */
+
+.run-status {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .75rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  border-radius: 4px; padding: .25rem .6rem; border: 1px solid var(--rule-strong);
+}
+.run-status--succeeded { background: var(--outcome-bg); color: var(--outcome-fg); border-color: var(--outcome-bg); }
+.run-status--partial   { background: var(--caveat-bg); color: var(--caveat-fg); border-color: var(--caveat-line); }
+.run-status--failed    { background: var(--error-bg); color: var(--error-fg); border-color: var(--error-line); }
+
+.run-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem,1fr)); gap: .75rem; margin: 1rem 0; padding: 0; list-style: none; }
+.run-stats li { margin: 0; border: 1px solid var(--rule); border-radius: var(--radius); padding: .625rem .75rem; background: var(--surface-2); }
+.run-stats .k { display: block; font-size: .6875rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.run-stats .v { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; }
+
+.qtable { width: 100%; border-collapse: collapse; font-size: .8125rem; }
+.qtable th, .qtable td { text-align: left; padding: .45rem .5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.qtable thead th { font-size: .6875rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.qtable td.n { font-family: var(--font-mono); text-align: right; width: 4rem; }
+.qtable tr[data-zero="true"] td { color: var(--ink-3); }
+.qtable .mono { overflow-wrap: anywhere; }
+
+/* ---------- 16. Design-review chrome (NOT part of the product) ------- */
+
+.dr-note {
+  border: 1px solid var(--accent); border-left-width: 4px;
+  background: var(--accent-soft); border-radius: var(--radius-lg);
+  padding: 1rem 1.125rem; margin: 0 0 1.75rem; max-width: 78ch;
+}
+.dr-note h2 { font-size: .8125rem; text-transform: uppercase; letter-spacing: .09em; color: var(--accent); margin: 0 0 .5rem; }
+.dr-note p { font-size: .875rem; color: var(--ink); margin: 0 0 .5rem; max-width: none; }
+.dr-note p:last-child { margin-bottom: 0; }
+.dr-note ul { font-size: .875rem; margin: 0; }
+.dr-note code { background: var(--surface); padding: .05em .3em; border-radius: 3px; }
+
+.dr-bar {
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  padding: .5rem 1.5rem; background: var(--surface-2);
+  border-bottom: 1px solid var(--rule); font-size: .8125rem;
+}
+.dr-bar .dr-crumb { color: var(--ink-3); }
+
+.dr-sectionhead { margin: 2.5rem 0 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--rule-strong); }
+
+/* Index page */
+.dr-index-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+@media (min-width: 760px) { .dr-index-list { grid-template-columns: 1fr 1fr; } }
+.dr-index-list li { margin: 0; }
+.dr-index-list a {
+  display: block; text-decoration: none; color: inherit; height: 100%;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-lg);
+  padding: .875rem 1rem;
+}
+.dr-index-list a:hover { border-color: var(--accent); }
+.dr-index-list .n { font-family: var(--font-mono); font-size: .75rem; color: var(--ink-3); }
+.dr-index-list .t { display: block; font-weight: 600; margin: .1rem 0 .2rem; }
+.dr-index-list .d { display: block; font-size: .8125rem; color: var(--ink-2); }
+.dr-index-list .ac { display: block; font-size: .6875rem; font-family: var(--font-mono); color: var(--ink-3); margin-top: .4rem; }
+
+/* Swatches / spec gallery */
+.swatch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem,1fr)); gap: .75rem; list-style: none; padding: 0; margin: 0; }
+.swatch-grid li { margin: 0; }
+.swatch { height: 3.5rem; border-radius: var(--radius); border: 1px solid var(--rule); }
+.swatch-grid .name { display: block; font-size: .75rem; margin-top: .35rem; font-weight: 600; }
+.swatch-grid .val { display: block; font-family: var(--font-mono); font-size: .6875rem; color: var(--ink-3); }
+
+.type-spec { border-collapse: collapse; width: 100%; }
+.type-spec td, .type-spec th { padding: .5rem .5rem; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: baseline; }
+.type-spec th { font-size: .6875rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+.type-spec .spec { font-family: var(--font-mono); font-size: .75rem; color: var(--ink-3); white-space: nowrap; }

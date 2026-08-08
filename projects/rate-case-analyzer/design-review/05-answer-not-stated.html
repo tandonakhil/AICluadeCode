@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 · NOT_STATED black-box settlement, vs. a parse failure · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">05 / 12 · NOT_STATED black box · and how it differs from a parse failure</span>
+  <span class="dr-crumb">AC-F36-02 · AC-F14-10 · AC-F14-11 · RCA-R5</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>An analyst asks for the authorized ROE in a black-box settled case. The correct answer is <em>"the settlement did not specify one"</em> — never a number back-solved from the revenue requirement and never the utility's requested figure.</p>
+    <ul>
+      <li><strong>This is an answer, not a refusal.</strong> The system knows something affirmative: the document is silent. That is a fact with a citation, so it renders as an answer with a citation card.</li>
+      <li><strong>The card's status chip is the third family — <code>ABSENT</code>.</strong> Dashed border, no fill, and the words <em>NOT STATED — the document does not state this figure</em>. Never blank, never a dash, never omitted (<code>AC-F36-02</code>).</li>
+      <li><strong>The verbatim quote is the evidence of silence</strong> — the settlement's own black-box language. Without it, "not stated" is an assertion; with it, it is a citation.</li>
+      <li><strong>What was requested is shown, clearly labelled as requested</strong>, because that is exactly the number an analyst under time pressure would otherwise reach for.</li>
+    </ul>
+    <p>Below the product surface is the side-by-side that motivates all of this: <strong>NOT_STATED vs. a parse failure</strong> (<code>AC-F14-10</code> / <code>AC-F14-11</code>). They are different facts and they get different components, different wording and different follow-up.</p>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel answer-panel" aria-labelledby="answer-h">
+        <h2 id="answer-h" class="vh">Answer</h2>
+        <p class="answer-question">What ROE was authorized in PECO's 2021 settled base rate case?</p>
+
+        <div class="answer-body">
+          <p><strong>The settlement did not specify a return on common equity.</strong> The PA PUC approved a black-box settlement in Docket <span class="mono">R-2021-3024601</span> on 16 December 2021. The settlement states a total revenue increase of <span class="claim-figure">$132.0 million</span> and expressly declines to state the underlying cost-of-capital parameters <a class="cite-ref" href="#cite-1">[1]</a>.</p>
+
+          <p>There is therefore no authorized ROE to report for this case. A figure derived from the revenue requirement would not be a commission finding, and this system does not produce one.</p>
+
+          <p>For context only: PECO <em>requested</em> <span class="claim-figure">10.35%</span> in its direct testimony in the same docket <a class="cite-ref" href="#cite-2">[2]</a>. That figure was never adopted by the commission and is not evidence of what the settlement embedded.</p>
+
+          <p class="tiny muted" style="margin-bottom:0;">This is a first-class outcome, not a gap in the corpus. The corpus records the settlement's silence explicitly.</p>
+        </div>
+
+        <p class="disclosure-note">AI-composed from cited docket documents. Verify against the linked source before relying on it in filed material.</p>
+      </section>
+
+      <section class="coverage-strip" aria-labelledby="cov-strip-h">
+        <h2 id="cov-strip-h" class="vh">Coverage summary</h2>
+        <p class="coverage-strip__sentence">Checked <span class="n">1</span> candidate case · included <span class="n">1</span> · excluded <span class="n">0</span> · could not assess <span class="n">0</span></p>
+        <div class="coverage-bar" role="img" aria-label="Of 1 candidate case: 1 included, 0 excluded, 0 could not be assessed.">
+          <span class="seg-included" style="width:100%"></span>
+        </div>
+        <ul class="coverage-key"><li><i class="k-included" aria-hidden="true"></i> Included (1)</li></ul>
+        <p class="coverage-arith">1 = 1 + 0 + 0 — every candidate is accounted for. Your question named a single docket, so only that docket was in scope.</p>
+      </section>
+
+      <section aria-labelledby="cites-h">
+        <div class="panel__head"><h2 id="cites-h">Citations <span class="muted tiny">— 2 verified sources</span></h2></div>
+        <ul class="citation-list">
+
+          <li class="citation-card citation-card--absent" id="cite-1">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Approved Settlement</span>
+                <span class="doctype-rank">document_type rank 3 of 14 · outcome document</span>
+                <span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED<span class="status-chip__gloss">— the settlement does not state this figure</span></span>
+              </div>
+              <h3 class="citation-title">Joint Petition for Settlement, as approved — <i>Pa. PUC v. PECO Energy Company</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2021-3024601</span></li>
+                <li><b>Approved</b> <span class="mono">16 Dec 2021</span> <span class="muted">(order date)</span></li>
+                <li><b>Parameter</b> ROE — <span class="mono">claim_status = NOT_STATED</span>, no numeric value recorded</li>
+                <li><b>Locator</b> <span class="locator">¶ 24 · p. 14</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"The Joint Petitioners have agreed to a total revenue increase of $132.0 million on a black-box basis. No specific return on common equity, capital structure or rate of return is stipulated, and no party shall be deemed to have agreed to any particular such value."</blockquote>
+              <span class="card-flag">Evidence of silence — the document affirmatively declines to state the figure</span>
+              <br>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1727391.pdf">https://www.puc.pa.gov/pcdocs/1727391.pdf</a>
+            </div>
+          </li>
+
+          <li class="citation-card citation-card--position" id="cite-2">
+            <span class="authority-spine" role="img" aria-label="Authority tier 2 of 4: party filing."><i data-on="1"></i><i data-on="1"></i><i></i><i></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Utility Direct Testimony</span>
+                <span class="doctype-rank">document_type rank 9 of 14 · party filing</span>
+                <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>REQUESTED<span class="status-chip__gloss">— what the utility asked for; not granted</span></span>
+              </div>
+              <h3 class="citation-title">Direct Testimony of P. R. Moul on behalf of PECO Energy Company</h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2021-3024601</span></li>
+                <li><b>Filed</b> <span class="mono">30 Mar 2021</span> <span class="muted">(filing date — this document is not an order)</span></li>
+                <li><b>Witness</b> P. R. Moul</li>
+                <li><b>Locator</b> <span class="locator">PECO St. No. 6 · p. 12 · ll. 15–19</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"I recommend a return on common equity of 10.35% for PECO's electric distribution service."</blockquote>
+              <p class="tiny" style="margin:.5rem 0 .35rem; font-weight:600; color:var(--position-fg);">Requested only. The settlement that resolved this docket states no ROE — see citation [1]. This figure is not evidence of what was settled.</p>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1698042.pdf">https://www.puc.pa.gov/pcdocs/1698042.pdf</a>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+    </div>
+
+    <aside class="rca-rail rca-stack">
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">1</span></h4>
+          <p class="tiny muted" style="margin:0;">Your question named a single docket. Jurisdiction examined: PA PUC. Date span examined: 16 Dec 2021.</p>
+        </div>
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">1</span></h4>
+          <ul class="coverage-list"><li><span class="case-id">R-2021-3024601</span><span class="reason">PECO Energy · PA PUC · settled, black box</span></li></ul>
+        </div>
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None excluded — no candidate was removed on any dimension.</p>
+        </div>
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None — every candidate was assessed on every dimension.</p>
+        </div>
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7DQ4T7N1WYE</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 14:31:57 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-compose-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>9</dd>
+          <dt>Chunks cited</dt><dd>2 (all verified)</dd>
+          <dt>Outcome</dt><dd>ANSWERED</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ THE DISTINCTION, OUTSIDE THE PRODUCT SURFACE ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">The distinction that must never collapse · <code>AC-F14-10</code> vs <code>AC-F14-11</code></h2>
+  <div class="dr-note">
+    <h2>Why two components, not one</h2>
+    <p><em>"The settlement did not state an ROE"</em> and <em>"we could not read the ROE out of this document"</em> are different facts about the world. Collapsing both into a blank field, a dash, or the word "unknown" destroys the system's ability to refuse honestly — and it is the one place where a well-meaning "N/A" would manufacture a false certainty. So they get different components, different wording, and different next actions.</p>
+  </div>
+
+  <div class="rca-columns" style="grid-template-columns: 1fr 1fr;">
+
+    <section class="panel" aria-labelledby="ns-h">
+      <p class="eyebrow">Case A — the document is silent</p>
+      <h3 id="ns-h">NOT_STATED · rendered as an answer</h3>
+      <p class="tiny muted">A <code>Claim</code> row exists, with <code>claim_status = NOT_STATED</code>, no numeric value, and a verbatim quote proving the silence.</p>
+      <div class="citation-card citation-card--absent" style="margin-top:.75rem;">
+        <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+        <div>
+          <div class="citation-card__head">
+            <span class="doctype-label">Approved Settlement</span>
+            <span class="status-chip status-chip--absent"><span class="status-chip__family">Absent</span>NOT STATED</span>
+          </div>
+          <p class="tiny" style="margin:0 0 .35rem;"><strong>ROE — the settlement does not state this figure.</strong></p>
+          <blockquote class="verbatim">"No specific return on common equity … is stipulated."</blockquote>
+          <p class="tiny muted" style="margin:.35rem 0 0;">What the analyst does next: nothing. This is the answer. There is no ROE to find.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="pf-h">
+      <p class="eyebrow">Case B — the figure is there and we could not read it</p>
+      <h3 id="pf-h">Extraction gap · rendered as a refusal + a run-report entry</h3>
+      <p class="tiny muted">No <code>Claim</code> row is created. The system never asserts the document is silent, because it is not.</p>
+      <div class="panel refusal-panel" style="margin-top:.75rem; border-radius:var(--radius); padding:.875rem 1rem;">
+        <span class="refusal-label">No answer given</span>
+        <p class="refusal-statement" style="font-size:1rem; margin:.6rem 0 .75rem;">The ROE for CPUC Docket <span class="mono">A.22-05-015</span> could not be read from the ingested document. This is a gap in extraction, not a statement that the decision is silent — the decision may well state a figure.</p>
+        <div class="refusal-gap" style="margin-bottom:.75rem;">
+          <dl>
+            <dt>Document</dt><dd>D.23-11-069 (Decision)</dd>
+            <dt>Parameter</dt><dd>ROE</dd>
+            <dt>Recorded on</dt><dd>Ingest run rca-2026-08-07-0300, extraction gap list</dd>
+          </dl>
+        </div>
+        <p class="tiny muted" style="margin:0;">What the analyst does next: open the source document directly. The run report names the document and the parameter so the gap can be closed. <a href="11-run-report.html">See the run report →</a></p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="06-refusal-none-comparable.html">06 · Refusal — checked 40, none comparable</a></p>
+</div>
+
+</body>
+</html>

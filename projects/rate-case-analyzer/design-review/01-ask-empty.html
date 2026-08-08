@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 · Ask screen — first run · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">01 / 12 · Ask screen — first run (empty state)</span>
+  <span class="dr-crumb">F35 · AC-F35-01, AC-F39-01, AC-F39-03</span>
+</nav>
+
+<div class="rca-shell rca-shell--narrow">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The screen an analyst sees on first load. Three deliberate choices:</p>
+    <ul>
+      <li><strong>No dashboard, no chrome, no illustration.</strong> One question field. This is the tool's whole job and the density arrives <em>after</em> you ask, never before.</li>
+      <li><strong>The corpus freshness banner is in the app bar from the very first frame</strong> (<code>AC-F39-01</code>) — not on the answer screen only. If the ingestion job silently stopped, you learn it before you trust anything, not after.</li>
+      <li><strong>The scope statement names what the corpus is and is not.</strong> Three commissions, twelve cases, base-rate proceedings only. Setting the boundary up front is what makes a later refusal read as expected rather than as breakage.</li>
+    </ul>
+    <p>The example questions are real corpus-answerable questions, not marketing copy — they teach the shape of a question the frame parser can resolve (jurisdiction, parameter, period).</p>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE STARTS HERE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell rca-shell--narrow">
+
+  <div class="ask-hero">
+    <h1>Ask a precedent question</h1>
+    <p class="lede">Every answer is built from cited docket documents, or it is declined. Nothing is inferred, blended across jurisdictions, or averaged.</p>
+  </div>
+
+  <form class="ask-form" onsubmit="return false;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="2"
+        placeholder="e.g. What ROE has the PA PUC authorized in fully-projected-future-test-year distribution cases since 2023?"></textarea>
+    </div>
+    <div class="ask-form__row" style="margin-top:.75rem; justify-content:space-between;">
+      <span class="tiny muted">Name a commission, a parameter and a period. Unresolvable questions are declined rather than guessed at.</span>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="scope-note">
+    <p style="margin:0 0 .4rem;"><strong>What this corpus contains.</strong> 12 curated base-rate proceedings across three commissions — Pennsylvania PUC, Public Utility Commission of Texas, and California PUC — each ingested with its outcome document (final order, approved settlement or compliance filing).</p>
+    <p style="margin:0;"><strong>What it does not contain.</strong> Rider, tracker and formula-rate proceedings (excluded from base-rate treatment); data-request responses and hearing transcripts; scanned filings with no extractable text. These standing limits are restated on every answer.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:2rem;">Questions this corpus can resolve</p>
+  <ul class="example-qs">
+    <li><button type="button">What ROE has the PA PUC authorized in fully-projected-future-test-year distribution cases since 2023?</button></li>
+    <li><button type="button">What common equity ratio was authorized for Oncor in its most recent base rate case?</button></li>
+    <li><button type="button">What ROE was authorized in PECO's 2021 settled base rate case?</button></li>
+  </ul>
+
+</main>
+
+<!-- ============ PRODUCT SURFACE ENDS HERE ============ -->
+
+<div class="rca-shell rca-shell--narrow">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="02-ask-inflight.html">02 · Question in flight</a></p>
+</div>
+
+</body>
+</html>

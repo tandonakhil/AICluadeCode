@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06 · Refusal — checked 40, none comparable · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">06 / 12 · Refusal — 40 cases checked, none comparable</span>
+  <span class="dr-crumb">F38 · AC-F37-04 · AC-F31-05/06/07 · RCA-R6 · RCA-R7</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The extrapolation trap, refused. The analyst asks for something that would be extremely easy to answer wrongly — the corpus holds fully-projected-future-test-year cases <em>and</em> vertically integrated cases, just never both in the same case. A blend of the two is fluent, well-sourced-looking, and is the catastrophic harm this product exists to avoid.</p>
+    <ul>
+      <li><strong>The refusal is not styled as an error.</strong> No red, no warning triangle, no alert role, and the words "error", "failed" and "problem" appear nowhere in it (<code>AC-F38-02</code>). It sits in the same panel treatment as an answer, distinguished by a dashed left rule and a neutral <em>No answer given</em> label. Refusal is the system working.</li>
+      <li><strong>It names the gap.</strong> Missing dimension, the question's value, and what the corpus actually holds instead — as a structured block, not buried in a sentence (<code>AC-F31-05</code>, <code>AC-F38-03</code>).</li>
+      <li><strong>The 40 examined cases are visible on the refusal itself</strong> (<code>AC-F38-04</code>), and the full coverage panel is rendered alongside it (<code>AC-F37-07</code>). This is the difference between "we found nothing" and "we looked at nothing" — compare screen 07, where the same panel looks completely different.</li>
+      <li><strong>No citation card is rendered</strong> (<code>AC-F36-09</code>) and no docket appears except in the list of what was examined (<code>AC-F31-11</code>). A refusal that shows citations manufactures the appearance of support.</li>
+      <li><strong>Next steps are offered without suggesting a workaround.</strong> They are ways to ask a question the corpus can answer, never ways to get the number anyway.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel refusal-panel" aria-labelledby="refusal-h">
+        <span class="refusal-label">No answer given</span>
+        <h2 id="refusal-h" class="vh">No answer given</h2>
+        <p class="answer-question" style="margin-top:1rem;">What ROE have vertically integrated utilities been authorized in fully-projected-future-test-year cases since 2023?</p>
+
+        <p class="refusal-statement">The corpus contains no fully-projected-future-test-year case decided for a vertically integrated utility. It holds cases of each kind separately, and combining them would produce a figure that describes no real proceeding.</p>
+
+        <div class="refusal-gap">
+          <dl>
+            <dt>Missing dimension</dt><dd>test_year_convention × market_structure (in combination)</dd>
+            <dt>You asked for</dt><dd>FPFTY · VERTICALLY_INTEGRATED · since 2023-01-01</dd>
+            <dt>Corpus holds</dt><dd>FPFTY only for RESTRUCTURED_WIRES_ONLY (PA PUC)</dd>
+            <dt>Corpus holds</dt><dd>VERTICALLY_INTEGRATED only with FORECAST test years (CPUC)</dd>
+          </dl>
+        </div>
+
+        <h3 style="font-size:.875rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3); margin-top:1.25rem;">40 cases were examined before this refusal</h3>
+        <p class="tiny muted" style="margin-bottom:.5rem;">Every one was excluded on a named dimension. None was dropped silently.</p>
+        <ul class="examined-list">
+          <li><span class="case-id">R-2024-3042569</span> · PA PUC · PPL Electric Utilities — market structure: restructured wires-only</li>
+          <li><span class="case-id">R-2023-3037679</span> · PA PUC · PECO Energy — market structure: restructured wires-only</li>
+          <li><span class="case-id">R-2021-3024601</span> · PA PUC · PECO Energy — market structure: restructured wires-only</li>
+          <li><span class="case-id">R-2019-3006814</span> · PA PUC · PPL Electric Utilities — market structure: restructured wires-only</li>
+          <li><span class="case-id">56211</span> · PUCT · Oncor Electric Delivery — market structure: restructured wires-only</li>
+          <li><span class="case-id">51415</span> · PUCT · AEP Texas — market structure: restructured wires-only</li>
+          <li><span class="case-id">A.23-05-010</span> · CPUC · Pacific Gas &amp; Electric — test year convention: forecast, not FPFTY</li>
+          <li><span class="case-id">A.22-05-015</span> · CPUC · Southern California Edison — test year convention: forecast, not FPFTY</li>
+          <li><span class="case-id">A.24-05-008</span> · CPUC · San Diego Gas &amp; Electric — test year convention: forecast, not FPFTY</li>
+          <li><span class="case-id">R-2023-3040020</span> · PA PUC · PPL DSIC — case type: rider proceeding</li>
+          <li><span class="case-id">53601</span> · PUCT · CenterPoint Energy Houston — case type: formula-rate annual filing</li>
+          <li><span class="case-id">R-2022-3031234</span> · PA PUC · Duquesne Light — case status: withdrawn, no outcome</li>
+          <li><span class="case-id">WP-SYN-0001 … WP-SYN-0016</span> · internal (synthetic) · 16 records — market structure: restructured wires-only</li>
+          <li><span class="case-id">WP-SYN-0017 … WP-SYN-0025</span> · internal (synthetic) · 9 records — test year convention: historical or forecast, not FPFTY</li>
+          <li><span class="case-id">WP-SYN-0026, WP-SYN-0027</span> · internal (synthetic) · 2 records — case type: rider proceeding</li>
+          <li><span class="case-id">WP-SYN-0028</span> · internal (synthetic) — case status: withdrawn, no outcome</li>
+        </ul>
+
+        <h3 style="font-size:.875rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3); margin-top:1.5rem;">Questions this corpus can answer instead</h3>
+        <ul class="next-steps">
+          <li>What ROE has the PA PUC authorized in fully-projected-future-test-year cases since 2023? <span class="muted">— 2 cases available</span></li>
+          <li>What ROE has the CPUC authorized for vertically integrated utilities since 2023? <span class="muted">— 3 cases available, forecast test year</span></li>
+        </ul>
+        <p class="tiny muted" style="margin-top:.75rem;">These are narrower questions, not workarounds. Neither one lets the missing combination be inferred, and the system will not combine their answers if you ask both.</p>
+      </section>
+
+    </div>
+
+    <aside class="rca-rail rca-stack">
+
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">40</span></h4>
+          <div class="coverage-bar" role="img" aria-label="Of 40 candidate cases: 0 included, 40 excluded, 0 could not be assessed." style="margin:.5rem 0;">
+            <span class="seg-excluded" style="width:100%"></span>
+          </div>
+          <p class="coverage-strip__sentence" style="margin:.5rem 0 0; font-size:.875rem;">Checked <span class="n">40</span> · included <span class="n">0</span> · excluded <span class="n">40</span> · could not assess <span class="n">0</span></p>
+          <p class="tiny muted" style="margin:.35rem 0 0;">Jurisdictions examined: PA PUC, PUCT, CPUC, internal (synthetic). Date span examined: 14 Mar 2019 – 21 Apr 2025.</p>
+          <p class="coverage-arith">40 = 0 + 40 + 0 — every candidate is accounted for.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">No case was comparable. This is not the same as no case being examined — 40 were, and each exclusion reason is below.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">40</span> — grouped by the dimension that excluded them</h4>
+          <ul class="coverage-list">
+            <li>
+              <span class="case-id">22 cases · <span class="dim">market structure</span> (blocking)</span>
+              <span class="reason">You asked about vertically integrated utilities; these are restructured wires-only. The composition of the revenue requirement differs in kind, and the structural spread is unrelated to case merits.</span>
+              <span class="reason mono tiny">R-2024-3042569, R-2023-3037679, R-2021-3024601, R-2019-3006814, 56211, 51415, WP-SYN-0001 … WP-SYN-0016</span>
+            </li>
+            <li>
+              <span class="case-id">12 cases · <span class="dim">test year convention</span> (blocking)</span>
+              <span class="reason">Your question named FPFTY. These use a forecast or historical test year, which changes what the cost data means and how much regulatory-lag risk the return has to compensate.</span>
+              <span class="reason mono tiny">A.23-05-010, A.22-05-015, A.24-05-008, WP-SYN-0017 … WP-SYN-0025</span>
+            </li>
+            <li>
+              <span class="case-id">4 cases · <span class="dim">case type</span> (blocking)</span>
+              <span class="reason">Rider, tracker or formula-rate proceedings. Excluded from base-rate treatment at ingestion, not filtered at query time.</span>
+              <span class="reason mono tiny">R-2023-3040020, 53601, WP-SYN-0026, WP-SYN-0027</span>
+            </li>
+            <li>
+              <span class="case-id">2 cases · <span class="dim">case status</span> (blocking)</span>
+              <span class="reason">Withdrawn. The docket holds persuasive testimony and no outcome at all, so it cannot support an authorized figure.</span>
+              <span class="reason mono tiny">R-2022-3031234, WP-SYN-0028</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">0</span></h4>
+          <p class="coverage-empty-note">None — every candidate carried the metadata needed to assess it.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7EX8H5R2VZQ</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 14:44:12 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-compose-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>60</dd>
+          <dt>Chunks cited</dt><dd>0</dd>
+          <dt>Outcome</dt><dd>REFUSED_INSUFFICIENT</dd>
+          <dt>Refusal gap</dt><dd>test_year_convention=FPFTY × market_structure=VERTICALLY_INTEGRATED</dd>
+        </dl>
+        <p class="tiny muted" style="margin:.75rem 0 0;">Refusals are recorded as fully as answers.</p>
+      </section>
+
+    </aside>
+  </div>
+</main>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="07-refusal-nothing-examined.html">07 · Refusal — nothing examined (checked 0)</a></p>
+</div>
+
+</body>
+</html>

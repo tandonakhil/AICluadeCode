@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · Ingest run report — the second surface · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">11 / 12 · Ingest run report (job surface) · quarantine · extraction gaps · silent stop</span>
+  <span class="dr-crumb">F42 · F43 · AC-F43-01…08 · IND-10 · IND-11 · RCA-R11</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The second surface. The ingestion job ships and fails independently of the web app, and its only observable output is this report plus an exit code. The spec does not require it to be a web page — it requires a human-readable report and a machine-readable structured form. This is the human-readable half, given the same visual language as the rest of the product so the two surfaces are recognisably one system.</p>
+    <ul>
+      <li><strong>Quarantine is reported as a complete table with explicit zeros</strong> (<code>AC-F43-03</code>). Every reason in the closed set is listed on every run, including the ones that did not fire. A section that disappears when its count is zero is the same failure as an empty flag list on the answer screen: you cannot tell "none" from "not checked".</li>
+      <li><strong>Confidential material is quarantined and reported, never flagged and indexed.</strong> The evidence that triggered it — the actual marking text — is quoted, because that is what lets a human confirm the classifier was right without reopening the document.</li>
+      <li><strong>Extraction gaps are a separate list from quarantine.</strong> A parse failure is a third state: no claim row is written, nothing is quarantined, and the document is in the corpus. This list is the only place that fact is recorded, and it is what screen 05's right-hand column points at.</li>
+      <li><strong>The silent-stop health check is on the report</strong>, not only in a log. A job that has stopped running produces no report at all — so the check is against the clock, and it is visible from the last report that does exist.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">ingestion job · run report</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Surface 2 of 2 · scheduled job</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong></span>
+  </div>
+</header>
+
+<main class="rca-shell">
+  <div class="rca-stack">
+
+    <section class="panel" aria-labelledby="run-h">
+      <div class="panel__head">
+        <h2 id="run-h">Ingest run <span class="mono">rca-2026-08-07-0300</span></h2>
+        <span class="run-status run-status--partial">PARTIAL</span>
+        <span class="tiny muted">exit code 0</span>
+      </div>
+      <p class="tiny muted" style="margin-bottom:.5rem;">Completed with expected quarantines and no ingest gate fired. <code>PARTIAL</code> means "everything that should have been ingested was, and some things were correctly refused" — it is a normal outcome, not a degraded one, and it exits 0 so a scheduler does not page anyone at 3am for a protective order.</p>
+
+      <ul class="run-stats">
+        <li><span class="k">Started</span><span class="v">03:00:04</span></li>
+        <li><span class="k">Finished</span><span class="v">03:12:41</span></li>
+        <li><span class="k">Mode</span><span class="v">FIXTURE</span></li>
+        <li><span class="k">Documents seen</span><span class="v">148</span></li>
+        <li><span class="k">Documents ingested</span><span class="v">141</span></li>
+        <li><span class="k">Quarantined</span><span class="v">7</span></li>
+      </ul>
+      <p class="coverage-arith" style="border-top:none; padding-top:0;">148 = 141 ingested + 7 quarantined — every document seen is accounted for.</p>
+      <p class="tiny muted" style="margin:.5rem 0 0;">Mode <code>FIXTURE</code>: run against captured fixtures for PA PUC, PUCT and CPUC. Live network fetching is behind a flag and is off by default, so a run's result never depends on a third-party website being up.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="q-h">
+      <div class="panel__head"><h2 id="q-h">Quarantine — every reason, including the zeros</h2></div>
+      <table class="qtable">
+        <caption class="vh">Quarantine reasons and counts for this run</caption>
+        <thead><tr><th scope="col">Reason</th><th scope="col" class="n">Count</th><th scope="col">What it means</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">PROTECTED_MARKING</td><td class="n">2</td><td>Filed under protective order, or bearing a confidentiality marking on its first page. Never indexed.</td></tr>
+          <tr><td class="mono">ACCESS_DENIED</td><td class="n">1</td><td>The fetch returned a login or access-denied body rather than the document.</td></tr>
+          <tr><td class="mono">NON_DOCUMENT_BODY</td><td class="n">1</td><td>An HTML error page, a zero-length response, or a content type that does not match the expected document.</td></tr>
+          <tr><td class="mono">NO_EXTRACTABLE_TEXT</td><td class="n">3</td><td>A scanned filing. Quarantined rather than OCR'd — an OCR error inside a numeric table produces a fluent, wrong number.</td></tr>
+          <tr data-zero="true"><td class="mono">UNRESOLVED_PARENT</td><td class="n">0</td><td>An exhibit schedule with no resolvable parent filing. None this run.</td></tr>
+          <tr data-zero="true"><td class="mono">MISSING_OUTCOME_DOCUMENT</td><td class="n">0</td><td>A decided or settled case with no order, settlement or compliance filing. None this run.</td></tr>
+          <tr data-zero="true"><td class="mono">ENUM_VALIDATION_FAILURE</td><td class="n">0</td><td>An unmapped enum value or an unmapped metadata key. None this run.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" aria-labelledby="qi-h">
+      <div class="panel__head"><h2 id="qi-h">Quarantined items <span class="muted tiny">— 7, each with the evidence that triggered it</span></h2></div>
+
+      <ul class="citation-list">
+
+        <li class="citation-card citation-card--absent">
+          <span class="authority-spine" role="img" aria-label="Not ingested."><i></i><i></i><i></i><i></i></span>
+          <div>
+            <div class="citation-card__head">
+              <span class="doctype-label">Not ingested</span>
+              <span class="status-chip status-chip--absent"><span class="status-chip__family">Quarantined</span>PROTECTED_MARKING</span>
+            </div>
+            <h3 class="citation-title">Direct Testimony of R. Alvarez — CONFIDENTIAL version</h3>
+            <ul class="citation-meta">
+              <li><b>Commission</b> Public Utility Commission of Texas</li>
+              <li><b>Docket</b> <span class="mono">56211</span></li>
+              <li><b>Detected</b> <span class="mono">7 Aug 2026, 03:04:18 UTC</span></li>
+            </ul>
+            <blockquote class="verbatim">"CONFIDENTIAL — SUBJECT TO PROTECTIVE ORDER IN DOCKET NO. 56211. DO NOT RELEASE."</blockquote>
+            <span class="card-flag">First-page marking scan · matched the protective-order marking</span>
+            <span class="card-flag">Public redacted version of the same document was ingested instead</span>
+          </div>
+        </li>
+
+        <li class="citation-card citation-card--absent">
+          <span class="authority-spine" role="img" aria-label="Not ingested."><i></i><i></i><i></i><i></i></span>
+          <div>
+            <div class="citation-card__head">
+              <span class="doctype-label">Not ingested</span>
+              <span class="status-chip status-chip--absent"><span class="status-chip__family">Quarantined</span>PROTECTED_MARKING</span>
+            </div>
+            <h3 class="citation-title">Exhibit SCE-04 Workpapers — Highly Confidential</h3>
+            <ul class="citation-meta">
+              <li><b>Commission</b> California Public Utilities Commission</li>
+              <li><b>Docket</b> <span class="mono">A.22-05-015</span></li>
+              <li><b>Detected</b> <span class="mono">7 Aug 2026, 03:07:52 UTC</span></li>
+            </ul>
+            <blockquote class="verbatim">"HIGHLY CONFIDENTIAL — PROVIDED UNDER D.16-08-024 PROTECTIVE ORDER"</blockquote>
+            <span class="card-flag">Docket index metadata · confidentiality attribute present</span>
+            <span class="card-flag">No public redacted version available — this case's workpapers are not in the corpus</span>
+          </div>
+        </li>
+
+        <li class="citation-card citation-card--absent">
+          <span class="authority-spine" role="img" aria-label="Not ingested."><i></i><i></i><i></i><i></i></span>
+          <div>
+            <div class="citation-card__head">
+              <span class="doctype-label">Not ingested</span>
+              <span class="status-chip status-chip--absent"><span class="status-chip__family">Quarantined</span>ACCESS_DENIED</span>
+            </div>
+            <h3 class="citation-title">Fetch returned an access-denied body, not a document</h3>
+            <ul class="citation-meta">
+              <li><b>Commission</b> California Public Utilities Commission</li>
+              <li><b>Docket</b> <span class="mono">A.24-05-008</span></li>
+              <li><b>Detected</b> <span class="mono">7 Aug 2026, 03:08:31 UTC</span></li>
+            </ul>
+            <blockquote class="verbatim">&lt;title&gt;Access Denied&lt;/title&gt; … "You do not have permission to view this document."</blockquote>
+            <span class="card-flag">Content type <span class="mono">text/html</span>, expected <span class="mono">application/pdf</span></span>
+            <span class="card-flag">Fails loud: an access-denied page stored as a "document" would later be retrieved as precedent</span>
+            <br>
+            <a class="source-url" href="https://docs.cpuc.ca.gov/PublishedDocs/Efile/G000/M541/K118/541118226.PDF">https://docs.cpuc.ca.gov/PublishedDocs/Efile/G000/M541/K118/541118226.PDF</a>
+          </div>
+        </li>
+
+        <li class="citation-card citation-card--absent">
+          <span class="authority-spine" role="img" aria-label="Not ingested."><i></i><i></i><i></i><i></i></span>
+          <div>
+            <div class="citation-card__head">
+              <span class="doctype-label">Not ingested</span>
+              <span class="status-chip status-chip--absent"><span class="status-chip__family">Quarantined</span>NON_DOCUMENT_BODY</span>
+            </div>
+            <h3 class="citation-title">Zero-length response</h3>
+            <ul class="citation-meta">
+              <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+              <li><b>Docket</b> <span class="mono">R-2024-3042569</span></li>
+              <li><b>Detected</b> <span class="mono">7 Aug 2026, 03:02:11 UTC</span></li>
+            </ul>
+            <blockquote class="verbatim">Content-Length: 0</blockquote>
+            <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1859117.pdf">https://www.puc.pa.gov/pcdocs/1859117.pdf</a>
+          </div>
+        </li>
+
+        <li class="citation-card citation-card--absent">
+          <span class="authority-spine" role="img" aria-label="Not ingested."><i></i><i></i><i></i><i></i></span>
+          <div>
+            <div class="citation-card__head">
+              <span class="doctype-label">Not ingested · 3 items</span>
+              <span class="status-chip status-chip--absent"><span class="status-chip__family">Quarantined</span>NO_EXTRACTABLE_TEXT</span>
+            </div>
+            <h3 class="citation-title">Scanned filings with no extractable text layer</h3>
+            <ul class="citation-meta">
+              <li><b>Documents</b> <span class="mono">R-2019-3006814 · Exhibit JMK-3</span>; <span class="mono">51415 · Attachment 2</span>; <span class="mono">A.23-05-010 · Workpaper WP-12</span></li>
+              <li><b>Detected</b> <span class="mono">7 Aug 2026, 03:05–03:09 UTC</span></li>
+            </ul>
+            <span class="card-flag">OCR is deliberately not enabled — a mis-OCR'd digit inside a rate-base table is silent and wrong</span>
+            <span class="card-flag">Reported to the answer surface as a standing corpus limit</span>
+          </div>
+        </li>
+
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="gap-h">
+      <div class="panel__head">
+        <h2 id="gap-h">Extraction gaps <span class="muted tiny">— 2 · not quarantine, not NOT_STATED</span></h2>
+      </div>
+      <p class="tiny muted">The document is in the corpus and a figure is present in it, but the extractor did not produce a claim. <strong>No claim row is written</strong> — so the system never reports these as "the document does not state a figure". This is the third state, and this list is where it lives.</p>
+      <table class="qtable">
+        <caption class="vh">Extraction gaps recorded on this run</caption>
+        <thead><tr><th scope="col">Document</th><th scope="col">Parameter</th><th scope="col">Locator attempted</th><th scope="col">Note</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">D.24-12-074 · CPUC A.22-05-015</td><td class="mono">ROE</td><td class="mono">p. 211, table 8-4</td><td>Figure present in a merged table cell; no unambiguous value parsed.</td></tr>
+          <tr><td class="mono">Order No. 42 · PUCT 56211</td><td class="mono">RATE_BASE</td><td class="mono">FoF 74, p. 24</td><td>Two adjacent candidate values (gross plant vs. rate base) could not be disambiguated. Nothing written rather than a guess.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" aria-labelledby="health-h">
+      <div class="panel__head"><h2 id="health-h">Job health</h2><span class="run-status run-status--succeeded">RUNNING ON SCHEDULE</span></div>
+      <p class="tiny" style="margin:0;">Configured interval 24h · last run started 7 Aug 2026 03:00:04 UTC · silent-stop threshold 48h · <strong>0h 14m since last run started</strong>. A run that has not started within twice the configured interval reports a silent stop and exits non-zero, so a job that has stopped running is detectable without anyone noticing its absence.</p>
+    </section>
+
+  </div>
+</main>
+
+<!-- ============ FAILED VARIANT ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">Variant · a run in which an ingest gate fired</h2>
+  <div class="dr-note">
+    <h2>Why this one is red and the PARTIAL run is not</h2>
+    <p>A quarantine is the pipeline correctly refusing a document. A gate firing means the corpus would have been left in a state the design forbids — here, a decided case with no outcome document, which is precisely the shape that produces "the ask presented as the outcome". The run fails, exits non-zero, and nothing from it advances the corpus as-of date.</p>
+  </div>
+
+  <section class="panel" aria-labelledby="failed-h" style="max-width:900px;">
+    <div class="panel__head">
+      <h2 id="failed-h">Ingest run <span class="mono">rca-2026-08-06-0300</span></h2>
+      <span class="run-status run-status--failed">FAILED</span>
+      <span class="tiny muted">exit code 2</span>
+    </div>
+    <table class="qtable">
+      <caption class="vh">Gated items</caption>
+      <thead><tr><th scope="col">Gate</th><th scope="col">Item</th><th scope="col">Detail</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">MISSING_OUTCOME_DOCUMENT</td><td class="mono">PUCT 53601</td><td>Case status <code>DECIDED</code> but no final order, approved settlement or compliance filing was found. A corpus of asks without outcomes is the direct route to reporting a request as a grant.</td></tr>
+        <tr><td class="mono">UNRESOLVED_PARENT</td><td class="mono">R-2023-3037679 · Sch. C-2</td><td>Exhibit schedule with no resolvable parent filing. A free-floating schedule chunk is an unattributable number and must be un-retrievable, not ambiguously attributed.</td></tr>
+        <tr><td class="mono">ENUM_VALIDATION_FAILURE</td><td class="mono">A.24-05-008 · doc 41</td><td>Unmapped <code>document_type</code> value <code>"ALJ_PROPOSED_DECISION_REVISED"</code>. Unknown values and unknown keys both fail loud rather than passing through as extra metadata.</td></tr>
+      </tbody>
+    </table>
+    <p class="tiny muted" style="margin:.75rem 0 0;">The corpus as-of date remains at the previous successful run. The web surface's freshness banner shows state 3 from screen 10 while this is unresolved.</p>
+  </section>
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="12-components.html">12 · Components, tokens and the 14×6 encoding</a></p>
+</div>
+
+</body>
+</html>

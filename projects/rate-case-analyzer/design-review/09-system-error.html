@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09 · System error, and the verification-failure refusal · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">09 / 12 · System error vs. refusal · verification-failure refusal</span>
+  <span class="dr-crumb">AC-F35-06 · AC-F38-06 · AC-F34-06 · AC-F28-03 · FDA-4</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>Three things, in order:</p>
+    <ul>
+      <li><strong>A genuine system error</strong> — the provenance store is unavailable, so the query record cannot be written. The system fails closed: no answer is shown even though one may have been composed, because an unrecorded answer is an answer nobody can account for later (<code>AC-F34-06</code>, <code>FDA-4</code>). <em>This is the only place in the entire product that uses red.</em></li>
+      <li><strong>The verification-failure refusal</strong> — the third refusal cause, and the least intuitive one. An answer <em>was</em> composed, it cited real documents, and one of its quoted spans did not match the stored text character-for-character. The whole answer is discarded rather than shown with a warning. Styled neutral, like every other refusal, because the guardrail worked.</li>
+      <li><strong>The two panels side by side</strong> (<code>AC-F38-06</code>): a user has to be able to tell "the tool declined" from "the tool broke", instantly, because the correct response to each is completely different — rephrase in one case, tell someone in the other.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE — SYSTEM ERROR ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="syserror-panel" role="alert" aria-labelledby="err-h">
+        <span class="syserror-label">System failure</span>
+        <h2 id="err-h">The system could not complete this query.</h2>
+        <p>The provenance store did not accept a query record, so no answer is being shown. Every answer this tool gives has to be recorded — what was asked, what was retrieved, what was cited and which model composed it. An answer that cannot be recorded cannot be produced.</p>
+        <p><strong>This is a fault in the system, not a limitation of the corpus.</strong> Your question may well be answerable. Nothing about the corpus should be inferred from this screen.</p>
+        <p class="syserror-detail">
+          reference: <strong>err_01K2F7J5N0Q3X7RD</strong> · component: provenance store · time: 7 Aug 2026, 15:14:22 UTC<br>
+          Retrying will not help until the store is available. Report the reference above.
+        </p>
+      </section>
+
+      <p class="tiny muted">No coverage panel, no citations and no provenance panel are rendered — none of them would be truthful. An error screen that borrowed the answer layout would imply a search happened.</p>
+
+    </div>
+    <aside class="rca-rail">
+      <p class="tiny muted">Design note: the right rail is deliberately empty here rather than showing a stale coverage panel from a previous query.</p>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ VERIFICATION-FAILURE REFUSAL ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">The verification-failure refusal · <code>REFUSED_VERIFICATION_FAILED</code></h2>
+  <div class="dr-note">
+    <h2>Why this is a refusal and not an error</h2>
+    <p>The composition step produced an answer with citation tags. The deterministic verifier then checked each one against the stored record — evidence id resolves, quoted span present character-for-character, document type and claim status match, numeric value matches the stored claim. One check did not pass, so the entire answer was discarded, not repaired and not shown with a caveat. The user sees a refusal because that is what happened: the system had no answer it could stand behind. It is styled exactly like every other refusal.</p>
+    <p><strong>Deliberate omission:</strong> the discarded prose is not shown, not summarised and not offered behind a link. A plausible sentence with a broken citation is precisely the artefact this product must never put in front of an analyst.</p>
+  </div>
+</div>
+
+<main class="rca-shell">
+  <div class="rca-columns">
+    <div class="rca-stack">
+      <section class="panel refusal-panel" aria-labelledby="vrefusal-h">
+        <span class="refusal-label">No answer given</span>
+        <h2 id="vrefusal-h" class="vh">No answer given</h2>
+        <p class="answer-question" style="margin-top:1rem;">What rate base did the CPUC adopt for Southern California Edison in its 2024 general rate case?</p>
+
+        <p class="refusal-statement">A draft answer was assembled and then discarded because one of its citations could not be confirmed against the stored record. Nothing that cannot be verified is shown, so there is no answer here.</p>
+
+        <div class="refusal-gap">
+          <dl>
+            <dt>Check not passed</dt><dd>quoted span not found in the cited chunk</dd>
+            <dt>Cited document</dt><dd>D.24-12-074, CPUC Docket A.22-05-015</dd>
+            <dt>Parameter</dt><dd>RATE_BASE</dd>
+            <dt>Consequence</dt><dd>whole answer discarded — partial answers are not shown</dd>
+          </dl>
+        </div>
+
+        <p>The corpus does contain this proceeding and may well support an answer. Try naming the parameter more precisely — rate base, gross plant and net plant are three different figures on adjacent lines of the same schedule and can differ by 30–50%.</p>
+      </section>
+
+      <section class="coverage-strip">
+        <p class="coverage-strip__sentence">Checked <span class="n">3</span> candidate cases · included <span class="n">1</span> · excluded <span class="n">2</span> · could not assess <span class="n">0</span></p>
+        <div class="coverage-bar" role="img" aria-label="Of 3 candidates: 1 included, 2 excluded.">
+          <span class="seg-included" style="width:33.3%"></span>
+          <span class="seg-excluded" style="width:66.7%"></span>
+        </div>
+        <p class="coverage-arith">3 = 1 + 2 + 0 — coverage is reported for a refusal exactly as it is for an answer.</p>
+      </section>
+    </div>
+    <aside class="rca-rail">
+      <section class="panel provenance-panel" aria-labelledby="prov2-h">
+        <div class="panel__head"><h2 id="prov2-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7K8P2S5Y9BF</dd>
+          <dt>Outcome</dt><dd>REFUSED_VERIFICATION_FAILED</dd>
+          <dt>Chunks retrieved</dt><dd>17</dd>
+          <dt>Chunks cited</dt><dd>0 — none passed verification</dd>
+          <dt>Refusal gap</dt><dd>verbatim span mismatch · D.24-12-074 · RATE_BASE</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ SIDE BY SIDE ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">Side by side · declined vs. broken</h2>
+  <div class="rca-columns" style="grid-template-columns:1fr 1fr;">
+    <div>
+      <p class="eyebrow">Refusal — the tool declined</p>
+      <div class="panel refusal-panel">
+        <span class="refusal-label">No answer given</span>
+        <p class="refusal-statement" style="font-size:1rem;">The corpus contains no fully-projected-future-test-year case decided for a vertically integrated utility.</p>
+        <p class="tiny muted" style="margin:0;">Neutral surface · dashed left rule · no role · no red · names the gap · coverage rendered alongside. <strong>What you do next:</strong> ask a narrower question.</p>
+      </div>
+    </div>
+    <div>
+      <p class="eyebrow">System failure — the tool broke</p>
+      <div class="syserror-panel">
+        <span class="syserror-label">System failure</span>
+        <h3 style="margin:.75rem 0 .5rem;">The system could not complete this query.</h3>
+        <p class="tiny" style="margin:0;">Red left rule · tinted surface · alert role · explicit reference code · states plainly that nothing about the corpus follows from it. <strong>What you do next:</strong> report the reference.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="10-freshness-states.html">10 · Corpus freshness banner states</a></p>
+</div>
+
+</body>
+</html>

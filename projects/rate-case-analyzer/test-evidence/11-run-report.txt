@@ -1,0 +1,36 @@
+NO BROWSER ROUTE SERVES THIS SCREEN.
+app/web/routes.py serves GET / and POST /ask and nothing else, by
+design. design-review/11-run-report.html is a design with no route
+behind it. Adding one is a surface addition requiring an Architecture
+pass. Captured below is the rendering the report actually has.
+========================================================================
+
+Ingest run R-PLAYWRIGHT-EVIDENCE
+  status    : PARTIAL — Completed with expected quarantines
+  started   : 2026-08-08T03:12:00+00:00
+  finished  : 2026-08-08T03:41:00+00:00
+  sources   : (none)
+
+  Ingested
+    cases ingested          4
+    documents ingested      0
+    chunks written          0
+    claims written          0
+
+  Quarantine — a count is stated for every reason, including zero
+    PROTECTED_MARKING           0
+    HIGHLY_SENSITIVE            0
+    ACCESS_DENIED               0
+    NON_DOCUMENT_BODY           0
+    NO_EXTRACTABLE_TEXT         0
+    CONTENT_TYPE_MISMATCH       0
+    ZERO_LENGTH_BODY            0
+    UNKNOWN_CONFIDENTIALITY     0
+    UNREDACTED_DUPLICATE        0
+    INJECTION_MARKER            0
+    INVISIBLE_TEXT              0
+    RESOURCE_LIMIT_EXCEEDED     0
+
+  Unresolved claim patterns (0) — no row was written for any of these
+
+  Gate failures (0)

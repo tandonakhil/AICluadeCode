@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 · Question in flight · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">02 / 12 · Question in flight</span>
+  <span class="dr-crumb">F35 · AC-F35-03, AC-F35-02</span>
+</nav>
+
+<div class="rca-shell rca-shell--narrow">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>Two states on one page.</p>
+    <p><strong>Top — in flight.</strong> <code>AC-F35-03</code> forbids showing an empty answer region, an empty citation region or an empty coverage region while the answer is being produced. So there is no skeleton screen: skeletons are exactly "an empty coverage panel", and on this product an empty coverage panel is the harm. Instead the progress indicator <em>names the pipeline stages</em> as they complete. This doubles as an honesty device — the analyst can see that metadata filtering happened before similarity ranking, which is the <code>RCA-R14</code> ordering guarantee made visible.</p>
+    <p><strong>Bottom — empty-question validation.</strong> <code>AC-F35-02</code>. Inline, next to the field, and no request leaves the client. This is the ported <code>min_length=1</code> whitespace-rejecting validator from <code>policy-lookup-assistant</code> given a visible surface.</p>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE — IN FLIGHT ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <form class="ask-form" onsubmit="return false;">
+        <label class="vh" for="q1">Your precedent question</label>
+        <div class="ask-form__row">
+          <textarea class="question-input" id="q1" rows="2" disabled>What ROE has the PA PUC authorized in fully-projected-future-test-year distribution cases since 2023?</textarea>
+        </div>
+        <div class="ask-form__row" style="margin-top:.75rem; justify-content:flex-end;">
+          <button class="submit-btn" type="submit" disabled>Working…</button>
+        </div>
+      </form>
+
+      <section class="panel" aria-labelledby="inflight-h">
+        <h2 id="inflight-h" class="vh">Answer in progress</h2>
+        <div class="inflight">
+          <span class="inflight__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <div>
+            <p style="margin:0; font-weight:600;">Resolving your question against the corpus…</p>
+            <ul class="inflight__steps">
+              <li data-done="true">Question frame resolved — jurisdiction <code>PA_PUC</code>, parameter <code>ROE</code>, test-year convention <code>FPFTY</code>, from 2023-01-01</li>
+              <li data-done="true">Metadata filter applied — 6 candidate cases in scope</li>
+              <li data-done="true">Similarity ranking within the filtered set</li>
+              <li>Comparability predicate</li>
+              <li>Citation verification</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <aside class="rca-rail">
+      <p class="tiny muted">The coverage and citation regions are <strong>not</strong> rendered yet — not even as placeholders. An empty coverage panel is indistinguishable from "checked nothing", which is the single failure this product exists to prevent.</p>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ PRODUCT SURFACE — VALIDATION ============ -->
+
+<div class="rca-shell rca-shell--narrow">
+  <h2 class="dr-sectionhead">Empty-question validation · <code>AC-F35-02</code></h2>
+</div>
+
+<main class="rca-shell rca-shell--narrow">
+  <form class="ask-form" onsubmit="return false;">
+    <label class="vh" for="q2">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q2" rows="2" aria-invalid="true" aria-describedby="q2-msg">   </textarea>
+    </div>
+    <p class="inline-validation" id="q2-msg">
+      <span aria-hidden="true">→</span>
+      <span>Enter a question. Whitespace alone is not a question, and nothing was sent.</span>
+    </p>
+    <div class="ask-form__row" style="margin-top:.75rem; justify-content:flex-end;">
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+</main>
+
+<div class="rca-shell rca-shell--narrow">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="03-answer-grounded.html">03 · Grounded answer</a></p>
+</div>
+
+</body>
+</html>

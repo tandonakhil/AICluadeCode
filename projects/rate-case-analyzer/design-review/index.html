@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rate Case Analyzer — Experience Design review (gate 5)</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">Experience Design review · gate 5</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">ui-ux-designer · 7 Aug 2026</span>
+</header>
+
+<main class="rca-shell">
+
+  <div style="max-width:78ch; padding:2rem 0 1rem;">
+    <h1>Twelve screens, every state the product can be in</h1>
+    <p class="lede" style="font-size:1.0625rem; color:var(--ink-2);">This is the rendered design proposal for the web surface and the ingestion job surface. Every page below is a real, static, self-contained render — open it from the file system or over a local server; there are no build steps, no external fonts and no network calls. The written proposal lives in <code>knowledge/UX_KB.md</code>; this is the part you can actually look at.</p>
+  </div>
+
+  <div class="dr-note" style="max-width:78ch;">
+    <h2>Read these three first, in this order</h2>
+    <p><strong>03 → 06 → 07.</strong> Screen 03 is the reference layout. Screens 06 and 07 are the two refusals that must never look alike: "we checked forty cases and none were comparable" versus "we checked nothing at all". If those two are confusable, the product has a silence-is-clearance failure and everything else is decoration. Screen 07 puts them side by side at the bottom of the page.</p>
+    <p>After that, <strong>05</strong> (the black-box settlement, and why "not stated" and "could not read it" are different components) and <strong>12</strong> (how fourteen document types and six claim statuses were made legible without eighty-four badges).</p>
+  </div>
+
+  <h2 class="dr-sectionhead">The web surface — asking</h2>
+  <ul class="dr-index-list">
+    <li><a href="01-ask-empty.html">
+      <span class="n">01</span>
+      <span class="t">Ask screen — first run</span>
+      <span class="d">Empty state. One question field, the corpus scope stated up front, and the freshness banner present from the very first frame.</span>
+      <span class="ac">F35 · AC-F35-01 · AC-F39-01</span>
+    </a></li>
+    <li><a href="02-ask-inflight.html">
+      <span class="n">02</span>
+      <span class="t">Question in flight, and empty-question validation</span>
+      <span class="d">No skeleton screen — a skeleton is an empty coverage panel, which is the one thing that must never render. The pipeline stages are named as they complete instead.</span>
+      <span class="ac">F35 · AC-F35-02 · AC-F35-03</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">The web surface — answers</h2>
+  <ul class="dr-index-list">
+    <li><a href="03-answer-grounded.html">
+      <span class="t"><span class="n">03</span> &nbsp;Grounded answer — the reference screen</span>
+      <span class="d">Two authorized ROE figures with full citations, the coverage strip above the fold, the requested-not-granted card, comparability with every dimension matched, and provenance. Start here.</span>
+      <span class="ac">F35 · F36 · F37 · F34 · F39 · F40</span>
+    </a></li>
+    <li><a href="04-answer-caveats.html">
+      <span class="t"><span class="n">04</span> &nbsp;Answer with caveats, stale precedent, a superseded order</span>
+      <span class="d">Named mismatched dimensions with both values, an unassessed dimension that is not counted as matched, a verbatim non-precedent clause, a superseded order shown and labelled, and a work-product source. Plus the all-cases-stale variant.</span>
+      <span class="ac">F40 · F32 · AC-F36-07 · AC-F36-08 · AC-F27-10</span>
+    </a></li>
+    <li><a href="05-answer-not-stated.html">
+      <span class="t"><span class="n">05</span> &nbsp;Black-box settlement — <code>NOT_STATED</code></span>
+      <span class="d">"The settlement did not specify an ROE" rendered as an answer with a citation, not as a gap. Ends with the side-by-side that motivates it: <code>NOT_STATED</code> versus an extraction gap.</span>
+      <span class="ac">AC-F36-02 · AC-F14-10 · AC-F14-11 · RCA-R5</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">The web surface — refusals, all first-class outcomes</h2>
+  <ul class="dr-index-list">
+    <li><a href="06-refusal-none-comparable.html">
+      <span class="t"><span class="n">06</span> &nbsp;Refusal — 40 checked, none comparable</span>
+      <span class="d">The extrapolation trap, refused. Names the missing dimension combination, lists all forty examined cases with their exclusion reason, and is styled neutral — no red, no alert role, no error wording.</span>
+      <span class="ac">F38 · AC-F37-04 · AC-F31-05/07 · RCA-R6</span>
+    </a></li>
+    <li><a href="07-refusal-nothing-examined.html">
+      <span class="t"><span class="n">07</span> &nbsp;Refusal — nothing examined</span>
+      <span class="d">The hardest design problem in the project. No bar at all: a dashed hatched band reading "Nothing was examined" with the filter values that produced the empty set. Side-by-side with screen 06 at the bottom.</span>
+      <span class="ac">AC-F37-03 · AC-F31-08 · AC-F28-05 · RCA-R7</span>
+    </a></li>
+    <li><a href="08-refusal-unparseable.html">
+      <span class="t"><span class="n">08</span> &nbsp;Refusal — the question could not be resolved</span>
+      <span class="d">A slot-by-slot account of what was and was not understood. Says nothing about what the corpus contains, because nothing was looked for. No keyword-search fallback.</span>
+      <span class="ac">AC-F38-07 · AC-F28-04 · ASM-11</span>
+    </a></li>
+    <li><a href="09-system-error.html">
+      <span class="t"><span class="n">09</span> &nbsp;System failure, and the verification-failure refusal</span>
+      <span class="d">The only red in the product. Plus the third refusal cause — an answer that was composed, failed citation verification and was discarded whole. Ends with declined-vs-broken side by side.</span>
+      <span class="ac">AC-F35-06 · AC-F38-06 · AC-F34-06</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">Corpus state and the second surface</h2>
+  <ul class="dr-index-list">
+    <li><a href="10-freshness-states.html">
+      <span class="t"><span class="n">10</span> &nbsp;Corpus freshness banner — four states</span>
+      <span class="d">Fresh, stale with the age in days, a newer run that did not succeed (the as-of date never advances), and never-succeeded — which closes the answer path entirely.</span>
+      <span class="ac">F39 · AC-F39-01…06 · RCA-R13</span>
+    </a></li>
+    <li><a href="11-run-report.html">
+      <span class="t"><span class="n">11</span> &nbsp;Ingest run report — the job surface</span>
+      <span class="d">Quarantine reported with explicit zeros for every reason, confidential material quarantined with the marking text quoted as evidence, extraction gaps kept separate from quarantine, and the silent-stop health check. Plus the gate-failure variant.</span>
+      <span class="ac">F42 · F43 · IND-10 · IND-11 · RCA-R11</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">The system sheet</h2>
+  <ul class="dr-index-list">
+    <li><a href="12-components.html">
+      <span class="t"><span class="n">12</span> &nbsp;Components, tokens, and the 14 × 6 encoding</span>
+      <span class="d">How fourteen document types became four countable authority tiers and six claim statuses became three chip families — with the full precision kept as text. Greyscale proof, colour tokens with contrast ratios, type scale, component inventory and the non-negotiable accessibility rules.</span>
+      <span class="ac">AC-F36-03 · AC-F48-01…05</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">Things worth knowing before you judge this</h2>
+  <div class="dr-note" style="max-width:78ch;">
+    <h2>Scope, honesty, and one environment constraint</h2>
+    <ul>
+      <li><strong>Desktop web only.</strong> Mobile is recorded as out of MVP scope. The layout does not break on a narrow window — the rail stacks under the main column — but a narrow window is not the design target.</li>
+      <li><strong>Light and dark both ship</strong>, via <code>prefers-color-scheme</code>. If your machine is in dark mode you are looking at the dark theme right now; both were designed, not one derived from the other.</li>
+      <li><strong>Every figure, docket number, witness name and URL on these pages is illustrative.</strong> The docket-number <em>formats</em> are the real formats for each commission, and the URL shapes are the real URL shapes — that part matters, because they are what the citation card has to render. The values behind them are not represented as real filings.</li>
+      <li><strong>No Figma, and none was faked.</strong> The available Figma account is a View-seat Starter plan: six MCP calls a month and no write access, so a design-system push was not attempted. These static pages <em>are</em> the deliverable and the reference implementation, which for this project is arguably the better artefact anyway — <code>code-agent</code> can read the markup directly. Recorded as an environment constraint in <code>knowledge/UX_KB.md</code> §7.</li>
+    </ul>
+  </div>
+
+</main>
+
+<div class="rca-shell">
+  <p class="tiny muted">Written proposal, judgment calls and assumptions: <code>projects/rate-case-analyzer/knowledge/UX_KB.md</code></p>
+</div>
+
+</body>
+</html>

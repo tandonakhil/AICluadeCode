@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 · Answer with comparability caveats, stale precedent and a superseded order · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">04 / 12 · Answer with caveats · stale precedent · superseded order · work-product source</span>
+  <span class="dr-crumb">F40 · F32 · F36-07 · F36-08 · AC-F27-06/07/08/10</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>The same layout as screen 03, carrying every "yes, but" the system can produce. This is where a lesser design would print <em>"results may not be comparable"</em> and stop. Here:</p>
+    <ul>
+      <li><strong>Every caveat names its dimension, the question's value and the case's value</strong> (<code>AC-F40-01</code>, <code>AC-F40-02</code>). "Vintage" is not a mood, it is <code>2019-10-24</code> against a five-year window.</li>
+      <li><strong>Severity is a word, not a colour</strong> — <code>CAVEAT</code>, <code>INFO</code>, <code>UNKNOWN</code>. A dimension the corpus does not record renders as <em>unassessed with its reason</em>, never as matched (<code>AC-F40-06</code>).</li>
+      <li><strong>The non-precedent clause is quoted verbatim with its locator</strong> (<code>AC-F40-03</code>). The document itself disclaims the use the analyst is about to make of it; that sentence is more useful than any summary of it.</li>
+      <li><strong>The superseded original order is shown, labelled, and names its successor</strong> (<code>AC-F36-07</code>) — rather than being silently dropped, which would leave an analyst who remembers the original figure unable to reconcile the two.</li>
+      <li><strong>The work-product card is dashed and labelled twice</strong> — corpus and synthetic (<code>AC-F36-08</code>). In MVP1 the entire internal corpus is synthetic and must never be mistaken for real internal history.</li>
+      <li><strong>No directional claim about settled vs. litigated outcomes appears anywhere</strong> (<code>AC-F27-13</code>). The dimension is named; no spread is asserted, because the evidence does not support one.</li>
+    </ul>
+    <p>At the bottom of the page, outside the product surface, is the <strong>all-cases-stale variant</strong> of the vintage caveat (<code>AC-F32-02</code>) — a different, stronger component from the per-case caveat shown in the answer.</p>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACE ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: Utility analyst · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>7 Aug 2026, 03:12 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel answer-panel" aria-labelledby="answer-h">
+        <h2 id="answer-h" class="vh">Answer</h2>
+        <p class="answer-question">What common equity ratio has been authorized for restructured wires-only electric distribution utilities since 2019?</p>
+
+        <div class="answer-body">
+          <p>Three cases in the corpus state an authorized or settled common equity ratio for a restructured wires-only electric distribution utility since 2019.</p>
+
+          <table class="answer-figures">
+            <caption class="vh">Authorized or settled common equity ratio, restructured wires-only distribution utilities, since 2019</caption>
+            <thead><tr><th scope="col">Utility</th><th scope="col">Docket</th><th scope="col">Date</th><th scope="col">Equity ratio</th><th scope="col">Status</th><th scope="col">Source</th></tr></thead>
+            <tbody>
+              <tr><td>Oncor Electric Delivery Company</td><td class="mono">56211</td><td class="mono">21 Apr 2025</td><td class="num">54.15%</td><td>Authorized</td><td><a class="cite-ref" href="#cite-2">[2]</a></td></tr>
+              <tr><td>AEP Texas Inc.</td><td class="mono">51415</td><td class="mono">10 Jun 2021</td><td class="num">52.70%</td><td>Authorized (on rehearing)</td><td><a class="cite-ref" href="#cite-3">[3]</a></td></tr>
+              <tr><td>PPL Electric Utilities Corporation</td><td class="mono">R-2019-3006814</td><td class="mono">24 Oct 2019</td><td class="num">53.35%</td><td>Settled</td><td><a class="cite-ref" href="#cite-1">[1]</a></td></tr>
+            </tbody>
+          </table>
+
+          <p>The AEP Texas figure is the ratio as revised on rehearing. The original final order of 24 March 2021 stated <span class="claim-figure">53.50%</span>; that order has been superseded and is shown, labelled, as citation <a class="cite-ref" href="#cite-4">[4]</a>.</p>
+
+          <p>One record in the internal (synthetic) work-product corpus states a <em>recommended</em> equity ratio of <span class="claim-figure">53.00%</span> for a comparable filing <a class="cite-ref" href="#cite-5">[5]</a>. It is internal work product, not commission authority, and in MVP1 it is synthetic.</p>
+
+          <p class="tiny muted" style="margin-bottom:0;">No average across these three figures is produced. They span two commissions, two resolution paths and six years.</p>
+        </div>
+
+        <p class="disclosure-note">AI-composed from cited docket documents. Every figure above was verified against the quoted span on its citation card. Verify against the linked source before relying on it in filed material.</p>
+      </section>
+
+      <section class="coverage-strip" aria-labelledby="cov-strip-h">
+        <h2 id="cov-strip-h" class="vh">Coverage summary</h2>
+        <p class="coverage-strip__sentence">Checked <span class="n">12</span> candidate cases · included <span class="n">3</span> · excluded <span class="n">7</span> · could not assess <span class="n">2</span></p>
+        <div class="coverage-bar" role="img" aria-label="Of 12 candidate cases: 3 included, 7 excluded, 2 could not be assessed.">
+          <span class="seg-included" style="width:25%"></span>
+          <span class="seg-excluded" style="width:58.3%"></span>
+          <span class="seg-unassessed" style="width:16.7%"></span>
+        </div>
+        <ul class="coverage-key">
+          <li><i class="k-included" aria-hidden="true"></i> Included (3)</li>
+          <li><i class="k-excluded" aria-hidden="true"></i> Excluded on a named dimension (7)</li>
+          <li><i class="k-unassessed" aria-hidden="true"></i> Could not assess (2)</li>
+        </ul>
+        <p class="coverage-arith">12 = 3 + 7 + 2 — every candidate is accounted for. Full reasons in the coverage panel →</p>
+      </section>
+
+      <!-- Comparability caveats — the point of this screen -->
+      <section class="panel comparability-panel" aria-labelledby="comp-h">
+        <div class="panel__head">
+          <h2 id="comp-h">Comparability — 4 caveats, 1 dimension unassessed</h2>
+          <span class="tiny muted">No score is computed. Each row is a named dimension.</span>
+        </div>
+
+        <table class="dim-table">
+          <caption class="vh">Comparability dimensions across the three included cases</caption>
+          <thead><tr><th scope="col">Dimension</th><th scope="col">Your question</th><th scope="col">Case value</th><th scope="col">Case</th><th scope="col">Severity</th></tr></thead>
+          <tbody>
+            <tr class="dim-row dim-row--matched"><td>market structure</td><td class="mono">RESTRUCTURED_WIRES_ONLY</td><td class="mono">RESTRUCTURED_WIRES_ONLY</td><td class="mono">all 3</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--matched"><td>case type</td><td class="mono">BASE_RATE</td><td class="mono">BASE_RATE</td><td class="mono">all 3</td><td><span class="dim-row__sev">MATCHED</span></td></tr>
+            <tr class="dim-row dim-row--caveat"><td>vintage</td><td class="mono">window: 5 years (since 2021-08-07)</td><td class="mono">order date 2019-10-24</td><td class="mono">R-2019-3006814</td><td><span class="dim-row__sev">CAVEAT</span></td></tr>
+            <tr class="dim-row dim-row--caveat"><td>resolution path</td><td class="mono">any</td><td class="mono">SETTLED_FULL</td><td class="mono">R-2019-3006814</td><td><span class="dim-row__sev">CAVEAT</span></td></tr>
+            <tr class="dim-row dim-row--caveat"><td>test year convention</td><td class="mono">not named in your question</td><td class="mono">HISTORICAL (TX) vs FPFTY (PA)</td><td class="mono">56211, 51415 vs R-2019-3006814</td><td><span class="dim-row__sev">CAVEAT</span></td></tr>
+            <tr class="dim-row dim-row--info"><td>utility scale</td><td class="mono">any</td><td class="mono">10.6m vs 1.4m customers</td><td class="mono">56211 vs 51415</td><td><span class="dim-row__sev">INFO</span></td></tr>
+            <tr class="dim-row dim-row--unknown"><td>capital structure basis</td><td class="mono">any</td><td class="mono">not recorded (NOT_STATED)</td><td class="mono">51415</td><td><span class="dim-row__sev">UNASSESSED</span></td></tr>
+          </tbody>
+        </table>
+
+        <p class="tiny" style="margin:.875rem 0 0;"><strong>Unassessed, not matched.</strong> The corpus does not record whether AEP Texas's 52.70% is stated on a deemed or actual capital structure. That dimension is therefore reported as unassessed with its reason and is not counted as a match.</p>
+
+        <div class="vintage-caveat" style="margin-top:1rem;">
+          <strong>Vintage caveat.</strong> One supporting case (PPL, <span class="mono">R-2019-3006814</span>) has an order date of <span class="mono">24 Oct 2019</span>, outside the configured five-year window. Cost of capital is a function of contemporaneous market conditions. The other two supporting cases are inside the window, so this is a per-case caveat rather than an all-precedent-is-stale caveat.
+        </div>
+
+        <figure class="nonprecedent-quote">
+          <blockquote>"This Joint Petition for Settlement is presented without prejudice to any position which any of the Joint Petitioners may have advanced, and shall not be cited as precedent in any future proceeding."</blockquote>
+          <figcaption>Joint Petition for Settlement, Docket R-2019-3006814 · ¶ 41 · p. 22 — attached to PPL Electric Utilities, citation [1]</figcaption>
+        </figure>
+        <p class="tiny muted" style="margin:.5rem 0 0;">The parties to that settlement expressly disclaimed its precedential use. The figure is reported because you asked what has been settled; the clause is reported because relying on it as precedent is what the document forbids.</p>
+      </section>
+
+      <!-- Citations -->
+      <section aria-labelledby="cites-h">
+        <div class="panel__head"><h2 id="cites-h">Citations <span class="muted tiny">— 5 verified sources</span></h2></div>
+        <ul class="citation-list">
+
+          <li class="citation-card" id="cite-1">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Approved Settlement</span>
+                <span class="doctype-rank">document_type rank 3 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>SETTLED<span class="status-chip__gloss">— agreed in an approved settlement</span></span>
+              </div>
+              <h3 class="citation-title">Joint Petition for Settlement, as approved — <i>Pa. PUC v. PPL Electric Utilities Corporation</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Pennsylvania Public Utility Commission</li>
+                <li><b>Docket</b> <span class="mono">R-2019-3006814</span></li>
+                <li><b>Approved</b> <span class="mono">24 Oct 2019</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">¶ 18 · p. 11</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"The Joint Petitioners agree to a capital structure consisting of 53.35% common equity and 46.65% long-term debt."</blockquote>
+              <span class="card-flag card-flag--superseded">Non-precedent clause present — quoted above</span>
+              <span class="card-flag">Vintage: outside the 5-year window</span>
+              <br>
+              <a class="source-url" href="https://www.puc.pa.gov/pcdocs/1644028.pdf">https://www.puc.pa.gov/pcdocs/1644028.pdf</a>
+            </div>
+          </li>
+
+          <li class="citation-card" id="cite-2">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Final Order</span>
+                <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
+              </div>
+              <h3 class="citation-title">Order, <i>Application of Oncor Electric Delivery Company LLC to Change Rates</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Public Utility Commission of Texas</li>
+                <li><b>Docket</b> <span class="mono">56211</span></li>
+                <li><b>Order</b> <span class="mono">Order No. 42</span>, signed <span class="mono">21 Apr 2025</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">Finding of Fact No. 96 · p. 31</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"Oncor's approved capital structure consists of 54.15% common equity and 45.85% long-term debt."</blockquote>
+              <a class="source-url" href="https://interchange.puc.texas.gov/Documents/56211_442_1349807.PDF">https://interchange.puc.texas.gov/Documents/56211_442_1349807.PDF</a>
+            </div>
+          </li>
+
+          <li class="citation-card" id="cite-3">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Order on Rehearing</span>
+                <span class="doctype-rank">document_type rank 2 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
+              </div>
+              <h3 class="citation-title">Order on Rehearing, <i>Application of AEP Texas Inc. to Change Rates</i></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Public Utility Commission of Texas</li>
+                <li><b>Docket</b> <span class="mono">51415</span></li>
+                <li><b>Order</b> <span class="mono">Order on Rehearing No. 61</span>, signed <span class="mono">10 Jun 2021</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">Finding of Fact No. 88 (as revised) · p. 27</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"Finding of Fact No. 88 is revised to reflect a capital structure of 52.70% common equity."</blockquote>
+              <span class="card-flag">Supersedes Order No. 54 of 24 Mar 2021 — see citation [4]</span>
+              <br>
+              <a class="source-url" href="https://interchange.puc.texas.gov/Documents/51415_612_1122483.PDF">https://interchange.puc.texas.gov/Documents/51415_612_1122483.PDF</a>
+            </div>
+          </li>
+
+          <li class="citation-card" id="cite-4">
+            <span class="authority-spine" role="img" aria-label="Authority tier 4 of 4: outcome document."><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i><i data-on="1"></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Final Order</span>
+                <span class="doctype-rank">document_type rank 1 of 14 · outcome document</span>
+                <span class="status-chip status-chip--outcome"><span class="status-chip__family">Outcome</span>AUTHORIZED<span class="status-chip__gloss">— granted by commission order</span></span>
+              </div>
+              <h3 class="citation-title">Order, <i>Application of AEP Texas Inc. to Change Rates</i> <span class="muted">(original)</span></h3>
+              <ul class="citation-meta">
+                <li><b>Commission</b> Public Utility Commission of Texas</li>
+                <li><b>Docket</b> <span class="mono">51415</span></li>
+                <li><b>Order</b> <span class="mono">Order No. 54</span>, signed <span class="mono">24 Mar 2021</span> <span class="muted">(order date)</span></li>
+                <li><b>Locator</b> <span class="locator">Finding of Fact No. 88 · p. 27</span></li>
+                <li><b>Corpus</b> Public — commission docket</li>
+              </ul>
+              <blockquote class="verbatim">"AEP Texas's approved capital structure consists of 53.50% common equity and 46.50% long-term debt."</blockquote>
+              <span class="card-flag card-flag--superseded">SUPERSEDED — replaced on this point by Order on Rehearing No. 61 of 10 Jun 2021 (citation [3]). Do not cite this figure as current.</span>
+              <br>
+              <a class="source-url" href="https://interchange.puc.texas.gov/Documents/51415_541_1113920.PDF">https://interchange.puc.texas.gov/Documents/51415_541_1113920.PDF</a>
+            </div>
+          </li>
+
+          <li class="citation-card citation-card--position" id="cite-5">
+            <span class="authority-spine" role="img" aria-label="Authority tier 2 of 4: party filing."><i data-on="1"></i><i data-on="1"></i><i></i><i></i></span>
+            <div>
+              <div class="citation-card__head">
+                <span class="doctype-label">Utility Rebuttal Testimony</span>
+                <span class="doctype-rank">document_type rank 8 of 14 · party filing</span>
+                <span class="status-chip status-chip--position"><span class="status-chip__family">Position</span>RECOMMENDED<span class="status-chip__gloss">— proposed; not granted</span></span>
+              </div>
+              <h3 class="citation-title">Rebuttal Testimony — internal comparable filing record</h3>
+              <ul class="citation-meta">
+                <li><b>Record</b> <span class="mono">WP-SYN-0011</span></li>
+                <li><b>Filed</b> <span class="mono">12 Sep 2023</span> <span class="muted">(filing date — this document is not an order)</span></li>
+                <li><b>Locator</b> <span class="locator">p. 8 · ll. 3–9</span></li>
+                <li><b>Corpus</b> Internal work-product</li>
+              </ul>
+              <blockquote class="verbatim">"We continue to support a capital structure of 53.00% common equity as reasonable for a wires-only distribution utility of comparable scale."</blockquote>
+              <span class="card-flag card-flag--workproduct">WORK-PRODUCT corpus — not a commission document</span>
+              <span class="card-flag card-flag--workproduct">SYNTHETIC record — generated for MVP1; not real internal history</span>
+              <br>
+              <span class="tiny muted">No public source URL: this record is not a filed document.</span>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+    </div>
+
+    <aside class="rca-rail rca-stack">
+      <section class="panel coverage-panel" aria-labelledby="cov-h">
+        <div class="panel__head"><h2 id="cov-h">Coverage — what was checked</h2></div>
+
+        <div class="cov-section">
+          <h4>Candidates considered <span class="cov-count">12</span></h4>
+          <p class="tiny muted" style="margin:0;">Jurisdictions examined: PA PUC, PUCT, CPUC. Date span examined: 14 Mar 2019 – 21 Apr 2025.</p>
+        </div>
+
+        <div class="cov-section">
+          <h4>Included <span class="cov-count">3</span></h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">56211</span><span class="reason">Oncor Electric Delivery · PUCT</span></li>
+            <li><span class="case-id">51415</span><span class="reason">AEP Texas · PUCT</span></li>
+            <li><span class="case-id">R-2019-3006814</span><span class="reason">PPL Electric Utilities · PA PUC — included with 2 caveats</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Excluded <span class="cov-count">7</span> — each on a named dimension</h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">A.23-05-010</span><span class="reason"><span class="dim">market structure</span> — vertically integrated, not wires-only (blocking)</span></li>
+            <li><span class="case-id">A.22-05-015</span><span class="reason"><span class="dim">market structure</span> — vertically integrated (blocking)</span></li>
+            <li><span class="case-id">A.24-05-008</span><span class="reason"><span class="dim">market structure</span> — vertically integrated (blocking)</span></li>
+            <li><span class="case-id">R-2023-3040020</span><span class="reason"><span class="dim">case type</span> — DSIC rider proceeding, not a base rate case (blocking)</span></li>
+            <li><span class="case-id">53601</span><span class="reason"><span class="dim">case type</span> — formula-rate annual filing (blocking)</span></li>
+            <li><span class="case-id">R-2018-3000124</span><span class="reason"><span class="dim">vintage</span> — order date 2018-03-16, before the period you asked about (blocking)</span></li>
+            <li><span class="case-id">R-2022-3031234</span><span class="reason"><span class="dim">case status</span> — WITHDRAWN; the docket has testimony but no outcome (blocking)</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Could not assess <span class="cov-count">2</span></h4>
+          <ul class="coverage-list">
+            <li><span class="case-id">R-2019-3008671</span><span class="reason">Corpus does not record a <span class="dim">market structure</span> for this case (<code>NOT_STATED</code>). Not treated as matching.</span></li>
+            <li><span class="case-id">WP-SYN-0007</span><span class="reason">Internal (synthetic) record; no equity-ratio claim extracted. Not treated as matching.</span></li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Standing limits of this corpus</h4>
+          <ul class="known-exclusions">
+            <li>Rider, tracker and formula-rate proceedings are excluded from base-rate treatment.</li>
+            <li>Data-request responses and hearing transcripts are not ingested.</li>
+            <li>Scanned filings with no extractable text are quarantined, not processed.</li>
+            <li>Supersession is detected only from explicit references in a later document.</li>
+          </ul>
+        </div>
+
+        <div class="cov-section">
+          <h4>Corpus as of</h4>
+          <p class="tiny" style="margin:0;"><span class="mono">7 Aug 2026, 03:12 UTC</span> — the same date shown in the banner above.</p>
+        </div>
+      </section>
+
+      <section class="panel provenance-panel" aria-labelledby="prov-h">
+        <div class="panel__head"><h2 id="prov-h">Provenance</h2></div>
+        <dl>
+          <dt>Query id</dt><dd>q_01K2F7C9YB2P8LMD</dd>
+          <dt>Asked at</dt><dd>7 Aug 2026, 14:19:03 UTC</dd>
+          <dt>Session role</dt><dd>UTILITY_ANALYST</dd>
+          <dt>Model</dt><dd>rca-compose-v1 / claude-opus-4-6-20260212</dd>
+          <dt>Corpus as of</dt><dd>7 Aug 2026, 03:12 UTC</dd>
+          <dt>Chunks retrieved</dt><dd>41</dd>
+          <dt>Chunks cited</dt><dd>5 (all verified)</dd>
+          <dt>Outcome</dt><dd>ANSWERED</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ VARIANT, OUTSIDE THE PRODUCT SURFACE ============ -->
+
+<div class="rca-shell">
+  <h2 class="dr-sectionhead">Variant · the all-cases-stale caveat (<code>AC-F32-02</code>)</h2>
+  <div class="dr-note">
+    <h2>Why this is a different component</h2>
+    <p>Above, one of three supporting cases was outside the vintage window, so the caveat is attached to that case. When <em>every</em> supporting case is outside the window, the caveat is about the answer as a whole and is rendered at answer level, naming the oldest and newest supporting order dates. The two must not look the same: "one of these is old" and "all of this is old" are different findings.</p>
+  </div>
+  <div class="vintage-caveat" style="max-width:78ch;">
+    <strong>All supporting precedent predates the vintage window.</strong> Every case supporting this answer was decided more than five years ago — oldest supporting order <span class="mono">16 Mar 2018</span>, newest <span class="mono">09 Nov 2020</span>. Cost of capital is a function of contemporaneous interest rates and market conditions, and figures from before the December 2017 federal tax-rate change were computed under a different statutory rate. Treat these as historical context rather than as current market evidence.
+  </div>
+</div>
+
+<div class="rca-shell">
+  <p class="tiny muted"><a href="index.html">← Back to design review index</a> · Next: <a href="05-answer-not-stated.html">05 · NOT_STATED black-box settlement</a></p>
+</div>
+
+</body>
+</html>
