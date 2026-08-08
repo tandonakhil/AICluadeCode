@@ -4,8 +4,8 @@
   "position": "Gate 10 \u00b7 Review",
   "env": "dev, local",
   "last_activity": "2026-08-08",
-  "served_url": "http://127.0.0.1:8041/ (design review)",
-  "notes": "MVP1 built and running. 899 tests green across 8 blocking suites against the real corpus (independently derived by test-agent, evidence at test-evidence/test-gate-2026-08-08-final.md). Gate 9 Verification 342/342 mapped, 0 NOT VERIFIED, 0 FAILED -- after one accepted loop-back to Code. Full-autonomy run at human instruction: every gate carries batch_authorized, and 31 numbered orchestrator assumptions (ASM-1..ASM-31) are recorded in PROJECT_CONTEXT.md for retrospective ratification.",
+  "served_url": "http://127.0.0.1:8477/",
+  "notes": "MVP1 built and running at http://127.0.0.1:8477/ (offline, no API key -- the model client replays recorded transcripts, so only recorded questions answer; everything else refuses and says why). Design previews at http://127.0.0.1:8041/. 899 tests green across 8 blocking suites against the real corpus, independently derived by test-agent (test-evidence/test-gate-2026-08-08-final.md). Gate 9 Verification 342/342, 0 NOT VERIFIED, 0 FAILED, after one accepted loop-back to Code. Full-autonomy run: every gate carries batch_authorized and ASM-1..ASM-31 are recorded in PROJECT_CONTEXT.md for retrospective ratification.",
   "gates": [
     {
       "n": 1,

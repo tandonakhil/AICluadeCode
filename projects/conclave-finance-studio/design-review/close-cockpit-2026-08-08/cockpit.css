@@ -1,0 +1,212 @@
+/* ==========================================================================
+   conclave-finance-studio — CLOSE COCKPIT LAYER, 2026-08-08
+   Loads AFTER apple.css and brand.css. Purely additive; every selector is new.
+
+   This is NOT a new visual language. Every colour, type size, hairline and
+   radius below resolves to a token already declared in apple.css. Nothing
+   here introduces a hue, and there is no green in either theme.
+
+   What it adds, and only this:
+     1 · .topbar        — the chrome that survives when all destinations move
+                          into a drawer (the human's decision, 2026-08-08)
+     2 · .drawer        — the hamburger itself
+     3 · .tracker       — the close tracker: five declared checkpoints, the
+                          refresh marker placed against the one it was DUE by
+     4 · .act           — an action tile: a number, a qualifier, a destination.
+                          A tile with no destination cannot be built with these
+                          classes, which is the point.
+   ========================================================================== */
+
+/* ==========================================================================
+   1 · TOP BAR — 52px, and it holds exactly three things
+   The hamburger, the return-to-close control, and who you are.
+   The return control is NOT navigation smuggled back in: it is one control to
+   ONE screen, the screen the human asked to carry the work. It carries the
+   remaining count because that is the badge that matters when you are deep in
+   an item and the drawer is shut.
+   ========================================================================== */
+.topbar{display:flex;align-items:center;gap:14px;height:52px;padding:0 20px;
+ border-bottom:1px solid var(--hairline);background:var(--paper);
+ position:sticky;top:0;z-index:40}
+
+.burger{display:flex;align-items:center;gap:10px;font:inherit;font-size:15px;
+ letter-spacing:-.008em;color:var(--ink);background:transparent;cursor:pointer;
+ border:1px solid var(--hairline);border-radius:9px;padding:7px 13px 7px 11px}
+.burger:hover{background:var(--line2);text-decoration:none}
+.burger .bars{display:inline-flex;flex-direction:column;gap:3px;width:16px}
+.burger .bars i{display:block;height:1.6px;background:var(--ink);border-radius:1px}
+/* The hamburger carries NO count. A count here would either duplicate the home
+   page's own figures or be an aggregate with no destination — a vanity metric
+   in the chrome, which is exactly what this pass exists to keep off the
+   product. The count lives on the control that goes somewhere. */
+
+.homelink{display:flex;align-items:baseline;gap:9px;padding:6px 12px;border-radius:9px;
+ color:var(--ink)}
+.homelink:hover{background:var(--line2);text-decoration:none}
+.homelink .lb{font-size:15px;font-weight:590;letter-spacing:-.008em}
+.homelink .ct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;
+ color:var(--sev2);font-weight:590}
+.homelink.on{background:var(--teal-bg)}
+.homelink.on .lb{color:var(--teal)}
+
+.topbar .lockup{padding:0;gap:9px}
+.topbar .spacer{flex:1}
+.topbar .signed{font-size:13px;color:var(--muted);text-align:right;line-height:1.3}
+.topbar .signed b{display:block;font-size:15px;color:var(--ink);font-weight:590;
+ letter-spacing:-.008em}
+
+/* ==========================================================================
+   2 · DRAWER — every destination, one list, grouped as the build groups them
+   ========================================================================== */
+.scrim{position:fixed;inset:0;background:rgba(29,28,26,.34);z-index:50}
+[data-theme=dark] .scrim{background:rgba(0,0,0,.55)}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:344px;z-index:51;
+ background:var(--surface);border-right:1px solid var(--hairline);
+ display:flex;flex-direction:column;overflow-y:auto}
+.drawer .dhd{display:flex;align-items:center;justify-content:space-between;gap:14px;
+ padding:14px 20px;border-bottom:1px solid var(--hairline)}
+.drawer .dclose{font:inherit;font-size:15px;color:var(--teal);background:transparent;
+ border:0;cursor:pointer;padding:6px 4px}
+.drawer .dgrp{padding:18px 20px 6px;font-size:12px;font-weight:590;letter-spacing:.075em;
+ text-transform:uppercase;color:var(--muted)}
+.drawer a.d{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:baseline;
+ margin:1px 12px;padding:10px 10px;border-radius:8px;color:var(--ink);font-size:15px;
+ letter-spacing:-.008em}
+.drawer a.d:hover{background:var(--line2);text-decoration:none}
+.drawer a.d.on{background:var(--teal-bg);color:var(--teal);font-weight:590}
+.drawer a.d .sub{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:2px;
+ line-height:1.4}
+.drawer a.d .badge{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;
+ color:var(--sev2);font-weight:590}
+.drawer a.d .badge.none{color:var(--muted);font-weight:400}
+.drawer .dfoot{margin-top:auto;border-top:1px solid var(--hairline);padding:14px 20px 20px;
+ font-size:13px;color:var(--muted)}
+.drawer .dfoot b{display:block;font-size:15px;color:var(--ink);font-weight:590}
+
+/* ==========================================================================
+   3 · CLOSE TRACKER — the declared calendar, drawn
+   Five checkpoints, at 08:00 UTC on close days 1-5 (common/close_calendar.py).
+   NO GREEN on a passed checkpoint: a passed cut-off is a fact, not an
+   achievement, and the whole no-green argument is that "fine, move on" is the
+   affect a depleted reviewer must not be handed. Passed = filled neutral ink.
+   THE GRAPHIC IS THE GAP, not the progress — same move as the coverage strip.
+   The bracket between "due by" and "actually refreshed" is what is drawn; the
+   staleness number is its label, not a separate assertion.
+   ========================================================================== */
+.tracker{border:1px solid var(--hairline);border-radius:12px;background:var(--surface);
+ padding:20px 22px 18px;margin-top:18px}
+.tracker .thd{display:flex;align-items:baseline;justify-content:space-between;gap:18px;
+ flex-wrap:wrap}
+.tracker .thd h3{font-size:17px}
+.tracker .where{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;
+ font-weight:590;color:var(--ink)}
+
+.stops{display:grid;grid-template-columns:repeat(5,1fr);margin-top:20px;position:relative}
+.stop{position:relative;padding:0 8px 0 0}
+.stop .dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);
+ background:var(--surface);position:relative;z-index:2}
+.stop.past .dot{background:var(--muted);border-color:var(--muted)}
+.stop.now .dot{background:var(--ink);border-color:var(--ink);width:17px;height:17px;
+ box-shadow:0 0 0 4px var(--line2)}
+.stop .rail{position:absolute;left:8px;right:0;top:7px;height:1.5px;background:var(--hairline)}
+.stop.past .rail,.stop.now .rail{background:var(--muted)}
+.stop:last-child .rail{display:none}
+.stop .day{font-size:12px;font-weight:590;letter-spacing:.075em;text-transform:uppercase;
+ color:var(--muted);margin-top:12px}
+.stop.now .day{color:var(--ink)}
+.stop .nm{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;max-width:20ch}
+.stop.now .nm{color:var(--ink)}
+.stop .at{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:5px}
+.stop.future .dot{border-style:dashed}
+.stop.future .day,.stop.future .nm{color:var(--muted)}
+
+/* the refresh marker and the bracket it spans — this is the whole point */
+.behind{margin-top:18px;display:grid;grid-template-columns:repeat(5,1fr);align-items:start}
+.behind .span{grid-column:2 / 4;border-top:1.5px solid var(--sev1);
+ border-left:1.5px solid var(--sev1);border-right:1.5px solid var(--sev1);
+ height:11px;border-radius:3px 3px 0 0}
+.behind .lab{grid-column:2 / 6;font-size:15px;font-weight:590;color:var(--sev1);
+ letter-spacing:-.008em;margin-top:7px;line-height:1.4}
+.behind .lab span{display:block;font-weight:400;font-size:13px;color:var(--muted);
+ margin-top:3px;max-width:66ch}
+/* variant: the refresh landed after the last declared checkpoint */
+.behind.after .span{grid-column:2 / 6}
+
+/* the tracker cannot be stated at all — an ABSENCE, not a zero */
+.tracker.absent{border-style:dashed;border-color:var(--slate);background:var(--slate-bg)}
+.tracker .cannot{font-family:var(--serif);font-size:17px;line-height:1.45;margin-top:4px}
+.tracker .cannotwhy{font-size:15px;color:var(--muted);margin-top:10px;max-width:76ch}
+
+/* ==========================================================================
+   4 · ACTION TILES — a number, a QUALIFIER, and a destination.
+   The qualifier is a required child. There is no tile variant without one,
+   and `.act` is an <a>, so a figure that goes nowhere cannot be expressed in
+   this component at all. That is the "a number that implies no action does
+   not belong here" rule, made structural instead of editorial.
+   ========================================================================== */
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px;
+ margin-top:16px}
+a.act{display:flex;flex-direction:column;border:1px solid var(--hairline);border-radius:12px;
+ background:var(--surface);padding:16px 18px 15px;border-left-width:3px;
+ border-left-color:var(--hairline);color:var(--ink)}
+a.act:hover{background:var(--line2);text-decoration:none}
+a.act .fig{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:28px;
+ font-weight:600;line-height:1.05;letter-spacing:-.022em}
+a.act .t{font-size:15px;font-weight:560;letter-spacing:-.008em;margin-top:6px}
+/* THE QUALIFIER FLOOR. 13px is the contract minimum for a reliability
+   qualifier; this renders at 13px and never smaller, and no rule below
+   overrides it. */
+a.act .q{font-size:13px;line-height:1.45;color:var(--muted);margin-top:7px}
+a.act .go{font-size:13px;color:var(--teal);margin-top:11px}
+a.act.t3{border-left-color:var(--sev3)} a.act.t3 .fig{color:var(--sev3)}
+a.act.t2{border-left-color:var(--sev2)} a.act.t2 .fig{color:var(--sev2)}
+a.act.t1{border-left-color:var(--sev1)} a.act.t1 .fig{color:var(--sev1)}
+a.act.gold{border-left-color:var(--gold)} a.act.gold .fig{color:var(--gold)}
+a.act.slate{border-left:3px dashed var(--slate)} a.act.slate .fig{color:var(--slate)}
+a.act.slate .t{font-family:var(--serif);font-weight:400;font-size:16px}
+a.act.quiet .fig{color:var(--muted)}
+
+/* the severity mix, drawn as a ramp rather than written as a sentence */
+.mix{display:flex;gap:4px;margin-top:10px;align-items:center}
+.mix i{display:block;height:6px;border-radius:2px}
+.mix i.t3{background:var(--sev3)} .mix i.t2{background:var(--sev2)}
+.mix i.t1{background:var(--sev1)} .mix i.ab{background:transparent;
+ border:1.5px dashed var(--slate);height:6px}
+.mixlg{font-size:13px;color:var(--muted);margin-top:7px;line-height:1.45}
+
+/* DEFERRED vs REFUSED — the two must never be confusable, and the contrast is
+   the teaching. Refused (`.refuse`, apple.css): solid slate, filled, heavy left
+   rule. Deferred (below): dashed severity outline, NO fill. Both carry the
+   distinction in their wording as well, so it survives greyscale and a screen
+   reader with all CSS disabled. */
+.deferred{border:1.5px dashed var(--sev1);border-radius:10px;background:transparent;
+ padding:18px 20px;margin-top:16px}
+.deferred .hd{font-size:17px;font-weight:600;letter-spacing:-.012em;color:var(--sev1);
+ margin-bottom:8px}
+.deferred p{font-size:15px;margin-top:0}
+.deferred .close{font-size:15px;color:var(--muted);margin-top:10px}
+
+/* the reduction account — collapsed, and LAST on the page */
+details.reduction{border-top:1px solid var(--hairline);margin-top:32px;padding-top:4px}
+details.reduction>summary{padding:14px 0;font-size:15px;color:var(--muted);cursor:pointer;
+ list-style:none;display:flex;justify-content:space-between;gap:14px}
+details.reduction>summary::-webkit-details-marker{display:none}
+details.reduction>summary:after{content:"Expand";color:var(--teal);font-size:14px}
+details.reduction[open]>summary:after{content:"Collapse"}
+details.reduction .body{padding:0 0 22px;font-size:15px;color:var(--muted);max-width:78ch}
+
+/* pilot + topology strips — carried verbatim in meaning from the build's shell */
+.pilotstrip{font-size:13px;line-height:1.5;color:var(--muted);padding:10px 20px;
+ border-bottom:1px solid var(--hairline);background:var(--cream)}
+.pilotstrip b{color:var(--ink)}
+.pilotstrip.hatch{background-color:var(--slate-bg);
+ background-image:repeating-linear-gradient(135deg,transparent 0 6px,
+  color-mix(in srgb,var(--slate) 20%,transparent) 6px 7px)}
+.pilotstrip .nodismiss{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
+
+/* the page body once the sidebar is gone */
+.full{max-width:1100px;padding:0 20px 96px}
+.sechd{display:flex;align-items:baseline;justify-content:space-between;gap:18px;
+ flex-wrap:wrap;margin-top:34px}
+.sechd h2{font-size:21px}
+.sechd .hint{font-size:13px;color:var(--muted)}

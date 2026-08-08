@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>The close tracker — its four honest states — Conclave Finance Studio</title>
+<script src="../redesign-2026-08-02/theme.js"></script>
+<link rel="stylesheet" href="../redesign-2026-08-02/apple.css">
+<link rel="stylesheet" href="../redesign-2026-08-02/brand.css">
+<link rel="stylesheet" href="cockpit.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="si-record" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></symbol>
+</defs></svg>
+
+<main class="page">
+<div class="opening">
+  <div class="eyebrow"><svg class="section-icon sm"><use href="#si-record"/></svg>The close tracker &middot; every state it can be in</div>
+  <h1 class="voice-title">Four states, and <span class="goldline">none of them is a
+    progress bar</span>.</h1>
+  <p class="answer">The tracker is drawn from the declared close calendar
+    (<span class="mono">close.pilot_2026_06@1</span>: five checkpoints at 08:00 UTC on close
+    days 1&ndash;5). A passed checkpoint is filled neutral ink and never green &mdash; a
+    cut-off that has gone by is a fact, not an achievement. What is drawn in colour is the
+    <b>gap</b> between the checkpoint the warehouse refresh was due by and the one it actually
+    landed in; the staleness sentence is that gap&rsquo;s label, not a second assertion beside
+    it.</p>
+  <hr class="rule">
+</div>
+
+<div class="full">
+
+  <!-- ============ 1 ============ -->
+  <div class="sechd"><h2>1 &middot; On the declared calendar, one close day behind</h2>
+    <span class="hint">The pilot&rsquo;s actual state.</span></div>
+  <section class="tracker">
+    <div class="thd"><h3>Where this close is</h3>
+      <span class="where">day 3 of 5 &middot; close.pilot_2026_06@1</span></div>
+    <div class="stops">
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 1</div><div class="nm">Subledger feeds complete</div><div class="at">01 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 2</div><div class="nm">Warehouse refresh complete</div><div class="at">02 Jul 08:00</div></div>
+      <div class="stop now"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 3 &mdash; now</div><div class="nm">Reconciliations complete</div><div class="at">03 Jul 08:00</div></div>
+      <div class="stop future"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 4</div><div class="nm">Review complete</div><div class="at">04 Jul 08:00</div></div>
+      <div class="stop future"><div class="dot"></div>
+        <div class="day">Day 5</div><div class="nm">Books closed</div><div class="at">05 Jul 08:00</div></div>
+    </div>
+    <div class="behind">
+      <div class="span" aria-hidden="true"></div>
+      <div class="lab">Data is 1 close day behind the day-2 cut-off it was due by.
+        <span>Refreshed 03 Jul 06:15 UTC &mdash; inside close day 3, after the checkpoint it
+          was due by. Every figure on the screen inherits that.</span></div>
+    </div>
+  </section>
+  <p class="note" style="max-width:84ch">The bracket is drawn from the checkpoint it was
+    <i>due</i> by to the one it <i>landed</i> in. Two readers of the same run get the same
+    figure because it is computed against the declared calendar, never against a wall clock:
+    a staleness number that changes because a page was refreshed is one two people would
+    disagree about.</p>
+
+  <!-- ============ 2 ============ -->
+  <div class="sechd"><h2>2 &middot; Refreshed after the last declared checkpoint</h2>
+    <span class="hint">&ldquo;Arrived after the books closed&rdquo; is a different fact from
+      &ldquo;just in time for day 5&rdquo;, and is not folded into it.</span></div>
+  <section class="tracker">
+    <div class="thd"><h3>Where this close is</h3>
+      <span class="where">after day 5 &middot; close.pilot_2026_06@1</span></div>
+    <div class="stops">
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 1</div><div class="nm">Subledger feeds complete</div><div class="at">01 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 2</div><div class="nm">Warehouse refresh complete</div><div class="at">02 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 3</div><div class="nm">Reconciliations complete</div><div class="at">03 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 4</div><div class="nm">Review complete</div><div class="at">04 Jul 08:00</div></div>
+      <div class="stop now"><div class="dot"></div>
+        <div class="day">Day 6 &mdash; now</div><div class="nm">Past the last declared checkpoint</div><div class="at">&mdash;</div></div>
+    </div>
+    <div class="behind after">
+      <div class="span" aria-hidden="true"></div>
+      <div class="lab">Data is 4 close days behind the day-2 cut-off it was due by, and
+        arrived after the day-5 cut-off &mdash; the last declared checkpoint of this close.
+        <span>Refreshed 06 Jul 07:40 UTC. The books were closed before this data existed.
+          Nothing computed from it is a statement about the close as it was signed.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <div class="sechd"><h2>3 &middot; No warehouse refresh was observed at all</h2>
+    <span class="hint">Not &ldquo;zero close days behind&rdquo;. Zero is an answer; this is
+      the absence of one.</span></div>
+  <section class="tracker">
+    <div class="thd"><h3>Where this close is</h3>
+      <span class="where">day 3 of 5 &middot; close.pilot_2026_06@1</span></div>
+    <div class="stops">
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 1</div><div class="nm">Subledger feeds complete</div><div class="at">01 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 2</div><div class="nm">Warehouse refresh complete</div><div class="at">02 Jul 08:00</div></div>
+      <div class="stop now"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 3 &mdash; now</div><div class="nm">Reconciliations complete</div><div class="at">03 Jul 08:00</div></div>
+      <div class="stop future"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 4</div><div class="nm">Review complete</div><div class="at">04 Jul 08:00</div></div>
+      <div class="stop future"><div class="dot"></div>
+        <div class="day">Day 5</div><div class="nm">Books closed</div><div class="at">05 Jul 08:00</div></div>
+    </div>
+    <div class="abstain" style="margin-top:20px">
+      <div class="hd">No warehouse refresh was observed for this period, so its staleness
+        relative to the day-2 cut-off could not be computed.</div>
+      <p style="font-size:15px;margin:0">This is not a statement that the data is current.
+        The close position above is still known &mdash; it comes from the calendar, not from
+        the data &mdash; but the refresh marker is absent because there is nothing to mark.</p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <div class="sechd"><h2>4 &middot; No close calendar is declared for this ledger</h2>
+    <span class="hint">The tracker is <b>absent</b>, not empty and not at zero progress.</span></div>
+  <section class="tracker absent">
+    <div class="thd"><h3>Where this close is</h3>
+      <span class="where" style="color:var(--slate)">cannot be stated</span></div>
+    <div class="cannot">No close calendar is declared for this ledger, so where this close
+      stands cannot be stated and neither can the staleness of its data.</div>
+    <div class="cannotwhy">The data as-of &mdash; <span class="mono">03 Jul 2026 06:15 UTC</span>
+      &mdash; is an absolute timestamp and is <b>not</b> a close-relative figure. It is shown
+      under its own name and never under a close-relative one.
+      (<span class="mono">AC-F38-11</span> unmet; deferred-substitution register 6.)
+      Declaring a calendar for this ledger is what makes the tracker exist; until then this
+      block is what renders, on every screen, with no control that dismisses it.</div>
+  </section>
+  <p class="note" style="max-width:84ch">This is the state that decides whether the tracker
+    is honest. A tracker that quietly drew five grey stops and no marker would look like a
+    close that has not started, which is a claim nobody made. An unknown ledger and a ledger
+    whose declared calendar reference is wrong are the same state to everything downstream
+    &mdash; no close clock &mdash; and both take this path.</p>
+
+</div>
+</main>
+</body></html>

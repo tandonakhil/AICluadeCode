@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Close cockpit &amp; hamburger — conclave-finance-studio — 2026-08-08</title>
+<link rel="stylesheet" href="../redesign-2026-08-02/ds.css"></head><body>
+<div class="rv">
+
+<div class="rvhd">
+  <h1 style="font-size:26px">Close cockpit, per persona &mdash; and every destination behind a hamburger</h1>
+  <div class="pagesub" style="margin-top:6px">
+    <b>ui-ux-designer &middot; 2026-08-08 &middot; Experience Design for the enhancement
+    <code>close-cockpit-home</code>.</b>
+    Your words: <i>&ldquo;based on the user who logs there should be a simple home page.
+    showing close tracker. Showing KPIs based action items for that user. move all the menu
+    items to a hamburger menu.&rdquo;</i>
+    <br>This is a <b>new</b> directory. <code>design-review/index.html</code> (the gate-5
+    record) and <code>design-review/redesign-2026-08-02/</code> are untouched. Every colour,
+    type size and component below resolves to a token already in <code>apple.css</code> /
+    <code>brand.css</code> &mdash; this is not a new visual language, it is two new components
+    (a tracker and an action tile) and one relocated navigation.
+  </div>
+  <div class="qtools">
+    <a class="chip on" href="#decision" style="background:#8A5A17;border-color:#8A5A17;color:#FBF3E4">1 &middot; The hamburger decision &mdash; read first</a>
+    <a class="chip on" href="#tracker">2 &middot; The close tracker</a>
+    <a class="chip on" href="#staff">3 &middot; Home &mdash; staff accountant</a>
+    <a class="chip on" href="#controller">4 &middot; Home &mdash; controller</a>
+    <a class="chip on" href="#fpa">5 &middot; Home &mdash; FP&amp;A analyst</a>
+    <a class="chip on" href="#menu">6 &middot; The menu, opened from mid-flow</a>
+    <a class="chip on" href="#kpi">7 &middot; Which figures earned a place, and which did not</a>
+    <a class="chip on" href="#dark">8 &middot; Dark theme</a>
+    <a class="chip on" href="#constraints">9 &middot; The constraints that do not move</a>
+    <a class="chip on" href="#gaps">10 &middot; What does not exist yet</a>
+    <a class="chip on" href="#scope">11 &middot; What this pass does and does not cover</a>
+  </div>
+  <div class="verdict new" style="margin-top:14px">
+    <h3>Built on A2.2, not started over &mdash; with one thing changed</h3>
+    <code>UX_KB</code> A2.2 already specified this screen: <b>Close</b>, the default landing,
+    answering <i>&ldquo;where is this close and what does it need from me tonight?&rdquo;</i>,
+    as a per-persona call-list. It was never built, and A2.3 records J3 as
+    <b>Unstartable</b> without it. That design stands and is reused.
+    <b>What has changed since:</b> A2.2 assumed a persistent four-item nav sitting beside the
+    cockpit. You have removed that. So the call-list is no longer a courtesy on top of
+    navigation &mdash; it <b>is</b> the navigation for the night&rsquo;s work, and I have
+    re-designed against that rather than re-skinning the old page. Concretely: every row on
+    this page now points at a <b>specific object</b>, never at a section; and the top bar
+    keeps one non-hamburger control, the way back here, carrying the remaining count.
+  </div>
+</div>
+
+<!-- ================= 1 THE DECISION ================= -->
+<div class="rvsec" id="decision" style="border-top:0;padding-top:6px">
+<h2 style="font-size:22px">1 &middot; Your all-in-the-hamburger decision: what it costs, and what I did about it</h2>
+<p class="pagesub">You were offered keeping Queue and Approvals persistent and chose
+everything in the drawer. That stands. Here is the honest accounting, because you asked
+whether it creates a problem I can design around or one I cannot.</p>
+
+<div class="two">
+  <div class="verdict keep">
+    <h3>What it costs &mdash; three things, named</h3>
+    <b>1. The nav badges go dark.</b> <code>UX_KB</code> &sect;4 made badges the volume
+    control expressed in the chrome: a reviewer who sees &ldquo;3&rdquo; before clicking is
+    budgeting attention correctly. Behind a drawer, nobody sees them.<br><br>
+    <b>2. The return path gets longer.</b> Six items a night &times; (open drawer &rarr; find
+    queue &rarr; click) is the tax, and it is paid at exactly the moment &mdash; item four,
+    11pm &mdash; when attention is already spent.<br><br>
+    <b>3. Refusals loses its standing rebuke.</b> &sect;5.11 keeps
+    <i>What we refuse to do</i> in global nav on the argument that burying a refusal makes it
+    look like an omission. A drawer is closer to a settings drawer than the old sidebar was.
+  </div>
+  <div class="verdict new">
+    <h3>Designed around &mdash; conditionally, and the condition is not mine to meet</h3>
+    <b>Cost 1 is fully answered.</b> Every badge&rsquo;s number is on this page, larger,
+    with a destination and a qualifier. While you are on home, chrome badges were always
+    redundant.<br><br>
+    <b>Cost 2 is answered by one control, not by nav.</b> The top bar keeps
+    <b>&ldquo;Close &mdash; 2026-06 &middot; 4 left&rdquo;</b>: one control, to one screen,
+    carrying the one badge that matters mid-flow. That is not navigation smuggled back in
+    &mdash; it goes to exactly the screen you asked to carry the work.<br><br>
+    <b>Cost 3 is answered by content, not position.</b> The refusal block is on all three home
+    pages, in the product&rsquo;s serif voice, at the moment a user is most likely to want the
+    thing it refuses. That is a <i>stronger</i> placement than a nav row nobody clicked.
+  </div>
+</div>
+
+<div class="verdict" style="margin-top:16px">
+  <h3>The one problem I cannot fully design around, stated plainly</h3>
+  <b>The return path only works if the post-resolution step exists, and it does not.</b>
+  <code>UX_KB</code> A2.6 lists it as an open severity-A gap: J1&rsquo;s final step produces
+  <i>no confirmation, no queue removal, no badge change and no next-item</i>. With a
+  persistent sidebar that was an irritation &mdash; you could always click &ldquo;My
+  queue&rdquo; again. With everything in a drawer it becomes the dominant interaction of the
+  night: save an item, land nowhere, open the drawer, find the queue, and count which rows
+  you have already done <i>because nothing removed them</i>.
+  <br><br>
+  <b>So: designable around, conditional on one build item.</b> After a resolution is recorded
+  the product must land the user on the next routed item, or back on this page with the count
+  decremented. That is <code>code-agent</code>&rsquo;s smallest listed fix and it is now
+  load-bearing rather than a nicety. If it is not built, your decision costs more than the
+  clutter it removes, and I would say so rather than ship the drawer over a dead end.
+  <b>I am not asking you to reverse the decision &mdash; I am asking that this one item ship
+  with it.</b>
+</div>
+</div>
+
+<!-- ================= 2 TRACKER ================= -->
+<div class="rvsec" id="tracker">
+<h2 style="font-size:22px">2 &middot; The close tracker</h2>
+<p class="pagesub">Drawn from the <b>declared close calendar</b> that already exists in the
+build &mdash; <code>close.pilot_2026_06@1</code>, five checkpoints at 08:00 UTC on close days
+1&ndash;5, and <code>AC-F26-05</code>/<code>AC-F38-11</code>&rsquo;s arithmetic against them.
+Nothing here is invented.
+<b>One correction to the existing prototype:</b> <code>v2-close.html</code> says
+&ldquo;day 3 of 8&rdquo;. The declared calendar has <b>five</b> checkpoints, so the honest
+figure is <b>day 3 of 5</b>. A tracker that disagrees with the calendar it is computed from
+is worse than no tracker.</p>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>The graphic is the gap, not the progress</h3>
+    A passed checkpoint is filled <b>neutral ink</b> &mdash; never green, because a cut-off
+    that has gone by is a fact, not an achievement, and &ldquo;fine, move on&rdquo; is the
+    affect a depleted reviewer must not be handed. What renders in severity colour is the
+    <b>bracket</b> between the checkpoint the refresh was <i>due</i> by (day 2) and the one it
+    <i>landed</i> in (day 3). The staleness sentence is that bracket&rsquo;s label, at 15px
+    semibold rust, not a second assertion beside it.
+  </div>
+  <div class="verdict keep">
+    <h3>Four states, because the fourth is the honest one</h3>
+    On calendar &middot; refreshed after the last checkpoint &middot; <b>no refresh
+    observed</b> (which is the absence of an answer, not &ldquo;zero days behind&rdquo;)
+    &middot; <b>no calendar declared</b>, where the tracker renders as an <i>absence</i> in
+    the product&rsquo;s serif voice rather than as five grey stops. Five grey stops would look
+    like a close that has not started &mdash; a claim nobody made.
+    <code>AC-F38-11</code> is currently unmet for that path (register 6) and the block says so.
+  </div>
+</div>
+
+<div class="frame"><div class="fhd"><b>tracker-states.html</b> &mdash; all four states, one page
+  &middot; <a href="tracker-states.html" target="_blank">open full size</a>
+  &middot; <a href="tracker-states.html?theme=dark" target="_blank">dark</a></div>
+  <iframe src="tracker-states.html" height="2100" title="The close tracker in its four states"></iframe></div>
+</div>
+
+<!-- ================= 3 STAFF ================= -->
+<div class="rvsec" id="staff">
+<h2 style="font-size:22px">3 &middot; Home &mdash; staff accountant (A. Reyes)</h2>
+<p class="pagesub">The person the product harms first and worst if it is wrong, and the one
+whose whole night now runs through this page. Six items are routed; the page names all six
+and points each at an object.</p>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>The abstention is pulled out of the count, not folded into it</h3>
+    The queue badge is <b>6</b>. The page says <b>&ldquo;five findings and one the system
+    could not settle&rdquo;</b> and gives the abstention its own dashed-slate row in serif.
+    A home page that said &ldquo;6 findings&rdquo; would have quietly converted an abstention
+    into a finding in the one place a tired reader takes the number at face value. The
+    severity ramp draws the five and then a <b>gap</b>, then the dashed abstention swatch
+    outside it.
+  </div>
+  <div class="verdict keep">
+    <h3>The routing cap is a qualifier, not a tile</h3>
+    Tonight: 6 routed against a cap of 12. It does not bind, so it implies no act and does not
+    earn a tile &mdash; it renders as a 13px qualifier under the queue tile. On a night when it
+    <i>does</i> bind, it becomes an action item on the <b>controller&rsquo;s</b> home, because
+    raising a cap is a controller&rsquo;s recorded control event and never a reviewer&rsquo;s.
+    Same fact, two homes, decided by whether anyone can act on it.
+  </div>
+</div>
+
+<div class="frame"><div class="fhd"><b>home-staff.html</b>
+  &middot; <a href="home-staff.html" target="_blank">open full size</a>
+  &middot; <a href="home-staff.html?theme=dark" target="_blank">dark</a></div>
+  <iframe src="home-staff.html" height="1900" title="Close cockpit — staff accountant"></iframe></div>
+
+<div class="verdict" style="margin-top:16px">
+  <h3>A build consequence that only appears once counts are on a home page</h3>
+  <b>Queue counts include probes; coverage figures exclude them.</b> The build is already
+  right about this &mdash; <code>state.conclusion</code> excludes probes from the coverage
+  population under <code>AC-F12-16</code>, because a coverage statement is a claim about the
+  customer&rsquo;s ledger and a probe is one we manufactured, while
+  <code>nav_badges["queue"]</code> counts every admitted item because a probe must be
+  indistinguishable. Putting both numbers on one page for the first time makes it possible to
+  &ldquo;tidy&rdquo; them into agreement. <b>They must not agree.</b> A &ldquo;5
+  findings&rdquo; figure computed by subtracting the probe would make the probe detectable by
+  arithmetic, which is the one thing <code>AC-F41-08</code> forbids.
+</div>
+</div>
+
+<!-- ================= 4 CONTROLLER ================= -->
+<div class="rvsec" id="controller">
+<h2 style="font-size:22px">4 &middot; Home &mdash; controller (D. Okafor)</h2>
+<p class="pagesub">Six action items, every one drawn from a fact the build already computes,
+and a panel naming the four real figures that are deliberately <i>not</i> here.</p>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>The strongest row is one nobody would have specified</h3>
+    <b>&ldquo;An agent acting tonight is not ready.&rdquo;</b> The pilot&rsquo;s
+    <code>readiness_report</code> for <code>crossperiod-surveillance</code> has <b>P2
+    unmet</b> &mdash; <i>one F32 forward disposition missed in 2026-05 and not yet
+    explained</i>. That is <b>the same miss</b> sitting on A. Reyes&rsquo; home page tonight.
+    The two personas&rsquo; pages are looking at one fact from two ends, and neither had a
+    surface where it was visible. This is real, computed, and it is the row I would defend
+    hardest.
+  </div>
+  <div class="verdict keep">
+    <h3>An explicit zero that is an action item</h3>
+    <b>&ldquo;0 routing caps raised tonight &mdash; 1 reviewer routed: A. Reyes, 6 against a
+    cap of 12.&rdquo;</b> A zero with its denominator, never a blank and never omitted.
+    It qualifies as an action item because a raise is the only way a reviewer receives more
+    than their cap and it is a control event the controller owns &mdash; so &ldquo;none
+    happened&rdquo; is a thing they must be able to see they have confirmed, and a night when
+    it is not zero is a night that needs them.
+  </div>
+</div>
+
+<div class="frame"><div class="fhd"><b>home-controller.html</b>
+  &middot; <a href="home-controller.html" target="_blank">open full size</a>
+  &middot; <a href="home-controller.html?theme=dark" target="_blank">dark</a></div>
+  <iframe src="home-controller.html" height="2000" title="Close cockpit — controller"></iframe></div>
+</div>
+
+<!-- ================= 5 FP&A ================= -->
+<div class="rvsec" id="fpa">
+<h2 style="font-size:22px">5 &middot; Home &mdash; FP&amp;A analyst</h2>
+<p class="pagesub">You asked what the honest content is for a persona whose Inquire surface
+does not exist. Here it is, and it is the page I most want you to look at.</p>
+
+<div class="verdict" style="margin-top:0">
+  <h3>Two facts you should hold before reading it</h3>
+  <b>1. There is no FP&amp;A persona in the build.</b> <code>state.PERSONAS</code> carries
+  exactly two &mdash; staff accountant and controller. A third is net-new scope requiring a
+  ruling, not a design decision (<code>UX_KB</code> A2.3 / A2.6, severity A). The page below
+  is rendered against a persona that does not yet exist.<br>
+  <b>2. Nothing in this product routes to an FP&amp;A analyst.</b> So the temptation is to
+  fill the page with coverage, detections and dwell &mdash; figures that are real and imply no
+  act. <b>I refused.</b>
+</div>
+
+<div class="two" style="margin-top:16px">
+  <div class="verdict new">
+    <h3>The design: apply the abstention grammar to a whole persona</h3>
+    The headline is <b>&ldquo;Nothing is routed to you, and that is a fact about this product,
+    not about this close.&rdquo;</b> Then the three things that <i>are</i> genuinely
+    obtainable from 2026-06 today: the <b>7 accounts with a quotable decomposition</b> (stamped
+    with certified query, version and dataset version &mdash; the stamp is what makes it
+    defensible in a variance meeting), the <b>3 accounts nothing has scanned</b> (the figure
+    most worth knowing <i>before</i> the meeting), and the <b>1 abstention</b>. That is a
+    genuinely useful page and every row is true.
+  </div>
+  <div class="verdict keep">
+    <h3>Refused and deferred, adjacent, so the contrast teaches</h3>
+    <b>Refused (solid slate, filled):</b> A22 &mdash; we will not write the sentence that
+    explains why the account moved. <b>Deferred (dashed outline, no fill):</b> Inquire mode
+    and an FP&amp;A identity &mdash; planned, not refused. Side by side, because a user who
+    only ever sees one treatment cannot learn to tell them apart, and the distinction is
+    carried in the <i>wording</i> too, so it survives greyscale and a screen reader with all
+    CSS off.
+  </div>
+</div>
+
+<div class="frame"><div class="fhd"><b>home-fpa.html</b>
+  &middot; <a href="home-fpa.html" target="_blank">open full size</a>
+  &middot; <a href="home-fpa.html?theme=dark" target="_blank">dark</a></div>
+  <iframe src="home-fpa.html" height="1900" title="Close cockpit — FP&A analyst"></iframe></div>
+</div>
+
+<!-- ================= 6 MENU ================= -->
+<div class="rvsec" id="menu">
+<h2 style="font-size:22px">6 &middot; The menu, opened from mid-flow</h2>
+<p class="pagesub">Shown deliberately from <b>item 3 of 6</b> rather than from the home page,
+because the hamburger&rsquo;s cost is paid there and nowhere else. Note the top bar behind
+the scrim: <b>&ldquo;Close &mdash; 2026-06 &middot; 4 left&rdquo;</b>.</p>
+
+<div class="two">
+  <div class="verdict new">
+    <h3>Every destination, and one line each saying what it answers</h3>
+    Work / Govern / Evidence exactly as <code>chrome.NAV</code> ships them, plus a
+    <b>This close</b> entry at the top and a <b>You</b> group holding your forward predictions
+    and your probe history. A drawer is entered deliberately, so it can afford a 13px
+    descriptor per row that a 15px sidebar could not &mdash; that is the one thing the
+    hamburger buys, and I have spent it.
+  </div>
+  <div class="verdict keep">
+    <h3>Counts stay on the rows</h3>
+    Queue 4, Approvals 1, your predictions 1; everything else renders an explicit
+    &ldquo;&mdash;&rdquo; rather than a blank, so &ldquo;nothing waiting&rdquo; and &ldquo;we
+    did not look&rdquo; are not the same pixel. <b>Period record is in the list and is not
+    built</b> in <code>dev/</code> &mdash; the link here goes to its prototype. It is
+    A2.6&rsquo;s other severity-A gap and J3 stays unstartable until it exists.
+  </div>
+</div>
+
+<div class="frame"><div class="fhd"><b>menu.html</b>
+  &middot; <a href="menu.html" target="_blank">open full size</a>
+  &middot; <a href="menu.html?theme=dark" target="_blank">dark</a></div>
+  <iframe src="menu.html" height="1100" title="The hamburger menu open from mid-flow"></iframe></div>
+</div>
+
+<!-- ================= 7 KPI RULE ================= -->
+<div class="rvsec" id="kpi">
+<h2 style="font-size:22px">7 &middot; Which figures earned a place, and which did not</h2>
+<p class="pagesub">Your instruction was <i>KPIs framed as that user&rsquo;s action items</i>,
+and <i>a number that implies no action does not belong here</i>. I made that structural rather
+than editorial.</p>
+
+<div class="verdict new">
+  <h3>The rule, and how the component enforces it</h3>
+  A figure earns a place only if it has all three of: <b>(a)</b> a number, <b>(b)</b> a
+  reliability qualifier at &ge;13px, <b>(c)</b> a destination that is a <i>specific object</i>
+  &mdash; not a section. The action tile <code>.act</code> is an <code>&lt;a&gt;</code>, and
+  there is no variant without a <code>.q</code> qualifier. <b>A tile with no destination and a
+  tile with no qualifier cannot be expressed in the component at all</b>, which is the same
+  move &sect;5.3 makes for the conclusion string: unreachable, not validated out.
+</div>
+
+<h3 style="margin-top:20px;font-size:16px">Computed facts I drew on &mdash; all of them already exist in the build</h3>
+<table class="tb" style="margin-top:10px"><thead><tr>
+  <th>Fact</th><th>Where it is computed</th><th>Whose home</th><th>Why it is an action item</th></tr></thead><tbody>
+<tr><td>Items routed to a human, and the severity mix</td><td class="mono">nav_badges["queue"], routed_items, item.tier</td><td>Staff</td><td>It is the night&rsquo;s work</td></tr>
+<tr><td>N detected &rarr; M routed (214 &rarr; 6)</td><td class="mono">detections_total, routed_count</td><td>Staff (as a qualifier)</td><td>Tells the reviewer whether the system is working for them or dumping on them</td></tr>
+<tr><td>Abstention, as a first-class count</td><td class="mono">item.kind == "abstention"</td><td>Staff, FP&amp;A</td><td>It needs a human precisely because the system declined to conclude</td></tr>
+<tr><td>Abstention warrant labels (counts, never a rate)</td><td class="mono">abstention_warrant_summary()</td><td>Controller</td><td>&ldquo;Not yet assessed&rdquo; is a judgement only they can record</td></tr>
+<tr><td>Coverage as a population, with gaps named</td><td class="mono">state.scope / conclusion</td><td>Staff, FP&amp;A</td><td>The unscanned accounts are a list of things to go and scan</td></tr>
+<tr><td>Proposals awaiting approval</td><td class="mono">nav_badges["approvals"]</td><td>Controller</td><td>The one act only they can complete</td></tr>
+<tr><td>Cross-period escalations, split by leg</td><td class="mono">f9_escalations()</td><td>Controller</td><td>The narrative-only leg is the earlier signal and is a first-class row</td></tr>
+<tr><td>Routing budget: cap, routed, raises and by whom</td><td class="mono">routing_budget(), apply_routing_budget()</td><td>Controller (tile), Staff (qualifier)</td><td>A raise is a recorded control event the controller owns</td></tr>
+<tr><td>Readiness P1&ndash;P5, stated individually</td><td class="mono">readiness_report()</td><td>Controller</td><td>An agent acting tonight with P2 unmet is a decision to make now</td></tr>
+<tr><td>Forward dispositions come due / missed</td><td class="mono">open_dispositions(), disposition_store</td><td>Staff, Controller</td><td>A miss is a state change: risk grade rises, auto-pass revoked</td></tr>
+<tr><td>Boundary checks, incl. &ldquo;not run&rdquo;</td><td class="mono">boundary_checks()</td><td>Staff</td><td>Not run is a result, not a pass &mdash; something is unconcluded</td></tr>
+<tr><td>Close-clock staleness against the declared calendar</td><td class="mono">close_clock_staleness()</td><td>All three</td><td>It qualifies every other figure on the page</td></tr>
+</tbody></table>
+
+<h3 style="margin-top:22px;font-size:16px">Computed facts I refused to put on a home page</h3>
+<table class="tb" style="margin-top:10px"><thead><tr>
+  <th>Fact</th><th>Why not</th><th>Where it belongs</th></tr></thead><tbody>
+<tr><td>Override rate per agent / per user</td><td>A high rate could mean a reviewer is catching things or an agent is misfiring. It does not say what the act is, and colouring it would assert an interpretation the data does not support.</td><td>Monitors</td></tr>
+<tr><td>Median dwell time</td><td>Same. Also a per-person figure on a management-chain surface at a glance-read cadence is the wrong pressure.</td><td>Monitors</td></tr>
+<tr><td>Forward-disposition hit rate (64%, 27 of 42)</td><td>It is the product marking its own homework. It is the Monitors <b>masthead</b> by design, and demoting it to a home tile among action items would make it look like one more number about you rather than the one about us.</td><td>Monitors masthead</td></tr>
+<tr><td>Probe aggregates</td><td>Aggregate-only by G-PROBE-3, no act implied tonight, and a home-page probe figure is one hop from a per-person one.</td><td>Monitors, aggregate only</td></tr>
+<tr><td>Total detections as a standalone tile</td><td>214 with no destination is the definition of a vanity metric. It survives only as the qualifier that makes 6 legible as a <i>reduction</i>.</td><td>Qualifier on the queue tile</td></tr>
+</tbody></table>
+</div>
+
+<!-- ================= 8 DARK ================= -->
+<div class="rvsec" id="dark">
+<h2 style="font-size:22px">8 &middot; Dark theme</h2>
+<p class="pagesub">Rendered, not assumed &mdash; A2.9 recorded dark as unverified last pass and
+that is corrected here. Every new component uses the same tokens, and the severity ramp still
+gets <i>brighter</i> with rank so the ordinal reading survives inversion.</p>
+<div class="two">
+  <div class="frame"><div class="fhd"><b>home-staff.html?theme=dark</b></div>
+    <iframe src="home-staff.html?theme=dark" height="1300" title="Staff home, dark theme"></iframe></div>
+  <div class="frame"><div class="fhd"><b>home-controller.html?theme=dark</b></div>
+    <iframe src="home-controller.html?theme=dark" height="1300" title="Controller home, dark theme"></iframe></div>
+</div>
+<div class="two" style="margin-top:16px">
+  <div class="frame"><div class="fhd"><b>menu.html?theme=dark</b></div>
+    <iframe src="menu.html?theme=dark" height="900" title="Menu, dark theme"></iframe></div>
+  <div class="frame"><div class="fhd"><b>tracker-states.html?theme=dark</b></div>
+    <iframe src="tracker-states.html?theme=dark" height="900" title="Tracker, dark theme"></iframe></div>
+</div>
+<div class="note">Contrast here is <b>designed, not measured</b>. Every brand pair was verified
+at AA by the marketing site; the two additions this pass makes &mdash; the neutral-ink
+checkpoint dot on surface, and the dashed slate abstention tile border &mdash; have not been
+run through a checker. That is the UX suite&rsquo;s job at the Test gate
+(<code>dev/tests/suites/ux/run.sh</code>, which now exists) and is not claimed here.</div>
+</div>
+
+<!-- ================= 9 CONSTRAINTS ================= -->
+<div class="rvsec" id="constraints">
+<h2 style="font-size:22px">9 &middot; The constraints that do not move</h2>
+<table class="tb" style="margin-top:10px"><thead><tr>
+  <th>Constraint</th><th>Where it lands on these screens</th></tr></thead><tbody>
+<tr><td><b>No green anywhere</b></td><td>A passed checkpoint is filled <b>neutral ink</b>, not green. There is no green token in either theme and none was added. The strongest state this page can show &mdash; nothing needing you &mdash; would render as neutral prose with its coverage, not a tick.</td></tr>
+<tr><td><b>Abstention structurally distinct, never &ldquo;no issues found&rdquo;</b></td><td>Own dashed-slate tile, serif title, pulled out of the finding count, drawn outside the severity ramp, and the qualifier says explicitly what it is not. On the FP&amp;A page it is one of only three rows.</td></tr>
+<tr><td><b>Coverage as a population strip</b></td><td>7 scanned + three named hatched gaps, with &ldquo;70% of 10 declared members&rdquo; and &ldquo;3 unscanned, named&rdquo;. The bare percentage never appears alone, and the three unscanned accounts also get their own action tile.</td></tr>
+<tr><td><b>Guardrails at the broker, never the UI</b></td><td>Every row is an <code>&lt;a&gt;</code>. There is no control on any of these pages that grants, hides, disables or enables anything. Stated on the page in words, and the routing cap is quoted as <i>the broker&rsquo;s</i> number with the in-process transport disclosed above it.</td></tr>
+<tr><td><b>Narrative collapsed and last</b></td><td>&ldquo;How tonight&rsquo;s list was reduced from 214 to 6&rdquo; is a closed <code>&lt;details&gt;</code>, last element on all three pages.</td></tr>
+<tr><td><b>Pilot and topology strips on every screen</b></td><td>Both, on every screen in this pass, hatch plus a sentence, with the non-dismissable line intact.</td></tr>
+<tr><td><b>Desktop web only</b></td><td>Designed at 1440&times;900. No breakpoint below tablet.</td></tr>
+<tr><td><b>Both themes</b></td><td>&sect;8.</td></tr>
+<tr><td><b>Typography floors, &ge;13px for any reliability qualifier</b></td><td>Every <code>.act .q</code> is 13px and nothing overrides it; staleness is 15px semibold rust; tracker checkpoint names 13px; the drawer&rsquo;s per-row descriptors 13px; micro-labels sit at the 12px floor and <b>never carry a qualifier</b>. <b>This rule changed a design decision:</b> coverage was going in the 12px-label stat strip and had to move to its own tile so its qualifier could be 13px.</td></tr>
+</tbody></table>
+</div>
+
+<!-- ================= 10 GAPS ================= -->
+<div class="rvsec" id="gaps">
+<h2 style="font-size:22px">10 &middot; What does not exist yet</h2>
+<table class="tb" style="margin-top:10px"><thead><tr>
+  <th>#</th><th>What is missing</th><th>Consequence if it is not built</th><th>Whose</th></tr></thead><tbody>
+<tr><td>1</td><td><b>Post-resolution landing</b>: confirmation, queue removal, count decrement, next-item</td><td><b>Blocking for the hamburger.</b> &sect;1. Without it the drawer sits over a dead end six times a night.</td><td><code>code-agent</code> (already listed, A2.6)</td></tr>
+<tr><td>2</td><td><b>An FP&amp;A persona</b> in <code>state.PERSONAS</code></td><td><code>home-fpa.html</code> cannot be reached by anyone. Net-new scope requiring a ruling.</td><td><code>plan-agent</code></td></tr>
+<tr><td>3</td><td><b>Per-user forward-disposition hit rate</b> (&ldquo;31 of 38 met&rdquo;)</td><td><code>disposition_store.hit_rate()</code> is period-wide. The staff tile quotes a per-user figure I could not confirm is computable. If it is not, that clause is dropped &mdash; not faked.</td><td><code>code-agent</code> to confirm</td></tr>
+<tr><td>4</td><td><b>The Period record</b> (A2.2, still unbuilt)</td><td>J3 stays unstartable; the controller&rsquo;s &ldquo;was last period clean?&rdquo; has no destination, and the drawer row points at a prototype.</td><td><code>code-agent</code> (A2.6 severity A)</td></tr>
+<tr><td>5</td><td>A <b>route and screen id</b> for this page</td><td>It has none. Suggested <code>/close</code>, with <code>/</code> re-pointed to it from <code>/queue</code>. That re-point is an IA change several criteria&rsquo;s screen references would need re-checking against.</td><td><code>solution-architect</code></td></tr>
+<tr><td>6</td><td><b>An acceptance criterion for the qualifier floor</b></td><td>A2.5 proposed &ge;13px for reliability qualifiers and it is still a design ruling, not a criterion. This pass makes it structural in one component; nothing stops the next component omitting it.</td><td><code>functional-design-agent</code></td></tr>
+<tr><td>7</td><td><b>A criterion that a home-page figure carries a destination</b></td><td>Proposed: <i>given a figure rendered on the close cockpit, then it is inside an element that is a link to a specific object, and it carries a qualifier rendered at &ge;13px.</i> Checkable from the DOM. Without it, &ldquo;action items only&rdquo; is a paragraph &mdash; and A2.1 records exactly what happens to those.</td><td><code>functional-design-agent</code></td></tr>
+<tr><td>8</td><td><b><code>DesignSync</code></b></td><td>Still not in this agent&rsquo;s tool grant &mdash; re-confirmed 2026-08-08, third pass running. No component-library push happened. Rendered HTML on disk is the deliverable instead.</td><td>orchestrator</td></tr>
+</tbody></table>
+<div class="note"><b>On Figma:</b> a Figma MCP server is present in this runtime, but it is not
+part of this agent&rsquo;s grant and no Figma file was created. Rendered HTML is the
+deliverable and is what approval should be given from.</div>
+</div>
+
+<!-- ================= 11 SCOPE ================= -->
+<div class="rvsec" id="scope">
+<h2 style="font-size:22px">11 &middot; What this pass does and does not cover</h2>
+<p class="pagesub">Per my contract I re-read <code>PROJECT_CONTEXT.md</code>&rsquo;s full
+Decisions Log, not only the request that triggered this invocation.</p>
+<div class="two">
+  <div class="verdict new">
+    <h3>Covered</h3>
+    Desktop-only MVP1 &middot; ERP-data-only &middot; three personas addressed, with the third
+    honestly bounded &middot; no bulk affordance anywhere &middot; the &ldquo;Part A2 built&rdquo;
+    correction of 2026-08-05 (this pass builds on A2.2 as still-unbuilt, not as shipped)
+    &middot; the five claim prohibitions&rsquo; grammar &mdash; no page here concludes a period
+    is clean, certifies, or states a rate where the build states counts &middot; the shipped
+    Work / Govern / Evidence grouping (A2.2a) carried into the drawer unchanged.
+  </div>
+  <div class="verdict">
+    <h3>Not covered &mdash; stated rather than glossed</h3>
+    <b>1.</b> <code>PROJECT_CONTEXT.md</code>&rsquo;s header still reads <i>multi-surface</i>
+    while every ruling scopes MVP1 to desktop web. I have designed desktop only, as at gate 5,
+    and flag the header again rather than silently satisfying the narrower reading.
+    <b>2.</b> No accessibility execution &mdash; this is a design pass; contrast is designed,
+    not measured.
+    <b>3.</b> The illustrative figures are the pilot fixture&rsquo;s. Two I could not confirm
+    (the per-user hit rate, and the escalation split as 1 numeric + 1 narrative-only) are
+    named in &sect;10 rather than presented as established.
+    <b>4.</b> No component-library push (&sect;10, item 8).
+  </div>
+</div>
+<div class="verdict keep" style="margin-top:16px">
+  <h3>What I am asking you to approve</h3>
+  The three home pages, the close tracker, the action-tile rule, and the drawer.
+  <b>And one thing alongside it:</b> that the post-resolution landing (&sect;10, item 1) ships
+  with the hamburger rather than after it. Everything else in &sect;10 can follow.
+</div>
+</div>
+
+</div></body></html>

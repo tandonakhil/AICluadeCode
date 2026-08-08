@@ -50,6 +50,40 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-08 — Human approved the close-cockpit design, from a rendering
+
+Approved at `design-review/close-cockpit-2026-08-08/` after review. **Includes the
+conditional**: the human said yes to shipping the **post-resolution landing**
+alongside the drawer.
+
+That condition is `ui-ux-designer`'s and it is load-bearing rather than a nicety.
+Saving a resolution today produces no confirmation, no queue removal, no count
+change and no next item. With a persistent sidebar that was an irritation — you
+could click back. **With every destination behind a drawer it becomes the
+dominant interaction of the night**: save, land nowhere, open the drawer, find
+the queue, and count which rows you have already done because nothing removed
+them. A2.6 already listed it as the smallest fix on the gap list; the human's
+all-in-the-hamburger decision makes it the one that must ship with the drawer.
+
+**A cross-persona finding nobody specified, which the design surfaced.** The
+pilot's `readiness_report` for `crossperiod-surveillance` carries **P2 unmet —
+one F32 forward disposition missed in 2026-05 and not yet explained** — and *the
+same miss* is a routed item on the staff accountant's page tonight. Two cockpits
+looking at one fact from opposite ends. **No surface in the product made that
+visible.** It is the argument for per-persona composition over a role-filtered
+dashboard, and it was found by designing the second persona rather than
+parameterising the first.
+
+**A build hazard recorded before it can be built:** queue counts **include**
+probes; coverage figures **exclude** them (`AC-F12-16`). They must not be
+reconciled. A "5 findings" figure computed by subtracting the probe **makes the
+probe detectable by arithmetic**, which is exactly what `AC-F41-08` forbids.
+
+**A correction to prior work:** `v2-close.html` said "day 3 of 8"; the declared
+calendar `close.pilot_2026_06@1` has five checkpoints, so it is **day 3 of 5**.
+
+
+
 ### 2026-08-06 — Gate 11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `c68ad84`
 
 **Deploy succeeded.** Run command is the template/README one:

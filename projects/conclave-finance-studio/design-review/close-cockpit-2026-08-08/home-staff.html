@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Close — 2026-06 — A. Reyes, staff accountant — Conclave Finance Studio</title>
+<script src="../redesign-2026-08-02/theme.js"></script>
+<link rel="stylesheet" href="../redesign-2026-08-02/apple.css">
+<link rel="stylesheet" href="../redesign-2026-08-02/brand.css">
+<link rel="stylesheet" href="cockpit.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="si-record" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></symbol>
+  <symbol id="si-door" viewBox="0 0 24 24"><path d="M7 21 V4 a1 1 0 0 1 1 -1 h8 a1 1 0 0 1 1 1 V21"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="14.5" cy="12" r="1"/></symbol>
+  <symbol id="si-gate" viewBox="0 0 24 24"><line x1="3" y1="4" x2="21" y2="4"/><line x1="6" y1="4" x2="6" y2="21"/><line x1="18" y1="4" x2="18" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/></symbol>
+</defs></svg>
+
+<!-- ==================== TOP BAR ==================== -->
+<header class="topbar">
+  <a class="burger" href="menu.html" aria-label="Open the menu — every destination is in here">
+    <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span></a>
+  <a class="homelink on" href="home-staff.html" aria-current="page">
+    <span class="lb">Close &mdash; 2026-06</span></a>
+  <div class="spacer"></div>
+  <div class="lockup" style="padding:0">
+    <span class="glyph mark" aria-hidden="true"><svg viewBox="0 0 28 28">
+      <path class="thread" d="M4 7 L12.5 13" stroke-width="1.3"/>
+      <path class="thread" d="M4 21 L12.5 15" stroke-width="1.3"/>
+      <path class="thread" d="M24.5 14 L15.5 14" stroke-width="1.3"/>
+      <circle class="core-dot" cx="14" cy="14" r="3.1"/>
+      <path class="pull" d="M14 3.5 L14 10.4" stroke-width="1.9"/>
+      <circle class="pull-dot" cx="14" cy="2.6" r="2.2"/>
+    </svg></span>
+    <div class="wm">Conclave<span>Finance Studio</span></div>
+  </div>
+  <div class="signed">Signed in as<b>A. Reyes</b>staff accountant</div>
+</header>
+
+<!-- ==================== CONTEXT — one line, then a disclosure ==================== -->
+<div class="ctx">
+  <div class="f"><span class="k">Entity</span><span class="v">Northwind Grid Holdings</span></div>
+  <div class="f"><span class="k">Period</span><span class="v">2026-06</span></div>
+  <div class="f"><span class="k">Close day</span><span class="v">3 of 5</span></div>
+  <div class="f stale"><span class="k">Data</span><span class="v">1 close day behind</span></div>
+  <span class="fixture">Pilot &mdash; synthetic fixture data</span>
+  <details>
+    <summary>What &ldquo;1 close day behind&rdquo; means, and where these figures came from</summary>
+    <div class="full" style="padding:0;max-width:86ch">Dataset <b>gl_balances vFIXTURE-2026.06.03-a</b>,
+      refreshed 03 Jul 2026 06:15 UTC. Measured against the declared close calendar
+      <b>close.pilot_2026_06@1</b>, whose five checkpoints fall at 08:00 UTC on close days
+      1&ndash;5 (1&ndash;5 July 2026). The refresh was due by the <b>day-2 cut-off (warehouse
+      refresh complete)</b> and arrived inside close day 3, so it is one close day behind.
+      Figures come from the twelve-period synthetic close fixture, not an Oracle-sourced
+      warehouse, and cannot support a posting or an assurance conclusion about a real ledger.</div>
+  </details>
+</div>
+
+<div class="pilotstrip"><b>Pilot build &mdash; the figures on this screen are synthetic.</b>
+  They come from an in-memory close over the twelve-period fixture, not from a run against
+  an Oracle-sourced warehouse. Nothing here is evidence about a real ledger.</div>
+<div class="pilotstrip hatch"><b>Pilot topology &mdash; the guardrail broker is running inside
+  this process.</b> Every broker fact on this screen &mdash; each eligibility, decision,
+  refusal and routing answer, including the routing cap quoted below &mdash; was obtained
+  over the in-process transport, so the trust boundary between this interface and the broker
+  is a module boundary in this build and not a process boundary.
+  <span class="nodismiss">There is no control that hides this. It is on every screen this
+  build serves, for as long as the broker runs in this process.</span></div>
+
+<main class="page">
+<div class="opening">
+  <div class="eyebrow"><svg class="section-icon sm"><use href="#si-record"/></svg>Close &mdash; 2026-06 &middot; day 3 of 5 &middot; your night</div>
+  <h1 class="voice-title">Six items are yours tonight &mdash;
+    <span class="goldline">five findings and one the system could not settle</span>.</h1>
+  <p class="answer">Every row below is a task with a destination. Nothing on this screen is a
+    report, and nothing on it decides anything.</p>
+  <div class="statstrip">
+    <div class="stat"><span class="num s3">6</span><span class="lab">routed<br>to you</span></div>
+    <div class="stat"><span class="num slate">1</span><span class="lab">of those six the system<br>could not conclude</span></div>
+    <div class="stat"><span class="num gold">1</span><span class="lab">promise of yours<br>come due</span></div>
+    <div class="stat"><span class="num s2">3</span><span class="lab">accounts nothing<br>has scanned</span></div>
+  </div>
+  <hr class="rule">
+</div>
+
+<div class="full">
+
+  <!-- ==================== CLOSE TRACKER ==================== -->
+  <section class="tracker" aria-labelledby="trk">
+    <div class="thd">
+      <h3 id="trk">Where this close is</h3>
+      <span class="where">day 3 of 5 &middot; close.pilot_2026_06@1</span>
+    </div>
+    <div class="stops">
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 1</div><div class="nm">Subledger feeds complete</div>
+        <div class="at">01 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 2</div><div class="nm">Warehouse refresh complete</div>
+        <div class="at">02 Jul 08:00</div></div>
+      <div class="stop now"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 3 &mdash; now</div><div class="nm">Reconciliations complete</div>
+        <div class="at">03 Jul 08:00</div></div>
+      <div class="stop future"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 4</div><div class="nm">Review complete</div>
+        <div class="at">04 Jul 08:00</div></div>
+      <div class="stop future"><div class="dot"></div>
+        <div class="day">Day 5</div><div class="nm">Books closed</div>
+        <div class="at">05 Jul 08:00</div></div>
+    </div>
+    <div class="behind">
+      <div class="span" aria-hidden="true"></div>
+      <div class="lab">Data is 1 close day behind the day-2 cut-off it was due by.
+        <span>Refreshed 03 Jul 06:15 UTC &mdash; inside close day 3, after the checkpoint it
+          was due by. Every figure below inherits that. This is not a statement that the data
+          is wrong; it is a statement of how far behind the close it is.</span></div>
+    </div>
+  </section>
+
+  <!-- ==================== CALL LIST ==================== -->
+  <div class="sechd"><h2>What needs you tonight</h2>
+    <span class="hint">Ordered by what the system ranked riskiest, not by age.</span></div>
+
+  <div class="acts">
+    <a class="act t3" href="../redesign-2026-08-02/v2-queue.html">
+      <span class="fig">6</span>
+      <span class="t">Items routed to you</span>
+      <span class="mix" aria-hidden="true"><i class="t3" style="width:26px"></i><i class="t3" style="width:26px"></i><i class="t2" style="width:26px"></i><i class="t1" style="width:26px"></i><i class="t1" style="width:26px"></i><i class="ab" style="width:26px"></i></span>
+      <span class="q"><b>214 detected this run, 6 routed to you.</b>
+        2 blast-radius, 1 omission (elevated), 2 elevated &mdash; and 1 abstention, drawn
+        outside the ramp because it is not a finding. 6 against a routing cap of 12 for
+        tonight; the cap is set and enforced at the broker and this page only reports it.</span>
+      <span class="go">Work the queue &rarr;</span>
+    </a>
+
+    <a class="act slate" href="../redesign-2026-08-02/v2-queue.html#abstentions">
+      <span class="fig">1</span>
+      <span class="t">The system could not establish this</span>
+      <span class="q">An abstention. It is <b>not</b> a finding, it is <b>not</b> &ldquo;no
+        issues found&rdquo;, and it is not a statement that anything is or is not wrong &mdash;
+        the system declined to conclude and says so. 13800 Intercompany Receivable &mdash;
+        NGH-CA-200. It is one of the six above and none of the five findings.</span>
+      <span class="go">See what is missing &rarr;</span>
+    </a>
+
+    <a class="act gold" href="../redesign-2026-08-02/p15-dispositions.html">
+      <span class="fig">1</span>
+      <span class="t">A forward prediction of yours has come due</span>
+      <span class="q">16200 CWIP &mdash; Substation. You recorded in 2026-05 that this would
+        clear by 2026-06. It did not. This is the check-back arriving on its own, as promised.
+        Your own record so far: <b>31 of 38 met</b>.</span>
+      <span class="go">Explain the miss &rarr;</span>
+    </a>
+
+    <a class="act t2" href="../redesign-2026-08-02/p9-run.html#m1">
+      <span class="fig">3</span>
+      <span class="t">Accounts nothing has scanned this period</span>
+      <span class="q">29100, 31200, 31300. No run has covered them, so no conclusion &mdash;
+        including a negative one &mdash; covers them either. The population strip below names
+        all three rather than leaving them as an absence you would have to notice.</span>
+      <span class="go">Close the coverage gap &rarr;</span>
+    </a>
+
+    <a class="act t1" href="../redesign-2026-08-02/p9-run.html#m2">
+      <span class="fig">1</span>
+      <span class="t">A boundary check that could not run</span>
+      <span class="q">A9 &mdash; FX/CTA arithmetic. <b>Not run is a result, not a pass.</b>
+        Nothing concludes over this boundary for 2026-06, and it renders in severity colour
+        rather than neutral for exactly that reason.</span>
+      <span class="go">Open the run report &rarr;</span>
+    </a>
+  </div>
+
+  <p class="note" style="max-width:82ch">This page composes facts the detectors and the
+    guardrail broker had already computed before it was rendered. It grants nothing, hides
+    nothing and enables nothing: every eligibility shown here was decided at the broker, and
+    a control this page cannot draw is a control the broker had already refused.</p>
+
+  <!-- ==================== COVERAGE ==================== -->
+  <div class="grid2" style="margin-top:24px">
+    <div class="panel">
+      <h3>Coverage achieved so far</h3>
+      <div class="pop" role="img" aria-label="Population: 7 of 10 declared members scanned; 29100, 31200 and 31300 not scanned">
+        <div class="seg in" style="flex:7">7 scanned</div>
+        <div class="seg out" style="flex:1">29100</div>
+        <div class="seg out" style="flex:1">31200</div>
+        <div class="seg out" style="flex:1">31300</div>
+      </div>
+      <div class="poplg"><span><b>70%</b> of 10 declared members</span>
+        <span class="r">3 unscanned, named</span></div>
+      <div class="note">A population, never a bare percentage: 70% <i>of what</i>, and
+        <i>which three</i> are missing, is the whole content of the figure. Probes are in no
+        run&rsquo;s coverage population &mdash; the conclusion is a claim about your ledger and
+        a probe is one we manufactured.</div>
+    </div>
+
+    <div class="refuse">
+      <div class="eyebrow" style="margin-bottom:8px"><svg class="section-icon sm"><use href="#si-door"/></svg>What we will not say</div>
+      <div class="voice">This is not a statement that the close is clean.</div>
+      <p style="margin-top:12px;font-size:15px">This product does not conclude that a period is
+        materially correct, and it does not certify. Those are refused by design &mdash; A20 and
+        A21 &mdash; not missing features. What it can tell you is what was examined, what was
+        concluded, and what nothing has looked at.</p>
+      <div class="btnrow"><a class="btn" href="../redesign-2026-08-02/p12-refusals.html">What we refuse to do</a>
+        <a class="btn" href="../redesign-2026-08-02/p6-period-record.html">Last period&rsquo;s record</a></div>
+    </div>
+  </div>
+
+  <!-- ==================== THE NARRATIVE — collapsed, and last ==================== -->
+  <details class="reduction">
+    <summary>How tonight&rsquo;s list was reduced from 214 to 6, in the system&rsquo;s own words</summary>
+    <div class="body">
+      <p>168 detections were disposed by cold-approved policy, 31 were unexpired prior-period
+      R1 acceptances, 6 were duplicates of one another, and 3 fell below the threshold in
+      force ($150,000.00, inclusive). All 208 remain listed and reachable from the run report
+      &mdash; nothing is hidden, things are ranked.</p>
+      <p>This account of the reduction is collapsed and last on the page deliberately. A
+      clearer, more prominent explanation makes a reviewer defer <i>more</i>, not less, and
+      whether you opened it is itself recorded &mdash; which it could not be if it were open
+      by default.</p>
+    </div>
+  </details>
+
+</div>
+</main>
+</body></html>

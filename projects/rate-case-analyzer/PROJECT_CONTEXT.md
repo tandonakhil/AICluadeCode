@@ -1142,9 +1142,134 @@ cannot distinguish "found nothing new" from "the docket search silently broke"
 is that exact failure mode. Routed back to gate 7 for `code-agent` to
 implement, not merely test.
 
+## Gate 7 · Code — fourth pass, 2026-08-08 (closing the gate-9 loop-back)
+
+The scheduled `code-agent` pass **terminated on a session usage limit having
+written nothing** — clean tree, no commits, neither mechanism present, verified
+directly rather than assumed. Rather than idle ~12h to the reset, the
+orchestrator implemented the seven criteria in the main loop. Commit `9d46d7e`.
+
+All seven protect one distinction the ingestion surface cannot otherwise make:
+**a run that looked and found nothing new vs. a run that found nothing because
+it silently stopped working.**
+
+### `AC-F42-03/04/05` — incremental discovery
+
+- **`content_hash`**: sha256 over **fetched bytes, not extracted text**.
+  Hashing extracted text would make every document look modified on the first
+  run after any extractor change — indistinguishable from a real mass update.
+- **`documents_seen` stored alongside `documents_ingested`**, not derived, so
+  "saw everything, ingested nothing" survives into the run record after the
+  process exits. Seen>0/ingested=0 reads as *looked, nothing new*; seen=0 reads
+  as *found nothing at all*. One number cannot say both.
+- **Two-phase ingest, unit = the CASE.** Hash everything, then decide. The
+  outcome-completeness gate can only ask "does this case have its final order?"
+  of a **fully assembled** case, so re-running only the changed document would
+  fail that gate on every incremental run.
+- **`documents_ingested` counts documents whose BYTES changed, not rows
+  written.** Reassembly rewrites every row; calling that "ingested" would report
+  8 when one exhibit changed, which is the opposite of what `AC-F42-04` asks.
+
+### `AC-F6-04` / `AC-F7-04` / `AC-F8-05` — zero-result search, all three jurisdictions
+
+`SearchNotice` records a zero-result search **affirmatively**, never inferred
+from the absence of ingested documents.
+
+### `AC-F6-05` — structural change fails loudly
+
+New `app/acquisition/search_page.py` checks the results container **first** and
+raises `AdapterStructureChanged` naming adapter and element. A parser that
+returns `()` on a page it no longer understands turns a broken adapter into a
+quiet docket, and nothing downstream can recover the difference. Asserted to
+land in `adapter_errors` and **never** in `search_notices`.
+
+Also: PA index rows now carry `content_type_hint` (CPUC's adapter already used
+format knowledge from the index). Two test-fixture corrections made rather than
+worked around — fixtures are **real PDFs** via the existing
+`tools.make_binaries.write_pdf` (the extractor has no plain-text path by
+design), and the order fixture now says "IT IS ORDERED THAT", which is what
+makes a case `DECIDED` and an `AUTHORIZED` claim legal.
+
+**13 new tests.**
+
+## Gate 8 · Test — evidence filed, 2026-08-08
+
+`test-agent` re-ran from a **scrubbed `env -i` shell** (no inherited `RCA_*`
+vars, no inherited venv): **exit 0, 899 tests, eight suites, all EXECUTED** —
+unit 676 · architecture 45 · functional 23 · industry 26 · security 43 ·
+red-team 27 · ui 48 · rendered-ui 11 (real Chromium). It derived the total
+**without using the orchestrator's figure as an input**, so the agreement is a
+confirmation rather than a restatement. Delta vs. the recorded 886: **+13, 0
+removed, 0 changed** — the entire delta is the one new file; all 15 pre-existing
+unit files match their previous per-file counts exactly.
+
+Stores verified **not stale**: schema signature of both live stores diffed
+against a database freshly built from `schema_sql.CORPUS_SCHEMA` —
+`missing_in_live=[] extra_in_live=[] column_diffs=[]`, `document.content_hash`
+present. It also drove `run_ingest` with **its own** scenarios and its own
+structure-changed page rather than the suite's constants: 8/8 pass.
+
+Artifact: `test-evidence/test-gate-2026-08-08-final.md`.
+
+**New non-blocking finding, routed to Review**: seeded documents carry an empty
+`content_hash` (0 of 153 public, 0 of 26 work-product), so the first real
+incremental run over seeded documents will report **every** document as changed.
+The direction is safe — it over-reports change rather than silently skipping —
+but that run's `documents_ingested` is not a true change count.
+
+## Gate 9 · Verification — PASS, 2026-08-08 (342/342)
+
+Re-audit scoped to the seven; the other 335 stood as previously verified.
+**342 of 342 criteria mapped to named checks. 0 NOT VERIFIED. 0 FAILED.**
+
+Two design points ruled on rather than waved through:
+
+- **`documents_ingested` = byte-changed, not rows written — satisfies
+  `AC-F42-04`, and the problem was not defined away.** The naming half is what
+  makes the count non-circular: a redefinition could not *also* name the correct
+  `source_url`. The test deliberately runs against a three-document case that
+  fully reassembles, so the row-counting reading would have produced 3 — that is
+  the discriminating case and it is asserted.
+- **Replace rather than supersession-edge satisfies `AC-F42-05`** — the
+  criterion itself says "superseded **or** replaced with the change recorded in
+  the report", so this is a choice *within* the criterion, not a deviation.
+
+### The evidence-provenance condition — and why it was honoured, not overridden
+
+`verification-agent` initially returned **PASS conditional**: the 335 rested on
+`test-agent`'s recorded gate-8 artifact, but the seven new rows rested only on
+**the orchestrator's prose report of "899 tests"**, with no filed artifact. Its
+contract bars scoring a criterion verified on a summary alone, so it recorded
+them as VERIFIED *on mapping* with execution evidence unrecorded, and left the
+call to the orchestrator.
+
+**The condition was satisfied, not overridden.** The orchestrator had run those
+tests itself, and "the orchestrator says they passed" is not evidence —
+accepting it would hollow out the one gate whose entire purpose is refusing
+unevidenced claims, and would do so at precisely the moment that refusal was
+inconvenient. `test-agent` re-ran independently and filed the artifact above;
+all seven rows now cite a recorded executed run.
+
 ## Current Status
 
-Gate 9 · Verification BLOCKED, loop-back to Gate 7 · Code in progress (fourth
-pass) — closing the 7 NOT VERIFIED acquisition/ingest gaps. ASM-31 (over-refusal
-on the synthetic corpus's identical document banners) carried forward to Review,
-no further action needed from Code.
+Gate 10 · Review running. `review-agent` terminated mid-run on an API error
+after 52 tool calls, having just found a candidate contradiction; resumed from
+its transcript rather than restarted so the analysis is not lost. Six items are
+before it: `ASM-31` (banner-induced over-refusal), `ASM-29`'s two deferred
+schema gaps, the "`documents_ingested` means byte-changed" wording,
+`ASM-26` (`corpus_as_of` on `PARTIAL`), `ASM-22` (44-vs-42), and gate 8's
+empty-`content_hash`-on-seed finding — plus the wiring sweep, including whether
+`design-review/11-run-report.html` having no browser route is a disclosed gap or
+a wiring failure.
+
+### Dashboard state file — defect found by the human, fixed
+
+`pipeline-state.json` used three values outside `conclave-dashboard`'s fixed
+vocabulary (`assumed`, `running`, `blocked`), so the dashboard reported the
+project as unreadable. The orchestrator had invented `assumed` rather than
+reading `conclave-dashboard/dev/app/state.py`, where `GATE_STATES` and
+`APPROVALS` are defined. Corrected to `batch_authorized` — the honest mapping,
+since *"make all assumptions, don't ask any questions"* **is** a batch
+authorisation, as distinct from `not_asked`, which exists to flag a gate that
+closed without an approval it owed. Verified by the running dashboard rather
+than by inspection.

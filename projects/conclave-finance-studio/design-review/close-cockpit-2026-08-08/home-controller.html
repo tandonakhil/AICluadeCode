@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Close — 2026-06 — D. Okafor, controller — Conclave Finance Studio</title>
+<script src="../redesign-2026-08-02/theme.js"></script>
+<link rel="stylesheet" href="../redesign-2026-08-02/apple.css">
+<link rel="stylesheet" href="../redesign-2026-08-02/brand.css">
+<link rel="stylesheet" href="cockpit.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="si-record" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></symbol>
+  <symbol id="si-door" viewBox="0 0 24 24"><path d="M7 21 V4 a1 1 0 0 1 1 -1 h8 a1 1 0 0 1 1 1 V21"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="14.5" cy="12" r="1"/></symbol>
+  <symbol id="si-seal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M10 12 l1.6 1.6 L15 10"/></symbol>
+  <symbol id="si-gate" viewBox="0 0 24 24"><line x1="3" y1="4" x2="21" y2="4"/><line x1="6" y1="4" x2="6" y2="21"/><line x1="18" y1="4" x2="18" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/></symbol>
+</defs></svg>
+
+<header class="topbar">
+  <a class="burger" href="menu.html" aria-label="Open the menu — every destination is in here">
+    <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span></a>
+  <a class="homelink on" href="home-controller.html" aria-current="page">
+    <span class="lb">Close &mdash; 2026-06</span></a>
+  <div class="spacer"></div>
+  <div class="lockup" style="padding:0">
+    <span class="glyph mark" aria-hidden="true"><svg viewBox="0 0 28 28">
+      <path class="thread" d="M4 7 L12.5 13" stroke-width="1.3"/>
+      <path class="thread" d="M4 21 L12.5 15" stroke-width="1.3"/>
+      <path class="thread" d="M24.5 14 L15.5 14" stroke-width="1.3"/>
+      <circle class="core-dot" cx="14" cy="14" r="3.1"/>
+      <path class="pull" d="M14 3.5 L14 10.4" stroke-width="1.9"/>
+      <circle class="pull-dot" cx="14" cy="2.6" r="2.2"/>
+    </svg></span>
+    <div class="wm">Conclave<span>Finance Studio</span></div>
+  </div>
+  <div class="signed">Signed in as<b>D. Okafor</b>controller</div>
+</header>
+
+<div class="ctx">
+  <div class="f"><span class="k">Entity</span><span class="v">Northwind Grid Holdings</span></div>
+  <div class="f"><span class="k">Period</span><span class="v">2026-06</span></div>
+  <div class="f"><span class="k">Close day</span><span class="v">3 of 5</span></div>
+  <div class="f stale"><span class="k">Data</span><span class="v">1 close day behind</span></div>
+  <span class="fixture">Pilot &mdash; synthetic fixture data</span>
+  <details>
+    <summary>What &ldquo;1 close day behind&rdquo; means, and where these figures came from</summary>
+    <div class="full" style="padding:0;max-width:86ch">Dataset <b>gl_balances vFIXTURE-2026.06.03-a</b>,
+      refreshed 03 Jul 2026 06:15 UTC, measured against the declared close calendar
+      <b>close.pilot_2026_06@1</b>. Due by the day-2 cut-off; arrived inside close day 3.
+      Synthetic fixture data, not an Oracle-sourced warehouse.</div>
+  </details>
+</div>
+
+<div class="pilotstrip"><b>Pilot build &mdash; the figures on this screen are synthetic.</b>
+  They come from an in-memory close over the twelve-period fixture, not from a run against an
+  Oracle-sourced warehouse. Nothing here is evidence about a real ledger.</div>
+<div class="pilotstrip hatch"><b>Pilot topology &mdash; the guardrail broker is running inside
+  this process.</b> Every broker fact on this screen &mdash; the approval eligibility, the
+  routing cap and the raise record below &mdash; was obtained over the in-process transport,
+  so the trust boundary between this interface and the broker is a module boundary in this
+  build and not a process boundary.
+  <span class="nodismiss">There is no control that hides this. It is on every screen this
+  build serves, for as long as the broker runs in this process.</span></div>
+
+<main class="page">
+<div class="opening">
+  <div class="eyebrow"><svg class="section-icon sm"><use href="#si-record"/></svg>Close &mdash; 2026-06 &middot; day 3 of 5 &middot; your week</div>
+  <h1 class="voice-title">One act is yours alone, and
+    <span class="goldline">an agent working tonight is not ready</span>.</h1>
+  <p class="answer">Review completes at the day-4 cut-off, 04 Jul 08:00 &mdash; one checkpoint
+    from now. Nothing on this screen decides anything; it reports what the broker and the
+    detectors already concluded.</p>
+  <div class="statstrip">
+    <div class="stat"><span class="num gold">1</span><span class="lab">proposal awaiting<br>your approval</span></div>
+    <div class="stat"><span class="num s3">2</span><span class="lab">cross-period<br>escalations open</span></div>
+    <div class="stat"><span class="num slate">1</span><span class="lab">abstention not<br>yet assessed</span></div>
+    <div class="stat"><span class="num">0</span><span class="lab">routing caps<br>raised tonight</span></div>
+  </div>
+  <hr class="rule">
+</div>
+
+<div class="full">
+
+  <section class="tracker" aria-labelledby="trk">
+    <div class="thd">
+      <h3 id="trk">Where this close is</h3>
+      <span class="where">day 3 of 5 &middot; close.pilot_2026_06@1</span>
+    </div>
+    <div class="stops">
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 1</div><div class="nm">Subledger feeds complete</div>
+        <div class="at">01 Jul 08:00</div></div>
+      <div class="stop past"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 2</div><div class="nm">Warehouse refresh complete</div>
+        <div class="at">02 Jul 08:00</div></div>
+      <div class="stop now"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 3 &mdash; now</div><div class="nm">Reconciliations complete</div>
+        <div class="at">03 Jul 08:00</div></div>
+      <div class="stop future"><div class="rail"></div><div class="dot"></div>
+        <div class="day">Day 4 &mdash; yours</div><div class="nm">Review complete</div>
+        <div class="at">04 Jul 08:00</div></div>
+      <div class="stop future"><div class="dot"></div>
+        <div class="day">Day 5</div><div class="nm">Books closed</div>
+        <div class="at">05 Jul 08:00</div></div>
+    </div>
+    <div class="behind">
+      <div class="span" aria-hidden="true"></div>
+      <div class="lab">Data is 1 close day behind the day-2 cut-off it was due by.
+        <span>Refreshed 03 Jul 06:15 UTC. Every figure below inherits that, including the
+          escalations and the readiness report. It is not a statement that the data is wrong.</span></div>
+    </div>
+  </section>
+
+  <div class="sechd"><h2>What needs you</h2>
+    <span class="hint">Only figures that name something you can do. The rest is on Monitors.</span></div>
+
+  <div class="acts">
+    <a class="act gold" href="../redesign-2026-08-02/p5a-approval-detail.html">
+      <span class="fig">1</span>
+      <span class="t">Proposal awaiting your deliberate act</span>
+      <span class="q"><b>PROP-2026-06-0031</b> &middot; 54100 Transmission O&amp;M Expense.
+        You are the only person in this product who can complete it &mdash; a staff accountant
+        holds no <span class="mono">approve.proposal</span> capability and the broker refuses
+        the attempt rather than this interface hiding the control. Approving produces a
+        Journal Import file for a human to load. <b>It does not post to Oracle.</b></span>
+      <span class="go">Open the approval &rarr;</span>
+    </a>
+
+    <a class="act t3" href="../redesign-2026-08-02/p9-run.html">
+      <span class="fig">2</span>
+      <span class="t">Cross-period escalations open</span>
+      <span class="q"><b>1 numeric leg</b> &mdash; an accumulating balance &mdash; and
+        <b>1 narrative-only leg</b> &mdash; an explanation restated verbatim across periods.
+        The narrative-only row is a first-class escalation and not a property of the numeric
+        one; it is the <i>earlier</i> signal. If the detector could not be reached this tile
+        reads &ldquo;could not be read&rdquo;, never &ldquo;none open&rdquo;.</span>
+      <span class="go">See both legs &rarr;</span>
+    </a>
+
+    <a class="act slate" href="../redesign-2026-08-02/v2-queue.html#abstentions">
+      <span class="fig">1</span>
+      <span class="t">Abstention not yet assessed</span>
+      <span class="q">1 abstention carries a retrospective warrant label:
+        <b>0 warranted, 0 unwarranted, 1 not yet assessed.</b> Counts, never a rate &mdash; a
+        rate reads as a score for abstaining, and over-caution is not the failure mode this
+        product is exposed to. Assessing it is a judgement only you can record.</span>
+      <span class="go">Assess the warrant &rarr;</span>
+    </a>
+
+    <a class="act t1" href="../redesign-2026-08-02/p10-agent.html">
+      <span class="fig">1</span>
+      <span class="t">An agent acting tonight is not ready</span>
+      <span class="q"><b>crossperiod-surveillance v2.2.0</b>, as of 2026-06 over 3 closed
+        periods. <b>P2 unmet</b> &mdash; one F32 forward disposition missed in 2026-05 and not
+        yet explained, which is the same miss sitting on A. Reyes&rsquo; list tonight.
+        <b>P4 not yet evaluable.</b> P1 and P5 are deferred to phase 2 and are reported as
+        deferred, not as met. Readiness requires all five, and precision is never consulted
+        for it.</span>
+      <span class="go">Open the agent &rarr;</span>
+    </a>
+
+    <a class="act quiet" href="../redesign-2026-08-02/p9-run.html#routing">
+      <span class="fig">0</span>
+      <span class="t">Routing caps raised tonight</span>
+      <span class="q">1 reviewer was routed: <b>A. Reyes, 6 items against a cap of 12.</b>
+        No cap was raised. An explicit zero with its denominator, never a blank and never
+        omitted. A raise is a recorded control event authorised at the broker, and it is the
+        only way a reviewer receives more than their cap.</span>
+      <span class="go">Open the routing budget &rarr;</span>
+    </a>
+
+    <a class="act t2" href="../redesign-2026-08-02/p15-dispositions.html">
+      <span class="fig">1</span>
+      <span class="t">Forward prediction missed on your team</span>
+      <span class="q">16200 CWIP &mdash; Substation. A. Reyes predicted clearance by 2026-06;
+        it did not clear. A miss is a <b>state change, not a notification</b>: the
+        account&rsquo;s risk grade rises and auto-pass is revoked. It is also the evidence
+        behind P2 above.</span>
+      <span class="go">Open the disposition &rarr;</span>
+    </a>
+  </div>
+
+  <p class="note" style="max-width:82ch">This page composes facts the detectors and the
+    guardrail broker had already computed before it was rendered. It grants nothing and hides
+    nothing: the approve control exists on the approval screen because the broker holds you
+    entitled, not because this page knows your role.</p>
+
+  <div class="grid2" style="margin-top:24px">
+    <div class="panel">
+      <div class="eyebrow" style="margin-bottom:8px"><svg class="section-icon sm"><use href="#si-gate"/></svg>Deliberately not on this page</div>
+      <h3>Four figures that are real, and are not action items</h3>
+      <dl class="dl" style="margin-top:12px">
+        <dt>Override rate per agent and per user</dt><dd class="t">No implied act</dd>
+        <dt>Median dwell time per reviewer</dt><dd class="t">No implied act</dd>
+        <dt>Forward-disposition hit rate (64%, 27 of 42)</dt><dd class="t">Monitors masthead</dd>
+        <dt>Probe outcomes, aggregate only</dt><dd class="t">No implied act</dd>
+      </dl>
+      <div class="note">Each of these is computed, correct and worth reading &mdash; on
+        Monitors, weekly, with time to think. A high override rate could mean a reviewer is
+        catching things or that an agent is misfiring; putting it here would ask you to act on
+        a number that does not say what the act is. The hit rate is the product marking its own
+        homework and belongs where it can be read as such.
+        <a href="../redesign-2026-08-02/index.html#screens">Open Monitors</a>.</div>
+    </div>
+
+    <div class="refuse">
+      <div class="eyebrow" style="margin-bottom:8px"><svg class="section-icon sm"><use href="#si-door"/></svg>What we will not say</div>
+      <div class="voice">This is not a statement that the close is clean.</div>
+      <p style="margin-top:12px;font-size:15px">When the audit committee asks whether 2026-06
+        was clean, this product does not answer yes or no. It answers with what was examined,
+        what was concluded, what abstained, and what nothing looked at. Certifying the period
+        and concluding material correctness are refused by design &mdash; A20 and A21 &mdash;
+        not missing features.</p>
+      <div class="btnrow"><a class="btn" href="../redesign-2026-08-02/p6-period-record.html">Open the period record</a>
+        <a class="btn" href="../redesign-2026-08-02/p12-refusals.html">What we refuse to do</a></div>
+    </div>
+  </div>
+
+  <details class="reduction">
+    <summary>How tonight&rsquo;s list was reduced from 214 to 6, in the system&rsquo;s own words</summary>
+    <div class="body">
+      <p>168 detections were disposed by cold-approved policy, 31 were unexpired prior-period
+      R1 acceptances, 6 were duplicates, and 3 fell below the threshold in force
+      ($150,000.00, inclusive). All 208 remain listed and reachable from the run report.</p>
+      <p>Collapsed and last, deliberately: a clearer, more prominent explanation makes a
+      reviewer defer more rather than less, and whether it was opened is itself recorded.</p>
+    </div>
+  </details>
+
+</div>
+</main>
+</body></html>

@@ -1303,6 +1303,216 @@ for `.lockup`, wrap each page head in `.opening`.
 ---
 ---
 
+# PART A3 — THE CLOSE COCKPIT, AND EVERY DESTINATION IN A DRAWER (2026-08-08)
+
+**Trigger.** The human, having used the running pilot: *"based on the user who logs there
+should be a simple home page. showing close tracker. Showing KPIs based action items for
+that user. move all the menu items to a hamburger menu."*
+
+Rendered prototype: `design-review/close-cockpit-2026-08-08/index.html`. Both earlier
+artefacts — `design-review/index.html` (gate-5 record) and `redesign-2026-08-02/` — are
+untouched. `apple.css` and `brand.css` are reused by reference; `cockpit.css` is an additive
+layer adding two components and no token.
+
+## A3.1 · This is A2.2's Close cockpit, built — with one thing changed
+
+A2.2 row 1 already specified this screen: **Close**, the default landing, *"where is this
+close and what does it need from me tonight?"*, a per-persona call-list, replacing landing on
+Ask. A2.3 records **J3 as Unstartable** without it and A2.6 carries it under **A — blocks a
+whole journey**. The human has arrived independently at the screen already specified. That
+design stands and is reused; this section does not restart it.
+
+**What has moved since, and why.** A2.2 assumed the cockpit sat *beside* a persistent
+four-item nav. The human has now removed that nav. So the call-list is no longer a courtesy
+on top of navigation — **it is the navigation for the night's work**. Two consequences,
+both designed against rather than inherited:
+
+1. **Every row points at a specific object, never at a section.** A2.2's rows could afford to
+   say "go to the queue" because the queue was one click away regardless. They cannot now.
+2. **A2.2's own "flat four-item nav" question is closed, not reopened.** A2.2a said building
+   Close would reopen it. It does not: with all destinations in a drawer there is no primary
+   nav to be flat or grouped, and the drawer carries **A2.2a's shipped Work / Govern /
+   Evidence grouping unchanged**, plus a *This close* entry and a *You* group.
+
+## A3.2 · The hamburger: what the decision costs, and the one cost I cannot absorb
+
+The human was offered keeping Queue and Approvals persistent and chose everything in the
+drawer. That is their call and it stands. The accounting, on the record:
+
+| Cost | Answer |
+|---|---|
+| **Nav badges go dark.** §4 made them the volume control expressed in the chrome. | **Fully answered.** Every badge's number is on the home page, larger, with a destination and a qualifier. While standing on home, chrome badges were always redundant. |
+| **Refusals loses its standing rebuke.** §5.11 keeps it in global nav so a refusal does not read as an omission. | **Answered by content, not position.** The refusal block is on all three home pages, in the serif voice, at the moment the user is most likely to want the thing it refuses — a *stronger* placement than a nav row nobody clicked. |
+| **The return path lengthens.** Six items a night × (open drawer → find queue → click), paid at the moment attention is already spent. | **Partly answered, and this is the live risk — A3.3.** |
+
+The return path is answered by **one non-hamburger control in the top bar**: *"Close — 2026-06
+· 4 left"* — one control, to one screen, carrying the one badge that matters mid-flow. **This
+is not navigation smuggled back in**, and the distinction is worth stating precisely because
+it would be easy to erode: it addresses exactly one destination, the screen the human asked
+to carry the work. A second such control is a sidebar with extra steps and should be refused.
+
+The drawer buys one thing and I have spent it: **a drawer is entered deliberately, so it can
+afford a 13px descriptor per row** saying what each destination answers. A 15px sidebar row
+could not.
+
+## A3.3 · The one problem I cannot design around, stated as a condition
+
+**The return path only works if the post-resolution step exists, and it does not.** A2.6
+already lists it as an open severity-A gap: J1's final step produces no confirmation, no
+queue removal, no badge change, no next-item. With a persistent sidebar that was an
+irritation. **With everything in a drawer it becomes the dominant interaction of the night**:
+save an item, land nowhere, open the drawer, find the queue, and count which rows you have
+already done because nothing removed them.
+
+So: **designable around, conditional on one build item.** After a resolution is recorded the
+product must land the user on the next routed item, or back on the cockpit with the count
+decremented. This was A2.6's *smallest* listed fix; the hamburger decision makes it
+**load-bearing**. My recommendation is not that the decision be reversed — it is that this
+item ships *with* the drawer rather than after it. Shipping the drawer over a dead end would
+cost more than the clutter it removes.
+
+## A3.4 · The close tracker — drawn from the declared calendar, and its four states
+
+Drawn from `common/close_calendar.py`'s declared calendar `close.pilot_2026_06@1`: **five**
+checkpoints at 08:00 UTC on close days 1–5, refresh due by the day-2 cut-off, and
+`AC-F26-05`/`AC-F38-11`'s arithmetic against them. Nothing invented.
+
+**Correction to A2.7's prototype:** `v2-close.html` renders *"day 3 of 8"*. The declared
+calendar has five checkpoints, so the honest figure is **day 3 of 5**. A tracker that
+disagrees with the calendar it is computed from is worse than no tracker.
+
+**The graphic is the gap, not the progress.** A passed checkpoint is **filled neutral ink,
+never green** — a cut-off that has gone by is a fact, not an achievement, and "fine, move on"
+is precisely the affect §3.2 exists to withhold. What renders in severity colour is the
+**bracket** between the checkpoint the refresh was *due* by and the one it *landed* in; the
+15px semibold rust staleness sentence is that bracket's label, not a second assertion beside
+it. This is the coverage strip's rhetorical move applied to time.
+
+Four states, and the fourth is what makes it honest:
+
+| State | Rendering |
+|---|---|
+| On calendar, N days behind | Five stops, bracket drawn, staleness sentence as its label |
+| Refreshed after the last checkpoint | Marker past day 5; *"arrived after the books closed"* — a different fact from "just in time for day 5", never folded into it |
+| **No refresh observed** | Tracker still drawn (position comes from the calendar, not the data); the marker is **absent** and an abstention block says so. Not "zero close days behind" — zero is an answer |
+| **No calendar declared** | The tracker is **absent, not empty**, in serif voice, naming `AC-F38-11` unmet and register 6. Five grey stops would look like a close that had not started — a claim nobody made |
+
+## A3.5 · KPIs as action items — the rule, made structural
+
+The rule: a figure earns a place on a home page only if it has **(a)** a number, **(b)** a
+reliability qualifier at **≥13px**, and **(c)** a destination that is a **specific object**,
+not a section.
+
+**Enforced by the component, not by editorial discipline.** `.act` is an `<a>` and has no
+variant without a `.q` qualifier: a tile with no destination and a tile with no qualifier are
+inexpressible. Same move §5.3 makes for the conclusion string — unreachable, not validated
+out. A2.1's lesson is that a paragraph does not survive contact with 262 criteria.
+
+**The floor changed a design decision, which is the evidence it is doing work.** Coverage was
+going into the stat strip, whose labels sit at the 12px micro-label floor. A coverage
+percentage is a reliability qualifier, so it could not live under a 12px label; it moved to
+its own tile with a 13px qualifier and the population strip beneath it.
+
+### What each persona sees, and why
+
+**Staff accountant (A. Reyes).** Six items routed, rendered as **"five findings and one the
+system could not settle"** — the queue badge is 6 and the page must never call 6 "findings",
+which would convert an abstention into a finding in the one place a tired reader takes the
+number at face value. The severity ramp draws the five, then a gap, then the dashed
+abstention swatch outside it. Then: the abstention's own row; a forward prediction come due
+(gold); three accounts nothing has scanned; one boundary check that could not run. The
+**routing cap is a qualifier, not a tile** — 6 against a cap of 12 does not bind, so it
+implies no act tonight.
+
+**Controller (D. Okafor).** One proposal awaiting the act only they can complete; two
+cross-period escalations split by leg with the narrative-only leg as a first-class row; one
+abstention **not yet assessed** (counts, never a rate); **an agent acting tonight that is not
+ready**; **zero routing caps raised**, with its denominator; one forward prediction missed on
+the team. Plus a panel naming the four real figures deliberately *not* here.
+
+> **The row I would defend hardest, because nobody would have specified it.** The pilot's
+> `readiness_report` for `crossperiod-surveillance` has **P2 unmet — "one F32 forward
+> disposition missed in 2026-05 and not yet explained"**. That is **the same miss** on the
+> staff accountant's page tonight. The two personas' cockpits are looking at one fact from
+> two ends, and there was no surface in the product on which that was visible. It is
+> computed, real, and it is the argument that per-persona composition is worth more than a
+> shared dashboard filtered by role.
+
+**FP&A analyst.** The honest one, and it required refusing the obvious page. **There is no
+FP&A persona in the build** — `state.PERSONAS` carries two — and nothing in this product
+routes to one. So the temptation was to fill the page with coverage, detections and dwell:
+figures that are real and imply no act. Instead the **abstention grammar is applied to a whole
+persona**: *"Nothing is routed to you, and that is a fact about this product, not about this
+close."* Then the three things genuinely obtainable from the period today — the 7 accounts
+with a quotable decomposition (stamped with certified query, version and dataset version,
+which is what makes it defensible in a variance meeting), the 3 accounts nothing has scanned
+(the figure most worth knowing *before* the meeting), and the 1 abstention. Then **refused
+(A22, solid slate, filled) and deferred (Inquire mode, dashed outline, no fill) side by
+side**, because a user who only ever sees one treatment cannot learn to tell them apart.
+
+### What was refused a place, and why
+
+| Fact | Why not | Where it belongs |
+|---|---|---|
+| Override rate per agent / per user | A high rate could mean a reviewer is catching things or an agent is misfiring. It does not name the act, and colouring it would assert an interpretation the data does not support | Monitors |
+| Median dwell time | Same, and a per-person figure at glance-read cadence on a management-chain surface is the wrong pressure | Monitors |
+| Forward-disposition hit rate (64%, 27 of 42) | It is the product marking its own homework and is the Monitors **masthead** by design. Demoting it to a home tile among action items makes it look like one more number about *you* rather than the one about *us* | Monitors masthead |
+| Probe aggregates | Aggregate-only by G-PROBE-3, no act implied tonight, and a home-page probe figure is one hop from a per-person one | Monitors, aggregate only |
+| Total detections (214) as a tile | A number with no destination is the definition of the vanity metric this pass exists to keep out. It survives only as the qualifier that makes 6 legible as a *reduction* | Qualifier on the queue tile |
+
+## A3.6 · A build consequence that only appears once counts share a page
+
+**Queue counts include probes; coverage figures exclude them — and they must not be made to
+agree.** The build is already right: `state.conclusion` excludes probes from the coverage
+population under `AC-F12-16` (a coverage statement is a claim about the customer's ledger; a
+probe is one we manufactured), while `nav_badges["queue"]` counts every admitted item because
+a probe must be indistinguishable. Putting both on one page for the first time creates the
+opportunity to "tidy" them into consistency. A "5 findings" figure computed by subtracting the
+probe would make the probe **detectable by arithmetic** — the one thing `AC-F41-08` forbids.
+Recorded here because it is invisible until a home page exists.
+
+## A3.7 · Gaps, and two criteria I am asking for
+
+**Blocking:** the post-resolution landing (A3.3) — `code-agent`, already on A2.6's list,
+now load-bearing.
+
+**Open:** an FP&A persona in `state.PERSONAS` (`plan-agent`, net-new scope);
+per-user forward-disposition hit rate — `disposition_store.hit_rate()` is period-wide and the
+staff tile quotes "31 of 38 met", which is **dropped rather than faked** if it is not
+computable (`code-agent` to confirm); the Period record (A2.6 severity A, still unbuilt, so
+J3 stays unstartable); a route and screen id for this page — suggested `/close` with `/`
+re-pointed to it from `/queue`, which is an IA change several criteria's screen references
+need re-checking against (`solution-architect`).
+
+**Two criteria requested from `functional-design-agent`:**
+
+1. A2.5's typography floor as an actual criterion. It is still a design ruling. This pass
+   makes it structural in one component; nothing stops the next component omitting it.
+2. *Given a figure rendered on the close cockpit; then it is inside an element that is a link
+   to a specific object, and it carries a qualifier rendered at ≥13px.* Checkable from the
+   DOM. Without it, "action items only" is a paragraph — and A2.1 records what happens to
+   those.
+
+## A3.8 · Not covered by this pass, stated rather than omitted
+
+- **`DesignSync` is still not in this agent's tool grant** — re-confirmed 2026-08-08, the
+  third consecutive pass (§10.5, A2.9). **No component-library push happened.** A Figma MCP
+  server is present in this runtime but is not part of this agent's grant and no Figma file
+  was created; rendered HTML is the deliverable.
+- **No accessibility execution.** Contrast is designed, not measured. Two new pairings — the
+  neutral-ink checkpoint dot on surface, and the dashed slate abstention-tile border — have
+  not been through a checker. `dev/tests/suites/ux/run.sh` now exists, so this is executable
+  at the Test gate and must be executed rather than statically reviewed.
+- **Desktop only**, as at gate 5. `PROJECT_CONTEXT.md`'s header still reads *multi-surface*
+  while every ruling scopes MVP1 to desktop web; flagged again rather than silently
+  satisfying the narrower reading.
+- **Two illustrative figures are unconfirmed** and are named as such rather than presented as
+  established: the per-user hit rate, and the escalation split as 1 numeric + 1
+  narrative-only.
+
+---
+---
+
 # PART B — OBSERVED POST-DEPLOY BEHAVIOUR
 
 **Status: empty. This project has not been built or deployed.**
@@ -1342,6 +1552,7 @@ _(no entries — no production usage)_
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-08 | 1.4.0 | MINOR — **Part A3, the close cockpit and the hamburger.** Builds A2.2's unbuilt **Close** row rather than restarting it, and records the one thing that changed since: with the persistent nav removed the call-list *is* the navigation, so every row points at a specific object. Adds the close tracker drawn from the declared calendar (`close.pilot_2026_06@1`, five checkpoints) in **four** states including the two absences, and corrects A2.7's "day 3 of 8" to **day 3 of 5**. Adds the KPI rule — number + ≥13px qualifier + object destination — enforced by the component rather than editorially, and records which computed facts were refused a place and why. Per-persona content for staff, controller and FP&A, the last of which applies abstention grammar to a whole persona because no FP&A persona exists in the build. Records **one cost of the hamburger decision that cannot be absorbed** (A3.3, post-resolution landing) as a condition on shipping it, and one build hazard (A3.6, probe counts vs coverage counts must not be reconciled). Rendered prototype at `design-review/close-cockpit-2026-08-08/index.html`; gate-5 record and `redesign-2026-08-02/` untouched. `DesignSync` unavailable for the third consecutive pass — no library push. | Human request, 2026-08-08; approval pending |
 | 2026-08-05 | 1.3.1 | PATCH — **gate-10 record correction, no design change.** E2: `AC-F12-08` was cited live in three places (§1.2 mechanisms table, §5.9, §6 traceability) though retired 2026-07-31 and replaced by `AC-F12-10`; corrected, with a §5.9 editorial marker that **preserves rather than deletes** the original per-user probe-column intent and records `RESPONSIBLE_AI_KB` G-PROBE-3 / gate-6 ruling 4 as a correct override of it. The per-user *probe* figure is removed from the design record; per-user *override rate* is untouched. The build was already aggregate-only — this was a documentation defect, not a product one. E3: A2.2 gains a status marker and a **Shipped?** column per row, naming **Close** and **Period record** as NOT BUILT; new **A2.2a** reconciles the grouping — what shipped is **§4's** Work/Govern/Evidence, not A2.2's flat four, with A2.2's demotions and merges inside it — and §4 gains a matching marker. Nothing in `dev/`, `design-review/`, `FUNCTIONAL_SPEC.md` or `PROJECT_CONTEXT.md` touched. **The Part A2 approval-pending rows below are unchanged and remain accurate.** | `review-agent` gate-10 escalations E2/E3, adjudicated by this file's owner; no new human approval sought or implied |
 | 2026-08-03 | 1.3.0 | MINOR — **A2.8, identity carried forward.** Logo (wordmark + Council Mark, incl. the Tier-3 signature and seal row reused for their original meaning), page-opening pattern graded by visit frequency, six section icons mapped 1:1, artifact card, gold underline. Corrects two A2.7 errors: the invented gold-disc app icon broke the Council Mark's own colour law, and the artifact card was sans where marketing is serif. New `brand.css` + `brand-assets.html`; applied to the four branded screens. Records what was left behind (`#conclaveNet`, `motion.css`, Tier-2 glyph, `.cta`, all six `/who` accents incl. the green) and what cannot come across (the question-and-answer spine). | Human request, 2026-08-03; approval pending |
 | 2026-08-02 | 1.2.0 | MINOR — **A2.7, visual pass "Paper & Seal, at close".** Conclave brand (read from `conclave-marketing/dev/.../site.css`, not a summary) + Apple pro-app discipline, in a new `apple.css`. Records that the **brand's green is not a status colour** — it is one of six team-family accents on the marketing `/who` page — and is therefore **dropped entirely rather than substituted**, with the no-green rule intact. Applies the typography ruling as built fact: staleness 10.5px → 15px, nav 10px → 15px, qualifier-to-assertion ratio 4.0× → 2.7×. Journey maps redrawn as designed artefacts. Four screens restyled, fifteen not — disclosed. | Human request, 2026-08-02; approval pending |
