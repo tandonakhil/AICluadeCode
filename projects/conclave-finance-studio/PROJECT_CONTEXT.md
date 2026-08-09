@@ -119,7 +119,68 @@ in `knowledge/FUNCTIONAL_SPEC.md` §29.15.
 3. File total unchanged at 290 issued IDs; now 287 live, three retired
    (`AC-F12-08`, `AC-F41-13`, `AC-COCKPIT-19`).
 
+### 2026-08-09 — Gate 7 · Code — `code-agent`, two defects from the live-render walk, independent of the disclosure-removal work above, `dev` @ `9888a7d` (parent `0199f0e`, parent `f925a3f`)
 
+Two commits. `test-evidence/rendered-ui-2026-08-09.md` (`test-agent`) read in full first.
+
+1. **Defect 1 (the superseded-approval finding).** Investigated and found the
+   walk's own attribution mixed two distinct mechanisms: `AC-F41-14`/`-15`
+   (supersession by DATA, `ges/supersession.py`) is already real-navigation-
+   driven with no query-param dependency — `_supersession(state)` is called
+   unconditionally by both `proposal_screen`/`approval_screen`, the live
+   pilot's GES process is seeded with real `RUN-2026-06-0412` bindings, and a
+   POST to `/proposal/{id}/approve` is refused by the broker itself
+   (pre-existing test: `test_POSTING_the_approval_anyway_is_REFUSED_...`).
+   Added `test_a_real_click_through_from_approvals_shows_the_block_with_no_
+   query_param` (`backend/tests/test_ui_proposal.py`), which follows the exact
+   `/approvals` → row-link → approval-screen path the walk itself used, with
+   no query string anywhere, after superseding a dataset for real via the
+   GES-side registry.
+
+   **The narrower fact the walk's quoted code comment actually describes**
+   — `AC-F41-12`, `item.superseded_by` / the `?superseded=1` toggle on
+   `PROP-2026-06-0031` — was investigated and NOT changed. `PROP-2026-06-0031`
+   is the only item in the whole pilot fixture carrying a `proposal_id`, and
+   roughly a dozen currently-passing test files across the functional/ux/
+   industry suites use it, unmodified, as the sole non-superseded "happy
+   path" approvable proposal — including live `POST /approve` flows that
+   expect success. Making `superseded_by` default-active (even OR'd with the
+   query param) makes every one of those fail. Closing this properly needs
+   either a second, dedicated fixture item or an explicit ruling that
+   `?superseded=1` stays a disclosed, demonstration-only path (the same
+   status `?tracker=` already has) — routed to `functional-design-agent` as a
+   fixture/plan-level judgement call, not forced here.
+
+2. **Defect 2 (cockpit content reconciled to `design-review/close-cockpit-
+   2026-08-08/`).** Checked this log and the cockpit's pass 1–4 history first
+   — none records an intentional cut of the fifth tile, the lower half, or the
+   descriptive checkpoint labels, so this was drift. Fixed, all from real
+   data: the fifth "boundary check that could not run" tile (reads
+   `app.pilot_close.boundary_checks()`, absent when nothing is `not_run`, new
+   `t1` action-tile tone); the coverage/refuse two-panel grid and the
+   collapsed "how tonight's list was reduced" footer (both new, real links to
+   `/refusals` and `/dispositions`, no fabricated per-category counts — the
+   footer restates `/queue`'s own real `detections_total`/`routed_count`
+   figures rather than a second hand-typed account); and
+   `close_calendar.Checkpoint.descriptive_name`, a new property the tracker's
+   stop label reads, kept separate from `short_name`, which every narrative
+   sentence elsewhere on this surface still quotes unchanged.
+
+   **Left open, not fixed:** the drawer (compact `<details>` vs the mockup's
+   full-height slide-out) is routed to `ui-ux-designer` as a design call, not
+   rebuilt here. Dark theme has a rendering requirement in `UX_KB` but no
+   toggle was ever specified anywhere in `UX_KB`/`FUNCTIONAL_SPEC`; per
+   instruction, none was invented — this stays a disclosed, unruled gap. The
+   controller-persona mockup's lower half (`home-controller.html`) differs
+   further from the staff one (a "four figures deliberately not here" panel
+   in place of the coverage strip); the walk's own comparison was staff-
+   persona only, so this was not reconciled and is noted here rather than
+   silently matched.
+
+Full suite green (all suites, 0 failures) at random seeds 1/7/42/20260731,
+reversed collection order, and plain file order. Human's pilot (8030) and the
+design preview (8050) both confirmed LISTEN, untouched, before and after; no
+port opened by this pass.
 
 ### 2026-08-08 — Gate 11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `f925a3f` — **THE LAST GATE FOR `close-cockpit-home`**
 
@@ -4966,6 +5027,74 @@ list, so the real child process really bound and the loopback really carried a
 broker decision. The residual the register names (no suite can witness that an
 api-process module cannot `import ges.executor`) is untouched by that and stays
 open for `solution-architect`.
+
+### 2026-08-09 — `test-agent`: live-rendered comparison against approved mockups, routed from `ui-ux-designer`
+
+**Not a gate suite run — an ad hoc rendered-UI walk of the running pilot on
+port 8030**, requested to inform the 2026-08-09 removal decision above (the
+synthetic-data and topology disclosures). `ui-ux-designer` declined the task
+correctly (no browser/HTTP tool in its grant) and routed it here. Full
+structured evidence: `test-evidence/rendered-ui-2026-08-09.md` and
+`test-evidence/rendered-ui-2026-08-09/` (46 screenshots + `results.json`).
+
+**Currency:** confirmed current at task start (`cockpit-h1` matched the
+expected staff-persona pattern). The live process's persona then drifted to
+controller mid-task — process-wide session state changed by a live user, not a
+stale build — fully disclosed, reconciled with a corrected verified-staff pass,
+and the instance was left exactly as found (staff persona, certified tier) by
+the end. A second instance on port 8031 was used for the two mutating actions
+(a resolution, an approval-detail view) so 8030 was never touched by anything
+irreversible; it was killed before this pass ended.
+
+**Five findings, reported for triage rather than scored against a gate:**
+
+1. **Cockpit content drift.** The live cockpit is missing the mockup's fifth
+   "What needs you tonight" tile (a boundary-check tile, A9/FX-CTA), the
+   entire lower half of the mockup (the "Coverage achieved so far" / "What we
+   refuse to do" two-column panel and the "how tonight's list was reduced"
+   footer), and renders generic checkpoint labels ("day-1 cut-off"…) where the
+   mockup names them ("Subledger feeds complete"…). Confirmed by reading full
+   page text, not just a screenshot.
+2. **Drawer IA drift.** The live drawer is a compact native `<details>`
+   dropdown with bare link labels; the approved mockup (`menu.html`) is a
+   full-height slide-out with a scrim and a description under every
+   destination. Plausibly the disclosed cost of the "no script tag"
+   architecture decision, but the mockup was not adapted to match.
+3. **Functional defect surfaced while walking the approval flow, not just a
+   render issue.** `ITEM-54100-CD`/`PROP-2026-06-0031` carries `superseded_by`
+   specifically so — per the code's own comment — "the proposal screen can
+   REMOVE the approval path." In the live build the `superseded` flag is a
+   query-parameter-only switch that nothing in normal navigation ever sets:
+   `/approvals` → `/approvals/PROP-2026-06-0031` renders a fully live,
+   clickable "Approve these 2 lines for export" button. Routed to
+   `functional-design-agent`/`code-agent` for triage, not fixed here.
+4. **Dark theme is unreachable in the served product.** No route ever renders
+   `theme="dark"`; it exists only as CSS tokens and in the static mockups. A
+   forced (`page.evaluate`) synthetic check confirms the tokens themselves are
+   legible, but no user can reach dark mode today.
+5. **Three-banner distinguishability and footprint, directly relevant to the
+   removal decision above.** Banners #2 (`transport-topology-state`) and #3
+   (`uncertified-dataset-state`) are pixel-identical in computed style
+   (same class, same hatch density, same colours) — distinguishable from each
+   other **only by reading the bold lead sentence**, confirming
+   `ui-ux-designer`'s concern that #3 will read exactly like #2 once #1/#2 are
+   removed. **The reported ~110px/~12% combined footprint does not match what
+   was measured**: banners #1+#2 (the two actually in scope for removal)
+   together occupy **≈173px, ≈19.2% of a 900px viewport** (56.3px + 102.6px +
+   a 14px gap), not ≈110px/≈12%. The ~110px figure traces to a different,
+   older pairing (`provenance()` + `pilot_strip()`, per `chrome.py`'s own
+   comment) rather than the two banners named for removal.
+
+**Not attempted:** an evidence export (would have required approving a
+proposal on top of the resolution already recorded on the second instance;
+judged disproportionate for this pass — reported as not attempted, not as a
+pass).
+
+**Screens walked, all 200, zero console errors:** cockpit (both personas),
+drawer, all nine destinations, the close tracker's four demo states, the
+`/dossier/{id}` exhibit, an approval flow, and a post-resolution landing (the
+`AC-COCKPIT-13..15` continuation, confirmed rendering the next open item
+inline after a recorded resolution).
 
 ## Deferred-substitution register — opened 2026-07-31 at gate 7 pass 1
 
