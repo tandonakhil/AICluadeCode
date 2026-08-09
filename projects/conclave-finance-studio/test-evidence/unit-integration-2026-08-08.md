@@ -101,3 +101,65 @@ none narrows an assertion:
   these four files is inside a `#`/docstring block.
 
 No assertion was weakened, narrowed, or removed in any changed test.
+
+---
+
+# PASS 3 — final confirmation at `dev` @ `f313d41`
+
+**Project:** conclave-finance-studio
+**Gate:** 8 · Test — `close-cockpit-home` **final confirmation** (third pass)
+**Commit under test:** `dev` @ **`f313d41`** (parent `7ecba21`, this file's pass-2 baseline)
+**Owner:** `test-agent`
+**Blocking:** yes
+**Command:** `.venv/bin/python -m pytest -o addopts="" -q` from `dev/`
+
+## Result — whole tree
+
+**3,193 passed, 0 failed, 0 errors, 0 skipped.** `pytest.ini`'s own `addopts = -q`
+combined with an explicit `-q` suppresses the summary line below verbosity −1
+(pass 26's finding, reproduced again here) — `-o addopts=""` is used
+throughout so the summary is visible.
+
+## Per-suite counts, measured by collecting each suite alone (`--collect-only`)
+
+| Suite | Owner | Status | Result | Δ vs. `7ecba21` |
+|---|---|---|---|---|
+| unit / integration (`backend/tests`) | `test-agent` | `EXECUTED` | **2,447 / 2,447** | 0 |
+| functional | `functional-design-agent` | `EXECUTED` | **400 / 400** | **+1** |
+| UX | `ui-ux-designer` | `EXECUTED` | **194 / 194** | 0 |
+| red-team | `responsible-ai-architect` | `EXECUTED` | **61 / 61** | 0 |
+| security | `security-architect` | `EXECUTED` | **40 / 40** | 0 |
+| architecture | `solution-architect` | `EXECUTED` | **28 / 28** | 0 |
+| industry | `industry-expert` | `EXECUTED` | **23 / 23** | 0 |
+| **whole tree** | — | `EXECUTED` | **3,193 / 3,193** | **+1** |
+
+The seven suite totals sum to 3,193 exactly. Per-suite pass counts are inferred
+from the whole-tree 100%-pass result plus each suite's own collected count
+(collecting each suite in isolation and summing reproduces the whole-tree
+total exactly, so no scenario is double-counted or orphaned); the whole tree
+itself was run directly, not assembled from suite runs.
+
+## Test-count delta — measured by node id, not counted
+
+**3,192 -> 3,193: +1 added, 0 removed, net +1.** Collected
+`pytest --collect-only` node ids at `7ecba21` and at `f313d41` (`git checkout`
+of the four files pass 3 touches back to `7ecba21` in the working tree, then
+forward again — confirmed equivalent to the full commit diff and confirmed
+clean before/after via `git status --porcelain`), sorted and diffed.
+
+**The single addition, named:**
+`tests/suites/functional/test_close_cockpit_criteria.py::TestAC_COCKPIT_20::test_resolving_an_item_leaves_the_cockpit_count_the_drawer_badge_and_the_queue_row_count_in_agreement`
+
+No removal, no same-node-id body change anywhere else in the tree — pass 3's
+diff is scoped to `backend/app/ui/pages.py`, `backend/app/ui/state.py`,
+`requirements-dev.txt` (a comment/version bump only, already covered by the
+order-independence file) and the one new test class in
+`test_close_cockpit_criteria.py`.
+
+## Order independence — six orderings, all 3,193, all green
+
+File order, reversed order, and seeds 1 / 7 / 42 / 20260731 (`pytest-randomly`,
+already installed in `dev/.venv`). Full detail in
+`order-independence-2026-08-08.md` (this file's pass-3 section).
+
+**Nothing was fixed by this agent.** No suite stubbed, no scenario skipped.

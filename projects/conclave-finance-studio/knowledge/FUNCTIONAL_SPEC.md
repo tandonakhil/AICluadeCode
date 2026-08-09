@@ -13,6 +13,28 @@ to routes. §20 now carries two retired IDs.
 human from a rendering on 2026-08-08. Twenty-two criteria issued in **§29**
 (`AC-COCKPIT-01`–`-19`, `AC-TYPESIZE-01`–`-03`), none retired. §29.11 records what
 this pass **refused** to issue, including the FP&A persona's home page.
+**Pass 5 (2026-08-08)** — `deploy-agent` found a consistency gap in gate 7's
+`close-cockpit-home` pass 3: the drawer's `nav-queue` badge and `/queue`'s own
+row listing did not reflect a resolution the cockpit's own count already
+reflected. `AC-COCKPIT-20` is issued in **§29.5** to close it. **Issued by
+`code-agent`, not `functional-design-agent`** — the orchestrator's own
+instruction for this pass authorized that fallback because
+`functional-design-agent` was not invocable in this turn's toolset; it is
+owed a review pass to confirm or amend the wording.
+**Pass 6 (2026-08-08)** — the owed review of `AC-COCKPIT-20`. **Ratified with
+one amendment**: the Then-clause's "both read from the same computation …"
+named an internal computation path rather than an observable outcome; replaced
+with a pure value-equality statement (drawer badge, `/queue` row-listing, and
+the cockpit's own routed-item count must all agree) that a test harness reads
+off three screens, not off source. ID, section and pass-5 counts unchanged —
+this is a wording amendment under the existing ID, not a new criterion.
+Numbering re-checked: 289 (pass 3+4) + 1 (`AC-COCKPIT-20`, pass 5) = 290
+issued, 288 live, holds. §29.9's observable-UI count corrected from eleven to
+twelve to include `AC-COCKPIT-20`. Detail in §29.5. The self-issue-and-flag
+fallback pattern itself is **not** ratified or rejected here — see §29.14 —
+because whether it becomes a standing rule is a pipeline-governance decision
+this agent cannot make unilaterally; it is reported as a finding for the
+orchestrator / Plan gate.
 This file is a durable
 knowledge base: it accumulates across features and enhancements, and it is what
 `verification-agent` audits against at the Verification gate.
@@ -1242,6 +1264,14 @@ file rather than a search.
 > `close-cockpit-home` enhancement (`AC-COCKPIT-01`–`-19`) and the product-wide
 > typography floor (`AC-TYPESIZE-01`–`-03`), and retired none. File total:
 > **289 issued, 287 live**, two retired. Counts in §29.8.
+>
+> **Pass 5 (2026-08-08, gate-7 loop-back)** issued one further criterion,
+> `AC-COCKPIT-20`, and retired none. File total: **290 issued, 288 live**, two
+> retired. Counts in §29.8.
+>
+> **Pass 6 (2026-08-08)** — `functional-design-agent`'s owed review of
+> `AC-COCKPIT-20`. Ratified with a wording amendment (§29.5); no criterion
+> issued or retired, counts unchanged.
 
 ### 22.1 Criteria per feature
 
@@ -2497,6 +2527,33 @@ that are exactly where a dead end would reappear.
 - **When** the save is attempted
 - **Then** the user remains on that item's screen, the item is still present in their queue, the routed-item count on the cockpit and on the return control are both unchanged, no confirmation is rendered, no next item is offered, and the reason the save did not complete is stated on the screen
 
+#### AC-COCKPIT-20 — observable UI
+> Issued at the `close-cockpit-home` gate-7 pass-3 loop-back, 2026-08-08, after
+> `deploy-agent` found the drawer badge and `/queue`'s row listing standing at
+> 6 while the cockpit's own `open_routed_count` had already gone to 5 for the
+> same resolved item — the same "figures must not disagree" property
+> `AC-COCKPIT-07` states for the routed/finding/abstention triple, here for
+> the cockpit, the drawer badge and the queue's row listing.
+- **Given** a signed-in user with K items routed to them, on the screen for one of those items
+- **When** they record a resolution on it and the save completes
+- **Then** the drawer's `nav-queue` badge reads K−1, `/queue`'s own row listing no longer includes that item as a row, and both equal the routed-item count rendered on the close cockpit in the same state — three independent readings that must agree, and a check that confirms only one of the three does not satisfy this criterion
+
+> **Amended by `functional-design-agent`, Pass 6.** As `code-agent` wrote it,
+> the Then-clause read: *"both read from the same computation the cockpit's
+> `open_routed_count` and `AC-COCKPIT-04`'s return-control count already read
+> from, not from a second count that happens to agree with it today."* That
+> names an internal computation path, not an outcome a test harness can see —
+> the class of self-drafted criterion this project's own conventions (§0)
+> reject on sight. The defect it closes does not need that phrasing to be
+> caught: unlike `AC-COCKPIT-08`'s probe count, where an honest figure and a
+> buggy derivation can coincide at one K and only diverge at another, the
+> "ever routed" miscount here diverges from `open_routed_count` on the very
+> first resolution — a single K, one resolution, three-way equality check is
+> sufficient and is what the Then-clause now states. Rewritten as value
+> equality across the three visible readings; nothing about which computation
+> produces them is asserted. ID, Given and When unchanged; §22, the header and
+> §29.8/§29.9 counts unaffected by a wording amendment under an existing ID.
+
 ---
 
 ### 29.6 The empty case, the error case, and what a new screen inherits
@@ -2569,12 +2626,23 @@ stays at 18 and this enhancement is `FEATURES.md`'s
 `feature/2026-08-08-close-cockpit-home`, not an eighteenth-plus-one feature
 invented here.
 
+**Pass 5 (2026-08-08, gate-7 loop-back)** issued one further criterion,
+`AC-COCKPIT-20` (observable UI), closing the drawer-badge/`/queue`-listing
+consistency gap `deploy-agent` found. **File total: 290 issued, 288 live**,
+two retired. Issued by `code-agent` under this pass's explicit fallback
+instruction.
+
+**Pass 6 (2026-08-08)** — the owed `functional-design-agent` review of
+`AC-COCKPIT-20`. Ratified with a wording amendment; see §29.5. Counts
+unchanged by an amendment under an existing ID.
+
 ### 29.9 Observable-UI position after this pass
 
-The enhancement is entirely UI-bearing and carries **eleven** observable-UI
-criteria, each naming which component, on which screen, in which state. Three
-areas of it are deliberately *not* observable-UI criteria, stated so the omission
-is visible rather than silent:
+The enhancement is entirely UI-bearing and carries **twelve** observable-UI
+criteria (eleven from pass 4, plus `AC-COCKPIT-20` from pass 5), each naming
+which component, on which screen, in which state. Three areas of it are
+deliberately *not* observable-UI criteria, stated so the omission is visible
+rather than silent:
 
 - **`AC-COCKPIT-08`** (probe arithmetic) is a differential assertion across two
   renderings. It is about what must **not** be derivable from the screen, and an
@@ -2735,3 +2803,48 @@ recorded since pass 3 (2026-08-04 through 2026-08-08). Those that bind this pass
    closes nor pre-empts it. **It remains owed, and it should be invoked as its
    own pass with `solution-architect` and `security-architect`'s §25.3.3
    material in front of me.**
+
+### 29.14 Pass 6 — the self-issue-and-flag fallback, reported as a finding
+
+`AC-COCKPIT-20` is the first criterion this file has carried that was drafted
+by `code-agent` rather than `functional-design-agent`. The instance is closed:
+ratified with a wording amendment, §29.5. Whether *the pattern* should recur is
+not.
+
+**This is not this agent's call to make unilaterally**, and it is not made
+here as a ruling — it is reported as a finding for the orchestrator and, if it
+proposes a standing rule, for whichever gate owns pipeline process (this
+project's `PROJECT_CONTEXT.md` Decisions Log or `admin/LESSONS.md`, neither of
+which this task's constraints permit this pass to write to).
+
+What this pass observed, for that decision to be made on:
+
+- **The instance that occurred was recoverable** only because the drafted
+  criterion was flagged as code-issued, pointed at a specific section, and
+  left for review before anything treated it as settled. Nothing in this file
+  closed a gate on `AC-COCKPIT-20` between pass 5 and this review.
+- **The instance that occurred was also imperfect on the first attempt** — the
+  Given/When held, the ID and placement were clean, but the Then-clause named
+  an internal computation rather than an observable outcome, which is exactly
+  the failure mode this agent's own contract exists to catch. A criterion
+  drafted by the agent implementing the fix is drafted by the party with the
+  least distance from "what the code does" and the most difficulty stating
+  "what the code does" and "what must be observably true" as two different
+  things — the F18 postmortem's premise applied to the drafter, not just the
+  checker.
+- **A criterion is not self-verifying just because it is well-formed.** Had
+  this review not happened before a suite ran against `AC-COCKPIT-20`, an
+  implementation-presuming Then-clause could have been satisfied by a check
+  that confirmed the wrong thing — the same failure this project's whole
+  Verification-gate design exists to prevent, recurring one layer up, in the
+  criterion rather than the check.
+
+**Recommendation, offered and not ruled**: a criterion issued outside this
+agent's pass should carry a `provisional` marker until reviewed, and a
+provisional criterion should not be usable as the *sole* evidence closing a
+gate — matching the constraint already placed on disclosed-unmet criteria
+(§29.11, §29.13 item 3) rather than inventing a new category. Self-issue-and-
+flag, as exercised once here, is a reasonable fallback for *drafting* under
+this file's ID discipline; it should not, on this one clean instance, be
+read as a reason to treat self-issued criteria as equivalent to
+agent-issued ones before they are reviewed.

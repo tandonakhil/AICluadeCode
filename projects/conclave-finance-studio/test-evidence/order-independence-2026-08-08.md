@@ -113,3 +113,69 @@ is negative, not skipped.
   while testing less
 - Actual: **3,192 in all six**
 - Result: PASS
+
+---
+
+# PASS 3 — re-run at `dev` @ `f313d41` (final confirmation)
+
+**Commit under test:** `f313d41` (was `7ecba21`) · **Owner:** `test-agent` ·
+**Blocking:** yes · **Status:** `EXECUTED`
+
+`AC-COCKPIT-20`'s new test adds one scenario to the collected population
+(3,192 -> 3,193); the sweep is re-run in full rather than assumed to still
+hold, since this is the third pass on this enhancement.
+
+## Result
+
+| Order | Result | Wall |
+|---|---|---|
+| file (`-p no:randomly -o addopts=""`) | **3193 passed** | 313.07s |
+| reversed (node ids collected in file order, `tac`'d, passed explicitly on the command line — held outside `dev/`, same property as pass 2's out-of-tree plugin: the tree under test cannot influence its own shuffle) | **3193 passed** | 311.36s |
+| seed 1 (`-p randomly --randomly-seed=1`) | **3193 passed** | 313.29s |
+| seed 7 (`--randomly-seed=7`) | **3193 passed** | 313.36s |
+| seed 42 (`--randomly-seed=42`) | **3193 passed** | 314.44s |
+| seed 20260731 (`--randomly-seed=20260731`) | **3193 passed** | 315.17s |
+
+**Six for six, 3,193 every time, exit 0 every time. No order dependence
+found**, including under the one new scenario (`AC-COCKPIT-20`'s three-way
+resolve-and-compare test, which mutates process-scoped `PilotState` by
+actually resolving an item — the exact shape of state a shuffle-sensitive
+leak would show up in).
+
+### Scenario: file order, pass 3
+- Status: EXECUTED · Input: `-p no:randomly -o addopts="" -q`
+- Actual: **`3193 passed in 313.07s`**, exit 0
+- Result: PASS
+
+### Scenario: reversed order, pass 3
+- Status: EXECUTED · Input: node ids collected forward, reversed with `tac`,
+  passed explicitly to `pytest -p no:randomly -o addopts=""`
+- Actual: **`3193 passed in 311.36s`**, exit 0
+- Result: PASS
+
+### Scenario: seeded shuffle, seed 1, pass 3
+- Status: EXECUTED · Input: `-p randomly --randomly-seed=1 -o addopts=""`
+- Actual: **`3193 passed in 313.29s`**, exit 0
+- Result: PASS
+
+### Scenario: seeded shuffle, seed 7, pass 3
+- Status: EXECUTED · Input: `--randomly-seed=7`
+- Actual: **`3193 passed in 313.36s`**, exit 0
+- Result: PASS
+
+### Scenario: seeded shuffle, seed 42, pass 3
+- Status: EXECUTED · Input: `--randomly-seed=42`
+- Actual: **`3193 passed in 314.44s`**, exit 0
+- Result: PASS
+
+### Scenario: seeded shuffle, seed 20260731, pass 3
+- Status: EXECUTED · Input: `--randomly-seed=20260731`
+- Actual: **`3193 passed in 315.17s`**, exit 0
+- Result: PASS
+
+### Scenario: the shuffled runs collect the same population, not a subset, pass 3
+- Status: EXECUTED
+- Input: each run's own summary line
+- Expected: 3,193 in every order
+- Actual: **3,193 in all six**
+- Result: PASS

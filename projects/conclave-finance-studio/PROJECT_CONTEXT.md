@@ -50,6 +50,121 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-08 — Gate 8/11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `7ecba21`
+
+**Deploy succeeded**, for the smoke-test gate `close-cockpit-home` owes. Deployed
+from a **detached worktree at `7ecba21`** (not `dev`'s current `HEAD`,
+`7496c0a`, which is one commit ahead and differs only by an unrelated
+`requirements-dev.txt` addition — confirmed by diff before choosing the
+worktree over checking out `dev` itself). `dev/` was never touched: `git
+status` on it is clean before and after, still on `main` @ `7496c0a`.
+
+**Ports — used the ones specified, not the ones this agent would otherwise
+pick.** `API_PORT=8021`, `GES_PORT=8022` (defaults in `.env.example` and
+`common/settings.py`, matching the human's instruction and gate 11's prior
+assignment). **8030 (human's pilot) and 8050 (design preview) were never
+touched** — confirmed LISTEN before start, after start, and after this
+agent's process was stopped. Only PID 2942 (this agent's own process) was
+killed, re-read from `lsof` immediately before the kill, never by name.
+
+**Served URL and health check:**
+
+| Field | Value |
+|---|---|
+| Served URL | `http://127.0.0.1:8021/` |
+| Health endpoint hit | `GET /health` |
+| Response | `200` — `{"status":"ok","env":"pilot","tenant":"tenant-demo","holds_credentials":false,"ges_base_url":"http://127.0.0.1:8022"}` |
+| Checked at | 2026-08-08 19:47 CDT |
+| Result | **PASS** |
+
+Only `8021` actually LISTENs (single-process pilot, broker collapsed in);
+`ges_base_url` in the health body is informational, matching gate 11's
+finding.
+
+**`/` now renders the close cockpit, not the queue** — `cockpit-h1`,
+`close-tracker`, `cockpit-acts`, `cockpit-coverage-strip` all present;
+`data-testid="exception-queue"` is absent from `/`.
+
+**Drawer is the only navigation, confirmed against the running instance, not
+the source.** No `.shell`/sidebar markup on any fetched page (only comments
+documenting its removal). All nine destinations plus the non-drawer return
+control resolved 200: `/queue`, `/approvals`, `/ask`, `/catalogue`,
+`/monitors`, `/audit`, `/inventory`, `/refusals`, `/my-probe-history`, and
+`cockpit-return` (`href="/"`).
+
+**Close tracker — all four `AC-COCKPIT-09..12` states are real, not
+fabricated.** Confirmed `backend/app/ui/state.py` before testing: the pilot's
+declared calendar (`close.pilot_2026_06@1`) naturally reaches only
+`on_calendar` (one close day behind); the other three (`after_last`,
+`no_refresh`, `absent`) are reached through the product's own `?tracker=`
+demo switch (`TRACKER_DEMO_VIEWS`), not a fixture this agent improvised. All
+four fetched and checked: `on_calendar`/`after_last`/`no_refresh` each render
+five `tracker-checkpoint` stops with the declared `data-tracker-state`;
+`absent` renders **zero** checkpoints and a stated reason
+(*"No close calendar is declared... AC-F38-11 is consequently unmet
+here"*) in its place, matching `AC-COCKPIT-12`'s requirement that the tracker
+must not render rather than render empty.
+
+**Post-resolution landing — the human's explicit condition — confirmed live,
+with one nuance flagged below.** Resolved `ITEM-21400-CP` (R1, "accepted and
+explained") via `POST /review/ITEM-21400-CP/resolve` with `explanation`,
+`expiry_period` and `clears_by` (the last is a second required field for R1
+beyond `explanation`/`expiry_period`, not obvious from the button's own "3
+step(s) to record" label until the form's `required` attributes are read —
+first attempt without it correctly refused at `422`,
+`expected_clearing_period_missing`, item left open, no confirmation, matching
+`AC-COCKPIT-13..16`'s save-failure case).
+- Landed on the **next item**, `ITEM-18300-OM` (`item-h1` present, not
+  `cockpit-h1` — both are valid landings per `AC-COCKPIT-15`, and six open
+  items remained so "next item" is the correct one here).
+- Confirmation named the item and resolution type verbatim:
+  `data-testid="cockpit-resolution-confirmation" data-resolved-item-id="ITEM-21400-CP"
+  data-resolution-type="R1"`, text *"Recorded: 21400 GR/IR Clearing - accepted
+  and explained."*
+- **The counter the acceptance criteria actually specify — `cockpit-return`'s
+  count (`open_routed_count`) — decremented 6 → 5**, confirmed on the resolve
+  response itself, on a fresh `/` reload, and on `/queue`.
+
+**Flagging a surface this agent found confusing and did not expect, for the
+human and `test-agent`, though it is not a failure of any AC checked above:**
+the **drawer's `nav-queue` badge** and the **`/queue` page's own row list**
+did **not** decrement/remove `ITEM-21400-CP` — the badge still reads 6 and the
+resolved item still appears as a queue row (its `/review` page correctly shows
+`item-state-line: "Not approved"` and a `disposition-record`, so the
+resolution itself did persist). `AC-COCKPIT-13..16`'s own test suite
+(`tests/suites/functional/test_close_cockpit_criteria.py`) asserts only against
+`state.open_routed_count`/`cockpit-return`, not the drawer badge or `/queue`'s
+listing, so this is outside what this pass's acceptance criteria cover — but a
+human resolving items tonight will see the cockpit's own count drop while the
+drawer they just opened still says 6, which is worth `test-agent` and the
+human's eyes even though nothing checked above failed on it.
+
+**FP&A confirmed absent, by design.** `/fpa`, `/fp-and-a`, `/fpna` all `404`;
+no `FP&A`/`FPNA` string anywhere in `/`, `/catalogue`, or the tracker-demo
+pages fetched.
+
+**Standing disclosures confirmed live on the new landing screen**, checked
+against served HTML: `pilot-strip` (*"Pilot build — synthetic fixture
+data... cannot support a posting or an assurance conclusion about a real
+ledger"*) and `transport-topology-state` (*"the guardrail broker is running
+inside this process... There is no control that hides this"*), both present
+on `/`.
+
+**NOT done here, and outstanding:**
+- **`test-agent`'s post-deploy smoke suite has NOT been run.** This agent had
+  no means to invoke a subagent in this invocation (no `Task`-equivalent
+  tool available); the handoff is owed and reported to the orchestrator
+  rather than silently skipped or substituted with this agent running the
+  suites itself, matching gate 11's prior note on the same limitation.
+- **Current Status is NOT changed** — that is the human's gate approval to
+  give, not this agent's to set.
+- **No promotion to `prod/`. `dev/` was not modified** — worktree only,
+  removed after the check (`git worktree remove --force`, confirmed absent
+  from `git worktree list` afterward).
+- **`clears_by` being a second required field for R1, undocumented on the
+  button itself,** is worth `functional-design-agent` or `ui-ux-designer`
+  knowing about even though the refusal behaviour on omission is correct.
+
 ### 2026-08-08 — Human approved the close-cockpit design, from a rendering
 
 Approved at `design-review/close-cockpit-2026-08-08/` after review. **Includes the
@@ -2479,7 +2594,97 @@ absent afterwards:**
 
 ## Test Results
 
-### 2026-08-08 — Gate 8 · Test — `test-agent`, `dev` @ `7ecba21` (`close-cockpit-home` close)
+### 2026-08-08 — Gate 8 · Test — `test-agent`, `dev` @ `f313d41` — **FINAL CONFIRMATION, `close-cockpit-home` pass 3**
+
+**Everything passes. All suites EXECUTED, all blocking, all green, including
+the post-deploy smoke test — which is now `EXECUTED` rather than the prior
+pass's `STATIC ONLY — NOT EXECUTED`. This gate closes for good on this
+enhancement.**
+
+**Whole tree: 3,193 / 3,193, six orderings all green** (file, reversed, seeds
+1 / 7 / 42 / 20260731). +1 vs. pass 2's 3,192 — the single new
+`AC-COCKPIT-20` mutation-tested scenario; zero removed.
+
+| Suite | Status | Result | Δ vs. `7ecba21` |
+|---|---|---|---|
+| unit / integration | `EXECUTED` | 2,447 / 2,447 | 0 |
+| functional | `EXECUTED` | 400 / 400 | **+1** |
+| UX | `EXECUTED` | 194 / 194 | 0 |
+| red-team | `EXECUTED` | 61 / 61 | 0 |
+| security | `EXECUTED` | 40 / 40 | 0 |
+| architecture | `EXECUTED` | 28 / 28 | 0 |
+| industry | `EXECUTED` | 23 / 23 | 0 |
+| **whole tree** | `EXECUTED` | **3,193 / 3,193** | **+1** |
+| **post-deploy smoke (served on 8021/8022, self-stood-up)** | `EXECUTED` | **13 / 13** | superseded `STATIC ONLY` |
+
+**Pass 3's fix and the criterion it produced, both verified rather than taken
+on the commit message.** `deploy-agent` found the drawer's `nav-queue` badge
+and `/queue`'s own row listing standing at 6 while the cockpit's own
+`open_routed_count` had already moved to 5 for the same resolved item.
+`code-agent`'s fix routes both onto `open_routed_count`/`open_routed_items`
+and introduced `AC-COCKPIT-20`; `functional-design-agent` then ratified it
+with one amendment — the Then-clause rewritten from an internal-computation
+claim to pure observable three-way value equality (drawer badge, `/queue`
+row-listing, cockpit count). Confirmed against `FUNCTIONAL_SPEC` §29.5
+directly, not the commit message: the test
+(`TestAC_COCKPIT_20`) asserts exactly that equality and inspects no
+computation path.
+
+**Mutation-tested, not merely read.** Reverted the fix (both files back to
+`7ecba21`), which makes the badge and `/queue`'s row count **both** wrong and
+**equal to each other** — the case a two-way badge-vs-rows check would pass
+and this three-way check catches: `1 failed` (`assert 6 == 5`). Reverted
+back, clean, re-run: `1 passed`.
+
+**Root cause confirmed independently — no fourth "what's open" computation
+anywhere in the codebase.** Traced every read site of `routed_to_human`,
+`open_routed_items`/`open_routed_count`, `queue_rows`, `nav_badges`, and the
+cockpit-return control (`chrome.py`): every surface that states an open count
+now reads from the same property. The one deliberately distinct count
+(`routed_items`/`routed_count`, "ever routed," used only for the routing
+budget) is unchanged and does not compete with it.
+
+**Full re-run of everything gate 8 already covered, third pass, nothing
+carried forward on a prior pass's word:**
+- `AC-COCKPIT-08`'s differential probe test and `AC-COCKPIT-04`'s
+  single-return-control claim: re-run passing (underlying code unchanged
+  since pass 2's deep mutation verification); the single-return-control claim
+  additionally re-swept independently across all sixteen chromed
+  screens/states (exactly one `href="/"` on each; zero on `/dossier/{id}`, by
+  design).
+- Sidebar: still genuinely gone — zero live call sites for
+  `.navitem`/`.navgrp`/`nav()`.
+- FP&A: still absent — `/fpa`/`/fp-and-a`/`/fpna` all 404, no string, on a
+  live served instance.
+- The nine overridden MVP1 criteria plus `AC-F41-13`/`AC-F12-08`: re-swept
+  over `f313d41` — zero unfiltered claims, zero occurrences.
+
+**The smoke test — executed this time, not a manual walk.** `deploy-agent`'s
+walk of `7ecba21` confirmed the app serves, but that is not an executed suite
+result. This pass stood up its own fresh pilot on 8021/8022, synchronously
+within one command invocation, drove 13 scenarios over real HTTP (health,
+twelve routes, the cockpit entry point, drawer-only nav, both disclosures,
+FP&A absence, and `AC-COCKPIT-20`'s three-way agreement re-verified live),
+and tore it down before returning — 13/13 pass. The human's pilot (8030) and
+the design preview (8050) were checked by `lsof` PID before and after and are
+unchanged, never probed or signalled.
+
+**Nothing was fixed by this agent.** All mutations performed for verification
+were reverted, each confirmed by `git status --porcelain` returning clean
+immediately after.
+
+Full evidence: `test-evidence/unit-integration-2026-08-08.md`,
+`test-evidence/order-independence-2026-08-08.md`,
+`test-evidence/close-cockpit-home-verification-2026-08-08.md`,
+`test-evidence/post-deploy-smoke-2026-08-08.md` (all four files' "PASS 3"
+sections).
+
+**Verdict: PASS. No blocking suite fails, no blocking suite went unexecuted,
+and the two open items from pass 2 (the badge/queue gap, the post-deploy
+smoke test's `STATIC ONLY` status) are both closed on evidence, not
+assertion. This gate closes for good on `close-cockpit-home`.**
+
+### 2026-08-08 — Gate 8 · Test — `test-agent`, `dev` @ `7ecba21` (`close-cockpit-home` close) — SUPERSEDED by pass 3 above
 
 **All suites EXECUTED and passing except the post-deploy smoke test, which is
 STATIC ONLY — NOT EXECUTED and does not satisfy its blocking obligation.**
