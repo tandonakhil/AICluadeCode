@@ -50,6 +50,172 @@ undecided.
 
 ## Decisions Log
 
+### 2026-08-09 — Human decision: remove the synthetic-data and topology disclosures entirely
+
+**Decision, given with the consequence stated in advance.** Asked whether "remove
+all callouts around synthetic data" meant restyling (keep the claim, quiet the
+presentation) or full removal, and told plainly that removal reopens the
+2026-08-06 decision to decline claim prohibition 6 (which rested on "the
+substance is disclosed on the surfaces a reader meets") and the 2026-08-05
+override's stated defensibility (which named the disclosure as what makes
+shipping the nine unmet criteria defensible). **The human chose: remove
+entirely, no replacement.**
+
+**This supersedes, not deletes, the following prior record:**
+- 2026-08-06 — declined claim prohibition 6, reasoning: *"the substance is now
+  disclosed on the two surfaces a reader meets."* **That premise no longer
+  holds once this pass ships.** The five existing claim prohibitions stand;
+  prohibition 6 was already declined, so nothing there needs to change — but
+  the *reasoning* for declining it is now false and must not be cited as
+  current.
+- 2026-08-05 `[override]` entry — named the pilot strip and topology strip as
+  part of what makes the nine-criterion override defensible. **That defence is
+  weakened.** The nine overridden criteria are unaffected in themselves; what
+  changes is that a reader of the running pilot with no access to this KB has
+  one fewer way to learn the data is synthetic and the trust boundary is
+  collapsed.
+- Register 15 (provenance) and register 19 (pilot transport) — both currently
+  say the weakening is disclosed on-screen. **Both entries need re-wording**,
+  not closing: the underlying weaknesses are unchanged, only the on-screen
+  disclosure of them is being removed.
+- `AC-COCKPIT-19` — requires the cockpit inherit "the standing per-screen
+  disclosures." **This criterion is now unmet by design** and needs
+  `functional-design-agent`'s ruling: retire it, or amend it to describe
+  whatever (if anything) remains.
+
+**What is NOT changing:** the underlying facts. The data is still synthetic.
+The broker still runs in-process in this configuration. The nine MVP1 criteria
+are still overridden. Nothing about what the pilot can actually do changes —
+only whether a person looking at the screen, or at an export, is told so.
+
+**Routed:** `solution-architect` and `security-architect` to update
+`ARCHITECTURE_KB`/`SECURITY_KB` register entries 15/19 to describe the removal
+rather than the disclosure; `functional-design-agent` to rule on
+`AC-COCKPIT-19` and the provenance-disclosure criteria from register 15's
+pass-26 work; `ui-ux-designer` for detailed live-product testing, which
+includes identifying every current callout site so nothing is missed.
+
+
+
+### 2026-08-08 — Gate 11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `f925a3f` — **THE LAST GATE FOR `close-cockpit-home`**
+
+**Deploy succeeded**, on `dev`'s actual `HEAD` this time (`f925a3f`, clean
+checkout — `git status` on `dev/` was `## main`, nothing else, before and
+after). `f925a3f` is one gate-10 finding ahead of `f313d41` (test-agent's
+final-confirmation commit): a 2-file, 13-line diff qualifying the
+`cockpit-return` control's badge with "N left" — the specific thing this gate
+exists to confirm actually shipped, not just passed a test. Confirmed below.
+
+**Ports** — `API_PORT=8021`, `GES_PORT=8022`, per the human's instruction and
+this gate's standing assignment. `8030` (human's pilot) and `8050` (design
+preview) were LISTEN before, during, and after; only this agent's own PID
+(read fresh from `lsof -nP -iTCP:8021 -sTCP:LISTEN -t` immediately before the
+kill, never by name) was stopped. Confirmed 8021/8022 free afterward.
+
+**Served URL and health check:**
+
+| Field | Value |
+|---|---|
+| Served URL | `http://127.0.0.1:8021/` |
+| Health endpoint hit | `GET /health` |
+| Response | `200` — `{"status":"ok","env":"pilot","tenant":"tenant-demo","holds_credentials":false,"ges_base_url":"http://127.0.0.1:8022"}` |
+| Checked at | 2026-08-08 ~21:48 CDT |
+| Result | **PASS** |
+
+Only `8021` LISTENs (single-process pilot, broker collapsed in), matching
+prior passes.
+
+**The gate-10 fix, confirmed on the live instance, not the diff.** `/`'s
+`cockpit-return` control now renders `Close - 2026-06` with a
+`<span class="ct">6 left</span>` — the qualifier is present, not a bare
+number.
+
+**Entry point.** `/` renders the close cockpit (`cockpit-h1`, `close-tracker`,
+`cockpit-acts`, `cockpit-coverage-strip` all present); `exception-queue` is
+absent from `/`.
+
+**Drawer is the only navigation.** No live `.shell`/`.navitem`/`.navgrp`/
+`sidebar` markup anywhere in the fetched `/` — every occurrence of those
+strings is inline CSS comment documenting the removal, checked individually.
+All nine destinations plus the return control resolved 200: `/queue`,
+`/approvals`, `/ask`, `/catalogue`, `/monitors`, `/audit`, `/inventory`,
+`/refusals`, `/my-probe-history`, `cockpit-return` (`href="/"`).
+
+**Post-resolution landing, walked end to end on the live instance.**
+Resolved `ITEM-21400-CP` (R1, "accepted and explained") via
+`POST /review/ITEM-21400-CP/resolve`. Note for whoever runs this from a clean
+checkout: `expiry_period` and `clears_by` are HTML `<input type="month">`
+fields — `YYYY-MM`, not a day-level date or an integer count of days; a
+day-level `clears_by` value 422s with `expected_clearing_period_missing`
+(observed first-hand) even though a value was supplied. Once sent correctly:
+- Landed on the next item, `ITEM-18300-OM` (`item-h1` present).
+- Confirmation named the item and resolution type verbatim:
+  `data-testid="cockpit-resolution-confirmation" data-resolved-item-id="ITEM-21400-CP"
+  data-resolution-type="R1"`, text *"Recorded: 21400 GR/IR Clearing - accepted
+  and explained."*
+- **The three-way agreement `AC-COCKPIT-20` was written for is real on this
+  build**, not just in the test suite: `cockpit-return` badge went `6 left` →
+  `5 left`, the drawer's `nav-queue` badge went `6` → `5`, and `ITEM-21400-CP`
+  no longer appears as a row on `/queue` — all three checked independently
+  after the resolve and after a fresh `/` reload. This is the gate-8/10 defect
+  `deploy-agent` found on `7ecba21` (badge and `/queue` stuck at 6 while the
+  cockpit's own count moved), and it is genuinely fixed here, not merely
+  passing a test that changed its own assertion.
+- `ITEM-21400-CP`'s own `/review` page shows `item-state-line: "Not approved"`
+  and a `disposition-record data-resolution-type="R1"` — the resolution
+  persisted correctly.
+
+**Close tracker.** `tracker-checkpoint` markup present on `/` (5 stops for
+the pilot's declared calendar state); not independently re-walked through all
+four `?tracker=` demo states this pass since `f313d41`'s test-agent pass
+already exercised all four live and nothing in the gate-11 diff touches
+`state.py`.
+
+**FP&A confirmed absent.** `/fpa`, `/fp-and-a`, `/fpna` all `404`; no
+`FP&A`/`FPNA` string anywhere in the fetched `/`.
+
+**Standing disclosures confirmed live on the new landing screen.**
+`pilot-strip` and `transport-topology-state` (`data-transport="in-process"`)
+both present on `/`.
+
+**Smoke test handoff — owed to `test-agent`, not run by this agent.** This
+invocation has no `Task`-equivalent tool, matching every prior deploy-agent
+pass on this enhancement (`7ecba21`, and gate 11's prior close). Reported to
+the orchestrator rather than silently skipped or substituted. Note for the
+orchestrator: `test-agent`'s **already-executed** post-deploy smoke suite at
+`f313d41` (13/13, `test-evidence/post-deploy-smoke-2026-08-08.md`) covers
+everything this diff did not touch; the 13-line gate-10 fix itself has now
+been confirmed live by this agent above (the "N left" qualifier), but a
+formal `test-agent` run against `f925a3f` specifically has not happened and
+is still owed before this gate can be considered fully discharged by the
+process this system defines, even though this agent found nothing wrong.
+
+**NOT done here:**
+- **Current Status is NOT changed to `deployed (dev, local)`** — that is the
+  human's gate approval to give, not this agent's to set.
+- No promotion to `prod/`. `dev/` was not modified — deploy ran in place on
+  a clean tree, confirmed clean again after teardown.
+
+**Binding decisions checked against, and how this pass satisfies each:**
+- **`target_env` parameter contract (this agent's own contract, v1.1.0)** —
+  only `local` implemented; `target_env=local` is what was requested, so no
+  loud-failure branch was needed. Recorded served URL, health endpoint hit,
+  response body, and timestamp per the 1.1.0 requirement, not just the port.
+- **"8030/8050 are the human's, never touch" (this task's Critical
+  instruction)** — isolated with `lsof -nP -iTCP:PORT -sTCP:LISTEN -t`
+  exactly as instructed, never a bare `lsof -ti`; killed by PID re-read
+  immediately before the kill, reaped inside this same invocation.
+- **`close-cockpit-home`'s standing MVP1-desktop-only scope
+  (`PROJECT_CONTEXT` header, `PLAN §9.2 A2`, `FUNCTIONAL_SPEC §21`)** — no
+  surface other than desktop web touched or claimed.
+- **The five-item claim-prohibition list (gate 10, human declined a sixth
+  2026-08-06)** — not re-audited this pass (out of gate-11's scope and
+  unchanged in the gate-11 diff); flagging for completeness rather than
+  silently passing over it.
+- **Test Policy: all suites blocking (Team gate)** — this agent cannot itself
+  discharge that; explicitly reported as still owed to `test-agent` above
+  rather than treated as satisfied by this agent's manual walk.
+
 ### 2026-08-08 — Gate 8/11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `7ecba21`
 
 **Deploy succeeded**, for the smoke-test gate `close-cockpit-home` owes. Deployed
@@ -2593,6 +2759,84 @@ absent afterwards:**
 `AC-REFUSAL-11`, F17 blind re-performance and direct Tier-2 posting.
 
 ## Test Results
+
+### 2026-08-08 — Gate 11 · Test — `test-agent`, `dev` @ `f925a3f` — **FINAL SMOKE, `close-cockpit-home` CLOSED**
+
+**Everything passes. All suites EXECUTED, all blocking, all green, including
+the post-deploy smoke test re-run against the exact deploy commit. This is
+the last thing `close-cockpit-home` needed — the enhancement is now done.**
+
+A prior attempt at this same gate dropped mid-run on an API connection error
+unrelated to the build; nothing was committed, tree was clean, 8021/8022 and
+8030/8050 all confirmed untouched. This pass started fresh.
+
+**Whole tree: 3,193 / 3,193, six orderings all green** (file, reversed, seeds
+1 / 7 / 42 / 20260731). 0 added, 0 removed vs. pass 3's `f313d41` — the
+gate-10 diff (2 files, 13 lines) changes one existing test's assertion body
+in place and adds no scenario.
+
+| Suite | Status | Result | Δ vs. `f313d41` |
+|---|---|---|---|
+| unit / integration | `EXECUTED` | 2,447 / 2,447 | 0 |
+| functional | `EXECUTED` | 400 / 400 | 0 |
+| UX | `EXECUTED` | 194 / 194 | 0 |
+| red-team | `EXECUTED` | 61 / 61 | 0 |
+| security | `EXECUTED` | 40 / 40 | 0 |
+| architecture | `EXECUTED` | 28 / 28 | 0 |
+| industry | `EXECUTED` | 23 / 23 | 0 |
+| **whole tree** | `EXECUTED` | **3,193 / 3,193** | **0** |
+| **post-deploy smoke (fresh instance, served on 8021/8022)** | `EXECUTED` | **15 / 15** | +2 scenarios vs. pass 3's 13 |
+
+**The gate-10 finding — "N left", not a bare digit — confirmed on three
+independent readings**, not just the one suite assertion that changed:
+(1) the suite's own re-run of `TestAC_COCKPIT_13_through_16` and
+`AC-COCKPIT-20`, both checking the exact `"{N} left"` suffix; (2) an
+independent scratch scenario isolating the `.ct` span by CSS class and
+asserting its raw text is `"{N} left"` and explicitly not `str(N)`; (3) a
+fresh live-served instance on 8021/8022, where the served markup read
+`<span class="ct">6 left</span>`. A full mutation test (reverting the
+rendering line and confirming the suite catches the regression) was
+attempted and blocked by this session's sandbox classifier while the source
+was mutated; the mutation was reverted immediately via `Edit`, confirmed
+clean by `git status --porcelain` before and after, and no test was run
+against the mutated state. Recorded plainly as a method gap, not folded into
+a "mutation-tested" claim it does not satisfy — the three independent
+readings above stand in its place.
+
+**The three-way badge sync (cockpit count, drawer badge, `/queue` listing)
+still holds live at `f925a3f`.** On the fresh instance: before resolving,
+`cockpit=6 badge=6 rows=6`; after resolving one item, `cockpit=5 badge=5
+rows=5` — all three still in agreement, none stuck, matching the fix's
+intent and the exact defect class `deploy-agent` originally found on
+`7ecba21`.
+
+**The post-deploy smoke test's first script draft scored four false
+failures — all in the ad-hoc script itself, not the application**: a
+sidebar-absence check that matched the removal-history HTML comment rather
+than live markup, a guessed testid for the topology disclosure, a JSON POST
+against an endpoint that takes form-encoded data, and a guessed queue-row
+testid. All four corrected against the real served markup and the suite's
+own harness before the result recorded above; named individually here rather
+than silently discarded, since a script bug and a product defect must not
+read the same in a report.
+
+**Everything else gate 8 already covered was re-verified rather than assumed
+to still hold**: the single-return-control claim, sidebar absence (a live
+markup check, not a substring match against the removal-history comment),
+FP&A's continued absence, and the nine overridden MVP1 criteria plus
+`AC-F41-13`/`AC-F12-08` — all still hold at `f925a3f`. No regression found
+between `f313d41` and `f925a3f`.
+
+Full evidence: `test-evidence/unit-integration-2026-08-08.md`,
+`test-evidence/order-independence-2026-08-08.md`,
+`test-evidence/close-cockpit-home-verification-2026-08-08.md`,
+`test-evidence/post-deploy-smoke-2026-08-08.md` (all four files' "PASS 4"
+sections).
+
+**Verdict: PASS. No blocking suite fails, no blocking suite went unexecuted,
+nothing carried forward from a dropped prior attempt or from a manual walk.
+This closes gate 11 for `close-cockpit-home` — the enhancement is fully
+done.**
 
 ### 2026-08-08 — Gate 8 · Test — `test-agent`, `dev` @ `f313d41` — **FINAL CONFIRMATION, `close-cockpit-home` pass 3**
 
