@@ -2479,6 +2479,88 @@ absent afterwards:**
 
 ## Test Results
 
+### 2026-08-08 — Gate 8 · Test — `test-agent`, `dev` @ `7ecba21` (`close-cockpit-home` close)
+
+**All suites EXECUTED and passing except the post-deploy smoke test, which is
+STATIC ONLY — NOT EXECUTED and does not satisfy its blocking obligation.**
+
+**Whole tree: 3,192 / 3,192, six orderings all green (file, reversed, seeds
+1 / 7 / 42 / 20260731).** The seeded-shuffle gap `code-agent` reported at
+pass 2 — `pytest-randomly` absent from this project's `.venv`, so order
+independence had only been checked by forward/reversed file order — is
+closed: `pytest-randomly>=3.15` installed into `dev/.venv` (not the platform
+environment) and all four of this project's history-standard seeds run.
+**No order dependence found.** This is reported as the real (negative)
+finding it is, not as a formality now that the tooling exists.
+
+| Suite | Status | Result | Δ vs. `b447a11` |
+|---|---|---|---|
+| unit / integration | `EXECUTED` | 2,447 / 2,447 | 0 |
+| functional | `EXECUTED` | 399 / 399 | **+34** |
+| UX | `EXECUTED` | 194 / 194 | 0 |
+| red-team | `EXECUTED` | 61 / 61 | 0 |
+| security | `EXECUTED` | 40 / 40 | 0 |
+| architecture | `EXECUTED` | 28 / 28 | 0 |
+| industry | `EXECUTED` | 23 / 23 | 0 |
+| **whole tree** | `EXECUTED` | **3,192 / 3,192** | **+34** |
+| post-deploy smoke | **`STATIC ONLY — NOT EXECUTED`** | — | — |
+
+**Test-count delta, by node id (not counted): 3,158 -> 3,192, +38 added, −4
+removed, net +34.** All 4 removals are named, superseded renames tracking the
+entry-point change (`/` now the close cockpit, not the merged queue) and the
+sidebar's removal; none is a coverage reduction. Full breakdown, including
+seven files with same-node-id body changes (all widen-or-repoint, none
+narrowed), in `test-evidence/unit-integration-2026-08-08.md`.
+
+**Six independent re-verifications, each executed rather than re-run green**
+(full detail in `test-evidence/close-cockpit-home-verification-2026-08-08.md`):
+
+1. **`AC-COCKPIT-08`'s differential test, mutation-tested.** Made a second
+   figure (the no-scan tile) move with the probe count; the test caught it
+   (`1 failed, 1 passed` → reverted → `2 passed`). The test genuinely checks
+   the delta it claims to.
+2. **`AC-COCKPIT-04`'s single-return-control claim, re-verified independently**
+   across 17 screens/states including three `code-agent` had not checked
+   (post-resolution empty-queue landing, an error state, `/dossier/{id}`).
+   Sixteen carry exactly one `href="/"`; `/dossier/{id}` carries zero **by
+   design** — it is the documented shell-off exhibit and links back to
+   `/review/{id}`, not to `/`. Not a defect; recorded explicitly rather than
+   folded into a blanket pass.
+3. **The sidebar is genuinely gone.** `nav()`, `.navitem`, `.navgrp` have no
+   live call site and no CSS rule block — every hit is historical comment.
+   Exactly one `<nav>` construction site in the build (`cockpit-topbar`).
+4. **Both pass-2 test corrections, mutation-tested by reverting each.**
+   Reverting `textContent`→`innerText` reintroduces the defect (12 of 13
+   scenarios wrongly flag the persona buttons). Reverting the drawer-aware
+   `click_nav()` helper back to a direct `.click()` reintroduces a Playwright
+   timeout against the closed `<details>`. Both are real fixes.
+5. **FP&A absence, confirmed by a real reachability sweep from `/`** — 18
+   nodes visited, zero FP&A hits in rendered text or link targets.
+6. **The nine overridden MVP1 criteria and `AC-F41-13`/`AC-F12-08` remain
+   claimed nowhere** — re-swept over `7ecba21`; only the same already-documented
+   self-denying node IDs appear, and `AC-F41-13`/`AC-F12-08` stay at 0
+   occurrences.
+
+**Post-deploy smoke test — `STATIC ONLY — NOT EXECUTED`.** No process is
+listening on this build's ports (8021/8022) at gate time; the last live
+deploy (gate 11, `b447a11`) predates this commit. Per this agent's
+process-lifecycle constraint, a served instance is `deploy-agent`'s/the
+orchestrator's to start, never this agent's own turn. **This does not satisfy
+the smoke test's blocking obligation** — it is an unmet gate condition, not a
+green line, and is reported as such rather than folded into the pass count
+above. The human's pilot (8030, pid 48206) and the design preview (8050,
+pid 85436) were both running before this gate and are both still running,
+unchanged, after it — confirmed by `lsof` PID re-read, never by name.
+
+**Nothing was fixed by this agent.** All mutations performed for verification
+(item 1's sentinel, item 4's two reverts) were reverted before this report,
+each confirmed by `git status --porcelain` returning clean immediately after.
+
+Full evidence: `test-evidence/unit-integration-2026-08-08.md`,
+`test-evidence/order-independence-2026-08-08.md`,
+`test-evidence/close-cockpit-home-verification-2026-08-08.md`,
+`test-evidence/post-deploy-smoke-2026-08-08.md`.
+
 ### 2026-08-06 — Gate 11 · POST-DEPLOY SMOKE **RE-RUN** — `test-agent`, `dev` @ `b447a11` (pass 26)
 
 **Everything passes. Both smoke failures are closed, verified by mutation rather
