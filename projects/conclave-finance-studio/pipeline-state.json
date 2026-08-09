@@ -1,7 +1,7 @@
 {
   "name": "conclave-finance-studio",
   "template": "custom (FastAPI, server-rendered)",
-  "position": "Enhancement close-cockpit-home \u2014 Deploy (walked live, formal smoke re-run in progress at f925a3f)",
+  "position": "close-cockpit-home complete \u2014 all 11 gates. MVP1 base also complete.",
   "env": "dev, local",
   "last_activity": "2026-07-31",
   "served_url": "http://127.0.0.1:8030/",
