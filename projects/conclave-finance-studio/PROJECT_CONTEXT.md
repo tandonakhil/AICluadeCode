@@ -95,6 +95,30 @@ rather than the disclosure; `functional-design-agent` to rule on
 pass-26 work; `ui-ux-designer` for detailed live-product testing, which
 includes identifying every current callout site so nothing is missed.
 
+**2026-08-09 — `functional-design-agent`'s ruling, delivered.** Full reasoning
+in `knowledge/FUNCTIONAL_SPEC.md` §29.15.
+
+1. `AC-COCKPIT-19` is **retired outright, no replacement** (§20, §29.15.1). Its
+   entire content was the disclosure-inheritance requirement; the human
+   withdrew the requirement rather than narrowing it, so there is no
+   stricter/re-scoped successor to issue — unlike `AC-F12-08`/`AC-F41-13`,
+   which were narrowed and replaced.
+2. **Export-side scope: no `FUNCTIONAL_SPEC.md` criterion was ever issued for
+   register 15's provenance section or register 19's transport section** in
+   the export's `REQUIRED_INTEGRITY_SECTIONS` contract — pass 26 built both as
+   `SECURITY_KB`/`ARCHITECTURE_KB` register mitigations and deliberately left
+   "whether a criterion should exist" to this agent, and it was never issued.
+   So there is nothing here to retire on their account. **Not flagged as
+   ambiguous**: this Decisions Log entry already answers "screens only or
+   everything" as *everything* ("remove entirely", register 15 and 19 both
+   named as needing re-wording, not scoped to screens). `code-agent` should
+   treat the export-side sections as in scope for whatever
+   `solution-architect`'s/`security-architect`'s register updates now say, and
+   should not read this file's silence as a reason to leave them — the
+   silence predates this decision and was never a ruling that they stay.
+3. File total unchanged at 290 issued IDs; now 287 live, three retired
+   (`AC-F12-08`, `AC-F41-13`, `AC-COCKPIT-19`).
+
 
 
 ### 2026-08-08 — Gate 11 · Deploy (`deploy-agent`), `target_env = local`, `dev` @ `f925a3f` — **THE LAST GATE FOR `close-cockpit-home`**
@@ -5266,6 +5290,47 @@ this system's most consequential readers are handed FILES.** Both weakenings
 were disclosed on ten screens and in no artefact, and both were found by a gate
 rather than by a check. What holds them down now is that each is a section of a
 contract validated at construction, not a sentence somewhere.
+
+**On register 19, reworded 2026-08-09 — the screen half of pass 25's fix is
+being removed by human decision; the export half is not.** `solution-architect`
+(drop-in text below, since `PROJECT_CONTEXT.md`'s register is not its file to
+edit — see `ARCHITECTURE_KB` §25.7):
+
+> **Register 19's mitigation clause changes** from *"every screen carries
+> `transport_topology_strip`, disclosing the collapsed boundary in words"* to:
+> the screen-level disclosure was **removed by human decision on 2026-08-09**
+> (see the Decisions Log entry of that date); the underlying module boundary
+> is unchanged; status stays **NARROWED, NOT CLOSED**.
+>
+> **T1–T4 are unaffected** — all four are facts about deploy-artefact
+> packaging or runtime self-attestation (the `ges` package absent from the api
+> image, `pilot_transport.py` absent from that image, one full approval
+> executed over `LoopbackHttp`, `backend/pilot.py`'s credential-guard
+> assertion), none reads or depends on any screen string, and they gate a
+> different event — first tenant deployment — than this "sufficient for the
+> pilot" ruling does. **One correction to the ruling's own ledger**: §25.3.1
+> condition 5 asserted the disclosure held; that assertion is struck, not
+> re-litigated, now that the call site it named is gone.
+>
+> **Orchestrator correction, 2026-08-09, same day.** The paragraph above said
+> the export's `transport` section was untouched and out of scope. **That was
+> this task's brief, not the human's actual decision** — I scoped
+> `solution-architect`'s task to the screen-level function only; the
+> Decisions Log entry it was asked to read named register 15 *and* 19 without
+> limiting either to screens. `functional-design-agent`, ruling from the full
+> entry, found the decision covers *"everything… not scoped to screens"* and
+> instructed `code-agent` to treat both export sections as in scope regardless
+> of this narrower KB text. **That ruling governs.** `ges_gateway.transport_status()`
+> and the export's `provenance`/`transport` sections are in scope for removal.
+> `solution-architect`'s technical analysis above (T1–T4 unaffected, condition
+> 5 struck) stands unchanged; only the "untouched, not asked for removal"
+> conclusion in this one paragraph is superseded.
+>
+> **The residual, stated plainly, and now covering both surfaces:** after
+> removal, nobody who looks at a served screen *or* opens an export has any
+> way to learn the trust boundary is collapsed, except by reading this KB or
+> the source. That is a real narrowing of who the information reaches,
+> recorded as a fact, not as an argument to reverse the decision.
 
 **On register 35 (style-inlining) at pass 26 — a finding for
 `solution-architect`, recorded here and NOT ACTED ON.** `test-agent` confirmed

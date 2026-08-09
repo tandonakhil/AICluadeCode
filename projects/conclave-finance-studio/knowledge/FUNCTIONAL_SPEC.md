@@ -35,6 +35,22 @@ fallback pattern itself is **not** ratified or rejected here — see §29.14 —
 because whether it becomes a standing rule is a pipeline-governance decision
 this agent cannot make unilaterally; it is reported as a finding for the
 orchestrator / Plan gate.
+**Pass 7 (2026-08-09)** — ruling owed by `PROJECT_CONTEXT.md`'s 2026-08-09
+Decisions Log entry (removal of the synthetic-data and transport-topology
+disclosures). `AC-COCKPIT-19` **retired outright, no replacement** (§20,
+§29.15): its entire content was the disclosure-inheritance requirement, and
+the requirement was withdrawn by the human, not narrowed. **Ruled: no
+functional-design-agent ID was ever issued for the export-side provenance
+section (`REQUIRED_INTEGRITY_SECTIONS`'s `provenance` key, register 15) or the
+export-side transport section (`transport` key, register 19)** — both were
+built as `SECURITY_KB`/`ARCHITECTURE_KB` register mitigations and their own
+test contracts, explicitly *not* promoted to an acceptance criterion at pass
+26 ("Whether a criterion should exist stays `functional-design-agent`'s
+ruling"). Nothing in this file names them, so nothing in this file requires
+retirement on their account; §29.15 states this so it is a checked finding
+rather than a silent absence. File total unchanged in count of issued IDs:
+**290 issued, 287 live**, three retired (`AC-F12-08`, `AC-F41-13`,
+`AC-COCKPIT-19`).
 This file is a durable
 knowledge base: it accumulates across features and enhancements, and it is what
 `verification-agent` audits against at the Verification gate.
@@ -1223,6 +1239,7 @@ are never shifted up to close the gap, and a retired ID is never reissued.
 |---|---|---|---|
 | `AC-F12-08` | 2026-07-31 (pass 2) | Readable as a per-named-user probe score, which G-PROBE-3 prohibits and the gate-6 ruling 4 forbids. Meaning materially narrowed to aggregate-only, so replaced rather than rewritten. | `AC-F12-10` |
 | `AC-F41-13` | 2026-08-03 (pass 3) | Asserts four elements **co-visible on one screen**. The approved design removes the approve control from the finding screen (`UX_KB` §5.4) and the human-approved pass-17 IA gives the approve act its own screen, so no screen in the approved IA can carry the set. Meaning changes materially; replaced, not rewritten. Split across three IDs asserting strictly more in total. | `AC-F41-22`, `AC-F41-23`, `AC-F41-24` |
+| `AC-COCKPIT-19` | 2026-08-09 (pass 7) | Required the cockpit inherit "the standing per-screen disclosures" (data-provenance/pilot and transport-topology). `PROJECT_CONTEXT.md` 2026-08-09 records the human's fully-informed decision to remove both disclosures entirely, from every screen, with no replacement. The requirement was withdrawn, not narrowed or better-specified, so there is no successor ID — retired outright. | none |
 
 **No criterion referencing the ≥95%-precision promotion gate was ever issued**, so
 `RESPONSIBLE_AI_KB` §6's inversion finding retires nothing here. The gate lives in
@@ -1272,6 +1289,12 @@ file rather than a search.
 > **Pass 6 (2026-08-08)** — `functional-design-agent`'s owed review of
 > `AC-COCKPIT-20`. Ratified with a wording amendment (§29.5); no criterion
 > issued or retired, counts unchanged.
+>
+> **Pass 7 (2026-08-09)** retired `AC-COCKPIT-19` outright, no replacement
+> (§29.15) — the human's 2026-08-09 decision to remove the per-screen
+> disclosures withdrew the criterion's entire content. No criterion issued.
+> File total: **290 issued, 287 live**, three retired (`AC-F12-08`,
+> `AC-F41-13`, `AC-COCKPIT-19`).
 
 ### 22.1 Criteria per feature
 
@@ -1400,10 +1423,12 @@ governing when that is legitimate and when it is not).
 | `/inventory` | `AC-F5-07`, **`AC-F5-08`** |
 | `/audit` | `AC-F1-09`, `AC-F2-07`, `AC-REFUSAL-04` |
 | `/refusals` | `AC-REFUSAL-01`, `AC-REFUSAL-02` |
-| **the entry point — the close cockpit** (route not yet settled; `ui-ux-designer` proposes `/close` with `/` re-pointed to it from `/queue`) | `AC-COCKPIT-01`, `-02`, `-05`, `-06`, `-07`, `-09`, `-15`, `-17`, `-19`; `AC-F38-11` now binds here too (§29.10 item 4) |
+| **the entry point — the close cockpit** (route not yet settled; `ui-ux-designer` proposes `/close` with `/` re-pointed to it from `/queue`) | `AC-COCKPIT-01`, `-02`, `-05`, `-06`, `-07`, `-09`, `-15`, `-17`; `AC-F38-11` now binds here too (§29.10 item 4) |
 | **every screen** — not a route | `AC-COCKPIT-03` (the drawer), `AC-COCKPIT-04` (the return control, on every screen but the cockpit), `AC-TYPESIZE-01`–`-03` |
 
 `AC-F41-13` appears nowhere in this table: it is retired (§20, §28.1).
+`AC-COCKPIT-19` is retired 2026-08-09 (pass 7, §20, §29.15) and is removed from
+this row for the same reason.
 
 **Pass 4 (2026-08-08) added the last two rows.** The cockpit's row is keyed on
 *the entry point* rather than on a route because the route is `solution-architect`'s
@@ -1506,6 +1531,7 @@ reading I state, and I have not resolved either.
 | 2026-08-08 | 1.3.0 | **Pass 4 — the `close-cockpit-home` enhancement.** 22 criteria issued in §29, 0 retired; file total 289 issued, 287 live. `AC-COCKPIT-01`–`-19`: the per-persona landing, drawer completeness and the non-drawer return control; the KPI rule `ui-ux-designer` asked for by name (a figure is inside a link to a specific object and carries a ≥13px qualifier, `-05`/`-06`); the abstention count (`-07`); the probe-arithmetic hazard as a **differential** criterion (`-08`); the close tracker's four states including both absences (`-09`–`-12`); the human's condition, the post-resolution landing, with its empty and error cases (`-13`–`-16`); and `-19`, a new screen inherits the standing per-screen disclosures. `AC-TYPESIZE-01`–`-03`: A2.5's typography floor issued **product-wide**, with the consequence disclosed in §29.11 rather than narrowed away. **Refused: the FP&A home page** — no such persona exists in the build and admitting one is `plan-agent`'s lane (§29.11 item 1). §23 gains two rows; §29.10 names the criteria and checks a re-point of `/` touches and rules that `AC-REFUSAL-13`'s text, not its check's gloss, governs. | Human approval of the close-cockpit design from a rendering, `PROJECT_CONTEXT.md` Decisions Log 2026-08-08, including the post-resolution-landing condition; `UX_KB` Part A3 (A3.7's two named requests); `FEATURES.md` `feature/2026-08-08-close-cockpit-home`. Gate 4 human approval of these criteria pending |
 | 2026-08-03 | 1.2.0 | **Pass 3 — gate-9 loop-back.** Three rulings in §28: `AC-F41-13` retired and replaced by `AC-F41-22`/`-23`/`-24`; `AC-F5-07`'s population ruled and `AC-F5-08` issued; §23 re-keyed from screen names to routes. Total 267 issued, 265 live, two retired. | Gate-9 Verification block, `PROJECT_CONTEXT.md` Decisions Log 2026-08-03 |
 | 2026-07-31 | 1.1.1 | **PATCH — arithmetic only.** §27.11 read "262 issued, 261 live (186 + 77 − 1)"; 186 + 77 = 263, so the file holds **263 issued, 262 live**. Found by `verification-agent` at gate 9, whose per-feature enumeration gave 262 and disagreed with the stated total. **No acceptance criterion was added, removed or renumbered** — two figures in one sentence were wrong. The corrected figures are carried through §21's cross-reference and the 1.1.0 row above. | Gate-9 loop-back to gate 7, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31 |
+| 2026-08-09 | 1.4.0 | **Pass 7 — the standing per-screen disclosures removed by human decision.** `AC-COCKPIT-19` retired outright, no replacement (§20, §29.15.1): its content was the disclosure-inheritance requirement, and the human withdrew the requirement rather than narrowing it. **Ruled: no `FUNCTIONAL_SPEC.md` ID was ever issued for the export-side provenance section (register 15) or transport section (register 19)** — both are `SECURITY_KB`/`ARCHITECTURE_KB` register mitigations built at gate-7 pass 26, never promoted to a criterion here, so their disposition is `solution-architect`'s/`security-architect`'s register update, not this file's (§29.15.2). No criterion issued. Total unchanged at 290 issued; 287 live, three retired (`AC-F12-08`, `AC-F41-13`, `AC-COCKPIT-19`). | `PROJECT_CONTEXT.md` Decisions Log 2026-08-09 (human decision: remove synthetic-data and topology disclosures entirely, no replacement) |
 
 ---
 
@@ -2568,16 +2594,29 @@ that are exactly where a dead end would reappear.
 - **When** the cockpit renders
 - **Then** that figure's place on the screen states that it could not be established and names why, and it is neither omitted from the screen nor rendered as zero, as blank, as a dash or as a stale prior value — convention C2 (silence is never a pass) holds on this screen as on every other
 
-#### AC-COCKPIT-19
-- **Given** the close cockpit as a screen this build renders
-- **When** it is rendered in any state and for any persona
-- **Then** it carries the standing per-screen disclosures every other screen of this build carries — the data-provenance (pilot) disclosure and the transport-topology disclosure — under the same wording obligations, so that adding a screen does not add a surface on which a disclosed weakness goes unstated
+#### AC-COCKPIT-19 — **RETIRED 2026-08-09 (pass 7). No replacement.**
+- ~~**Given** the close cockpit as a screen this build renders~~
+- ~~**When** it is rendered in any state and for any persona~~
+- ~~**Then** it carries the standing per-screen disclosures every other screen of this build carries — the data-provenance (pilot) disclosure and the transport-topology disclosure — under the same wording obligations, so that adding a screen does not add a surface on which a disclosed weakness goes unstated~~
 
-> `AC-COCKPIT-19` exists because of a pattern already on this project's record:
-> `PROJECT_CONTEXT.md` 2026-08-06 notes that the collapsed trust boundary
-> *"slipped past three disclosure surfaces."* A new top-level screen is a fourth
-> opportunity. This criterion says nothing about the wording, which belongs to
-> the disclosures' owners; it says the new surface is not exempt.
+> **Retired, body preserved, not replaced.** `PROJECT_CONTEXT.md`'s 2026-08-09
+> Decisions Log entry records the human's fully-informed choice to remove the
+> synthetic-data (pilot) disclosure and the transport-topology disclosure
+> **entirely, from every screen, with no replacement wording and no substitute
+> surface**. This criterion's entire content was "the cockpit inherits the
+> standing per-screen disclosures" — once there are no standing per-screen
+> disclosures to inherit, there is nothing left for the criterion to assert.
+> Unlike `AC-F12-08` and `AC-F41-13`, this is not a narrowing that a successor
+> ID can capture at a stricter meaning: the underlying requirement was
+> withdrawn by explicit human decision, not superseded by a better-specified
+> version of itself. §0's rule that a retired ID is never silently reused holds
+> exactly the same way; there is simply no `-20`-shaped replacement to name,
+> because issuing one would be re-litigating a decision that is not this
+> agent's to reopen (see the constraint on this pass, below). §29.13 item 4 —
+> whether the pilot's process/trust boundary should have an acceptance
+> criterion **of its own**, independent of any screen disclosure — remains open
+> and is **not** answered by this retirement; it is a different question,
+> named here so the two are not conflated.
 
 ---
 
@@ -2635,6 +2674,12 @@ instruction.
 **Pass 6 (2026-08-08)** — the owed `functional-design-agent` review of
 `AC-COCKPIT-20`. Ratified with a wording amendment; see §29.5. Counts
 unchanged by an amendment under an existing ID.
+
+**Pass 7 (2026-08-09)** retired `AC-COCKPIT-19` outright, no replacement (§29.15).
+`AC-COCKPIT-19` was never in the observable-UI list above (the eleven pass-4
+observable-UI IDs did not include it), so §29.9's count of twelve is unaffected
+by this retirement. **File total: 290 issued, 287 live**, three retired
+(`AC-F12-08`, `AC-F41-13`, `AC-COCKPIT-19`).
 
 ### 29.9 Observable-UI position after this pass
 
@@ -2848,3 +2893,118 @@ flag, as exercised once here, is a reasonable fallback for *drafting* under
 this file's ID discipline; it should not, on this one clean instance, be
 read as a reason to treat self-issued criteria as equivalent to
 agent-issued ones before they are reviewed.
+
+---
+
+## 29.15 · Pass 7 (2026-08-09) — `AC-COCKPIT-19`'s retirement, and the export-side scope ruling
+
+**Task.** `PROJECT_CONTEXT.md`'s 2026-08-09 Decisions Log entry records the
+human's fully-informed choice to remove the synthetic-data (pilot) disclosure
+and the transport-topology disclosure **entirely, from every screen and
+export**, with the consequence stated in advance and accepted: claim
+prohibition 6's declined-reasoning no longer holds, and the 2026-08-05
+override's stated defensibility is weakened. That decision is not re-argued
+here. Two things were routed to this agent: rule on `AC-COCKPIT-19`, and rule
+on whether the "provenance-disclosure criteria from register 15 / pass 26"
+cover export-side scope.
+
+### 29.15.1 `AC-COCKPIT-19` — retired outright, no replacement
+
+`AC-COCKPIT-19`'s entire Then-clause was: the cockpit carries "the standing
+per-screen disclosures every other screen of this build carries — the
+data-provenance (pilot) disclosure and the transport-topology disclosure."
+Once those disclosures are removed by human decision, there are no standing
+per-screen disclosures for a new screen to inherit. Checked against §0's rule
+(a criterion whose meaning changes materially gets a new ID, not a rewrite
+under the old one) and against precedent (`AC-F12-08`, `AC-F41-13`): both
+precedents retired a criterion whose requirement was **narrowed or
+re-shaped** by an approved design change, and both had a successor ID that
+asserted a stricter or differently-scoped version of the same underlying
+obligation. This is not that shape. There is no narrower version of "inherit
+the standing disclosures" left to state once the standing disclosures do not
+exist — the obligation was withdrawn, not refined. **Ruling: retire
+`AC-COCKPIT-19` outright. No successor ID is issued**, because issuing one
+would mean inventing a disclosure requirement the human explicitly declined,
+which is this agent re-opening a decision that is not its lane to reopen.
+Done in place at its original location (§29.6) per this file's convention, and
+recorded in §20's Retired IDs table.
+
+This retirement does **not** touch §29.13 item 4 (whether the pilot's
+process/trust boundary should carry an acceptance criterion **of its own**,
+independent of any on-screen disclosure). That question is still open, still
+`plan-agent`'s and the human's to invoke as its own pass, and is a different
+question from the one this ruling answers — named here so the two are not
+read as the same thing settled by the same act.
+
+### 29.15.2 Export-side scope — ruled, not flagged: **out of this file's scope, because it was never in it**
+
+The brief asked me to confirm with `ui-ux-designer`'s parallel inventory
+whether the human's 2026-08-09 instruction reaches export-side disclosure or
+only screen banners, and to retire or amend register 15's criteria if export
+scope applies. Checked `knowledge/FUNCTIONAL_SPEC.md` directly for every ID
+that could name the export-side provenance section
+(`REQUIRED_INTEGRITY_SECTIONS`'s `provenance` key, `SECURITY_KB`/
+`ARCHITECTURE_KB` register 15) or the export-side transport section
+(`transport` key, register 19): **no such ID exists and none was ever
+issued.**
+
+The record is explicit about why, at the point pass 26 built the mechanism
+(`PROJECT_CONTEXT.md`, gate 7 pass 26, item 3): *"no criterion says the
+figures must come from a real warehouse, because that is a substitution the
+pilot made rather than a requirement it failed — so its reference is register
+15 in `register_entry`… Whether a criterion should exist stays
+`functional-design-agent`'s ruling."* That ruling was never made — the
+provenance and transport export sections were built and tested entirely as
+`SECURITY_KB`/`ARCHITECTURE_KB` register mitigations and their own contract
+tests (`REQUIRED_INTEGRITY_SECTIONS`, `tests/suites/security/
+test_transport_disclosure.py` and its provenance counterpart), never promoted
+into this file. `AC-F1-08` and `AC-F1-11` are the only export-integrity IDs
+this file carries (retention and anchor respectively); `AC-F1-01`–`-14` is the
+complete F1 range and none of it names provenance or transport.
+
+**Ruling, stated plainly for `code-agent`:**
+
+1. **There is nothing in `knowledge/FUNCTIONAL_SPEC.md` to retire or amend on
+   register 15's or register 19's account.** No ID here asserts export-side
+   provenance or transport disclosure, so none is now unmet-by-design and none
+   needs a §20 entry.
+2. **This is not ambiguous and is not being flagged as a scope question**, in
+   spite of the brief's instruction to flag if ambiguous — it is not ambiguous
+   *from this file's side*: the absence is total and was a deliberate,
+   recorded non-issuance at pass 26, not an oversight this pass discovered.
+   Whether the export-side sections should be removed is a live question, but
+   it is answered by reading `PROJECT_CONTEXT.md`'s 2026-08-09 entry itself
+   ("remove … entirely" was given in response to being asked whether "all
+   callouts" meant screen-only or full removal, and answered **entirely**,
+   with register 15 and register 19 both named as needing re-wording, not
+   scoped to screens only) and by `SECURITY_KB`/`ARCHITECTURE_KB`'s parallel
+   register updates (`solution-architect`, `security-architect`, routed in the
+   same entry) — neither of which is this agent's artefact to re-decide.
+   **`code-agent` should treat the export sections as in scope for whatever
+   `SECURITY_KB`/`ARCHITECTURE_KB` register entries 15 and 19 now say**, and
+   should not read this file's silence as licence to leave them, because this
+   file's silence predates the decision and was never a ruling that they stay.
+3. **If `SECURITY_KB`/`ARCHITECTURE_KB` retire or re-word the register-15/19
+   test contracts** (`REQUIRED_INTEGRITY_SECTIONS`'s `provenance`/`transport`
+   keys, and the security suite scenarios asserting the four required
+   phrases), **no `FUNCTIONAL_SPEC.md` edit follows from that**, because this
+   file never bound them. `code-agent` and `test-agent` should look to
+   `solution-architect`'s and `security-architect`'s register updates, not to
+   this file, for the export-side disposition.
+
+### 29.15.3 Completeness check — binding decisions this pass was checked against
+
+`PROJECT_CONTEXT.md`'s Decisions Log re-read in full, including every entry
+recorded since pass 6 (through 2026-08-09).
+
+| Binding decision | How this pass satisfies it |
+|---|---|
+| **2026-08-09 — remove the synthetic-data and topology disclosures entirely, no replacement, consequence accepted in advance** | `AC-COCKPIT-19` retired outright with no successor ID, matching "no replacement" exactly; the ruling does not re-litigate whether removal is acceptable. |
+| **2026-08-09 — register 15 and register 19 need re-wording, not closing; the underlying weaknesses are unchanged** | Left entirely to `solution-architect`/`security-architect`, as routed. Nothing in this file asserted those weaknesses as criteria, so nothing here needed re-wording, and this pass does not invent a criterion to re-word. |
+| **2026-08-06 — claim prohibition 6 declined; reasoning now stated as no longer holding** | Untouched — prohibition 6 remains declined; only the cited reasoning is flagged stale, and that flag lives in the Decisions Log, not in a criterion. |
+| **2026-08-05 `[override]` — nine criteria overridden, defensibility weakened, not reversed** | Unaffected. The nine overridden criteria are not named by this pass and remain overridden on their own terms. |
+| **Standing authorization; make the calls; report findings rather than defer them** | The export-side scope question is ruled, not flagged, because the record answers it; §29.15.2 states the reasoning so the ruling is checkable rather than asserted. |
+
+**Conflicts: none.** This ruling does not contradict `solution-architect`'s
+parallel register-19 KB update; §29.15.2 item 3 explicitly defers the export
+contract's disposition to that update rather than pre-empting it.

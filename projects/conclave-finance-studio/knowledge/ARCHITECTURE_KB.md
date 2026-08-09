@@ -19,6 +19,25 @@ where a ruling implies work, the owning agent is named and the work is theirs.
 `PROJECT_CONTEXT.md`'s register is likewise not edited by me; §25.6 states which
 entries each ruling closes, narrows or leaves open, for the orchestrator to record.
 
+**Write set for pass 3 (2026-08-09, register 19 reworded — removal, not
+disclosure), declared:**
+
+1. `projects/conclave-finance-studio/knowledge/ARCHITECTURE_KB.md` — this file
+   (**`Edit` only**; it exists, so `Write` is off the table for this path).
+   Sections amended: new §25.7 (register 19 reworded), §25.6 (register-effects
+   table, entry 19 row updated to point at §25.7), §24 (change history).
+
+**Nothing in `dev/` is touched by this pass.** This is a register/KB correction
+following a human decision recorded in `PROJECT_CONTEXT.md`'s 2026-08-09
+Decisions Log entry, not a design change — the underlying architecture (module
+boundary, not process boundary, for the pilot's collapsed trust boundary) is
+unchanged; what changes is that `chrome.transport_topology_strip()`, the
+on-screen disclosure of it, is being removed by `code-agent` in a later pass.
+`PROJECT_CONTEXT.md`'s register is, per the standing convention recorded at
+§25.6, not edited by me directly — the orchestrator is given the exact
+drop-in text for its two register locations (the summary table and the full
+register entry) in my report for this pass.
+
 **Write set for pass 1 (2026-07-31), declared:**
 
 1. `projects/conclave-finance-studio/knowledge/ARCHITECTURE_KB.md` — this file (new).
@@ -2211,7 +2230,7 @@ Stated for the orchestrator to record; **I do not edit `PROJECT_CONTEXT.md`.**
 
 | Entry | Effect | Why |
 |---|---|---|
-| **19** — pilot transport collapses the trust boundary | **NARROWED, NOT CLOSED** | Ruled sufficient for the pilot on five standing conditions (§25.3.1), and the precondition for first tenant deployment is now written as three conjunctive gates T1–T3 (§25.3.2) rather than as an open residual. It closes when T1/T2 are verifiable in a deploy artefact and T3 executes — none of which is possible on a single-host pilot. Owners: `deploy-agent`, `code-agent`, `test-agent`. |
+| **19** — pilot transport collapses the trust boundary | **NARROWED, NOT CLOSED — see §25.7 (pass 3, 2026-08-09) for the current text** | Ruled sufficient for the pilot on five standing conditions (§25.3.1), and the precondition for first tenant deployment is now written as three conjunctive gates T1–T3 (§25.3.2) rather than as an open residual. It closes when T1/T2 are verifiable in a deploy artefact and T3 executes — none of which is possible on a single-host pilot. Owners: `deploy-agent`, `code-agent`, `test-agent`. **§25.7 supersedes this row's wording of the mitigation** — the on-screen disclosure named here (via §25.3.1 condition 5) is being removed by human decision; the entry stays NARROWED, NOT CLOSED on the unchanged T1–T4 residual, not on the disclosure. |
 | **30** — `journal_attribute_outlier` threshold declared, not calibrated | **LEFT OPEN, and re-scoped upward** | Promoting the primitive into §7.3 does not calibrate it, and it must not be read as doing so. What changed is that the disclosure obligation is now an **architectural rule binding every future primitive** (§7.3), not a property of one module. Closing it still needs real close data — register 21/24. |
 | **35** — style-inlining (opened at gate 10 from the §9.4 residual) | **RESTATED 2026-08-06, still open, still one work item** — see the row below, which supersedes this one | Ruled at gate 10: inline it, four constraints, `code-agent` + `test-agent` (§25.4). Not a pilot blocker; a precondition on the first real-auditor export. |
 | **35 — as it now reads (supersedes the row above)** | **OPEN. Same remedy, different justification, and one thing it was thought to close that it does not.** | **Restated per §25.4bis.** *(i)* The remedy is unchanged: inline `chrome.stylesheet()` into each per-dossier retained view, under §25.4's four constraints. *(ii)* **The reason is now legibility, not `AC-F41-03`.** Unstyled, the artefact glues every label to its value (`Amount312,480.00`, `Coverage of this run70% - partial`) across 133 elements at two computed sizes — a misparse hazard in a seven-year record read by a party with no login and no one to ask, and arguably a failure of `AC-F41-04`'s own "reproduces … the figures, the threshold and the bundle version". *(iii)* **What entry 35 does NOT close, recorded so it is not read as closing it:** `AC-F41-03` is **not** made checkable in this artefact by inlining, because the risk band is absent from it entirely — the retained region derives from the approval screen and the band lives on Review. That is ruled correct and permanent (§25.4bis.2), not a gap. *(iv)* The byte cost is **unmeasured**; the two figures supplied so far were both wrong, and `code-agent` measures it before building. Owners: `code-agent` (build), `test-agent` (ARCH-16). |
@@ -2221,10 +2240,110 @@ Stated for the orchestrator to record; **I do not edit `PROJECT_CONTEXT.md`.**
 
 ---
 
+### 25.7 Register 19, reworded — removal, not disclosure (pass 3, 2026-08-09)
+
+**Not a ruling on whether this is acceptable.** The human decided that, fully
+informed that it reopens the 2026-08-06 decline of claim prohibition 6 and
+weakens the 2026-08-05 override's stated defensibility (`PROJECT_CONTEXT.md`,
+2026-08-09 Decisions Log entry). My job here is to make the register accurate
+once `chrome.transport_topology_strip()` — the on-screen call site D1 of gate-7
+pass 25, §25.3.1 condition 5 — stops rendering, and to state the consequence
+plainly. `code-agent` executes the actual removal in a later pass, after
+`functional-design-agent` rules on the affected criteria (`AC-COCKPIT-19`
+among them); nothing here changes what is built.
+
+**What is NOT changing.** The underlying fact register 19 exists to describe:
+*with the pilot transport running, the boundary between the api role and GES
+is a module boundary, not a process boundary* — a prompt-injected tool in the
+api process could reach `ges.executor` by `import` alone. That fact is
+architectural and is untouched by this pass. So is `ges_gateway.py`'s own
+header statement of it, and so — as far as this ruling can see — is the
+export's `transport` integrity section (`ges_gateway.transport_status()`,
+added at gate-7 pass 25 item D2), which is a *different* call site from the
+one named for removal. **This pass reworks only the screen half.** If the
+export section is later also removed, that is a further register-19 change
+and is not pre-empted here.
+
+**Register 19 — reworded text (drop-in for `PROJECT_CONTEXT.md`, both
+locations, given to the orchestrator in this pass's report rather than
+written by me):** the entry's mitigation clause changes from *"every screen
+carries `transport_topology_strip`, disclosing the collapsed boundary in
+words"* to *"the collapsed boundary was disclosed on every screen via
+`transport_topology_strip()` from gate-7 pass 25 through 2026-08-09; that
+call site is removed by human decision, reasoning and consequence recorded in
+`PROJECT_CONTEXT.md`'s 2026-08-09 Decisions Log. The underlying module
+boundary is unchanged; only the fact that a screen reader is told about it is
+gone."* **Status stays NARROWED, NOT CLOSED** — removing a disclosure cannot
+close an entry that was already open on a different, structural residual
+(T1–T4, below).
+
+**§25.3.1 condition 5 — struck, not silently dropped.** The five-condition
+"sufficient for the pilot" ruling's condition 5 read: *"every screen
+rendering a broker fact obtained through it says so, in words, in the pilot
+strip."* That condition is about to become **false as written** — not
+narrowed, not weakened, false — because there will be no call site left for
+it to be true of. I am not re-litigating whether four conditions are enough;
+the human has already made that call with the consequence stated in advance.
+What I am doing is recording, for anyone who reads §25.3.1 after this pass,
+that **condition 5 is struck**, and that the "sufficient for the pilot"
+ruling from here on rests on the remaining four conditions (refusal under
+`CONCLAVE_ENV=production`; one named file outside `app`; the static
+api-never-imports-ges check; `ARCH_04`'s executing topology witness) plus the
+export's `transport` section, which condition 5 never actually named but
+which is the one disclosure surface this pass leaves standing.
+
+#### 25.7.1 T1–T4: unchanged. They were already independent of the on-screen disclosure.
+
+Answering directly, as asked. **No — removing the on-screen strip changes
+nothing about T1–T4.** They were never conditioned on it in the first place;
+this is not a coincidence that survives by luck, it is because the two things
+gate two different questions:
+
+- §25.3.1 (five conditions, one of which is the strip) rules whether the
+  **pilot as currently run** is an acceptable trade for one host, synthetic
+  data, and a knowledgeable operator.
+- §25.3.2's T1–T4 gate **first tenant deployment** — a different, harder
+  event — and every one of them is a fact about packaging or runtime
+  self-attestation, not about what a screen says:
+  - **T1** — the `ges` package is absent from the api host's disk, checked in
+    the deploy artefact.
+  - **T2** — `backend/pilot_transport.py` is absent from that same artefact.
+  - **T3** — one full approval is exercised end-to-end over `LoopbackHttp` by
+    an executing suite.
+  - **T4** — `backend/pilot.py` asserts the credential guard
+    (`CONCLAVE_PROCESS_ROLE` set, `assert_api_process_holds_no_credentials()`
+    called) and refuses with exit 3 if not — discharged at gate-7 pass 25,
+    independently of and before D1/D2 were added in the same pass.
+
+None of the four reads, renders, or depends on any UI string. A human could
+delete every visible sentence about the transport and T1–T4 would not move,
+because they check what is on disk and what a process asserts about itself,
+not what a person is told. **They were already the harder, structural half of
+this residual; the screen strip was always the softer, human-facing half, and
+removing the softer half does not touch the harder one.**
+
+#### 25.7.2 The fact worth naming plainly, for the record — not an argument to reverse
+
+Once `chrome.transport_topology_strip()` is gone, **a human running the pilot
+has no way to learn, from the running application itself, that the trust
+boundary is collapsed to a module boundary — except by reading this KB (or
+`SECURITY_KB`, or the source).** The export's `transport` section is
+unaffected by this pass and still reaches the reader `AC-F1-04` defines as
+having no application login — but that reader is someone who downloads and
+parses the evidence export; it is not the person watching the screen while
+the pilot runs. That is a real narrowing of who the information reaches, from
+"anyone who looks at any served screen" to "anyone who opens the JSON export,
+or reads the KB." I am stating it because my contract requires me to say what
+changes plainly; I am not stating it as a reason to keep the strip — the
+human has already weighed that trade with the consequence in front of them.
+
+---
+
 ## 24 · Change history
 
 | Date | Version | Change | Approving decision |
 |---|---|---|---|
+| 2026-08-09 | 1.3.0 | **Pass 3 — register 19 reworded from disclosure to removal (§25.7).** The human decided to remove `chrome.transport_topology_strip()` (the on-screen disclosure of the collapsed trust boundary) entirely, fully informed that this reopens the 2026-08-06 decline of claim prohibition 6 and weakens the 2026-08-05 override's stated defensibility. This pass does not rule on whether that is acceptable — it reworks the register to describe removal rather than disclosure, since the underlying weakness (module boundary, not process boundary) is unchanged and only the screen-level statement of it is going away; the export's separate `transport` integrity section (`ges_gateway.transport_status()`, D2) is a different call site and is untouched here. **§25.3.1 condition 5 is struck** — it will be false as written once the call site is gone; the pilot-sufficiency ruling now rests on the remaining four conditions plus the still-standing export disclosure. **§25.7.1 answers plainly: T1–T4 are unchanged**, because they gate a different event (first tenant deployment) on packaging and runtime self-attestation facts, none of which ever read a screen. **§25.7.2 states for the record**, not as an argument to reverse: once the strip is gone, a human running the pilot has no way to learn the boundary is collapsed except by reading `ARCHITECTURE_KB`/`SECURITY_KB` or the source — the export still reaches the no-login reader, but not the person watching the screen. No `dev/` file touched by this pass; `code-agent` executes the removal separately after `functional-design-agent` rules on `AC-COCKPIT-19`. | Human decision, `PROJECT_CONTEXT.md` 2026-08-09 Decisions Log; register-update task, not a ruling |
 | 2026-08-06 | 1.2.0 | **Gate 11 re-ruling of §25.4 / register 35 (§25.4bis), after `test-agent` falsified its premise in Chromium.** The export's artefact carries **neither** the riskiest-element size nor the element: `riskiest-figure` is absent, because the retained region derives from the **approval** screen while the risk band lives on **Review**. **The root error is mine and predates styling** — §9.4 consequence 3 (2026-07-31) asserted a Review-screen property was checkable in an approval-screen artefact; `AC-F41-03`'s own Given/When says *"when the Review screen is rendered"* and `UX_KB` UX-4 scopes the strengthening the same way. §9.4 consequence 3 is **struck where it stands**, not rewritten. **Rulings: (a) option 3 on `AC-F41-03`** — it is a screen criterion by design, the retained view carries the evidence without the emphasis; **option 2 (importing the risk band) is refused** because it would put in the artefact a fact the approver was never shown — the defect `pages.py` already names from the opposite direction — and because pass 21's per-screen-uniqueness typography judgement is upheld as better architecture than the sentence of mine it contradicted. The emphasis is not lost from the product: `pages.dossier` renders the band style-inlined at 40px. **(b) Option 1 on inlining — still inline, on a replaced reason**: legibility. Unstyled, 133 elements at two computed sizes with every label glued to its value (`Coverage of this run70% - partial`), a misparse hazard in an S4 deliverable read by a party with no login. §25.4's four constraints are unchanged; the byte cost is **unmeasured and to be measured by `code-agent`**, both figures supplied so far having been wrong. Corrected in the same sweep: §19.3's S1 row (which asserted `AC-F41-03` against the retained artefact), §25.5's S4 size claim and S6 falsifier. **Register 35: OPEN, restated — same remedy, different justification, and explicitly not closing `AC-F41-03`.** No `dev/` file modified. | Gate 11 smoke, `test-agent` verification 2026-08-06; routed back by the orchestrator rather than built on |
 | 2026-08-05 | 1.1.0 | **Architecture pass 2 — gate 10 review-and-rule (§25).** Four items ruled. (1) **§18.1 was stale, not disclosed**, and is amended: supersession-by-data now has `AC-F41-14`/`-15`, is built in `ges/supersession.py`, is enforced by bundle rule `scope.no_bound_dataset_superseded_by_later_data` (`override_eligible: false`, context resolved server-side), and its **negative half is the rule's `non_firing` fixture**, so §8.2's compile-time fixture evaluation verifies it on every build. The consequential sweep also corrects **§20.1** (same defect) and **§18.3** (routing budget — superseded by `AC-F41-16`/`-17`). (2) **§7.3 grows from eleven primitives to thirteen**: `obligation_gap` (declaration-derived, not history-derived; stays **one** primitive over three closed obligation kinds) and `journal_attribute_outlier` (attribution, not a distance scalar) both join; neither is folded. New **standing calibration-denial rule** binding every future primitive. (3) **Register 19 / §3.2**: the pilot transport is ruled **sufficient for the pilot** on five standing conditions, and the precondition for first tenant deployment is stated as **three conjunctive gates T1–T3** — the `ges` package absent from the api image, `pilot_transport.py` absent from that image, and one full approval exercised over `LoopbackHttp`. Narrowed, not closed. A **gap in the override's claim-prohibition list** is raised for the human (§25.3.3). (4) **§9.4**: the export's per-dossier `rendered_view` **must be style-inlined** — the size emphasis exists only in the stylesheet, so `AC-F41-03` is unverifiable in the artefact the auditor actually receives; four constraints, `code-agent` + `test-agent`, precondition on the first real-auditor export, not a pilot blocker. **§20.1 execution status changed from `STATIC ONLY — NOT EXECUTED` to EXECUTED**: the suite was re-run for real per the standing commitment — 28 scenarios, 0 failures, exit 0 — and eleven §20.2 scenarios are now named as **not present**, including ARCH-06 and ARCH-16. **Impact Analysis §25.5** enumerates all six surfaces; S2 and S4 reached, S1/S3/S5/S6 not reached with falsifiable reasons. No `dev/` file was modified by this pass. | Gate 10 review, 2026-08-05; joint presentation with `security-architect` owed for §25.3.3 |
 | 2026-07-31 | 1.0.0 | Initial Architecture pass for MVP1. Five-plane component model with the api↔GES process boundary as the single trust boundary (§3); warehouse-lag resolved via run pinning, close-clock staleness and Point-of-Action Revalidation (§5); certified semantic layer with SQL made unroutable rather than filtered (§6); detector runtime as manifests over eleven registered evaluator primitives (§7); guardrail broker with compiled hash-addressed bundles, compile-time predicate schema binding and transactionally co-committed blast-radius state (§8); evidence store as Postgres + hash chain + KMS-signed anchors + 7-year Object-Lock archive, with server-rendered self-contained rendered views (§9); export path and CUEC model (§10); coverage as a closed sum type (§11). Twelve judgement calls registered (§17). `PLAN` §9.3's per-action-vs-policy-cold question **decided** (§16). Two new findings raised (§18.1 supersession-by-data has no criterion; §18.2 F24 native mobile approval is incompatible with the rendered-view mechanism). **Impact Analysis §19** establishes a six-surface register; four surfaces reached, two not reached with falsifiable reasons. Architecture suite specified, **STATIC ONLY — NOT EXECUTED** (§20.1). Four items handed to `security-architect` for joint presentation (§22). | Standing authorization to build MVP1, `PROJECT_CONTEXT.md` Decisions Log 2026-07-31; gate 6 joint sign-off with `security-architect` pending |
