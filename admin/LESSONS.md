@@ -499,3 +499,30 @@ and edited; "Open" = observed, not yet reviewed.
   tested, every "scoped" Bash grant on this platform is honour-system, and the
   registry's `Scope constraint` column should be read as documentation, not
   as a control.
+
+## 2026-08-08 — a self-issued criterion is fine once; unmarked, it isn't
+
+On `conclave-finance-studio`'s `close-cockpit-home` enhancement, `code-agent` hit
+a real gap mid-pass: it found a defect worth a criterion (two figures that must
+agree and didn't) and had no way to invoke `functional-design-agent`. Its task
+brief gave it an explicit fallback — issue the ID yourself, flag it clearly as
+code-issued, and it's owed a review pass. That worked. But it worked *because*
+someone remembered to route the review before treating the gate as closed, and
+`functional-design-agent`'s own review found the criterion's Then-clause named
+an internal computation path rather than an observable outcome — exactly the
+class of defect the design-agent gate exists to catch. The instance was
+recoverable only because it was held for review before being trusted as
+settled, not because the first draft was right.
+
+**Standing rule adopted**: a criterion issued outside a `functional-design-agent`
+pass carries a `provisional` marker and **may not be the sole evidence closing a
+gate** until reviewed. This mirrors the existing disclosed-unmet-criteria
+discipline (a criterion with a known gap is recorded as such, never silently
+treated as met) rather than inventing new machinery. Applies platform-wide, not
+just to this project: any agent that self-issues a criterion under an
+explicit fallback must mark it provisional in the same edit, and the
+orchestrator must route it to `functional-design-agent` before the gate it
+closes can be reported clean.
+
+Recommended by `functional-design-agent` (2026-08-08, `close-cockpit-home`
+pass), adopted by the orchestrator rather than left as an unresolved finding.
