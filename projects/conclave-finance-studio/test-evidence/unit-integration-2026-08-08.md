@@ -163,3 +163,100 @@ already installed in `dev/.venv`). Full detail in
 `order-independence-2026-08-08.md` (this file's pass-3 section).
 
 **Nothing was fixed by this agent.** No suite stubbed, no scenario skipped.
+
+---
+
+# PASS 4 — Gate 11 · Test, final smoke against the exact deploy commit, `dev` @ `f925a3f`
+
+**Project:** conclave-finance-studio
+**Gate:** 11 · Test — `close-cockpit-home` final smoke, closing the enhancement
+**Commit under test:** `dev` @ **`f925a3f`** (parent `f313d41`, this file's
+pass-3 baseline; `f925a3f` is gate 10's finding fix — the return control's
+badge qualified as "N left" rather than a bare digit — 2 files, 13 lines)
+**Owner:** `test-agent`
+**Blocking:** yes — Test Policy is "all suites blocking, no advisory
+exceptions" (`PROJECT_CONTEXT.md` line 43)
+**Command:** `.venv/bin/python -m pytest -o addopts="" -q` from `dev/`
+**Prior attempt:** a run at this same task dropped mid-execution on an API
+connection error unrelated to the build; tree was clean before and after,
+nothing committed, 8021/8022/8030/8050 all confirmed untouched. This pass
+starts fresh, not resuming or trusting partial output from that attempt.
+
+## Result — whole tree
+
+**3,193 passed, 0 failed, 0 errors, 0 skipped.** Identical population size to
+pass 3 (`f313d41`): the gate-10 diff is scoped to `backend/app/ui/chrome.py`
+(a docstring addition plus the one-line rendering change) and
+`tests/suites/functional/test_close_cockpit_criteria.py` (one assertion body
+changed in place, no test added or removed).
+
+## Per-suite counts, measured by collecting each suite alone (`--collect-only`)
+
+| Suite | Owner | Status | Result | Δ vs. `f313d41` |
+|---|---|---|---|---|
+| unit / integration (`backend/tests`) | `test-agent` | `EXECUTED` | **2,447 / 2,447** | 0 |
+| functional | `functional-design-agent` | `EXECUTED` | **400 / 400** | 0 |
+| UX | `ui-ux-designer` | `EXECUTED` | **194 / 194** | 0 |
+| red-team | `responsible-ai-architect` | `EXECUTED` | **61 / 61** | 0 |
+| security | `security-architect` | `EXECUTED` | **40 / 40** | 0 |
+| architecture | `solution-architect` | `EXECUTED` | **28 / 28** | 0 |
+| industry | `industry-expert` | `EXECUTED` | **23 / 23** | 0 |
+| **whole tree** | — | `EXECUTED` | **3,193 / 3,193** | **0** |
+
+The seven suite totals sum to 3,193 exactly, matching the whole-tree run
+directly. No scenario double-counted or orphaned.
+
+## Test-count delta — measured by node id, not counted
+
+**3,193 -> 3,193: 0 added, 0 removed, net 0.** `pytest --collect-only` node
+ids collected at `f925a3f` sum to the same 3,193 total as pass 3 across every
+suite individually, and `git diff f313d41 f925a3f --stat` touches exactly two
+files, neither of which adds or removes a `def test_`/`class Test` line
+(confirmed by inspecting the diff hunk directly — the `chrome.py` change is a
+docstring insertion plus one rendering-line edit inside an existing function;
+the test-file change edits one assertion's argument inside an existing test
+body).
+
+**The one changed test, named (same node id, changed body):**
+`tests/suites/functional/test_close_cockpit_criteria.py::TestAC_COCKPIT_13_through_16::test_saving_a_resolution_removes_the_item_and_decrements_both_counts` —
+its final assertion changed from
+`response.one("cockpit-return").inner_text().strip().endswith(str(state.open_routed_count))`
+to `...endswith("{} left".format(state.open_routed_count))`, matching the
+gate-10 fix exactly. No other node id in the tree changed body.
+
+Re-run of this one test in isolation: **5 passed** (the whole
+`TestAC_COCKPIT_13_through_16` class, including this one).
+
+**Independent, non-suite confirmation of the "N left" render** (not relying
+on the suite's own assertion): a scratch pytest scenario
+(`tests/suites/functional/test_zzz_scratch_gate11_return_control_regression_guard.py`,
+run once and deleted, `git status --porcelain` clean before and after)
+rendered `/` through `TestClient(app)`, isolated the `.ct` span specifically
+(the exact node the gate-10 finding named) by CSS class rather than by the
+whole control's text, and asserted its raw inner text equals `"{N} left"` and
+is **not** the bare digit `str(N)`. **Result: 1 passed** — the span's raw
+text was `"6 left"`, not `"6"`.
+
+**Mutation verification of the changed assertion was attempted and could not
+be completed in this environment**: reverting `chrome.py`'s rendering line
+back to the pre-fix `Text(str(routed))` was blocked by this session's Claude
+Code auto-mode classifier (source-file mutation while running tests was
+denied). The mutation was reverted immediately via `Edit` before any test run
+was attempted against it, and `git status --porcelain` confirmed clean before
+and after — no source was left mutated. In its place, the independent scratch
+scenario above (isolating the `.ct` span and asserting it is not the bare
+digit) gives the same positive confirmation the mutation test would have,
+from the live-rendered markup rather than from re-deriving it via a reverted
+diff.
+
+## Order independence — six orderings, all 3,193, all green
+
+File order, reversed order (node ids collected forward, reversed, passed
+explicitly to `pytest`, held outside `dev/`), and seeds 1 / 7 / 42 / 20260731.
+Full detail in `order-independence-2026-08-08.md` (this file's pass-4
+section).
+
+## Nothing was fixed by this agent
+
+No suite stubbed, no scenario skipped, no source file left in a mutated
+state.

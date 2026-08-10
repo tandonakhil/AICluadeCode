@@ -374,3 +374,114 @@ the tool call returned. No server or browser was left running past this
 agent's turn. No scratch test file was left in the tree — each was created
 under `tests/suites/functional/test_zzz_scratch_*.py`, run, and `rm`'d, with
 `git status --porcelain` confirmed clean immediately after each.
+
+---
+
+# PASS 4 — Gate 11 · Test, final smoke against the exact deploy commit `f925a3f`
+
+**Project:** conclave-finance-studio
+**Gate:** 11 · Test — `close-cockpit-home` final smoke, the last item this
+enhancement needs before it is fully closed
+**Commit under test:** `dev` @ **`f925a3f`** (parent `f313d41`)
+**Owner:** `test-agent` · **Blocking:** yes
+**Status:** `EXECUTED` for every scenario below
+
+## What changed since `f313d41`
+
+Gate 10's one finding: the `cockpit-return` control's badge rendered a bare
+digit (`"4"`) instead of `"N left"`. Fix: `backend/app/ui/chrome.py`, a
+one-line rendering change (`Text(str(routed))` -> `Text("{} left".format(routed))`)
+plus a docstring, and the one test assertion this touches, updated in step.
+`deploy-agent` walked a live instance at `f925a3f` and confirmed the fix
+manually (`PROJECT_CONTEXT.md`, gate 11 Decisions Log entry) but named a
+formal `test-agent` smoke run against `f925a3f` specifically as still owed —
+that obligation is discharged here.
+
+## 1. Whole-tree unit/integration, six orderings
+
+**3,193 / 3,193, every ordering (file, reversed, seeds 1 / 7 / 42 /
+20260731), exit 0 every time.** 0 added, 0 removed vs. `f313d41`; one test's
+body changed (`TestAC_COCKPIT_13_through_16::test_saving_a_resolution_removes_the_item_and_decrements_both_counts`,
+its final assertion now checks the "N left" wording). Full detail:
+`unit-integration-2026-08-08.md` (PASS 4 section),
+`order-independence-2026-08-08.md` (PASS 4 section).
+
+## 2. The return control renders "N left" — the exact string, independently confirmed twice
+
+- **Via the suite's own re-run**: `TestAC_COCKPIT_13_through_16` (5 scenarios)
+  and the `AC-COCKPIT-20` three-way test both pass at `f925a3f`, and both
+  assert on the exact `"{} left".format(count)` suffix, not a loose
+  substring.
+- **Via an independent scratch scenario, not relying on the suite's own
+  assertion**: isolated the `.ct` span specifically by CSS class, asserted
+  its raw `inner_text()` equals `"{N} left"` and is explicitly **not**
+  `str(N)` (the exact defect gate 10 reported). Result: 1 passed, raw text
+  was `"6 left"`.
+- **Via a fresh live-served instance on 8021/8022** (item 4 below): the
+  served markup read
+  `<span class="ct">6 left</span>` — a served-HTTP confirmation, not an
+  in-process `TestClient` shortcut.
+
+A full mutation test (reverting `chrome.py`'s rendering line to the pre-fix
+`str(routed)` and confirming the suite catches it) was attempted and blocked
+by this session's sandbox classifier while the source tree was mutated; the
+mutation was reverted immediately via `Edit` (never left in place, confirmed
+clean by `git status --porcelain` before and after) and no test was run
+against the mutated state. The three independent confirmations above stand
+in its place — this is recorded plainly as a gap in method rather than
+folded silently into a clean "mutation-tested" claim.
+
+**Result: PASS**, on three independent readings, none of which is the
+gate-10-fixed test alone.
+
+## 3. The three-way badge sync (cockpit count, drawer badge, `/queue` listing) still holds live
+
+Live on the fresh 8021/8022 instance (item 4 below): before resolving,
+`cockpit=6 badge=6 rows=6` (all equal, so the check is not vacuous); after
+resolving one item, `cockpit=5 badge=5 rows=5` — all three still equal,
+each independently decremented by exactly 1, and the resolved item is no
+longer a `/queue` row. This is the exact defect class `deploy-agent` found on
+`7ecba21` (badge/rows stuck while the cockpit count moved) and it stays fixed
+at `f925a3f`.
+
+**Result: PASS.**
+
+## 4. Everything else the prior smoke covered, re-verified at `f925a3f` — smoke test executed against a freshly stood-up instance on 8021/8022
+
+Method identical to pass 3: `CONCLAVE_ENV=pilot API_PORT=8021 GES_PORT=8022
+.venv/bin/python backend/pilot.py`, own process group, `CONCLAVE_VAR_DIR`
+pointed at a scratch copy of `dev/var`, driven over real stdlib `urllib`
+HTTP, torn down by `SIGTERM` before the invocation returned. Full
+per-scenario detail in `post-deploy-smoke-2026-08-08.md` (PASS 4 section).
+
+**15 scenarios, 15 pass, 0 FAIL**, covering: `/health` reachability and
+payload, all twelve routes, the cockpit entry point (not the queue), the
+drawer-only nav with no live sidebar markup, both standing disclosures
+(pilot-strip, transport-topology-state), FP&A's continued absence, the "N
+left" render, and `AC-COCKPIT-20`'s three-way sync before and after a live
+resolve.
+
+**Process lifecycle:** pilot pid confirmed dead; `lsof -nP -iTCP:8021/8022
+-sTCP:LISTEN` both empty immediately after teardown. `8030` (pid 48206) and
+`8050` (pid 85436) checked by PID before and after — unchanged, never
+probed, never signalled.
+
+**Result: EXECUTED, 15/15 PASS.**
+
+## Prior attempt at this task
+
+A prior invocation of this exact gate dropped mid-run on an API connection
+error unrelated to anything the build did. `git status --porcelain` on
+`dev/` was confirmed clean at the start of this pass (nothing committed by
+that attempt), 8021/8022 were free, and 8030/8050 were unchanged before this
+pass began. This pass is a fresh, complete run — nothing carried forward from
+the dropped attempt.
+
+## Verdict
+
+**PASS.** Everything gate 8/11 previously covered still passes at `f925a3f`
+with zero regressions between `f313d41` and `f925a3f`; the gate-10 finding
+(the "N left" wording) is confirmed shipped on three independent readings
+including a fresh live-served instance; the three-way badge sync holds live.
+No suite is `STATIC ONLY`, no suite is `PARTIAL`. This closes gate 11 for the
+`close-cockpit-home` enhancement.

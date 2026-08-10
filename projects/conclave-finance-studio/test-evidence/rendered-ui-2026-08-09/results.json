@@ -1,0 +1,260 @@
+{
+  "currency_check": {
+    "status": 200,
+    "h1": "One act is yours alone tonight."
+  },
+  "cockpit_staff": {
+    "1280x900": {
+      "status": 200
+    },
+    "1440x900": {
+      "status": 200
+    }
+  },
+  "banners_certified": {
+    "1280x900": {
+      "pilot-strip": {
+        "box": {
+          "x": 74,
+          "y": 200.59375,
+          "width": 1132,
+          "height": 56.28125
+        },
+        "text": "Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion a",
+        "style": {
+          "bg": "repeating-linear-gradient(135deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 7px, rgba(120, 128, 140, 0.16) 7px, rgba(120, 128, 140, 0.16) 8px)",
+          "color": "rgb(74, 79, 88)",
+          "border": "rgb(92, 99, 110)"
+        }
+      },
+      "transport-topology-state": {
+        "box": {
+          "x": 74,
+          "y": 270.875,
+          "width": 1132,
+          "height": 102.5625
+        },
+        "text": "Pilot topology - the guardrail broker is running inside this process. Every broker fact on this screen - each eligibility, decision, refusal and routing answer - was obtained over the in-process trans",
+        "style": {
+          "bg": "repeating-linear-gradient(135deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 6px, rgba(120, 128, 140, 0.28) 6px, rgba(120, 128, 140, 0.28) 7px)",
+          "color": "rgb(74, 79, 88)",
+          "border": "rgb(92, 99, 110)"
+        }
+      },
+      "uncertified-dataset-state": null
+    },
+    "1440x900": {
+      "pilot-strip": {
+        "box": {
+          "x": 154,
+          "y": 200.59375,
+          "width": 1132,
+          "height": 56.28125
+        },
+        "text": "Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion a",
+        "style": {
+          "bg": "repeating-linear-gradient(135deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 7px, rgba(120, 128, 140, 0.16) 7px, rgba(120, 128, 140, 0.16) 8px)",
+          "color": "rgb(74, 79, 88)",
+          "border": "rgb(92, 99, 110)"
+        }
+      },
+      "transport-topology-state": {
+        "box": {
+          "x": 154,
+          "y": 270.875,
+          "width": 1132,
+          "height": 102.5625
+        },
+        "text": "Pilot topology - the guardrail broker is running inside this process. Every broker fact on this screen - each eligibility, decision, refusal and routing answer - was obtained over the in-process trans",
+        "style": {
+          "bg": "repeating-linear-gradient(135deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 6px, rgba(120, 128, 140, 0.28) 6px, rgba(120, 128, 140, 0.28) 7px)",
+          "color": "rgb(74, 79, 88)",
+          "border": "rgb(92, 99, 110)"
+        }
+      },
+      "uncertified-dataset-state": null
+    }
+  },
+  "drawer_links": {
+    "1280x900": [
+      "My queue\n6",
+      "Approvals\n1",
+      "Ask",
+      "Catalogue",
+      "Monitors",
+      "Runs & dossiers",
+      "Agents & datasets",
+      "What we refuse to do",
+      "My probe history"
+    ],
+    "1440x900": [
+      "My queue\n6",
+      "Approvals\n1",
+      "Ask",
+      "Catalogue",
+      "Monitors",
+      "Runs & dossiers",
+      "Agents & datasets",
+      "What we refuse to do",
+      "My probe history"
+    ]
+  },
+  "destinations": {
+    "queue": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "approvals": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "ask": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "catalogue": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "monitors": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "audit": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "inventory": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "refusals": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "my-probe-history": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    }
+  },
+  "tracker": {
+    "on_calendar": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "after_last": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "no_refresh": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    },
+    "absent": {
+      "1280x900": {
+        "status": 200
+      },
+      "1440x900": {
+        "status": 200
+      }
+    }
+  },
+  "dossier": {
+    "1280x900": {
+      "status": 200
+    },
+    "1440x900": {
+      "status": 200
+    }
+  },
+  "console_errors": {
+    "1280x900": [],
+    "1440x900": []
+  },
+  "cockpit_controller": {
+    "h1": "One act is yours alone tonight."
+  },
+  "cockpit_persona_restored": {
+    "h1": "6 item(s) are yours tonight - 5 finding(s) and 1 the system could not settle."
+  },
+  "forced_dark_theme_bg": "rgb(14, 16, 19)",
+  "banners_exploration": {
+    "pilot-strip": {
+      "box": {
+        "x": 154,
+        "y": 200.59375,
+        "width": 1132,
+        "height": 56.28125
+      },
+      "text": "Pilot build - synthetic fixture data. Figures here come from the twelve-period synthetic close fixture, not from an Oracle-sourced warehouse. They cannot support a posting or an assurance conclusion about a real ledger."
+    },
+    "transport-topology-state": {
+      "box": {
+        "x": 154,
+        "y": 270.875,
+        "width": 1132,
+        "height": 102.5625
+      },
+      "text": "Pilot topology - the guardrail broker is running inside this process. Every broker fact on this screen - each eligibility, decision, refusal and routing answer - was obtained over the in-process transport, so the trust boundary between this interface"
+    },
+    "uncertified-dataset-state": {
+      "box": {
+        "x": 154,
+        "y": 387.4375,
+        "width": 1132,
+        "height": 82.421875
+      },
+      "text": "Not certified - cannot support a posting or a no-exceptions conclusion. This result derives from Treasury bank feed - raw extract (ds.treasury_bank_feed_raw), which has no certifying owner, no ERP tie-out and no content hash. Nothing on this screen m"
+    }
+  },
+  "approval_detail_status": 200,
+  "post_resolution_url": "http://localhost:8031/review/ITEM-18300-OM/resolve"
+}
