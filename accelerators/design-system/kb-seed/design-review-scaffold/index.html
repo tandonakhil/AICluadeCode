@@ -1,0 +1,135 @@
+<!doctype html>
+<!--
+  design-review index-page template — accelerators/design-system.
+
+  Adapted from `rate-case-analyzer/design-review/index.html`, the clearest
+  example of the convention read during harvest (2026-08-09): self-contained
+  static HTML, no build step, no external fonts, no network calls, openable
+  directly from the filesystem or a bare `python3 -m http.server`. Every
+  design-review directory sampled during harvest (conclave-finance-studio,
+  rate-case-analyzer, conclave-dashboard, little-milestones) follows this
+  same shape — see ../../ACCELERATOR.md H6 for exact paths.
+
+  WHAT TO CHANGE when you copy this in:
+    - Replace every ALL-CAPS placeholder below.
+    - Replace the :root token VALUES with your project's own palette — see
+      ../../src/tokens_schema.md for the role list. The token NAMES here are
+      the schema's generic role names; you may rename them to match your
+      project's own naming convention, this file does not require these
+      exact identifiers.
+    - Add one <li> per screen/state, grouped under an <h2 class="dr-sectionhead">
+      per journey or feature area — not per unrelated screen. Per the journey-
+      map timing rule (../JOURNEY_MAPS.md), group screens so a reviewer can
+      walk one named persona's journey end-to-end without leaving this page.
+    - This page is a REVIEW INDEX, not the mockups themselves. Each <li> links
+      to its own self-contained HTML file (or an anchor within one file, per
+      your project's convention) — this scaffold does not itself supply
+      screen content.
+
+  WHAT THIS PAGE DELIBERATELY DOES NOT DO:
+    - No component library, no build step, no JS framework. If your project
+      needs interactivity in the mockups themselves that is a per-project
+      decision (several source projects use small vanilla-JS theme togglers);
+      this index page does not need any.
+    - No default palette. The colours below are illustrative placeholders in
+      low chroma only, not a recommended brand — see ../../ACCELERATOR.md's
+      admission statement on why a default palette would misrepresent this
+      accelerator's own basis for existing.
+-->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROJECT NAME — Experience Design review (gate 5)</title>
+<style>
+/* ---- tokens — PLACEHOLDER VALUES, replace with your project's own ---- */
+:root{
+  --ground-0:#F6F6F3; --ground-1:#FFFFFF; --ground-2:#F0F0EC;
+  --line:#D9D9D2; --line-strong:#C2C2B8;
+  --ink:#14161A; --ink-2:#4A4F58; --ink-3:#5E646E;
+  --accent:#1D4ED8; --accent-bg:#ECF1FE;
+}
+[data-theme="dark"]{
+  --ground-0:#0E1013; --ground-1:#16191F; --ground-2:#1D212A;
+  --line:#2B303A; --line-strong:#3A414D;
+  --ink:#E7E9ED; --ink-2:#A6ADB9; --ink-3:#8B929E;
+  --accent:#7AA2F7; --accent-bg:#161E2C;
+}
+html{color-scheme:light} [data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground-0);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ font-size:16px;line-height:1.55}
+.mono,.num{font-variant-numeric:tabular-nums lining-nums}
+.dr-bar{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;
+ padding:.75rem 1.5rem;background:var(--ground-1);
+ border-bottom:1px solid var(--line);font-size:.875rem}
+.dr-bar .spacer{flex:1 1 auto}
+.dr-shell{max-width:1080px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.dr-note{border:1px solid var(--accent);border-left-width:4px;
+ background:var(--accent-bg);border-radius:10px;
+ padding:1rem 1.125rem;margin:1rem 0 1.75rem;max-width:78ch}
+.dr-sectionhead{margin:2.5rem 0 1rem;padding-bottom:.5rem;
+ border-bottom:2px solid var(--line-strong)}
+.dr-index-list{list-style:none;padding:0;margin:0;display:grid;gap:.75rem}
+@media(min-width:760px){.dr-index-list{grid-template-columns:1fr 1fr}}
+.dr-index-list a{display:block;text-decoration:none;color:inherit;
+ height:100%;background:var(--ground-1);border:1px solid var(--line);
+ border-radius:10px;padding:.875rem 1rem}
+.dr-index-list a:hover{border-color:var(--accent)}
+.dr-index-list .n{font-family:ui-monospace,monospace;font-size:.75rem;
+ color:var(--ink-3)}
+.dr-index-list .t{display:block;font-weight:600;margin:.1rem 0 .2rem}
+.dr-index-list .d{display:block;font-size:.8125rem;color:var(--ink-2)}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="dr-bar">
+  <strong>PROJECT NAME — Experience Design review · gate 5</strong>
+  <span class="spacer"></span>
+  <span>ui-ux-designer · DATE</span>
+</header>
+
+<main class="dr-shell">
+  <h1>ONE-LINE DESCRIPTION OF WHAT THIS REVIEW COVERS</h1>
+  <p style="max-width:70ch;color:var(--ink-2)">
+    This is the rendered design proposal. Every page linked below is a real,
+    static, self-contained render — open it from the filesystem or a local
+    server; no build step, no external fonts, no network calls. The written
+    proposal lives in <code>knowledge/UX_KB.md</code>; this is the part you
+    can actually look at.
+  </p>
+
+  <div class="dr-note">
+    <h2 style="margin-top:0">Walk the journeys first, not the screens</h2>
+    <p>Per the journey-map timing rule
+      (<code>accelerators/design-system/kb-seed/JOURNEY_MAPS.md</code>): a
+      journey that cannot be walked end-to-end in these mockups is a gate-5
+      blocker, not a follow-up note. Name your journeys here — NAMED PERSONA
+      pursuing NAMED GOAL — and link the screens in walking order, not
+      alphabetical or build order.</p>
+  </div>
+
+  <h2 class="dr-sectionhead">JOURNEY / FEATURE AREA 1</h2>
+  <ul class="dr-index-list">
+    <li><a href="SCREEN-01.html">
+      <span class="n">01</span>
+      <span class="t">SCREEN TITLE</span>
+      <span class="d">What this screen shows and which criteria it covers.</span>
+    </a></li>
+  </ul>
+
+  <h2 class="dr-sectionhead">JOURNEY / FEATURE AREA 2</h2>
+  <ul class="dr-index-list">
+    <li><a href="SCREEN-02.html">
+      <span class="n">02</span>
+      <span class="t">SCREEN TITLE</span>
+      <span class="d">What this screen shows and which criteria it covers.</span>
+    </a></li>
+  </ul>
+</main>
+
+</body>
+</html>

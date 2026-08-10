@@ -29,26 +29,23 @@ admission H1–H10) → `deprecated` (superseded; **still runnable**, never dele
 
 ## Entries
 
-Nothing is harvested yet. All five entries below were approved by the human on
-2026-08-08 (`admin/proposals/2026-08-08-accelerator-layer.md`) and are `planned`
-at `0.0.0` until their directory, contract and suite actually exist.
+A1/A2/A3/A4/A5 are all harvested and `built`.
 
 | # | Name | Version | Status | Gate relevance | Known consumers | Purpose |
 |---|---|---|---|---|---|---|
-| A1 | `auth-core` | 0.0.0 | planned | Architecture (H9 security co-sign required) | — | Auth, session and mobile token-store core: argon2id, hashed session tokens, sliding+absolute expiry, TOTP, rate limiting. |
-| A2 | `grounded-answer-kernel` | 0.0.0 | planned | Architecture (H9 responsible-AI co-sign required) | — | Four-layer RAG grounding: refusal contract, refusal/sources kernel, retrieval protocol, coverage-ledger assurance. |
-| A3 | `design-system` | 0.0.0 | planned | Experience Design, Architecture | — | Conclave token schema, light/dark law, semantic-law checklist, and the journey-map timing rule (journeys at Experience Design, unwalkable journey blocks the gate). |
-| A4 | `test-scaffold` | 0.0.0 | planned | Code, Test | — | Suite scaffold and harnesses, and the platform 0/1/3/4 exit-code convention every other accelerator's suite must satisfy. |
-| A5 | `conformance-kit` | 0.0.0 | planned | Architecture, Test | — | Structural conformance checks (import-boundary closure) plus their negative-control fixture trees. |
+| A1 | `auth-core` | 1.0.0 | **built** | Architecture (H9 security co-sign required) | `little-milestones` (origin — harvested *from*, not yet vendored *back into*; see `ACCELERATOR.md` H10) | Auth, session and mobile token-store core: argon2id, hashed session tokens, sliding+absolute expiry, TOTP, rate limiting, tenant-genericized via a `PrincipalResolver` seam. **H9 co-signed by security-architect 2026-08-09, conditional on ACCELERATOR.md items 1-8, all incorporated.** |
+| A2 | `grounded-answer-kernel` | 1.0.0 | **built (not yet `admitted`** — H9 responsible-AI co-sign outstanding, see `ACCELERATOR.md`) | Architecture (H9 responsible-AI co-sign required) | rate-case-analyzer, policy-lookup-assistant, templates/rag-knowledge-base (origin/pattern-source, not vendored consumers) | Four-layer RAG grounding: L0 contract, L1 refusal/sources kernel, L2 retrieval protocol + offline hash-embed, L3 coverage-ledger + abstention assurance. |
+| A3 | `design-system` | 1.0.0 | built | Experience Design, Architecture | CFS, RCA, marketing, dashboard | Conclave token schema, light/dark law, semantic-law checklist, and the journey-map timing rule (journeys at Experience Design, unwalkable journey blocks the gate). |
+| A4 | `test-scaffold` | 1.0.0 | **built** | Code, Test | `templates/genai-chatbot`, `templates/agentic-workflow`, `templates/rag-knowledge-base`, `projects/conclave-marketing/dev`, `projects/little-milestones/dev` (origin — harvested *from*, not yet vendored *back into*; see `ACCELERATOR.md` H10) | Suite scaffold and harnesses (`browser.py`, `native.py`), and the platform 0/1/3/4 exit-code convention every other accelerator's suite must satisfy. |
+| A5 | `conformance-kit` | 1.0.0 | **built** | Architecture, Test | rate-case-analyzer (origin), conclave-finance-studio (origin) | Structural conformance checks (import-boundary closure) plus a live-resource construction guard and a numeric-leak assertion, each with negative controls. |
 
-**Build order is not rank order.** `A4` is built **first**: every other entry
-must ship a runnable suite in the platform exit-code convention (H4), and A4 is
-what defines it. Then A5 → A3 → A2 → A1 (A1 last: largest, and gated on
-`security-architect`'s H9 rulings).
-
-Slugs other than `auth-core` (which the approved proposal fixes via its
-provenance-stamp example) are **provisional** and are fixed at the moment each
-entry is actually built.
+**Build order was not rank order.** `A4` was built **first**: every other
+entry ships a runnable suite in the platform exit-code convention (H4), and
+A4 is what defines it. A1 shipped out of the originally-stated A5→A3→A2→A1
+sequence, at the human's explicit approval, in parallel with A2-A5's own
+harvests — see `A1/ACCELERATOR.md`'s H3 note on what that means for the
+A5-closure-checker cross-check (not yet run against A1, since A5 had not
+yet landed at the moment A1's harvest started).
 
 ## Known consumers
 
