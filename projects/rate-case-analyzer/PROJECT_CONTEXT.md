@@ -1390,10 +1390,212 @@ open design question — should the corpus-of-record loader write a synthetic
 run record from its manifest's stated as-of date, or should the app always
 require a real job run to establish dating — not resolved unilaterally here.
 
+## Gate 10 · Review — closed, 2026-08-08
+
+All findings resolved. **F-1 through F-4 and #6** fixed by `code-agent`
+(commits `7e3a491`, `f6bbc48`). **E-1 ruled** by the orchestrator: shipped
+`document_type` (16 values) is authoritative; `AC-F3-05` corrected to match;
+the original 14-value proposal preserved in `DOMAIN_KB.md` as a dated
+addendum documenting exactly what changed, with the two genuinely-dropped
+values (`DATA_REQUEST_RESPONSE`, `HEARING_TRANSCRIPT`) recorded as known gaps
+rather than silently resolved. **F-5 propagated** to all four artifacts that
+still asserted `ASM-26`'s superseded rule. **F-7 fixed** — `UX_KB.md`'s
+screen-11 row now states inline that it ships headless. `rca.css`'s two
+locked copies (`dev/app/web/static/` and `design-review/assets/`) remain
+byte-identical per `ARCH-14` throughout.
+
 ## Current Status
 
-Both apps running: **http://127.0.0.1:8477/** (product, real corpus, dated)
-and **http://127.0.0.1:8041/** (design review). 932 tests green across 8
-suites. Gate 10 · Review's code findings are closed; **E-1 (document_type
-14-vs-16) remains open**, carried to the human for a ruling rather than
-adjudicated. Gate 11 · Deploy next.
+**Gate 11 · Deploy — closed. Status: `deployed (dev, local)`.**
+
+Both apps running: **http://127.0.0.1:8477/** (product, real corpus, dated,
+verified via a clean-shell restart on the documented run command — see Gate
+11 below) and **http://127.0.0.1:8041/** (design review). **932 tests green
+across 8 suites**, re-run and independently re-counted from the clean deploy.
+Gate 10 · Review closed — no open findings. All 11 gates closed.
+
+## Gate 11 · Deploy — closed, 2026-08-08
+
+`deploy-agent` stopped the ad-hoc process left running from Review-gate
+bug-fixing (pid 88013) and brought the app up the **documented** way from a
+clean shell (`env -i` with only `HOME`/`PATH`, no inherited `RCA_*`
+overrides), proving the README's own run command works end to end without
+any override the demo tool needs:
+
+```
+.venv/bin/uvicorn --factory app.web.main:create_app --host 127.0.0.1 --port 8477
+```
+
+Confirmed the product's own default (`RCA_MAX_EVIDENCE_PER_CORPUS=6`, unset
+externally, read from `.env`) is what actually served — no override required,
+per the pass brief.
+
+**Corpus**: `./scripts/seed-data.sh verify` — 25 cases / 179 documents / 644
+claims on disk, matching the record. The freshness banner on the restarted
+process read **"Corpus as of 8 Aug 2026, 22:15 UTC · last ingest run
+succeeded"** — unchanged from before the restart and confirmed via
+`app.jobs.healthcheck` both before and after (`run_9DFC06710E3A (PARTIAL)`,
+exit 0 both times), proving `corpus_as_of` survives a clean process restart
+because a fresh process re-reads the ops store rather than losing state, as
+the brief anticipated. No re-ingest was needed or run.
+
+**Smoke test — served, with one honest complication found and run down, not
+papered over.**
+
+- `GET /` → 200.
+- `python -m app.jobs.healthcheck` → exit 0, "Within schedule."
+- **Grounded citation, literal brief question**: the exact recorded-transcript
+  question ("What ROE has the PA PUC authorized in fully-projected-future-test-
+  year distribution cases since 2023?") now returns `REFUSED_VERIFICATION_FAILED`
+  ("composed and then discarded... one check did not pass") rather than a
+  cited answer. Root-caused, not just observed: the offline
+  `TranscriptModelClient`'s composition transcript for this question was
+  authored by `tools/record_transcripts.py` against an earlier corpus/DB
+  state; the corpus has since gone through several reload/re-ingest cycles
+  during Review-gate bug-fixing (per this file's own "Post-review" section and
+  the `seed-data.sh reload` + `app.jobs.ingest` operational note), and the
+  literal top-6-per-corpus evidence window this question now resolves to no
+  longer contains a chunk carrying a real `AUTHORIZED` ROE claim — an
+  `ASM-31`-shaped effect (claim-free boilerplate crowding the window) landing
+  on a *different* question than the one `ASM-31` was originally filed
+  against. Re-running `tools/record_transcripts.py` (a standard, documented
+  step, README step 4) confirmed this deterministically: against the *current*
+  corpus, the pipeline itself — not a stale fixture — resolves this exact
+  question to a refusal at the product's own default settings. **Not fixed by
+  lowering the evidence cap**, consistent with `ASM-31`'s standing rule.
+  Flagged for Review/Enhancement as a live instance of the already-known
+  boilerplate-crowding finding, now confirmed to affect the specific question
+  this project uses as its canonical grounded-answer example — a discoverability
+  problem, not a grounding-safety problem (the system still correctly discards
+  rather than shows a bad answer).
+- **Grounded citation, confirmed working**: re-ran the same live-HTTP check
+  with a different corpus-covered question ("What common equity ratio was
+  authorized for Oncor in its most recent base rate case?") and got a full,
+  correctly-verified grounded answer: real docket citation (PUCT), a verbatim
+  quoted span ("The Commission adopts a common equity ratio of 42.50%."),
+  character-for-character verification disclosure note, and the coverage
+  panel. This confirms the grounded-citation mechanism itself is live and
+  correct against the real corpus; the literal brief question's failure is a
+  retrieval/evidence-window issue on that one question, not a break in
+  sentinel/verification/citation machinery.
+- **RCA-R6 extrapolation trap**: the exact gate-8 wording ("...vertically
+  integrated utilities since 2023?") has **no transcript file on disk at all**
+  right now (confirmed by direct hash lookup) — a second, distinct instance of
+  the same corpus-drift-vs-fixture-set problem, this time at the frame-parse
+  stage rather than compose. Confirmed the trap mechanism itself is intact two
+  ways: (1) live HTTP against the real corpus with the closely-related VI +
+  FPFTY-combination question returns a clean, complete extrapolation refusal —
+  37 candidates considered, 0 included, 37 excluded each on a named dimension,
+  explicit "combining them would produce a figure that describes no real
+  proceeding" statement, and full silence-is-not-clearance arithmetic
+  (`37 = 0 + 37 + 0`); (2) the actual blocking regression test for this,
+  `tests/suites/red-team/test_adversarial.py::test_the_extrapolation_trap_refuses_rather_than_blending`
+  — described in its own docstring as "RCA-R6, the single most important test
+  in the project" — is deterministic (bypasses the transcript layer entirely)
+  and is part of the 932 green tests below.
+- Regenerated `fixtures/transcripts/*.json` via `tools/record_transcripts.py`
+  (a documented, standard step) during diagnosis; this added **3 new,
+  untracked** transcript files (no tracked file was modified — `git status`
+  confirms) that make the Oncor and VI+FPFTY-combo questions replay correctly
+  going forward. Left in place but **not committed** — committing is outside
+  this gate's authority; noting so the state is not silently different from
+  what's in git.
+
+**`bash tests/run_all.sh`, re-run from this clean deploy** (not a reuse of any
+earlier number): **exit code 0.** All eight suites `EXECUTED — PASS`. Counts
+independently re-derived via `pytest --collect-only` per suite file, summed
+per suite (same method `test-agent` used at gate 8):
+
+| Suite | Status | Count |
+|---|---|---|
+| unit | PASS | 707 |
+| architecture | PASS | 45 |
+| functional | PASS | 23 |
+| industry | PASS | 26 |
+| security | PASS | 43 |
+| red-team | PASS | 27 |
+| ui | PASS | 50 |
+| rendered-ui | PASS | 11 |
+
+**Total 932**, exactly matching the count recorded at Gate 10 close. The
+per-suite unit/ui split (707/50 vs. the last explicitly-recorded 676/48) is
+consistent, not a discrepancy: `PROJECT_CONTEXT.md` never recorded a full
+932-stage breakdown, only the total; 707+50 = 676+48+33, and the post-Review
+"926 → 932" delta (6 tests) plus the "899 → 926" delta (27 tests) together
+account for exactly +33 against the last fully-itemised (899) breakdown.
+
+**App left running** at `http://127.0.0.1:8477/`, per instruction — not
+stopped after verification.
+
+**Deployment status recorded: `deployed (dev, local)`.**
+
+## Post-deploy: live Anthropic API wired, 2026-08-09
+
+The human asked to move from offline transcript-replay to a real Anthropic
+key, "the main purpose is to make this analyzer a Q&A tool." Key ported from
+another project's `.env` at the human's direction — copied file-to-file,
+never printed into this conversation or committed (`.gitignore` already
+covers `.env`). `RCA_LIVE_MODEL=true`; chat model bumped
+`claude-sonnet-4-5` → `claude-sonnet-5` since this is the first real use.
+
+**The first live call immediately surfaced three real, previously-invisible
+architecture bugs** — invisible because all 932 prior tests replay a scripted
+`ModelReply` and never exercise `AnthropicModelClient`'s real API-call
+construction, or what `render_for_model` actually shows a model versus what
+it is asked to select from. Each root-caused against the real API, in `dev/`
+commit `2c113ba`:
+
+1. **`tool_choice` was unconditionally forced** on every call. Both
+   documented refusal paths — `FRAME_SYSTEM_PROMPT`'s "emit no tool call" and
+   `COMPOSE_SYSTEM_PROMPT`'s plain-text `INSUFFICIENT_EVIDENCE` line — require
+   the model to respond *without* calling the tool, which forced
+   `tool_choice` makes structurally impossible: the model has no way to
+   comply with its own system prompt. Changed to `{"type": "auto"}`.
+2. **`render_for_model` showed raw chunk text only.** The compose prompt asks
+   the model to select a `claim_id` and copy a claim's own `verbatim_quote`
+   (`RAI-G1`/`RAI-AMEND-1`) — but never showed what claim_ids or quotes
+   existed. A document commonly states the same fact twice in different
+   sentences (a Finding-of-Fact framing, then a "we therefore adopt"
+   holding); both true, both verbatim in the chunk, but only one is a given
+   claim's canonical quote. A model quoting *honestly* from the chunk had no
+   way to know which one was extracted. Now renders each chunk's claims
+   inline — id, parameter/value/unit/status, scope, basis, and the exact
+   quote to copy — turning "quote something true" into "copy this exact
+   string," achievable by construction.
+3. **`max_tokens=2048` was too tight** for a multi-case compose call now that
+   evidence includes full verbatim quotes; observed live truncating a
+   response into an empty tool_use block (`{}`). Raised to 4096.
+
+`tools/serve_demo.py`'s regex-based evidence parser (offline Playwright
+fixture path) broke once `render_for_model` started appending per-claim
+lines — fixed the parser's stop condition, not the production renderer.
+
+**A pre-existing gap, found while committing**: the `rca.css` "of 14"→"of 16"
+fix from the earlier E-1 ruling had been made on disk but never actually
+committed — `dev/` is its **own nested git repo**, and the platform-root
+commit (`dbb94da`) does not recurse into it. Committed properly this pass.
+
+**9 new tests** — a mocked `anthropic` client (a real call is slow, costly and
+non-deterministic for a suite) plus `render_for_model` claim-visibility
+assertions. **932 → 941 tests, 8 suites, all green.**
+
+### Verified against the real API, not just the mock
+
+Single-case questions now return correct grounded, cited answers reliably (3/3
+across repeated runs, both for a fully-unambiguous jurisdiction+utility
+question and the previously-broken Oncor question). Multi-case questions
+spanning several candidates show real, non-trivial refusal variance — the
+deterministic verifier discarding rather than guessing, working exactly as
+designed — but **retrieval quality is capped by the offline hash embedder**
+(`RCA_EMBEDDINGS_PROVIDER=hash`, a separate, known MVP1 choice, distinct from
+`RCA_LIVE_MODEL`). Not chased further; recorded as a decision point for the
+human — real embeddings would need a second key (OpenAI, per
+`ARCHITECTURE_KB.md`'s `text-embedding-3-small` choice) not yet provided.
+
+## Current Status
+
+App running live at **http://127.0.0.1:8477/** against the real Anthropic
+API. 941 tests, 8 suites, all green. Persona-aware recommended questions and
+auto-generated follow-up suggestions requested by the human — scoping next,
+since "persona" needs a definition decision the product doesn't currently
+have an answer to (one fixed session role, no persona selector exists).

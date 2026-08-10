@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13 · Persona picker, MidWestUtilities session, and follow-up suggestions · Rate Case Analyzer design review</title>
+<link rel="stylesheet" href="assets/rca.css">
+</head>
+<body>
+
+<nav class="dr-bar" aria-label="Design review navigation">
+  <a href="index.html">← Design review index</a>
+  <span class="dr-crumb">13 / 13 · Persona picker + follow-ups (2026-08-09)</span>
+</nav>
+
+<div class="rca-shell">
+  <div class="dr-note">
+    <h2>What you are looking at</h2>
+    <p>Two additions, shown together because they're both about giving an analyst a useful next question, not about changing what the corpus contains or what the wall permits:</p>
+    <ul>
+      <li><strong>The session is always MidWestUtilities.</strong> Not a login screen — the human's own decision, recorded: "assume the user is a MidWest utility logged in." What the app bar shows changed from a generic role label to a named utility, and a persona picker sits underneath it that biases which <em>recommended</em> questions surface. Switching persona never changes the wall, the corpus, or what a question can retrieve — only which starting questions are suggested.</li>
+      <li><strong>Two follow-up suggestions appear under every answer and refusal</strong>, built from the corpus index — not the model, same rule the refusal screen's alternatives already follow (<code>ASM-UX-8</code> as narrowed). Each is a real, individually citable question. Comparisons are always to a <em>named</em> peer case with its own citation — never an average or a benchmark (<code>ASM-14</code> holds).</li>
+    </ul>
+    <p>Screen 1 below: the Ask screen with the persona picker and MidWestUtilities' own recommended questions, for the <strong>Regulatory Analyst</strong> persona. Screen 2: the same Ask screen, <strong>Strategy Lead</strong> persona selected — same session, different suggested questions. Screen 3: a grounded answer to MidWestUtilities' own pending-case question, with two follow-ups underneath.</p>
+  </div>
+</div>
+
+<div class="dr-sectionhead" style="margin-top:0;"><strong>1 — Ask screen, Regulatory Analyst persona</strong></div>
+
+<!-- ============ PRODUCT SURFACE 1 ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: MidWestUtilities, Inc. · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>9 Aug 2026, 04:15 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell rca-shell--narrow">
+
+  <div class="ask-hero">
+    <h1>Ask a precedent question</h1>
+    <p class="lede">Every answer is built from cited docket documents, or it is declined. Nothing is inferred, blended across jurisdictions, or averaged.</p>
+    <div class="persona-picker" role="group" aria-label="Recommended-question persona">
+      <span class="persona-picker__label">Suggest questions for:</span>
+      <button type="button" class="persona-chip" aria-pressed="true">Regulatory Analyst</button>
+      <button type="button" class="persona-chip" aria-pressed="false">Strategy Lead</button>
+      <button type="button" class="persona-chip" aria-pressed="false">Consultant</button>
+    </div>
+  </div>
+
+  <form class="ask-form" onsubmit="return false;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="2"
+        placeholder="e.g. What return on equity is MidWestUtilities requesting in its pending rate case?"></textarea>
+    </div>
+    <div class="ask-form__row" style="margin-top:.75rem; justify-content:space-between;">
+      <span class="tiny muted">Name a commission, a parameter and a period. Unresolvable questions are declined rather than guessed at.</span>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="scope-note">
+    <p style="margin:0 0 .4rem;"><strong>What this corpus contains.</strong> 12 curated public base-rate proceedings across three commissions — Pennsylvania PUC, Public Utility Commission of Texas, and California PUC — plus MidWestUtilities' own internal case file (Illinois Commerce Commission, pending).</p>
+    <p style="margin:0;"><strong>What it does not contain.</strong> Any other utility's internal or unfiled material. Named comparisons only — never an average across peers.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:2rem;">Questions for a Regulatory Analyst preparing this case</p>
+  <ul class="example-qs">
+    <li><button type="button">What return on equity is MidWestUtilities requesting in its pending rate case?</button></li>
+    <li><button type="button">What test year convention applies to MidWestUtilities' pending case, and why?</button></li>
+    <li><button type="button">What common equity ratio did MidWestUtilities' direct testimony request?</button></li>
+    <li><button type="button">What revenue requirement increase did MidWestUtilities' application state?</button></li>
+  </ul>
+
+</main>
+
+<div class="dr-sectionhead"><strong>2 — Same session, Strategy Lead persona selected</strong></div>
+
+<!-- ============ PRODUCT SURFACE 2 ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: MidWestUtilities, Inc. · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>9 Aug 2026, 04:15 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell rca-shell--narrow">
+
+  <div class="ask-hero">
+    <h1>Ask a precedent question</h1>
+    <p class="lede">Every answer is built from cited docket documents, or it is declined. Nothing is inferred, blended across jurisdictions, or averaged.</p>
+    <div class="persona-picker" role="group" aria-label="Recommended-question persona">
+      <span class="persona-picker__label">Suggest questions for:</span>
+      <button type="button" class="persona-chip" aria-pressed="false">Regulatory Analyst</button>
+      <button type="button" class="persona-chip" aria-pressed="true">Strategy Lead</button>
+      <button type="button" class="persona-chip" aria-pressed="false">Consultant</button>
+    </div>
+  </div>
+
+  <form class="ask-form" onsubmit="return false;">
+    <label class="vh" for="q">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q" rows="2"
+        placeholder="e.g. How does PECO's most recent authorized ROE compare to MidWestUtilities' request?"></textarea>
+    </div>
+    <div class="ask-form__row" style="margin-top:.75rem; justify-content:space-between;">
+      <span class="tiny muted">Name a commission, a parameter and a period. Unresolvable questions are declined rather than guessed at.</span>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="scope-note">
+    <p style="margin:0 0 .4rem;"><strong>What this corpus contains.</strong> 12 curated public base-rate proceedings across three commissions — Pennsylvania PUC, Public Utility Commission of Texas, and California PUC — plus MidWestUtilities' own internal case file (Illinois Commerce Commission, pending).</p>
+    <p style="margin:0;"><strong>What it does not contain.</strong> Any other utility's internal or unfiled material. Named comparisons only — never an average across peers.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:2rem;">Questions for setting MidWestUtilities' ask</p>
+  <ul class="example-qs">
+    <li><button type="button">What return on equity did PECO's most recent Pennsylvania FPFTY case authorize, and how does it compare to MidWestUtilities' requested 10.20%?</button></li>
+    <li><button type="button">What return on equity did Pacific Gas and Electric's most recent California case authorize?</button></li>
+    <li><button type="button">What common equity ratio was authorized for Oncor in its most recent Texas base rate case?</button></li>
+  </ul>
+  <p class="tiny muted" style="margin-top:.625rem;">Each of these resolves to one named case with its own citation. No peer average or ranking is produced — a Strategy Lead question is still answered one case at a time.</p>
+
+</main>
+
+<div class="dr-sectionhead"><strong>3 — A grounded answer to MidWestUtilities' own question, with two follow-ups</strong></div>
+
+<!-- ============ PRODUCT SURFACE 3 ============ -->
+
+<header class="rca-appbar">
+  <p class="rca-wordmark">Rate Case Analyzer <span class="sub">precedent research</span></p>
+  <span class="rca-appbar__spacer"></span>
+  <span class="rca-session">Session: MidWestUtilities, Inc. · public + internal corpora</span>
+  <div class="rca-freshness">
+    <span class="rca-freshness__dot" aria-hidden="true"></span>
+    <span>Corpus as of <strong>9 Aug 2026, 04:15 UTC</strong> · last ingest run succeeded</span>
+  </div>
+</header>
+
+<main class="rca-shell">
+
+  <form class="ask-form" onsubmit="return false;" style="margin-bottom:1.5rem;">
+    <label class="vh" for="q2">Your precedent question</label>
+    <div class="ask-form__row">
+      <textarea class="question-input" id="q2" rows="1" placeholder="Ask another question…"></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </div>
+  </form>
+
+  <div class="rca-columns">
+    <div class="rca-stack">
+
+      <section class="panel answer-panel" aria-labelledby="answer-h2">
+        <h2 id="answer-h2" class="vh">Answer</h2>
+        <p class="answer-question">What return on equity is MidWestUtilities requesting in its pending rate case?</p>
+
+        <div class="answer-body">
+          <p>One citable figure was found for the return on common equity requested by MidWestUtilities in its pending Illinois rate case.</p>
+
+          <table class="answer-figures">
+            <caption class="vh">Requested ROE, MidWestUtilities pending case</caption>
+            <thead>
+              <tr><th scope="col">Utility</th><th scope="col">Docket</th><th scope="col">Status</th><th scope="col">Requested ROE</th><th scope="col">Source</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MidWestUtilities, Inc.</td>
+                <td class="mono">SYN-WP-MWU-2026</td>
+                <td><span class="status-chip status-chip--position"><span class="status-chip__family">POSITION</span><span class="status-chip__gloss">REQUESTED — what the utility asked for; not granted</span></span></td>
+                <td class="num">10.20%</td>
+                <td><a class="cite-ref" href="#cite-1b">[1]</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="tiny muted" style="margin-bottom:0;">No average, blend or peer benchmark is produced. This case has not been decided; nothing above is an authorized figure.</p>
+        </div>
+
+        <p class="disclosure-note">AI-composed from cited docket documents. Every figure above was verified character-for-character against the quoted span on its citation card before this answer was shown. Verify against the linked source before relying on it in filed material.</p>
+
+        <div class="followups">
+          <p class="followups__label">Follow-up questions</p>
+          <ul class="followups__list">
+            <li><button type="button">What common equity ratio did MidWestUtilities request alongside this ROE figure?</button></li>
+            <li><button type="button">What return on equity did PECO's most recent Pennsylvania FPFTY case authorize?</button></li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="rca-stack rca-stack--rail">
+      <section class="panel" aria-labelledby="prov-h2">
+        <h2 id="prov-h2" class="vh">Provenance</h2>
+        <dl class="provenance-list">
+          <div><dt>Session</dt><dd>MidWestUtilities, Inc. (Regulatory Analyst)</dd></div>
+          <div><dt>Corpus as of</dt><dd>9 Aug 2026, 04:15 UTC</dd></div>
+          <div><dt>Model</dt><dd class="mono">anthropic/claude-sonnet-5</dd></div>
+        </dl>
+      </section>
+    </aside>
+  </div>
+
+</main>
+
+<div class="rca-shell">
+  <div class="dr-note" style="margin-top:2rem;">
+    <h2>Assumptions, stated plainly</h2>
+    <ul>
+      <li><strong>Persona changes suggestions only.</strong> It is stored client-side for this session (no new session-role concept, no new wall boundary) — a decision recorded so it isn't mistaken for an access-control feature later.</li>
+      <li><strong>Follow-ups are generated from the corpus index against the case just answered</strong> — the same pattern as a refusal's alternatives, and bound by the same rule: never relax the one dimension that made this answer specific (asking a laxer version of the same question), and never propose an aggregate.</li>
+      <li><strong>Recommended-question sets are static per persona for MVP</strong>, not generated per-question by a model call — cheap, deterministic, and avoids inventing a fourth live-model call site under time pressure. A future pass could make them corpus-derived the same way follow-ups are.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

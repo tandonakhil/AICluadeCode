@@ -857,6 +857,27 @@ security work is the five gaps below, not a from-scratch rebuild.
   destroys the evidence that the exposure occurred and the record of how long it
   lasted.
 
+### 6.5 Cross-project key reuse — standing rule, set 2026-08-09
+
+This project has twice now reused a live secret from a sibling project rather
+than requiring the human to generate a fresh one — `ANTHROPIC_API_KEY` from
+`little-milestones` and `OPENAI_API_KEY` from `policy-lookup-assistant`. Both
+were done at the human's explicit direction, copied file-to-file, never
+printed into any conversation or committed. The human then set a **standing
+process rule**, not a one-off:
+
+> The orchestrator may **locate** and report where a usable key exists in
+> another project — that is research, not use. It must obtain **explicit human
+> approval before actually using it** — copying it into this project's `.env`
+> or wiring it into any config. Locating and using are two different actions
+> and the second always needs a fresh yes, even if the first was invited.
+
+This is now the standing rule for any further key reuse on this project, and a
+pattern worth carrying to any project doing the same. It does not relax
+anything above — `.env`-only, never printed, never committed, `SEC-T50`
+scanning full history — it adds a **human checkpoint before the copy**, which
+is upstream of all of those and cannot be satisfied by them after the fact.
+
 ---
 
 ## 7. Provenance and audit — what a defensible record contains

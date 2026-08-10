@@ -572,6 +572,53 @@ code, .mono { font-family: var(--font-mono); font-size: .875em; }
 .qtable tr[data-zero="true"] td { color: var(--ink-3); }
 .qtable .mono { overflow-wrap: anywhere; }
 
+/* ---------- 15b. Persona picker + follow-up suggestions (2026-08-09) - */
+/* A persona biases which recommended questions surface; it never changes
+   what the corpus contains or what the wall permits, so it renders as a
+   plain preference control -- not styled as a login or role switch, which
+   this deliberately is not (ASM-12: session role binding ships, real login
+   does not; the human is always the same MidWestUtilities session). */
+
+.persona-picker {
+  display: flex; gap: .375rem; flex-wrap: wrap; margin: .375rem 0 0;
+}
+.persona-picker__label {
+  font-size: .75rem; color: var(--ink-3); align-self: center; margin-right: .25rem;
+}
+.persona-chip {
+  font: inherit; font-size: .8125rem; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 999px; padding: .3rem .75rem; color: var(--ink-2);
+}
+.persona-chip[aria-pressed="true"] {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
+  font-weight: 600;
+}
+
+/* Follow-up suggestions, after an answer or a refusal. Deliberately built
+   from the corpus index, not the model -- same rule as a refusal's
+   alternatives (ASM-UX-8 as narrowed): capped at two, and each must be a
+   real, individually citable question, never a rephrasing that only works
+   by relaxing the exact dimension that made THIS answer specific. */
+.followups {
+  margin: 1.5rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--rule);
+}
+.followups__label {
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--ink-3); margin: 0 0 .625rem;
+}
+.followups__list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.followups__list li { margin: 0; }
+.followups__list button {
+  font: inherit; text-align: left; width: 100%; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: .625rem .875rem; color: var(--ink-2);
+  display: flex; gap: .625rem; align-items: baseline;
+}
+.followups__list button:before {
+  content: "→"; color: var(--accent); flex: none;
+}
+
 /* ---------- 16. Design-review chrome (NOT part of the product) ------- */
 
 .dr-note {
