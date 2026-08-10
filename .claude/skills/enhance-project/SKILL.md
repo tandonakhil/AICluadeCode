@@ -62,6 +62,15 @@ full procedure — this skill is the thin entry point).
   surface omitted without justification blocks Architecture. On any
   multi-surface project `solution-architect` is non-droppable, so this is not
   waivable by trimming the roster.
+- **Accelerator consultation is mandatory at the mini pipeline's Architecture
+  stage too** (2026-08-08): `solution-architect` reads
+  `accelerators/CATALOGUE.md` and records a **Reuse Decision Table** in
+  `ARCHITECTURE_KB.md` — one row per catalogue entry, decision exactly
+  `reuse` / `adapt` / `build-new`, never "not considered"; a `build-new` with no
+  reason blocks Architecture. Consultation is mandatory, reuse is not, and reuse
+  never lowers the evidence bar. The Impact Analysis must also state which
+  accelerator-derived code this enhancement touches, by slug and version, and
+  whether it creates, widens or closes a local divergence from upstream.
 - **Verification is blocking**: an acceptance criterion from
   `FUNCTIONAL_SPEC.md` with no mapped, executed, passing check is
   `NOT VERIFIED` and routes back to Code, exactly as in `/new-project`.

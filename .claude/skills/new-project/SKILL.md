@@ -151,8 +151,15 @@ agent roster or gate order changes, not left stale.
    roster (content/behavior guardrails — distinct lane from the other two,
    don't let it duplicate their passes). They design around the approved
    plan and experience design, writing `knowledge/ARCHITECTURE_KB.md` /
-   `knowledge/SECURITY_KB.md` / `knowledge/RESPONSIBLE_AI_KB.md`. Stop and
-   wait for approval before Code.
+   `knowledge/SECURITY_KB.md` / `knowledge/RESPONSIBLE_AI_KB.md`.
+   **Accelerator consultation is mandatory here (2026-08-08)**:
+   `solution-architect` reads `accelerators/CATALOGUE.md` and writes a **Reuse
+   Decision Table** into `ARCHITECTURE_KB.md` — one row per catalogue entry,
+   decision exactly `reuse` / `adapt` / `build-new`, never "not considered", and
+   a `build-new` with no reason blocks the gate. Consultation is mandatory;
+   reuse is not — and reuse never lowers the evidence bar, so accelerator-derived
+   code still needs its own acceptance criteria verified in *this* project. Stop
+   and wait for approval before Code.
 
 9. **Code gate**: invoke `code-agent` with the approved plan, functional spec,
    experience design, and architecture. Present a summary of what was
