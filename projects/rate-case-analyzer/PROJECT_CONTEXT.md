@@ -1640,7 +1640,68 @@ the pending case, most likely) but out of scope for this UI feature.
 ## Current Status
 
 App running live at **http://127.0.0.1:8477/** against the real Anthropic
-API. 959 tests, 8 suites, all green. Persona picker and follow-up
-suggestions are both built and verified live. Known follow-up: live-answer
-non-determinism on borderline single-source questions (see above) —
-not yet investigated.
+API. 968 tests, 8 suites, all green. Persona picker (now a home + dashboard
+flow, see below) and follow-up suggestions are both built and verified live.
+Known follow-up: live-answer non-determinism on borderline single-source
+questions (see above) — not yet investigated.
+
+## Persona picker superseded by a home + dashboard flow (2026-08-11)
+
+The human asked for more than the design-review 13 chip toggle: "the persona
+selection [should] be a home page... when you login it should open up a
+dashboard meant for that particular persona," then clarified "just click on
+the persona it should take you to persona page, and give an option on top
+right to switch persona" — plain navigation, not a credentialed login.
+`ASM-12` still holds (session role binding ships, real login does not):
+picking a persona is a URL, not an authentication event.
+
+**Routes** (`app/web/routes.py`, now 4 total, still zero JSON/partial
+endpoints — `ARCH-10` updated and still green):
+- `GET /` — home screen, three persona cards, no persona context yet.
+- `GET /dashboard/{persona}` — that persona's dashboard. Unknown persona
+  redirects to `/` (302) rather than 404 or guessing.
+- `POST /ask` — unchanged answer path; now carries the asking persona
+  through a hidden form field so a rejection re-renders the right dashboard
+  and the resulting answer/refusal screen's app bar shows the right
+  persona-switcher.
+
+**Dashboard content** — the human picked "Full dashboard" when asked
+(greeting, case-at-a-glance, corpus status, recommended questions, ask
+form) over two lighter options. Two new read-only modules built to support
+it, both reading STORED records directly (no live-model call, so nothing on
+the dashboard can refuse or vary between page loads the way a free-form
+answer can):
+- `app/web/case_snapshot.py` — `midwest_snapshot()`, MidWestUtilities' own
+  pending-case figures (ROE, equity ratio, revenue requirement increase),
+  deduped per parameter. Required one new store method,
+  `WorkProductStore.claims_for_case` / the matching `WorkProductRetriever`
+  passthrough — the existing read API only supported claims-by-chunk-ids.
+  Reading directly from `app.web.routes` is in-bounds: `web-never-writes`
+  and `web-never-composes-directly` (`app/boundaries.py`) forbid
+  `app.ingest.writer/stages` and `app.grounding.compose` respectively, not
+  store reads.
+- `app/web/corpus_status.py` — `corpus_status()`, case count + jurisdictions
+  covered across both corpora.
+
+**The old chip-toggle picker (design-review 13) is retired**, not kept
+alongside the new flow — running two competing persona-selection patterns
+at once (inline chips AND page-level routing) would confuse users and
+double the surface to maintain. `ask.html` deleted; its content split
+across the new `home.html` and `dashboard.html`. `.persona-picker` /
+`.persona-chip` / `.persona-questions[hidden]` CSS rules removed;
+`.persona-landing` / `.persona-card` / `.persona-switcher` /
+`.case-snapshot` / `.corpus-status` added (both `rca.css` copies, still
+byte-identical per `ARCH-14`).
+
+**Real bug found via live Playwright verification, not the test suite** (a
+repeat of the same lesson from the chip-toggle build): none. This time the
+suite was updated in step with the routes before the live pass, and the
+live pass confirmed rather than caught anything — recorded here mainly to
+note the pattern held.
+
+959 → 968 tests (`test_case_snapshot.py`'s 4, plus reachability rewrites for
+the new routes). Verified live end-to-end with Playwright: home → pick a
+persona → dashboard (case snapshot showing real MidWestUtilities figures,
+10.20% ROE etc.) → switch persona via the app-bar link → dashboard updates
+→ ask a recommended question → answer/refusal renders with the persona
+switcher intact.
