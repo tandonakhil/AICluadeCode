@@ -1592,10 +1592,55 @@ designed — but **retrieval quality is capped by the offline hash embedder**
 human — real embeddings would need a second key (OpenAI, per
 `ARCHITECTURE_KB.md`'s `text-embedding-3-small` choice) not yet provided.
 
+## Persona picker — built (2026-08-10)
+
+Design-review 13 (approved: "Approved, build it.") implemented in full. The
+app-bar session label is now the static, human-approved fiction "Session:
+MidWestUtilities, Inc." (`ASM-12`: session role binding ships, real login
+does not). A `.persona-picker` with three chips — Regulatory Analyst,
+Strategy Lead, Consultant — sits under the Ask-screen hero; each renders its
+own static recommended-question list (`app/web/personas.py`,
+`PERSONA_QUESTIONS`), and the picker toggles which list is visible via
+`[hidden]`, entirely client-side (`app/web/static/app.js`) — no new route, no
+JSON endpoint, consistent with `AC-F35-07`'s HTML-only surface. The
+Consultant list is the corpus's original curated examples, reused rather
+than duplicated: a consultant surveys the broader market, not
+MidWestUtilities' own file.
+
+**Bug found and fixed before shipping**: the CSS rule added to satisfy
+ARCH-14 ("every template class has a matching CSS rule") —
+`.persona-questions { display: block; }` — has equal specificity to the
+browser's built-in `[hidden] { display: none }` rule, and author stylesheets
+win ties over the UA stylesheet regardless of source order. Net effect: all
+three persona question lists rendered simultaneously, silently defeating the
+picker. Caught only by an actual Playwright screenshot pass, not by the
+(passing) test suite — the reachability test asserted the markup existed and
+was correctly `hidden` server-side, but no test drove the client-side toggle.
+Fixed by scoping the rule to `.persona-questions[hidden] { display: none; }`
+instead of touching the un-hidden state at all. Re-verified with fresh
+screenshots of all three persona states and a full click-through (pick a
+recommended question → auto-fills the textarea → submit → grounded answer
+with follow-ups renders). **5 new tests** (`test_personas.py`'s 4 +
+`test_persona_picker_is_reachable_with_all_three_chips`), **954 → 959 tests,
+8 suites, all green.**
+
+**Observed, not chased further — live-answer non-determinism**: repeated
+identical requests for MidWestUtilities' own pending-case ROE question
+(the exact scenario design-review 13 screen 3 shows) sometimes return the
+correct grounded, cited answer and sometimes a refusal ("supplied evidence
+does not support an answer... combining them would produce a figure that
+describes no real proceeding"), roughly evenly across ~5 repeated identical
+calls. This is a pre-existing property of the live retrieval+compose
+pipeline, not something touched or introduced by this feature — the
+persona picker and follow-ups code paths are unaffected either way, and
+when it does answer, the answer, citation and follow-ups are all correct.
+Worth a follow-up investigation (borderline single-chunk retrieval score for
+the pending case, most likely) but out of scope for this UI feature.
+
 ## Current Status
 
 App running live at **http://127.0.0.1:8477/** against the real Anthropic
-API. 941 tests, 8 suites, all green. Persona-aware recommended questions and
-auto-generated follow-up suggestions requested by the human — scoping next,
-since "persona" needs a definition decision the product doesn't currently
-have an answer to (one fixed session role, no persona selector exists).
+API. 959 tests, 8 suites, all green. Persona picker and follow-up
+suggestions are both built and verified live. Known follow-up: live-answer
+non-determinism on borderline single-source questions (see above) —
+not yet investigated.
